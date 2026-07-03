@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  MENTOR
+  ADMIN
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ContentType {
+  VIDEO
+  TEXT
+  QUIZ
+  ASSIGNMENT
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  FREE
+  UNPAID
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         Role         @default(STUDENT)
+  avatarUrl    String?
+  mentorProfile Mentor?
+  enrollments  Enrollment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Mentor {
+  id            String   @id @default(cuid())
+  user          User?    @relation(fields: [userId], references: [id])
+  userId        String?  @unique
+  name          String
+  bio           String
+  photoUrl      String?
+  specialty     String
+  position      String?
+  linkedinUrl   String?
+  githubUrl     String?
+  telegramUrl   String?
+  order         Int      @default(0)
+  featured      Boolean  @default(false)
+  courses       Course[]
+  blogPosts     BlogPost[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Course {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  title          String
+  subtitle       String?
+  description    String
+  iconKey        String
+  color          String
+  bg             String
+  border         String
+  price          Decimal?
+  isFree         Boolean      @default(true)
+  currency       String       @default("UZS")
+  durationMonths Int
+  level          Level        @default(BEGINNER)
+  rating         Float        @default(0)
+  studentsCount  Int          @default(0)
+  tags           String[]
+  published      Boolean      @default(false)
+  mentor         Mentor?      @relation(fields: [mentorId], references: [id])
+  mentorId       String?
+  modules        Module[]
+  enrollments    Enrollment[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String
+  title       String
+  description String?
+  order       Int
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id              String      @id @default(cuid())
+  module          Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId        String
+  title           String
+  order           Int
+  contentType     ContentType @default(VIDEO)
+  videoUrl        String?
+  content         String?
+  durationMinutes Int?
+  isFreePreview   Boolean     @default(false)
+}
+
+model Partner {
+  id         String   @id @default(cuid())
+  name       String
+  logoUrl    String
+  websiteUrl String?
+  category   String
+  order      Int      @default(0)
+  featured   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model Enrollment {
+  id            String           @id @default(cuid())
+  user          User             @relation(fields: [userId], references: [id])
+  userId        String
+  course        Course           @relation(fields: [courseId], references: [id])
+  courseId      String
+  status        EnrollmentStatus @default(PENDING)
+  paymentStatus PaymentStatus    @default(UNPAID)
+  provider      String?
+  providerRef   String?
+  amountPaid    Decimal?
+  enrolledAt    DateTime         @default(now())
+  completedAt   DateTime?
+
+  @@unique([userId, courseId])
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    MessageStatus @default(NEW)
+  createdAt DateTime      @default(now())
+}
+
+model BlogPost {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  excerpt      String
+  content      String
+  category     String
+  iconKey      String
+  color        String
+  bg           String
+  border       String
+  readMinutes  Int       @default(5)
+  views        Int       @default(0)
+  tags         String[]
+  published    Boolean   @default(false)
+  mentor       Mentor?   @relation(fields: [mentorId], references: [id])
+  mentorId     String?
+  publishedAt  DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
