@@ -2,6 +2,13 @@ import { Request, Response } from 'express';
 import * as mentorsService from '../services/mentors.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
+import { ApiError } from '../utils/ApiError';
+
+export const mentorDashboardHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const dashboard = await mentorsService.getMentorDashboard(req.user.userId);
+  sendSuccess(res, dashboard);
+});
 
 export const listMentorsHandler = asyncHandler(async (_req: Request, res: Response) => {
   const mentors = await mentorsService.listMentors();

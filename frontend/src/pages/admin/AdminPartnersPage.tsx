@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, Building2 } from 'lucide-react';
 import { listPartners, createPartner, updatePartner, deletePartner } from '../../api/partners';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 interface PartnerFormState {
   id?: string | number;
@@ -126,11 +127,14 @@ export default function AdminPartnersPage(): React.ReactElement {
 
   return (
     <div>
-      {!editing && (
-        <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ marginBottom:20 }}>
-          <Plus size={15}/> Yangi hamkor
-        </button>
-      )}
+      <AdminPageHeader title="Hamkorlar" sub="Hamkor tashkilotlarni boshqarish"
+        actions={
+          !editing ? (
+            <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
+              <Plus size={15}/> Yangi hamkor
+            </button>
+          ) : undefined
+        } />
 
       {editing && <PartnerForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 

@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  role?: string;
+  role?: string | string[];
 }
 
 export default function ProtectedRoute({ children, role }: ProtectedRouteProps): React.ReactElement {
@@ -18,8 +18,11 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps):
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (role && user.role !== role) {
-    return <Navigate to="/" replace />;
+  if (role) {
+    const allowed = Array.isArray(role) ? role : [role];
+    if (!allowed.includes(user.role)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

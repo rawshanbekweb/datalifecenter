@@ -4,6 +4,7 @@ import {
   deleteMentorHandler,
   getMentorHandler,
   listMentorsHandler,
+  mentorDashboardHandler,
   updateMentorHandler,
 } from '../controllers/mentors.controller';
 import { authenticate } from '../middleware/authenticate';
@@ -14,6 +15,7 @@ import { createMentorSchema, updateMentorSchema } from '../validators/mentors.va
 const router = Router();
 
 router.get('/', listMentorsHandler);
+router.get('/me/dashboard', authenticate, authorize('MENTOR', 'ADMIN'), mentorDashboardHandler);
 router.post('/', authenticate, authorize('ADMIN'), validateBody(createMentorSchema), createMentorHandler);
 router.get('/:id', getMentorHandler);
 router.put('/:id', authenticate, authorize('ADMIN'), validateBody(updateMentorSchema), updateMentorHandler);

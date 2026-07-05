@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle } from 'lucide-react';
 import { listBlogPostsAdmin, createBlogPost, updateBlogPost, deleteBlogPost } from '../../api/blog';
 import { resolveIcon } from '../../utils/iconMap';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 const ICON_KEYS: string[] = ['BookOpen', 'Shield', 'Map', 'Monitor', 'Server', 'Database', 'Cloud'];
 const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
@@ -188,11 +189,14 @@ export default function AdminBlogPage(): React.ReactElement {
 
   return (
     <div>
-      {!editing && (
-        <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ marginBottom:20 }}>
-          <Plus size={15}/> Yangi maqola
-        </button>
-      )}
+      <AdminPageHeader title="Blog" sub="Maqolalarni yaratish va chop etish"
+        actions={
+          !editing ? (
+            <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
+              <Plus size={15}/> Yangi maqola
+            </button>
+          ) : undefined
+        } />
 
       {editing && <BlogForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 

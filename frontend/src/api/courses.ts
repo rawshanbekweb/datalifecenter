@@ -38,3 +38,33 @@ export function updateCourse(id: string | number, data: unknown): Promise<any> {
 export function deleteCourse(id: string | number): Promise<any> {
   return apiFetch(`/courses/${id}`, { method: 'DELETE' });
 }
+
+export function getCourseLearn(slug: string): Promise<any> {
+  return apiFetch(`/courses/${slug}/learn`);
+}
+
+// ---------- Kurs dasturi (modul/dars) ----------
+
+export function createModule(data: unknown): Promise<any> {
+  return apiFetch('/modules', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export function updateModule(id: string, data: unknown): Promise<any> {
+  return apiFetch(`/modules/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+}
+
+export function deleteModule(id: string): Promise<any> {
+  return apiFetch(`/modules/${id}`, { method: 'DELETE' });
+}
+
+export function createLesson(moduleId: string, data: unknown): Promise<any> {
+  return apiFetch(`/modules/${moduleId}/lessons`, { method: 'POST', body: JSON.stringify(data) });
+}
+
+export function updateLesson(id: string, data: unknown): Promise<any> {
+  return apiFetch(`/lessons/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+}
+
+export function deleteLesson(id: string): Promise<any> {
+  return apiFetch(`/lessons/${id}`, { method: 'DELETE' });
+}

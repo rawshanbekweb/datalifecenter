@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import AdminLayout from './layouts/AdminLayout'
 import HomePage from './pages/HomePage'
@@ -13,8 +13,15 @@ import ContactPage from './pages/ContactPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
+import ProfilePage from './pages/ProfilePage'
+import MentorDashboardPage from './pages/MentorDashboardPage'
+import LearnPage from './pages/LearnPage'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminEnrollmentsPage from './pages/admin/AdminEnrollmentsPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 import AdminMessagesPage from './pages/admin/AdminMessagesPage'
 import AdminCoursesPage from './pages/admin/AdminCoursesPage'
+import AdminCurriculumPage from './pages/admin/AdminCurriculumPage'
 import AdminMentorsPage from './pages/admin/AdminMentorsPage'
 import AdminPartnersPage from './pages/admin/AdminPartnersPage'
 import AdminBlogPage from './pages/admin/AdminBlogPage'
@@ -38,19 +45,25 @@ export const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
-      {
-        path: 'admin',
-        element: <ProtectedRoute role="ADMIN"><AdminLayout /></ProtectedRoute>,
-        children: [
-          { index: true, element: <Navigate to="messages" replace /> },
-          { path: 'messages', element: <AdminMessagesPage /> },
-          { path: 'courses', element: <AdminCoursesPage /> },
-          { path: 'mentors', element: <AdminMentorsPage /> },
-          { path: 'partners', element: <AdminPartnersPage /> },
-          { path: 'blog', element: <AdminBlogPage /> },
-        ],
-      },
+      { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
+      { path: 'mentor', element: <ProtectedRoute role={['MENTOR', 'ADMIN']}><MentorDashboardPage /></ProtectedRoute> },
+      { path: 'learn/:slug', element: <ProtectedRoute><LearnPage /></ProtectedRoute> },
       { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <ProtectedRoute role="ADMIN"><AdminLayout /></ProtectedRoute>,
+    children: [
+      { index: true, element: <AdminDashboardPage /> },
+      { path: 'enrollments', element: <AdminEnrollmentsPage /> },
+      { path: 'users', element: <AdminUsersPage /> },
+      { path: 'messages', element: <AdminMessagesPage /> },
+      { path: 'courses', element: <AdminCoursesPage /> },
+      { path: 'courses/:id/curriculum', element: <AdminCurriculumPage /> },
+      { path: 'mentors', element: <AdminMentorsPage /> },
+      { path: 'partners', element: <AdminPartnersPage /> },
+      { path: 'blog', element: <AdminBlogPage /> },
     ],
   },
 ])

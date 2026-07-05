@@ -6,6 +6,10 @@ import mentorsRoutes from './mentors.routes';
 import partnersRoutes from './partners.routes';
 import enrollmentsRoutes from './enrollments.routes';
 import blogRoutes from './blog.routes';
+import adminRoutes from './admin.routes';
+import usersRoutes from './users.routes';
+import { lessonsRouter, modulesRouter } from './curriculum.routes';
+import progressRoutes from './progress.routes';
 
 const router = Router();
 
@@ -17,5 +21,10 @@ router.use('/mentors', mentorsRoutes);
 router.use('/partners', partnersRoutes);
 router.use('/enrollments', enrollmentsRoutes);
 router.use('/blog', blogRoutes);
+router.use('/admin', adminRoutes);
+router.use('/users', usersRoutes);
+router.use('/modules', modulesRouter);
+router.use('/lessons', lessonsRouter);
+router.use('/progress', progressRoutes);
 
 export default router;

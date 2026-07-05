@@ -11,6 +11,7 @@ export const createMentorSchema = z.object({
   telegramUrl: z.string().optional(),
   featured: z.boolean().default(false),
   order: z.coerce.number().int().default(0),
+  userId: z.string().nullish().or(z.literal('').transform(() => null)),
 });
 
 export const updateMentorSchema = createMentorSchema.partial();

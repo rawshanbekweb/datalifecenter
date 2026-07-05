@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
 import { listContactMessages, updateContactMessageStatus } from '../../api/contact';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 type MessageStatus = 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
 
@@ -52,18 +53,25 @@ export default function AdminMessagesPage(): React.ReactElement {
     }
   };
 
-  if (status === 'loading') return <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>;
-  if (status === 'error') return <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>;
+  const header = <AdminPageHeader title="Xabarlar" sub="Aloqa formasidan kelgan murojaatlar" />;
+
+  if (status === 'loading') return <div>{header}<p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p></div>;
+  if (status === 'error') return <div>{header}<p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p></div>;
   if (messages.length === 0) {
     return (
-      <div className="card" style={{ padding:40, textAlign:'center' }}>
-        <p style={{ color:'#64748b', fontSize:14 }}>Hozircha xabarlar yo'q.</p>
+      <div>
+        {header}
+        <div className="card" style={{ padding:40, textAlign:'center' }}>
+          <p style={{ color:'#64748b', fontSize:14 }}>Hozircha xabarlar yo'q.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+    <div>
+      {header}
+      <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
       {messages.map((m) => {
         const s = STATUS_LABELS[m.status];
         return (
@@ -87,6 +95,7 @@ export default function AdminMessagesPage(): React.ReactElement {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

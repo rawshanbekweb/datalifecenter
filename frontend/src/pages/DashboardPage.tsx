@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, CreditCard } from 'lucide-react';
+import { ArrowRight, Clock, CreditCard, PlayCircle, Settings } from 'lucide-react';
 import { getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
@@ -21,6 +21,7 @@ interface Enrollment {
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: string;
   enrolledAt: string;
+  progress?: { totalLessons: number; completedLessons: number };
 }
 
 interface StatusLabel {
@@ -69,8 +70,29 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
           <p style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#94a3b8' }}>
             <Clock size={12} /> Yozilgan sana: {new Date(enrollment.enrolledAt).toLocaleDateString('uz-UZ')}
           </p>
+          {enrollment.progress && enrollment.progress.totalLessons > 0 && (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED') && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7 }}>
+              <div style={{ flex: 1, maxWidth: 220, height: 6, borderRadius: 99, background: '#fff', border: `1px solid ${enrollment.course.border}`, overflow: 'hidden' }}>
+                <div style={{
+                  width: `${Math.round((enrollment.progress.completedLessons / enrollment.progress.totalLessons) * 100)}%`,
+                  height: '100%', borderRadius: 99,
+                  background: enrollment.status === 'COMPLETED' ? '#16a34a' : enrollment.course.color,
+                }} />
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b', flexShrink: 0 }}>
+                {enrollment.progress.completedLessons}/{enrollment.progress.totalLessons} dars
+              </span>
+            </div>
+          )}
         </div>
       </Link>
+      {(enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED') && (
+        <Link to={`/learn/${enrollment.course.slug}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <button className="btn-primary" style={{ fontSize: 12, padding: '8px 14px' }}>
+            <PlayCircle size={13} /> Davom etish
+          </button>
+        </Link>
+      )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
         <button onClick={simulatePayment} disabled={payStatus === 'loading'} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', opacity: payStatus === 'loading' ? 0.7 : 1 }}>
@@ -99,9 +121,18 @@ export default function DashboardPage(): React.ReactElement {
     <section className="section-light" style={{ padding: '160px 0 104px' }}>
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 36 }}>
-          <span className="pill">Shaxsiy kabinet</span>
-          <h1 className="h-section" style={{ marginBottom: 6 }}>Xush kelibsiz, <span className="accent">{user?.name?.split(' ')[0]}</span></h1>
-          <p className="sub" style={{ textAlign: 'left' }}>Kurslaringiz va o'quv jarayoningiz shu yerda</p>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 240 }}>
+              <span className="pill">Shaxsiy kabinet</span>
+              <h1 className="h-section" style={{ marginBottom: 6 }}>Xush kelibsiz, <span className="accent">{user?.name?.split(' ')[0]}</span></h1>
+              <p className="sub" style={{ textAlign: 'left' }}>Kurslaringiz va o'quv jarayoningiz shu yerda</p>
+            </div>
+            <Link to="/profile" style={{ textDecoration: 'none' }}>
+              <button className="btn-outline" style={{ fontSize: 13 }}>
+                <Settings size={14} /> Profil sozlamalari
+              </button>
+            </Link>
+          </div>
         </motion.div>
 
         {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}

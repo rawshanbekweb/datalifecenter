@@ -63,3 +63,33 @@ export async function getMe(userId: string) {
   }
   return toPublicUser(user);
 }
+
+interface UpdateProfileInput {
+  name?: string;
+  phone?: string | null;
+  avatarUrl?: string | null;
+}
+
+export async function updateProfile(userId: string, input: UpdateProfileInput) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw ApiError.notFound('Foydalanuvchi topilmadi');
+  }
+  const updated = await prisma.user.update({ where: { id: userId }, data: input });
+  return toPublicUser(updated);
+}
+
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw ApiError.notFound('Foydalanuvchi topilmadi');
+  }
+
+  const valid = await comparePassword(currentPassword, user.passwordHash);
+  if (!valid) {
+    throw ApiError.unauthorized("Joriy parol noto'g'ri", 'INVALID_CURRENT_PASSWORD');
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+}

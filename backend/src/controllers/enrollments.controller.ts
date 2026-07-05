@@ -16,6 +16,23 @@ export const myEnrollmentsHandler = asyncHandler(async (req: Request, res: Respo
   sendSuccess(res, enrollments);
 });
 
+export const listEnrollmentsAdminHandler = asyncHandler(async (req: Request, res: Response) => {
+  const filters = req.validatedQuery as {
+    status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+    paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REFUNDED';
+    search?: string;
+    page: number;
+    limit: number;
+  };
+  const result = await enrollmentsService.listEnrollmentsAdmin(filters);
+  sendSuccess(res, result);
+});
+
+export const updateEnrollmentAdminHandler = asyncHandler(async (req: Request, res: Response) => {
+  const enrollment = await enrollmentsService.updateEnrollmentAdmin(req.params.id as string, req.body);
+  sendSuccess(res, enrollment);
+});
+
 export const mockPayHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
   const enrollment = await enrollmentsService.mockPayEnrollment(req.user.userId, req.params.id as string);

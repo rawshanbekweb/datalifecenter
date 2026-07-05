@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as coursesService from '../services/courses.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
+import { ApiError } from '../utils/ApiError';
 
 export const listCoursesHandler = asyncHandler(async (req: Request, res: Response) => {
   const filters = req.validatedQuery as unknown as {
@@ -18,6 +19,16 @@ export const listCoursesHandler = asyncHandler(async (req: Request, res: Respons
 export const getCourseHandler = asyncHandler(async (req: Request, res: Response) => {
   const course = await coursesService.getCourseBySlug(req.params.slug as string);
   sendSuccess(res, course);
+});
+
+export const getCourseLearnHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const result = await coursesService.getCourseForLearning(
+    req.params.slug as string,
+    req.user.userId,
+    req.user.role
+  );
+  sendSuccess(res, result);
 });
 
 export const listCoursesAdminHandler = asyncHandler(async (_req: Request, res: Response) => {

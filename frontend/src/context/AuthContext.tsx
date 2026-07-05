@@ -38,8 +38,12 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     setUser(null);
   }, []);
 
+  const applyUser = useCallback((updated: User): void => {
+    setUser(updated);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, applyUser }}>
       {children}
     </AuthContext.Provider>
   );

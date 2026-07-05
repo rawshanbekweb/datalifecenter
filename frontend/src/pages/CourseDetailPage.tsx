@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, Star, Users, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
 import { getCourseBySlug } from '../api/courses';
-import { createEnrollment, mockPayEnrollment } from '../api/enrollments';
+import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import ComingSoon from '../components/common/ComingSoon';
@@ -52,6 +52,7 @@ interface CourseDetail {
 interface Enrollment {
   id: string | number;
   paymentStatus: string;
+  status?: string;
   [key: string]: unknown;
 }
 
@@ -79,6 +80,23 @@ export default function CourseDetailPage(): React.ReactElement {
       .catch((err) => { if (!cancelled) setStatus(err.status === 404 ? 'not-found' : 'error'); });
     return () => { cancelled = true; };
   }, [slug]);
+
+  // Foydalanuvchi bu kursga yozilganmi — sahifa ochilganda aniqlaymiz
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    getMyEnrollments()
+      .then((list: Enrollment[]) => {
+        if (cancelled) return;
+        const found = list.find((e) => (e.course as { slug?: string } | undefined)?.slug === slug);
+        if (found) {
+          setEnrollment(found);
+          setEnrollStatus(found.status === 'PENDING' ? 'success' : 'already');
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user, slug]);
 
   if (status === 'loading') {
     return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</section>;
@@ -195,9 +213,16 @@ export default function CourseDetailPage(): React.ReactElement {
               )}
 
               {user && enrollStatus === 'success' && enrollment && enrollment.paymentStatus !== 'UNPAID' && (
-                <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0' }}>
-                  <CheckCircle size={18} style={{ color:'#16a34a', flexShrink:0 }} />
-                  <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>Muvaffaqiyatli yozildingiz!</p>
+                <div>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0', marginBottom:14 }}>
+                    <CheckCircle size={18} style={{ color:'#16a34a', flexShrink:0 }} />
+                    <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>Muvaffaqiyatli yozildingiz!</p>
+                  </div>
+                  <Link to={`/learn/${slug}`}>
+                    <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
+                      <PlayCircle size={15}/> Darslarni boshlash
+                    </button>
+                  </Link>
                 </div>
               )}
               {user && enrollStatus === 'success' && enrollment && enrollment.paymentStatus === 'UNPAID' && (
@@ -215,17 +240,31 @@ export default function CourseDetailPage(): React.ReactElement {
                     </button>
                   )}
                   {import.meta.env.DEV && payStatus === 'success' && (
-                    <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0' }}>
-                      <CheckCircle size={18} style={{ color:'#16a34a', flexShrink:0 }} />
-                      <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>To'lov tasdiqlandi (dev simulyatsiya) — kurs faollashtirildi!</p>
+                    <div>
+                      <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0', marginBottom:14 }}>
+                        <CheckCircle size={18} style={{ color:'#16a34a', flexShrink:0 }} />
+                        <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>To'lov tasdiqlandi (dev simulyatsiya) — kurs faollashtirildi!</p>
+                      </div>
+                      <Link to={`/learn/${slug}`}>
+                        <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
+                          <PlayCircle size={15}/> Darslarni boshlash
+                        </button>
+                      </Link>
                     </div>
                   )}
                 </div>
               )}
               {user && enrollStatus === 'already' && (
-                <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0f9ff', border:'1.5px solid #bae6fd' }}>
-                  <CheckCircle size={18} style={{ color:'#0ea5e9', flexShrink:0 }} />
-                  <p style={{ fontSize:13, color:'#0ea5e9', fontWeight:600 }}>Siz bu kursga allaqachon yozilgansiz.</p>
+                <div>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0f9ff', border:'1.5px solid #bae6fd', marginBottom:14 }}>
+                    <CheckCircle size={18} style={{ color:'#0ea5e9', flexShrink:0 }} />
+                    <p style={{ fontSize:13, color:'#0ea5e9', fontWeight:600 }}>Siz bu kursga allaqachon yozilgansiz.</p>
+                  </div>
+                  <Link to={`/learn/${slug}`}>
+                    <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
+                      <PlayCircle size={15}/> Darslarni davom ettirish
+                    </button>
+                  </Link>
                 </div>
               )}
               {user && (enrollStatus === 'idle' || enrollStatus === 'loading' || enrollStatus === 'error') && (

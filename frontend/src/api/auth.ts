@@ -28,3 +28,14 @@ export function logoutUser(): Promise<any> {
 export function fetchMe(): Promise<any> {
   return apiFetch('/auth/me');
 }
+
+export function updateProfile(data: { name?: string; phone?: string | null }): Promise<any> {
+  return apiFetch('/auth/me', { method: 'PATCH', body: JSON.stringify(data) });
+}
+
+export function changePassword(currentPassword: string, newPassword: string): Promise<any> {
+  return apiFetch('/auth/me/password', {
+    method: 'PATCH',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}

@@ -34,3 +34,15 @@ export const meHandler = asyncHandler(async (req: Request, res: Response) => {
   const user = await authService.getMe(req.user.userId);
   sendSuccess(res, user);
 });
+
+export const updateProfileHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const user = await authService.updateProfile(req.user.userId, req.body);
+  sendSuccess(res, user);
+});
+
+export const changePasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  await authService.changePassword(req.user.userId, req.body.currentPassword, req.body.newPassword);
+  sendSuccess(res, { message: "Parol o'zgartirildi" });
+});

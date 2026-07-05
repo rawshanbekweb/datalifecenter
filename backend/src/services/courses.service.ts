@@ -78,11 +78,60 @@ export async function listCoursesAdmin() {
 }
 
 export async function getCourseByIdAdmin(id: string) {
-  const course = await prisma.course.findUnique({ where: { id } });
+  const course = await prisma.course.findUnique({
+    where: { id },
+    include: {
+      mentor: { select: { id: true, name: true } },
+      modules: {
+        orderBy: { order: 'asc' },
+        include: { lessons: { orderBy: { order: 'asc' } } },
+      },
+    },
+  });
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
   }
   return course;
+}
+
+export async function getCourseForLearning(slug: string, userId: string, role: string) {
+  const course = await prisma.course.findFirst({
+    where: { slug, published: true },
+    include: {
+      mentor: true,
+      modules: {
+        orderBy: { order: 'asc' },
+        include: { lessons: { orderBy: { order: 'asc' } } },
+      },
+    },
+  });
+
+  if (!course) {
+    throw ApiError.notFound('Kurs topilmadi');
+  }
+
+  let enrollment = null;
+  if (role !== 'ADMIN') {
+    enrollment = await prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId, courseId: course.id } },
+    });
+    if (!enrollment) {
+      throw ApiError.forbidden("Siz bu kursga yozilmagansiz", 'NOT_ENROLLED');
+    }
+    if (enrollment.status === 'PENDING') {
+      throw ApiError.forbidden("Yozilishingiz hali tasdiqlanmagan — to'lov kutilmoqda", 'ENROLLMENT_PENDING');
+    }
+    if (enrollment.status === 'CANCELLED') {
+      throw ApiError.forbidden('Yozilishingiz bekor qilingan', 'ENROLLMENT_CANCELLED');
+    }
+  }
+
+  const progress = await prisma.lessonProgress.findMany({
+    where: { userId, lesson: { module: { courseId: course.id } } },
+    select: { lessonId: true },
+  });
+
+  return { course, enrollment, completedLessonIds: progress.map((p) => p.lessonId) };
 }
 
 async function uniqueSlug(title: string, excludeId?: string): Promise<string> {

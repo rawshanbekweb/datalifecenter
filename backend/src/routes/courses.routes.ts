@@ -4,6 +4,7 @@ import {
   deleteCourseHandler,
   getCourseAdminHandler,
   getCourseHandler,
+  getCourseLearnHandler,
   listCoursesAdminHandler,
   listCoursesHandler,
   updateCourseHandler,
@@ -22,6 +23,7 @@ router.put('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseSc
 router.delete('/:id', authenticate, authorize('ADMIN'), deleteCourseHandler);
 
 router.get('/', validateQuery(listCoursesQuerySchema), listCoursesHandler);
+router.get('/:slug/learn', authenticate, getCourseLearnHandler);
 router.get('/:slug', getCourseHandler);
 
 export default router;

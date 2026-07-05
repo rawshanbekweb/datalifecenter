@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Pencil, Trash2, AlertCircle, ListTree } from 'lucide-react';
 import { listCoursesAdmin, createCourse, updateCourse, deleteCourse } from '../../api/courses';
 import { listMentors } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 const ICON_KEYS: string[] = ['Monitor', 'Server', 'Shield', 'Smartphone', 'Database', 'Cloud', 'BookOpen'];
 const LEVELS: { value: string; label: string }[] = [
@@ -222,11 +224,14 @@ export default function AdminCoursesPage(): React.ReactElement {
 
   return (
     <div>
-      {!editing && (
-        <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ marginBottom:20 }}>
-          <Plus size={15}/> Yangi kurs
-        </button>
-      )}
+      <AdminPageHeader title="Kurslar" sub="Kurslarni yaratish, tahrirlash va dasturini boshqarish"
+        actions={
+          !editing ? (
+            <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
+              <Plus size={15}/> Yangi kurs
+            </button>
+          ) : undefined
+        } />
 
       {editing && (
         <CourseForm initial={editing} mentors={mentors} onCancel={() => setEditing(null)}
@@ -254,6 +259,10 @@ export default function AdminCoursesPage(): React.ReactElement {
                 <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#f8fafc', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8' }}>
                   {c.published ? 'Chop etilgan' : 'Qoralama'}
                 </span>
+                <Link to={`/admin/courses/${c.id}/curriculum`} title="Kurs dasturi (modul/darslar)"
+                  style={{ display:'flex', alignItems:'center', gap:6, height:32, padding:'0 10px', borderRadius:8, border:'1px solid #bae6fd', background:'#f0f9ff', color:'#0ea5e9', fontSize:12, fontWeight:700, textDecoration:'none' }}>
+                  <ListTree size={14}/> Dastur
+                </Link>
                 <button onClick={() => startEdit(c)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                   <Pencil size={14}/>
                 </button>

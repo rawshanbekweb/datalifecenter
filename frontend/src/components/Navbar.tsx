@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, LogOut, ShieldCheck } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import React from 'react';
 
@@ -90,8 +90,13 @@ export default function Navbar(): React.ReactElement {
             {user ? (
               <>
                 {user.role === 'ADMIN' && (
-                  <Link to="/admin/messages" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#9333ea' }}>
+                  <Link to="/admin" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#9333ea' }}>
                     <ShieldCheck size={16}/> Admin
+                  </Link>
+                )}
+                {user.role === 'MENTOR' && (
+                  <Link to="/mentor" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#9333ea' }}>
+                    <GraduationCap size={16}/> Mentor
                   </Link>
                 )}
                 <Link to="/dashboard" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>
@@ -133,9 +138,16 @@ export default function Navbar(): React.ReactElement {
             {user ? (
               <>
                 {user.role === 'ADMIN' && (
-                  <MotionLink to="/admin/messages" onClick={() => setOpen(false)}>
+                  <MotionLink to="/admin" onClick={() => setOpen(false)}>
                     <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#9333ea', borderColor:'#e9d5ff' }}>
                       <ShieldCheck size={15}/> Admin panel
+                    </button>
+                  </MotionLink>
+                )}
+                {user.role === 'MENTOR' && (
+                  <MotionLink to="/mentor" onClick={() => setOpen(false)}>
+                    <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#9333ea', borderColor:'#e9d5ff' }}>
+                      <GraduationCap size={15}/> Mentor kabineti
                     </button>
                   </MotionLink>
                 )}

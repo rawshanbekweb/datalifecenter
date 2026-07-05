@@ -23,3 +23,7 @@ export function updateMentor(id: string | number, data: unknown): Promise<any> {
 export function deleteMentor(id: string | number): Promise<any> {
   return apiFetch(`/mentors/${id}`, { method: 'DELETE' });
 }
+
+export function getMentorDashboard(): Promise<any> {
+  return apiFetch('/mentors/me/dashboard');
+}

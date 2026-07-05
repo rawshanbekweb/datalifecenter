@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, Trash2, AlertCircle, UserCheck } from 'lucide-react';
 import { listMentors, createMentor, updateMentor, deleteMentor } from '../../api/mentors';
+import { listUsers, AdminUser } from '../../api/users';
+import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 interface MentorFormState {
   id?: string | number;
@@ -12,6 +14,7 @@ interface MentorFormState {
   githubUrl: string;
   telegramUrl: string;
   featured: boolean;
+  userId: string;
 }
 
 interface Mentor {
@@ -24,13 +27,14 @@ interface Mentor {
   githubUrl?: string | null;
   telegramUrl?: string | null;
   featured: boolean;
+  userId?: string | null;
   courses?: { id: string | number }[];
   [key: string]: unknown;
 }
 
 type Status = 'loading' | 'ready' | 'error';
 
-const emptyForm: MentorFormState = { name:'', bio:'', specialty:'', photoUrl:'', linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false };
+const emptyForm: MentorFormState = { name:'', bio:'', specialty:'', photoUrl:'', linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false, userId:'' };
 
 function initials(name: string): string {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -38,11 +42,12 @@ function initials(name: string): string {
 
 interface MentorFormProps {
   initial: MentorFormState;
+  users: AdminUser[];
   onCancel: () => void;
   onSaved: () => void;
 }
 
-function MentorForm({ initial, onCancel, onSaved }: MentorFormProps): React.ReactElement {
+function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): React.ReactElement {
   const [form, setForm]     = useState<MentorFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -56,11 +61,12 @@ function MentorForm({ initial, onCancel, onSaved }: MentorFormProps): React.Reac
   const submit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setStatus('loading');
+    const payload = { ...form, userId: form.userId || null };
     try {
       if (form.id) {
-        await updateMentor(form.id, form);
+        await updateMentor(form.id, payload);
       } else {
-        await createMentor(form);
+        await createMentor(payload);
       }
       onSaved();
     } catch (err: any) {
@@ -109,6 +115,19 @@ function MentorForm({ initial, onCancel, onSaved }: MentorFormProps): React.Reac
           <input className="inp" value={form.telegramUrl} onChange={change('telegramUrl')} />
         </div>
       </div>
+      <div>
+        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>
+          Platformadagi hisobi (mentor kabinetiga kirish uchun)
+        </label>
+        <select className="inp" value={form.userId}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm((f) => ({ ...f, userId: e.target.value }))}>
+          <option value="">Bog'lanmagan</option>
+          {users.map((u) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
+        </select>
+        <p style={{ fontSize:11, color:'#94a3b8', marginTop:4 }}>
+          Foydalanuvchiga avval "Foydalanuvchilar" bo'limida MENTOR roli berilishi tavsiya etiladi.
+        </p>
+      </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
         <input type="checkbox" checked={form.featured} onChange={change('featured')} /> Tavsiya etilgan (birinchi ko'rsatiladi)
       </label>
@@ -124,12 +143,15 @@ function MentorForm({ initial, onCancel, onSaved }: MentorFormProps): React.Reac
 
 export default function AdminMentorsPage(): React.ReactElement {
   const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [users, setUsers]     = useState<AdminUser[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
   const [editing, setEditing] = useState<MentorFormState | null>(null);
 
   const load = (): void => {
     setStatus('loading');
-    listMentors().then((data) => { setMentors(data as Mentor[]); setStatus('ready'); }).catch(() => setStatus('error'));
+    Promise.all([listMentors(), listUsers({ limit: 100 })])
+      .then(([m, u]) => { setMentors(m as Mentor[]); setUsers(u.items); setStatus('ready'); })
+      .catch(() => setStatus('error'));
   };
 
   useEffect(load, []);
@@ -137,7 +159,7 @@ export default function AdminMentorsPage(): React.ReactElement {
   const startEdit = (m: Mentor): void => setEditing({
     id: m.id, name: m.name, bio: m.bio, specialty: m.specialty,
     photoUrl: m.photoUrl || '', linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
-    featured: m.featured,
+    featured: m.featured, userId: m.userId || '',
   });
 
   const remove = async (id: string | number): Promise<void> => {
@@ -152,13 +174,16 @@ export default function AdminMentorsPage(): React.ReactElement {
 
   return (
     <div>
-      {!editing && (
-        <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ marginBottom:20 }}>
-          <Plus size={15}/> Yangi mentor
-        </button>
-      )}
+      <AdminPageHeader title="Mentorlar" sub="O'qituvchilar jamoasini boshqarish"
+        actions={
+          !editing ? (
+            <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
+              <Plus size={15}/> Yangi mentor
+            </button>
+          ) : undefined
+        } />
 
-      {editing && <MentorForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
+      {editing && <MentorForm initial={editing} users={users} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
       {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
@@ -174,6 +199,11 @@ export default function AdminMentorsPage(): React.ReactElement {
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{m.name}</p>
                 <p style={{ fontSize:12, color:'#94a3b8' }}>{m.specialty} · {m.courses?.length || 0} kurs</p>
               </div>
+              {m.userId && (
+                <span className="tag" style={{ display:'flex', alignItems:'center', gap:5, background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a' }}>
+                  <UserCheck size={11}/> Hisob bog'langan
+                </span>
+              )}
               {m.featured && <span className="tag" style={{ background:'#faf5ff', borderColor:'#e9d5ff', color:'#9333ea' }}>Tavsiya</span>}
               <button onClick={() => startEdit(m)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                 <Pencil size={14}/>
