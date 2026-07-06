@@ -5,6 +5,7 @@ import {
   getMentorHandler,
   listMentorsHandler,
   mentorDashboardHandler,
+  mentorStudentsHandler,
   updateMentorHandler,
 } from '../controllers/mentors.controller';
 import { authenticate } from '../middleware/authenticate';
@@ -16,6 +17,7 @@ const router = Router();
 
 router.get('/', listMentorsHandler);
 router.get('/me/dashboard', authenticate, authorize('MENTOR', 'ADMIN'), mentorDashboardHandler);
+router.get('/me/students', authenticate, authorize('MENTOR', 'ADMIN'), mentorStudentsHandler);
 router.post('/', authenticate, authorize('ADMIN'), validateBody(createMentorSchema), createMentorHandler);
 router.get('/:id', getMentorHandler);
 router.put('/:id', authenticate, authorize('ADMIN'), validateBody(updateMentorSchema), updateMentorHandler);

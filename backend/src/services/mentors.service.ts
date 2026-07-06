@@ -107,6 +107,68 @@ export async function getMentorDashboard(userId: string) {
   return { mentor, recentEnrollments, stats: { totalStudents, activeStudents, coursesCount: mentor.courses.length } };
 }
 
+// Mentor kurslaridagi talabalar va ularning dars progressi
+export async function getMentorStudents(userId: string) {
+  const mentor = await prisma.mentor.findUnique({
+    where: { userId },
+    select: { id: true, courses: { select: { id: true } } },
+  });
+
+  if (!mentor) {
+    throw ApiError.notFound(
+      "Sizning hisobingizga mentor profili bog'lanmagan. Administratorga murojaat qiling.",
+      'MENTOR_NOT_LINKED'
+    );
+  }
+
+  const courseIds = mentor.courses.map((c) => c.id);
+  if (!courseIds.length) return [];
+
+  const enrollments = await prisma.enrollment.findMany({
+    where: { courseId: { in: courseIds }, status: { in: ['ACTIVE', 'COMPLETED'] } },
+    orderBy: { enrolledAt: 'desc' },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      course: { select: { id: true, title: true, slug: true } },
+    },
+  });
+  if (!enrollments.length) return [];
+
+  // Har bir kursdagi jami darslar soni (modul orqali)
+  const modules = await prisma.module.findMany({
+    where: { courseId: { in: courseIds } },
+    select: { courseId: true, _count: { select: { lessons: true } } },
+  });
+  const totalByCourse = new Map<string, number>();
+  for (const m of modules) {
+    totalByCourse.set(m.courseId, (totalByCourse.get(m.courseId) ?? 0) + m._count.lessons);
+  }
+
+  // Har bir talaba+kurs bo'yicha tugatilgan darslar
+  const userIds = [...new Set(enrollments.map((e) => e.user.id))];
+  const progressRows = await prisma.lessonProgress.findMany({
+    where: { userId: { in: userIds }, lesson: { module: { courseId: { in: courseIds } } } },
+    select: { userId: true, lesson: { select: { module: { select: { courseId: true } } } } },
+  });
+  const completedByUserCourse = new Map<string, number>();
+  for (const p of progressRows) {
+    const key = `${p.userId}:${p.lesson.module.courseId}`;
+    completedByUserCourse.set(key, (completedByUserCourse.get(key) ?? 0) + 1);
+  }
+
+  return enrollments.map((e) => ({
+    id: e.id,
+    status: e.status,
+    enrolledAt: e.enrolledAt,
+    user: e.user,
+    course: e.course,
+    progress: {
+      totalLessons: totalByCourse.get(e.course.id) ?? 0,
+      completedLessons: completedByUserCourse.get(`${e.user.id}:${e.course.id}`) ?? 0,
+    },
+  }));
+}
+
 export async function deleteMentor(id: string) {
   const mentor = await prisma.mentor.findUnique({ where: { id } });
   if (!mentor) {

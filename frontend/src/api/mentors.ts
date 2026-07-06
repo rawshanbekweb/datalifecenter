@@ -27,3 +27,7 @@ export function deleteMentor(id: string | number): Promise<any> {
 export function getMentorDashboard(): Promise<any> {
   return apiFetch('/mentors/me/dashboard');
 }
+
+export function getMentorStudents(): Promise<any> {
+  return apiFetch('/mentors/me/students');
+}

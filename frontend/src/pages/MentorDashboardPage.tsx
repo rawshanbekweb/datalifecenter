@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, GraduationCap, ArrowRight, AlertCircle } from 'lucide-react';
-import { getMentorDashboard } from '../api/mentors';
+import { BookOpen, Users, GraduationCap, ArrowRight, AlertCircle, TrendingUp } from 'lucide-react';
+import { getMentorDashboard, getMentorStudents } from '../api/mentors';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import MentorSessionsPanel from '../components/sessions/MentorSessionsPanel';
@@ -36,6 +36,15 @@ interface MentorDashboardData {
   stats: { totalStudents: number; activeStudents: number; coursesCount: number };
 }
 
+interface StudentProgressRow {
+  id: string;
+  status: string;
+  enrolledAt: string;
+  user: { id: string; name: string; email: string };
+  course: { id: string; title: string; slug: string };
+  progress: { totalLessons: number; completedLessons: number };
+}
+
 const STATUS_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
   PENDING:   { label: 'Kutilmoqda',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
   ACTIVE:    { label: 'Faol',           color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
@@ -48,6 +57,7 @@ export default function MentorDashboardPage(): React.ReactElement {
   const [data, setData]     = useState<MentorDashboardData | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [students, setStudents] = useState<StudentProgressRow[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +68,9 @@ export default function MentorDashboardPage(): React.ReactElement {
         setErrorMsg(err.message || '');
         setStatus(err.code === 'MENTOR_NOT_LINKED' ? 'not-linked' : 'error');
       });
+    getMentorStudents()
+      .then((rows: StudentProgressRow[]) => { if (!cancelled) setStudents(rows); })
+      .catch(() => { /* bo'lim shunchaki ko'rinmaydi */ });
     return () => { cancelled = true; };
   }, []);
 
@@ -132,6 +145,46 @@ export default function MentorDashboardPage(): React.ReactElement {
                 );
               })}
             </div>
+
+            {students.length > 0 && (
+              <>
+                <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14, display:'flex', alignItems:'center', gap:8 }}>
+                  <TrendingUp size={17} style={{ color:'#9333ea' }} /> Talabalar progressi
+                </h2>
+                <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:32 }}>
+                  {students.map((row) => {
+                    const pct = row.progress.totalLessons > 0
+                      ? Math.round((row.progress.completedLessons / row.progress.totalLessons) * 100)
+                      : 0;
+                    const done = row.status === 'COMPLETED';
+                    return (
+                      <div key={row.id} className="card" style={{ padding:'14px 16px', display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
+                        <div style={{ flex:'1 1 180px', minWidth:0 }}>
+                          <p style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{row.user.name}</p>
+                          <p style={{ fontSize:11.5, color:'#94a3b8' }}>{row.course.title}</p>
+                        </div>
+                        <div style={{ flex:'2 1 220px', display:'flex', alignItems:'center', gap:10, minWidth:0 }}>
+                          <div style={{ flex:1, height:7, borderRadius:99, background:'#f1f5f9', border:'1px solid #e2e8f0', overflow:'hidden' }}>
+                            <div style={{ width:`${pct}%`, height:'100%', borderRadius:99, background: done ? '#16a34a' : '#9333ea' }} />
+                          </div>
+                          <span style={{ fontSize:11.5, fontWeight:800, color: done ? '#16a34a' : '#475569', flexShrink:0, minWidth:74, textAlign:'right' }}>
+                            {row.progress.completedLessons}/{row.progress.totalLessons} · {pct}%
+                          </span>
+                        </div>
+                        <span className="tag" style={{
+                          background: done ? '#f0fdf4' : '#faf5ff',
+                          borderColor: done ? '#bbf7d0' : '#e9d5ff',
+                          color: done ? '#16a34a' : '#9333ea',
+                          fontWeight:700, flexShrink:0,
+                        }}>
+                          {done ? 'Yakunladi' : "O'qimoqda"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
             <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>Oxirgi yozilishlar</h2>
             {data.recentEnrollments.length === 0 && (

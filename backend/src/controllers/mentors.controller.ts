@@ -10,6 +10,12 @@ export const mentorDashboardHandler = asyncHandler(async (req: Request, res: Res
   sendSuccess(res, dashboard);
 });
 
+export const mentorStudentsHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const students = await mentorsService.getMentorStudents(req.user.userId);
+  sendSuccess(res, students);
+});
+
 export const listMentorsHandler = asyncHandler(async (_req: Request, res: Response) => {
   const mentors = await mentorsService.listMentors();
   sendSuccess(res, mentors);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, CreditCard, PlayCircle, Settings } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Clock, CreditCard, PlayCircle, Settings, TrendingUp } from 'lucide-react';
 import { getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
@@ -137,6 +137,37 @@ export default function DashboardPage(): React.ReactElement {
         </motion.div>
 
         <UpcomingSessionsPanel />
+
+        {status === 'ready' && enrollments.length > 0 && (() => {
+          const active = enrollments.filter((e) => e.status === 'ACTIVE').length;
+          const completed = enrollments.filter((e) => e.status === 'COMPLETED').length;
+          const withProgress = enrollments.filter((e) => e.progress && e.progress.totalLessons > 0);
+          const doneLessons = withProgress.reduce((sum, e) => sum + (e.progress?.completedLessons ?? 0), 0);
+          const totalLessons = withProgress.reduce((sum, e) => sum + (e.progress?.totalLessons ?? 0), 0);
+          const overallPct = totalLessons > 0 ? Math.round((doneLessons / totalLessons) * 100) : 0;
+          const cards = [
+            { label: 'Faol kurslar',        value: String(active),                       icon: BookOpen,     color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+            { label: 'Yakunlangan kurslar', value: String(completed),                    icon: CheckCircle2, color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+            { label: 'Tugatilgan darslar',  value: `${doneLessons}/${totalLessons}`,     icon: PlayCircle,   color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
+            { label: 'Umumiy progress',     value: `${overallPct}%`,                     icon: TrendingUp,   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+          ];
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14, marginBottom: 28 }}>
+              {cards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <div key={card.label} className="card" style={{ padding: 20, background: card.bg, border: `1.5px solid ${card.border}` }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: `1.5px solid ${card.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                      <Icon size={16} style={{ color: card.color }} />
+                    </div>
+                    <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{card.value}</p>
+                    <p style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', marginTop: 5 }}>{card.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
         {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>Ma'lumotlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.</p>}
