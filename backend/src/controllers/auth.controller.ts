@@ -5,10 +5,13 @@ import { sendSuccess } from '../utils/ApiResponse';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 
+// Production'da frontend (vercel.app) va backend (onrender.com) turli saytlarda —
+// krossdomen cookie faqat SameSite=None; Secure bilan ishlaydi. Lokalda 'lax' qoladi.
+const isProd = env.NODE_ENV === 'production';
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  sameSite: 'lax',
-  secure: env.NODE_ENV === 'production',
+  sameSite: isProd ? 'none' : 'lax',
+  secure: isProd,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
