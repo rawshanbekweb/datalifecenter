@@ -1,4 +1,5 @@
 import { apiFetch } from './client';
+import { API_URL } from './config';
 
 export function createEnrollment(courseId: string | number): Promise<any> {
   return apiFetch('/enrollments', { method: 'POST', body: JSON.stringify({ courseId }) });
@@ -10,6 +11,31 @@ export function getMyEnrollments(): Promise<any> {
 
 export function mockPayEnrollment(enrollmentId: string | number): Promise<any> {
   return apiFetch(`/enrollments/${enrollmentId}/mock-pay`, { method: 'POST' });
+}
+
+export function submitReceipt(enrollmentId: string, receiptUrl: string): Promise<any> {
+  return apiFetch(`/enrollments/${enrollmentId}/receipt`, {
+    method: 'POST',
+    body: JSON.stringify({ receiptUrl }),
+  });
+}
+
+// PDF'ni blob sifatida olib, brauzerda yuklab olishni boshlaydi
+export async function downloadCertificate(enrollmentId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/enrollments/${enrollmentId}/certificate`, { credentials: 'include' });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error?.message || "Sertifikatni yuklab bo'lmadi");
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sertifikat-DL-${String(enrollmentId).slice(-8).toUpperCase()}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 export interface ListEnrollmentsAdminParams {

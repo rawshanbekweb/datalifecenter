@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, BookOpen, CheckCircle2, Clock, CreditCard, PlayCircle, Settings, TrendingUp } from 'lucide-react';
-import { getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp } from 'lucide-react';
+import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
+import FileUpload from '../components/common/FileUpload';
+import { PAYMENT_INFO } from '../config/payment';
 
 interface CourseInfo {
   iconKey: string;
@@ -14,6 +16,9 @@ interface CourseInfo {
   bg: string;
   border: string;
   color: string;
+  isFree?: boolean;
+  price?: string | number | null;
+  currency?: string;
 }
 
 interface Enrollment {
@@ -21,6 +26,7 @@ interface Enrollment {
   course: CourseInfo;
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: string;
+  receiptUrl?: string | null;
   enrolledAt: string;
   progress?: { totalLessons: number; completedLessons: number };
 }
@@ -46,8 +52,15 @@ interface EnrollmentRowProps {
 
 function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactElement {
   const [payStatus, setPayStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [payOpen, setPayOpen]     = useState<boolean>(false);
+  const [receiptUrl, setReceiptUrl] = useState<string>('');
+  const [receiptState, setReceiptState] = useState<'idle' | 'sending' | 'error'>('idle');
+  const [certState, setCertState] = useState<'idle' | 'loading' | 'error'>('idle');
   const Icon = resolveIcon(enrollment.course.iconKey);
   const s = STATUS_LABELS[enrollment.status];
+
+  const awaitingPayment = enrollment.status === 'PENDING' && enrollment.paymentStatus === 'UNPAID';
+  const receiptSent     = enrollment.paymentStatus === 'PENDING';
 
   const simulatePayment = async () => {
     setPayStatus('loading');
@@ -59,9 +72,32 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
     }
   };
 
+  const sendReceipt = async () => {
+    if (!receiptUrl.trim()) return;
+    setReceiptState('sending');
+    try {
+      const updated = await submitReceipt(enrollment.id, receiptUrl.trim());
+      setPayOpen(false);
+      onPaid(updated);
+    } catch {
+      setReceiptState('error');
+    }
+  };
+
+  const getCertificate = async () => {
+    setCertState('loading');
+    try {
+      await downloadCertificate(enrollment.id);
+      setCertState('idle');
+    } catch {
+      setCertState('error');
+    }
+  };
+
   return (
     <motion.div whileHover={{ x: 4 }} className="card"
-      style={{ padding: 20, display: 'flex', alignItems: 'center', gap: 16, background: enrollment.course.bg, border: `1.5px solid ${enrollment.course.border}` }}>
+      style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14, background: enrollment.course.bg, border: `1.5px solid ${enrollment.course.border}` }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
       <Link to={`/courses/${enrollment.course.slug}`} style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0, textDecoration: 'none' }}>
         <div style={{ width: 48, height: 48, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `1.5px solid ${enrollment.course.border}`, flexShrink: 0 }}>
           <Icon size={22} style={{ color: enrollment.course.color }} />
@@ -94,6 +130,18 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
           </button>
         </Link>
       )}
+      {enrollment.status === 'COMPLETED' && (
+        <button onClick={getCertificate} disabled={certState === 'loading'} className="btn-outline"
+          style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0, opacity: certState === 'loading' ? 0.7 : 1 }}>
+          <Award size={13} /> {certState === 'loading' ? 'Tayyorlanmoqda...' : 'Sertifikat'}
+        </button>
+      )}
+      {awaitingPayment && (
+        <button onClick={() => setPayOpen((v) => !v)} className="btn-primary"
+          style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
+          <CreditCard size={13} /> To'lov qilish
+        </button>
+      )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
         <button onClick={simulatePayment} disabled={payStatus === 'loading'} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', opacity: payStatus === 'loading' ? 0.7 : 1 }}>
@@ -101,6 +149,45 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
         </button>
       )}
       <span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color, fontWeight: 700, flexShrink: 0 }}>{s.label}</span>
+    </div>
+
+    {certState === 'error' && (
+      <p style={{ fontSize: 12, color: '#dc2626' }}>Sertifikatni yuklab bo'lmadi. Qayta urinib ko'ring.</p>
+    )}
+
+    {receiptSent && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: '#fffbeb', border: '1px solid #fde68a' }}>
+        <Hourglass size={14} style={{ color: '#d97706', flexShrink: 0 }} />
+        <p style={{ fontSize: 12.5, fontWeight: 600, color: '#92400e' }}>
+          Chek yuborildi — administrator tasdiqlashi bilan kurs ochiladi.
+        </p>
+      </div>
+    )}
+
+    {awaitingPayment && payOpen && (
+      <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
+        <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+          To'lov summasi:{' '}
+          <span style={{ color: enrollment.course.color }}>
+            {enrollment.course.price ? `${Number(enrollment.course.price).toLocaleString('uz-UZ')} ${enrollment.course.currency || 'UZS'}` : '—'}
+          </span>
+        </p>
+        <p style={{ fontSize: 12.5, color: '#475569', marginBottom: 2 }}>
+          Karta raqami: <b style={{ color: '#0f172a', letterSpacing: 0.5 }}>{PAYMENT_INFO.cardNumber}</b> ({PAYMENT_INFO.cardOwner})
+        </p>
+        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>{PAYMENT_INFO.note}</p>
+        <FileUpload value={receiptUrl} onChange={setReceiptUrl} kind="image" label="To'lov cheki (rasm)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+          <button onClick={sendReceipt} disabled={!receiptUrl.trim() || receiptState === 'sending'} className="btn-primary"
+            style={{ fontSize: 12.5, padding: '9px 16px', opacity: !receiptUrl.trim() || receiptState === 'sending' ? 0.6 : 1 }}>
+            {receiptState === 'sending' ? 'Yuborilmoqda...' : 'Chekni yuborish'}
+          </button>
+          {receiptState === 'error' && (
+            <span style={{ fontSize: 12, color: '#dc2626' }}>Yuborishda xatolik. Qayta urinib ko'ring.</span>
+          )}
+        </div>
+      </div>
+    )}
     </motion.div>
   );
 }
@@ -187,7 +274,7 @@ export default function DashboardPage(): React.ReactElement {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {enrollments.map((e) => (
               <EnrollmentRow key={e.id} enrollment={e}
-                onPaid={(paid) => setEnrollments((prev) => prev.map((x) => x.id === paid.id ? paid : x))} />
+                onPaid={(paid) => setEnrollments((prev) => prev.map((x) => x.id === paid.id ? { ...x, ...paid, progress: paid.progress ?? x.progress } : x))} />
             ))}
           </div>
         )}

@@ -3,6 +3,7 @@ import * as enrollmentsService from '../services/enrollments.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
+import { streamCertificatePdf } from '../utils/certificate';
 
 export const createEnrollmentHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
@@ -31,6 +32,26 @@ export const listEnrollmentsAdminHandler = asyncHandler(async (req: Request, res
 export const updateEnrollmentAdminHandler = asyncHandler(async (req: Request, res: Response) => {
   const enrollment = await enrollmentsService.updateEnrollmentAdmin(req.params.id as string, req.body);
   sendSuccess(res, enrollment);
+});
+
+export const submitReceiptHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const enrollment = await enrollmentsService.submitReceipt(
+    req.user.userId,
+    req.params.id as string,
+    req.body.receiptUrl
+  );
+  sendSuccess(res, enrollment);
+});
+
+export const certificateHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const data = await enrollmentsService.getCertificateData(
+    req.user.userId,
+    req.user.role,
+    req.params.id as string
+  );
+  streamCertificatePdf(res, data);
 });
 
 export const mockPayHandler = asyncHandler(async (req: Request, res: Response) => {

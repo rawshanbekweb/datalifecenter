@@ -194,6 +194,7 @@ model Enrollment {
   provider      String?
   providerRef   String?
   amountPaid    Decimal?
+  receiptUrl    String?
   enrolledAt    DateTime         @default(now())
   completedAt   DateTime?
 

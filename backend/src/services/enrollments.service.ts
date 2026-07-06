@@ -131,6 +131,56 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
   });
 }
 
+// Talaba to'lov chekini yuboradi — admin tasdiqlashini kutadi
+export async function submitReceipt(userId: string, enrollmentId: string, receiptUrl: string) {
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { id: enrollmentId },
+    include: { course: true },
+  });
+
+  if (!enrollment || enrollment.userId !== userId) {
+    throw ApiError.notFound('Yozilish topilmadi');
+  }
+  if (enrollment.paymentStatus === 'FREE') {
+    throw ApiError.conflict("Bu kurs bepul — to'lov talab qilinmaydi", 'PAYMENT_NOT_REQUIRED');
+  }
+  if (enrollment.paymentStatus === 'PAID') {
+    throw ApiError.conflict("Bu yozilish uchun to'lov allaqachon tasdiqlangan", 'ALREADY_PAID');
+  }
+
+  return prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: { receiptUrl, paymentStatus: 'PENDING', provider: 'receipt' },
+    include: { course: true },
+  });
+}
+
+// Sertifikat ma'lumotlari — faqat yakunlangan kurs uchun, egasi yoki admin
+export async function getCertificateData(userId: string, role: string, enrollmentId: string) {
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { id: enrollmentId },
+    include: {
+      user: { select: { name: true } },
+      course: { select: { title: true, durationMonths: true } },
+    },
+  });
+
+  if (!enrollment || (enrollment.userId !== userId && role !== 'ADMIN')) {
+    throw ApiError.notFound('Yozilish topilmadi');
+  }
+  if (enrollment.status !== 'COMPLETED') {
+    throw ApiError.conflict('Sertifikat faqat kurs yakunlangandan keyin beriladi', 'NOT_COMPLETED');
+  }
+
+  return {
+    studentName: enrollment.user.name,
+    courseTitle: enrollment.course.title,
+    durationMonths: enrollment.course.durationMonths,
+    completedAt: enrollment.completedAt ?? new Date(),
+    certificateNo: `DL-${enrollment.id.slice(-8).toUpperCase()}`,
+  };
+}
+
 export async function mockPayEnrollment(userId: string, enrollmentId: string) {
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },

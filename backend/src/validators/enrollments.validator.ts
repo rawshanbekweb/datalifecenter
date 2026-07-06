@@ -12,6 +12,10 @@ export const listEnrollmentsAdminQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+export const submitReceiptSchema = z.object({
+  receiptUrl: z.string().min(1, 'receiptUrl kerak').max(500),
+});
+
 export const updateEnrollmentAdminSchema = z
   .object({
     status: z.enum(['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELLED']).optional(),
