@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import AdminLayout from './layouts/AdminLayout'
+import MentorLayout from './layouts/MentorLayout'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import CoursesPage from './pages/CoursesPage'
@@ -14,7 +15,9 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
-import MentorDashboardPage from './pages/MentorDashboardPage'
+import MentorHomePage from './pages/mentor/MentorHomePage'
+import MentorStudentsPage from './pages/mentor/MentorStudentsPage'
+import MentorSessionsPage from './pages/mentor/MentorSessionsPage'
 import LearnPage from './pages/LearnPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminEnrollmentsPage from './pages/admin/AdminEnrollmentsPage'
@@ -46,9 +49,17 @@ export const router = createBrowserRouter([
       { path: 'register', element: <RegisterPage /> },
       { path: 'dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
       { path: 'profile', element: <ProtectedRoute><ProfilePage /></ProtectedRoute> },
-      { path: 'mentor', element: <ProtectedRoute role={['MENTOR', 'ADMIN']}><MentorDashboardPage /></ProtectedRoute> },
       { path: 'learn/:slug', element: <ProtectedRoute><LearnPage /></ProtectedRoute> },
       { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+  {
+    path: '/mentor',
+    element: <ProtectedRoute role={['MENTOR', 'ADMIN']}><MentorLayout /></ProtectedRoute>,
+    children: [
+      { index: true, element: <MentorHomePage /> },
+      { path: 'students', element: <MentorStudentsPage /> },
+      { path: 'sessions', element: <MentorSessionsPage /> },
     ],
   },
   {
