@@ -18,7 +18,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   // Token yaroqli bo'lsa ham bloklangan/o'chirilgan user kirolmasligi kerak
   const user = await prisma.user.findUnique({
     where: { id: req.user.userId },
-    select: { isBlocked: true },
+    select: { isBlocked: true, role: true },
   });
   if (!user) {
     return next(ApiError.unauthorized('Hisob topilmadi'));
@@ -26,6 +26,10 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
   if (user.isBlocked) {
     return next(ApiError.forbidden('Hisobingiz bloklangan. Administratorga murojaat qiling.', 'USER_BLOCKED'));
   }
+
+  // Rol har doim bazadan olinadi — admin rolni o'zgartirsa qayta login talab qilinmaydi
+  // (aks holda tokendagi eski rol bilan yangi rol sahifalari 403 qaytaradi)
+  req.user.role = user.role;
 
   next();
 }
