@@ -21,4 +21,18 @@ export const createBlogPostSchema = z.object({
   mentorId: z.string().nullable().optional(),
 });
 
-export const updateBlogPostSchema = createBlogPostSchema.partial();
+// .partial() emas — default'li maydonlar (published, tags, ranglar) qisman so'rovda qayta yozilib ketmasligi uchun
+export const updateBlogPostSchema = z.object({
+  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
+  excerpt: z.string().min(5, "Qisqacha mazmun kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  content: z.string().min(10, "Matn kamida 10 ta belgidan iborat bo'lishi kerak").optional(),
+  category: z.string().min(1, 'Kategoriya kerak').optional(),
+  iconKey: z.string().optional(),
+  color: z.string().optional(),
+  bg: z.string().optional(),
+  border: z.string().optional(),
+  readMinutes: z.coerce.number().int().min(1).optional(),
+  tags: z.array(z.string()).optional(),
+  published: z.boolean().optional(),
+  mentorId: z.string().nullable().optional(),
+});

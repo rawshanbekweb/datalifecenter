@@ -25,4 +25,22 @@ export const createCourseSchema = z.object({
   mentorId: z.string().nullable().optional(),
 });
 
-export const updateCourseSchema = createCourseSchema.partial();
+// DIQQAT: createCourseSchema.partial() ishlatib bo'lmaydi — zod .partial()da ham
+// .default() qiymatlar qo'llanadi va qisman PUT yuborilganda qolgan maydonlar
+// default'ga qaytib ketadi (published:false bo'lib kurs ro'yxatdan yo'qoladi).
+export const updateCourseSchema = z.object({
+  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
+  subtitle: z.string().optional(),
+  description: z.string().min(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  iconKey: z.string().optional(),
+  color: z.string().optional(),
+  bg: z.string().optional(),
+  border: z.string().optional(),
+  price: z.coerce.number().min(0).optional(),
+  currency: z.string().optional(),
+  durationMonths: z.coerce.number().int().min(1).optional(),
+  level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
+  tags: z.array(z.string()).optional(),
+  published: z.boolean().optional(),
+  mentorId: z.string().nullable().optional(),
+});
