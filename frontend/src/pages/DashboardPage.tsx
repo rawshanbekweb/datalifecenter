@@ -5,6 +5,7 @@ import { ArrowRight, Clock, CreditCard, PlayCircle, Settings } from 'lucide-reac
 import { getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
+import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
 
 interface CourseInfo {
   iconKey: string;
@@ -134,6 +135,8 @@ export default function DashboardPage(): React.ReactElement {
             </Link>
           </div>
         </motion.div>
+
+        <UpcomingSessionsPanel />
 
         {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
         {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>Ma'lumotlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.</p>}

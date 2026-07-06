@@ -48,9 +48,7 @@ export default function Footer(): React.ReactElement {
         <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr 1fr', gap:40, marginBottom:48 }} className="footer-grid">
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
-              <div style={{ width:34, height:34, borderRadius:9, background:'#0ea5e9', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontFamily:'JetBrains Mono,monospace', fontWeight:800, color:'#fff', fontSize:12 }}>DL</span>
-              </div>
+              <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:34, height:34, borderRadius:9, objectFit:'cover' }} />
               <span style={{ fontWeight:800, fontSize:17, color:'#fff' }}>DATA <span style={{ color:'#38bdf8' }}>LIFE</span></span>
             </div>
             <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', lineHeight:1.8, maxWidth:230, marginBottom:20 }}>

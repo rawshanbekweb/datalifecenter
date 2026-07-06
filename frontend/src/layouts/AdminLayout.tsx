@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
-  Newspaper, Handshake, Mail, LogOut, Globe, Menu, X, Database,
+  Newspaper, Handshake, Mail, LogOut, Globe, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -38,9 +38,7 @@ export default function AdminLayout(): React.ReactElement {
     <>
       <Link to="/admin" onClick={() => setMenuOpen(false)}
         style={{ display:'flex', alignItems:'center', gap:10, padding:'22px 20px 18px', textDecoration:'none', borderBottom:'1px solid #1e293b' }}>
-        <div style={{ width:34, height:34, borderRadius:10, background:'#0ea5e9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <Database size={17} style={{ color:'#fff' }} />
-        </div>
+        <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:34, height:34, borderRadius:10, objectFit:'cover', flexShrink:0 }} />
         <div>
           <p style={{ fontFamily:'Outfit,sans-serif', fontSize:15, fontWeight:800, color:'#f8fafc', lineHeight:1.1 }}>DATA LIFE</p>
           <p style={{ fontSize:10, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.08em' }}>Admin panel</p>

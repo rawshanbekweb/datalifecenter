@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle, AlertCircle, User, KeyRound } from 'lucide-react';
 import { updateProfile, changePassword } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
+import FileUpload from '../components/common/FileUpload';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -30,6 +31,7 @@ export default function ProfilePage(): React.ReactElement {
 
   const [name, setName]   = useState<string>(user?.name || '');
   const [phone, setPhone] = useState<string>((user?.phone as string) || '');
+  const [avatarUrl, setAvatarUrl] = useState<string>((user?.avatarUrl as string) || '');
   const [profileStatus, setProfileStatus] = useState<FormStatus>('idle');
   const [profileError, setProfileError]   = useState<string>('');
 
@@ -43,7 +45,7 @@ export default function ProfilePage(): React.ReactElement {
     e.preventDefault();
     setProfileStatus('loading');
     try {
-      const updated = await updateProfile({ name, phone: phone || null });
+      const updated = await updateProfile({ name, phone: phone || null, avatarUrl: avatarUrl || null });
       applyUser(updated);
       setProfileStatus('success');
     } catch (err: unknown) {
@@ -96,6 +98,8 @@ export default function ProfilePage(): React.ReactElement {
             <label style={labelStyle}>Telefon</label>
             <input className="inp" value={phone} onChange={(e) => { setPhone(e.target.value); setProfileStatus('idle'); }} placeholder="+998 90 123 45 67" />
           </div>
+          <FileUpload kind="image" label="Profil rasmi" value={avatarUrl}
+            onChange={(url) => { setAvatarUrl(url); setProfileStatus('idle'); }} />
           <div>
             <label style={labelStyle}>Email (o'zgartirib bo'lmaydi)</label>
             <input className="inp" value={user?.email || ''} disabled style={{ opacity:0.6, cursor:'not-allowed' }} />

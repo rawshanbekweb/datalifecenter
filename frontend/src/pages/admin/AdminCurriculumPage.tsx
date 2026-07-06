@@ -6,6 +6,7 @@ import {
   createLesson, updateLesson, deleteLesson,
 } from '../../api/courses';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import FileUpload from '../../components/common/FileUpload';
 
 interface LessonItem {
   id: string;
@@ -104,8 +105,9 @@ function LessonForm({ initial, moduleId, onCancel, onSaved }: LessonFormProps): 
           onChange={(e) => setForm((f) => ({ ...f, durationMinutes: e.target.value }))} placeholder="Daqiqa" />
       </div>
       {form.contentType === 'VIDEO' && (
-        <input className="inp" value={form.videoUrl} onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))}
-          placeholder="Video URL (YouTube va h.k.)" style={{ fontSize:13 }} />
+        <FileUpload kind="video" value={form.videoUrl}
+          placeholder="YouTube havolasi yoki video fayl yuklang"
+          onChange={(url) => setForm((f) => ({ ...f, videoUrl: url }))} />
       )}
       {form.contentType !== 'VIDEO' && (
         <textarea className="inp" rows={4} value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}

@@ -29,7 +29,7 @@ export function fetchMe(): Promise<any> {
   return apiFetch('/auth/me');
 }
 
-export function updateProfile(data: { name?: string; phone?: string | null }): Promise<any> {
+export function updateProfile(data: { name?: string; phone?: string | null; avatarUrl?: string | null }): Promise<any> {
   return apiFetch('/auth/me', { method: 'PATCH', body: JSON.stringify(data) });
 }
 

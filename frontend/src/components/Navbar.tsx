@@ -69,9 +69,7 @@ export default function Navbar(): React.ReactElement {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Logo */}
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }}>
-              <span style={{ fontFamily: 'JetBrains Mono,monospace', fontWeight: 800, color: '#fff', fontSize: 13 }}>DL</span>
-            </div>
+            <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }} />
             <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: 0.5, fontFamily: 'Outfit,sans-serif' }}>
               DATA <span style={{ color: '#0ea5e9' }}>LIFE</span>
             </span>

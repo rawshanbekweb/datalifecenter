@@ -28,7 +28,7 @@ const INFO: InfoItem[] = [
   { icon:Phone,  label:'Telefon',  value:'+998 99 208 11 77', sub:'Du-Sha, 09:00–19:00',     color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd', href:'tel:+998992081177' },
   { icon:Send,   label:'Telegram', value:'@datalife_uz',       sub:'Tezkor javob',             color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', href:'https://t.me/datalife_uz' },
   { icon:Mail,   label:'Email',    value:'info@datalife.uz',   sub:'24 soat ichida javob',     color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0', href:'mailto:info@datalife.uz' },
-  { icon:MapPin, label:'Manzil',   value:'Toshkent, Yunusobod',sub:"Amir Temur ko'chasi, 108", color:'#d97706', bg:'#fffbeb', border:'#fde68a', href:'#' },
+  { icon:MapPin, label:'Manzil',   value:'Qoraqolpog\'iston, Nukus',sub:"Amir Temur ko'chasi, 108", color:'#d97706', bg:'#fffbeb', border:'#fde68a', href:'#' },
 ];
 
 function MapBox(): React.ReactElement {

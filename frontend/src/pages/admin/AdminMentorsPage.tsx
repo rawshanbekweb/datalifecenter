@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, AlertCircle, UserCheck } from 'lucide-react';
 import { listMentors, createMentor, updateMentor, deleteMentor } from '../../api/mentors';
 import { listUsers, AdminUser } from '../../api/users';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import FileUpload from '../../components/common/FileUpload';
 
 interface MentorFormState {
   id?: string | number;
@@ -97,10 +98,8 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
         <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Bio *</label>
         <textarea className="inp" rows={3} value={form.bio} onChange={change('bio')} required style={{ resize:'none' }} />
       </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Rasm URL</label>
-        <input className="inp" value={form.photoUrl} onChange={change('photoUrl')} placeholder="https://..." />
-      </div>
+      <FileUpload kind="image" label="Mentor rasmi" value={form.photoUrl}
+        onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>LinkedIn</label>

@@ -20,3 +20,21 @@ export const updateUserRoleHandler = asyncHandler(async (req: Request, res: Resp
   const user = await usersService.updateUserRole(req.params.id as string, req.body.role, req.user.userId);
   sendSuccess(res, user);
 });
+
+export const setUserBlockedHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const user = await usersService.setUserBlocked(req.params.id as string, req.body.blocked, req.user.userId);
+  sendSuccess(res, user);
+});
+
+export const deleteUserHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  await usersService.deleteUser(req.params.id as string, req.user.userId);
+  sendSuccess(res, { deleted: true });
+});
+
+export const resetUserPasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const result = await usersService.resetUserPassword(req.params.id as string);
+  sendSuccess(res, result);
+});

@@ -5,6 +5,7 @@ import { BookOpen, Users, GraduationCap, ArrowRight, AlertCircle } from 'lucide-
 import { getMentorDashboard } from '../api/mentors';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
+import MentorSessionsPanel from '../components/sessions/MentorSessionsPanel';
 
 interface MentorCourse {
   id: string;
@@ -101,6 +102,8 @@ export default function MentorDashboardPage(): React.ReactElement {
                 );
               })}
             </div>
+
+            <MentorSessionsPanel courses={data.mentor.courses.map((c) => ({ id: c.id, title: c.title }))} />
 
             <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>Kurslarim</h2>
             {data.mentor.courses.length === 0 && (

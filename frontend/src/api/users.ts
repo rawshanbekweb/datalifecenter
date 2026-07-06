@@ -6,6 +6,7 @@ export interface AdminUser {
   name: string;
   phone?: string | null;
   role: 'STUDENT' | 'MENTOR' | 'ADMIN';
+  isBlocked: boolean;
   avatarUrl?: string | null;
   createdAt: string;
   _count: { enrollments: number };
@@ -36,4 +37,16 @@ export function listUsers(params: ListUsersParams = {}): Promise<UsersListResult
 
 export function updateUserRole(id: string, role: string): Promise<AdminUser> {
   return apiFetch(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) });
+}
+
+export function setUserBlocked(id: string, blocked: boolean): Promise<AdminUser> {
+  return apiFetch(`/users/${id}/block`, { method: 'PATCH', body: JSON.stringify({ blocked }) });
+}
+
+export function deleteUser(id: string): Promise<{ deleted: boolean }> {
+  return apiFetch(`/users/${id}`, { method: 'DELETE' });
+}
+
+export function resetUserPassword(id: string): Promise<{ tempPassword: string }> {
+  return apiFetch(`/users/${id}/reset-password`, { method: 'POST' });
 }

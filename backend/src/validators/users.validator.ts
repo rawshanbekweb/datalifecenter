@@ -10,3 +10,7 @@ export const listUsersQuerySchema = z.object({
 export const updateUserRoleSchema = z.object({
   role: z.enum(['STUDENT', 'MENTOR', 'ADMIN'], { message: "Rol noto'g'ri" }),
 });
+
+export const setUserBlockedSchema = z.object({
+  blocked: z.boolean({ message: 'blocked qiymati boolean bo\'lishi kerak' }),
+});

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, Building2 } from 'lucide-react';
 import { listPartners, createPartner, updatePartner, deletePartner } from '../../api/partners';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import FileUpload from '../../components/common/FileUpload';
 
 interface PartnerFormState {
   id?: string | number;
@@ -77,10 +78,8 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Logotip URL *</label>
-          <input className="inp" value={form.logoUrl} onChange={change('logoUrl')} required />
-        </div>
+        <FileUpload kind="image" label="Logotip *" required value={form.logoUrl}
+          onChange={(url) => setForm((f: PartnerFormState) => ({ ...f, logoUrl: url }))} />
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Veb-sayt</label>
           <input className="inp" value={form.websiteUrl} onChange={change('websiteUrl')} placeholder="https://..." />

@@ -78,9 +78,7 @@ export default function About(): React.ReactElement {
           <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="card" style={{ padding:28, boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                <div style={{ width:42, height:42, borderRadius:12, background:'#0ea5e9', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <span style={{ fontFamily:'JetBrains Mono,monospace', fontWeight:800, color:'#fff', fontSize:13 }}>DL</span>
-                </div>
+                <img src="/assets/logotype.png" alt="DATA LIFE" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
                 <div>
                   <p style={{ fontWeight:700, color:'#0f172a' }}>DATA LIFE</p>
                   <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace' }}>IT Education Center</p>

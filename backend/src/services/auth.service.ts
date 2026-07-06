@@ -52,6 +52,10 @@ export async function login(input: LoginInput) {
     throw ApiError.unauthorized('Email yoki parol noto\'g\'ri', 'INVALID_CREDENTIALS');
   }
 
+  if (user.isBlocked) {
+    throw ApiError.forbidden('Hisobingiz bloklangan. Administratorga murojaat qiling.', 'USER_BLOCKED');
+  }
+
   const token = signToken({ userId: user.id, role: user.role });
   return { user: toPublicUser(user), token };
 }
