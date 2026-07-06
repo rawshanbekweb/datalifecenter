@@ -18,4 +18,12 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+// Production'da zaif yoki dev-qiymatli sirlar bilan ishga tushishga yo'l qo'ymaymiz
+if (parsed.data.NODE_ENV === 'production') {
+  if (parsed.data.JWT_SECRET === 'change-me-in-production' || parsed.data.JWT_SECRET.length < 32) {
+    console.error('Production uchun JWT_SECRET kamida 32 belgili tasodifiy qiymat bo\'lishi shart.');
+    process.exit(1);
+  }
+}
+
 export const env = parsed.data;
