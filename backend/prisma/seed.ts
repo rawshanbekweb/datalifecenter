@@ -4,7 +4,12 @@ import 'dotenv/config';
 import { hashPassword } from '../src/utils/password';
 import { slugify } from '../src/utils/slugify';
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+// Render external Postgres SSL talab qiladi — src/config/prisma.ts dagi mantiq bilan bir xil
+const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+});
 const prisma = new PrismaClient({ adapter });
 
 const COURSES = [
