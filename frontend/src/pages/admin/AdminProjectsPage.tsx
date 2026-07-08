@@ -13,6 +13,7 @@ interface ProjectFormState {
   screenshotUrl: string;
   liveUrl: string;
   repoUrl: string;
+  liveEmbed: boolean;
   featured: boolean;
   published: boolean;
 }
@@ -26,6 +27,7 @@ interface Project {
   screenshotUrl: string;
   liveUrl?: string | null;
   repoUrl?: string | null;
+  liveEmbed: boolean;
   featured: boolean;
   published: boolean;
   [key: string]: unknown;
@@ -35,7 +37,7 @@ type Status = 'loading' | 'ready' | 'error';
 
 const emptyForm: ProjectFormState = {
   title: '', category: '', description: '', techStackText: '',
-  screenshotUrl: '/projects/placeholder-screenshot.svg', liveUrl: '', repoUrl: '', featured: false, published: true,
+  screenshotUrl: '/projects/placeholder-screenshot.svg', liveUrl: '', repoUrl: '', liveEmbed: false, featured: false, published: true,
 };
 
 interface ProjectFormProps {
@@ -65,6 +67,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
       screenshotUrl: form.screenshotUrl,
       liveUrl: form.liveUrl || undefined,
       repoUrl: form.repoUrl || undefined,
+      liveEmbed: !!form.liveUrl && form.liveEmbed,
       featured: form.featured,
       published: form.published,
     };
@@ -119,6 +122,17 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
           <input className="inp" value={form.repoUrl} onChange={change('repoUrl')} placeholder="https://github.com/..." />
         </div>
       </div>
+      <div>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#334155', cursor: form.liveUrl ? 'pointer' : 'not-allowed', opacity: form.liveUrl ? 1 : 0.5 }}>
+          <input type="checkbox" checked={form.liveEmbed} disabled={!form.liveUrl} onChange={change('liveEmbed')} />
+          Skrinshot o'rniga saytni jonli (live) ko'rsatish
+        </label>
+        <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 4, lineHeight: 1.6 }}>
+          Kartada skrinshot o'rniga sayt to'g'ridan-to'g'ri iframe orqali yuklanadi. Ba'zi saytlar xavfsizlik sozlamalari
+          tufayli iframe ichida umuman ochilmasligi mumkin — shunday holatda bo'sh joy ko'rinadi, buni yoqishdan oldin
+          sinab ko'ring va muammo bo'lsa o'chirib, skrinshotdan foydalaning.
+        </p>
+      </div>
       <div style={{ display: 'flex', gap: 20 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#334155', cursor: 'pointer' }}>
           <input type="checkbox" checked={form.featured} onChange={change('featured')} /> Tavsiya etilgan
@@ -152,7 +166,7 @@ export default function AdminProjectsPage(): React.ReactElement {
   const startEdit = (p: Project): void => setEditing({
     id: p.id, title: p.title, category: p.category, description: p.description,
     techStackText: p.techStack.join(', '), screenshotUrl: p.screenshotUrl,
-    liveUrl: p.liveUrl || '', repoUrl: p.repoUrl || '', featured: p.featured, published: p.published,
+    liveUrl: p.liveUrl || '', repoUrl: p.repoUrl || '', liveEmbed: p.liveEmbed, featured: p.featured, published: p.published,
   });
 
   const remove = async (id: string): Promise<void> => {
@@ -191,6 +205,7 @@ export default function AdminProjectsPage(): React.ReactElement {
                 <p style={{ fontSize: 12, color: '#94a3b8' }}>{p.category}</p>
               </div>
               {p.featured && <span className="tag" style={{ background: '#faf5ff', borderColor: '#e9d5ff', color: '#9333ea' }}>Tavsiya</span>}
+              {p.liveEmbed && <span className="tag" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>Live</span>}
               {!p.published && (
                 <span className="tag" style={{ background: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <EyeOff size={11} /> Yashirilgan

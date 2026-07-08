@@ -12,6 +12,7 @@ interface ProjectItem {
   screenshotUrl: string;
   liveUrl?: string | null;
   repoUrl?: string | null;
+  liveEmbed: boolean;
   featured: boolean;
 }
 
@@ -46,27 +47,54 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
           )}
         </div>
         {(() => {
-          const ShotWrapper = p.liveUrl ? 'a' : 'div';
-          const wrapperProps = p.liveUrl
+          const isLive = p.liveEmbed && !!p.liveUrl;
+
+          // Skrinshot rejimida butun blok o'zi havola; live iframe rejimida esa
+          // iframe pointer-events:none bo'lgani uchun ustiga alohida havola qatlami kerak
+          // (aks holda ikkita <a> ichma-ich bo'lib, HTML buzilardi).
+          const Wrapper = isLive ? 'div' : (p.liveUrl ? 'a' : 'div');
+          const wrapperProps = !isLive && p.liveUrl
             ? { href: p.liveUrl, target: '_blank', rel: 'noopener noreferrer' }
             : {};
+
           return (
-            <ShotWrapper {...wrapperProps}
+            <Wrapper {...wrapperProps}
               style={{ display: 'block', position: 'relative', aspectRatio: '16/10', overflow: 'hidden', cursor: p.liveUrl ? 'pointer' : 'default', background: '#fff' }}
               className="proj-shot-link">
-              <img src={p.screenshotUrl} alt={`${p.title} skrinshoti`} loading="lazy" className="proj-shot-img"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block', transition: 'transform 0.4s ease' }} />
-              {p.liveUrl && (
-                <div className="proj-shot-overlay" style={{
-                  position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s',
-                }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 50, background: '#fff', fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
-                    Saytga o'tish <ExternalLink size={13} />
-                  </span>
-                </div>
+              {isLive ? (
+                <iframe src={p.liveUrl!} title={`${p.title} — jonli ko'rinish`} loading="lazy" sandbox="allow-scripts allow-same-origin"
+                  style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }} />
+              ) : (
+                <img src={p.screenshotUrl} alt={`${p.title} skrinshoti`} loading="lazy" className="proj-shot-img"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block', transition: 'transform 0.4s ease' }} />
               )}
-            </ShotWrapper>
+              {p.liveUrl && (
+                isLive ? (
+                  <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="proj-shot-overlay" style={{
+                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s', textDecoration: 'none',
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 50, background: '#fff', fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
+                      Saytga o'tish <ExternalLink size={13} />
+                    </span>
+                  </a>
+                ) : (
+                  <div className="proj-shot-overlay" style={{
+                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s',
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 50, background: '#fff', fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
+                      Saytga o'tish <ExternalLink size={13} />
+                    </span>
+                  </div>
+                )
+              )}
+              {isLive && (
+                <span style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 20, background: 'rgba(22,163,74,0.92)', color: '#fff', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', fontFamily: 'JetBrains Mono,monospace', pointerEvents: 'none' }}>
+                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff', display: 'inline-block' }} /> Live
+                </span>
+              )}
+            </Wrapper>
           );
         })()}
       </div>

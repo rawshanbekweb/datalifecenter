@@ -331,6 +331,10 @@ model Project {
   screenshotUrl String
   liveUrl       String?
   repoUrl       String?
+  // true bo'lsa kartada skrinshot o'rniga liveUrl to'g'ridan-to'g'ri iframe orqali
+  // "jonli" ko'rsatiladi — ba'zi saytlar (X-Frame-Options/CSP) buni bloklashi mumkin,
+  // shu holatlarda admin buni o'chirib skrinshotga qaytishi kerak.
+  liveEmbed     Boolean  @default(false)
   order         Int      @default(0)
   featured      Boolean  @default(false)
   published     Boolean  @default(true)
