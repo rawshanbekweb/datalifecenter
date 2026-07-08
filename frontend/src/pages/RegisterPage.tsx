@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserPlus, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { roleHome } from '../utils/roleHome';
 
 interface RegisterForm {
   name: string;
@@ -25,8 +26,8 @@ export default function RegisterPage(): React.ReactElement {
     e.preventDefault();
     setStatus('loading');
     try {
-      await register(form);
-      navigate('/dashboard', { replace: true });
+      const registered = await register(form);
+      navigate(roleHome(registered.role), { replace: true });
     } catch (err: any) {
       setErrorMsg(err.message || "Ro'yxatdan o'tishda xatolik yuz berdi");
       setStatus('error');

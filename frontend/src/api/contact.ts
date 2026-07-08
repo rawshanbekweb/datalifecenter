@@ -14,8 +14,13 @@ export function sendContactMessage(form: unknown): Promise<any> {
   });
 }
 
-export function listContactMessages(): Promise<any> {
-  return apiFetch('/contact');
+export function listContactMessages(params?: { status?: string; page?: number; limit?: number }): Promise<any> {
+  const query = new URLSearchParams();
+  if (params?.status) query.set('status', params.status);
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  const qs = query.toString();
+  return apiFetch(`/contact${qs ? `?${qs}` : ''}`);
 }
 
 export function updateContactMessageStatus(id: string | number, status: string): Promise<any> {

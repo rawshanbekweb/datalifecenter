@@ -4,6 +4,7 @@ import { ArrowLeft, PlayCircle, FileText, HelpCircle, ClipboardList, ChevronDown
 import { getCourseLearn } from '../api/courses';
 import { completeLesson, uncompleteLesson } from '../api/progress';
 import ComingSoon from '../components/common/ComingSoon';
+import LessonQA from '../components/questions/LessonQA';
 
 interface LearnLesson {
   id: string;
@@ -39,15 +40,30 @@ const TYPE_ICONS: Record<LearnLesson['contentType'], React.ComponentType<{ size?
   ASSIGNMENT: ClipboardList,
 };
 
+// To'g'ridan-to'g'ri video fayl (mp4/webm) — <video> tegi bilan ochiladi
+function isDirectVideo(url: string): boolean {
+  return /\.(mp4|webm)(\?|$)/i.test(url) || url.includes('/uploads/videos/');
+}
+
+// YouTube/Vimeo havolalarini embed ko'rinishiga o'giradi.
+// Pullik kontent uchun tavsiya: YouTube'da "unlisted" video — havolasiz topilmaydi
+// va to'g'ridan-to'g'ri yuklab olib bo'lmaydi.
 function toEmbedUrl(url: string): string | null {
   try {
     const u = new URL(url);
     if (u.hostname.includes('youtube.com')) {
-      const id = u.searchParams.get('v');
+      // watch?v=ID, shorts/ID, live/ID, embed/ID — hammasi qo'llab-quvvatlanadi
+      const id =
+        u.searchParams.get('v') ||
+        u.pathname.match(/^\/(?:shorts|live|embed)\/([\w-]{6,})/)?.[1];
       return id ? `https://www.youtube.com/embed/${id}` : url;
     }
     if (u.hostname === 'youtu.be') {
       return `https://www.youtube.com/embed${u.pathname}`;
+    }
+    if (u.hostname.includes('vimeo.com') && !u.hostname.includes('player.')) {
+      const id = u.pathname.match(/\/(\d+)/)?.[1];
+      return id ? `https://player.vimeo.com/video/${id}` : url;
     }
     return url;
   } catch {
@@ -161,7 +177,7 @@ export default function LearnPage(): React.ReactElement {
     <section style={{ padding:'130px 0 104px' }}>
       <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:14, flexWrap:'wrap', marginBottom:14 }}>
-          <Link to="/dashboard" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none' }}>
+          <Link to="/student" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none' }}>
             <ArrowLeft size={14}/> Kabinet
           </Link>
           <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(18px,2.4vw,24px)', fontWeight:800, color:'#0f172a', flex:1, minWidth:200 }}>
@@ -243,7 +259,13 @@ export default function LearnPage(): React.ReactElement {
                     <Clock size={12}/> {activeLesson.durationMinutes ? `${activeLesson.durationMinutes} daqiqa` : 'Davomiylik ko\'rsatilmagan'}
                   </p>
 
-                  {activeLesson.contentType === 'VIDEO' && embedUrl && (
+                  {activeLesson.contentType === 'VIDEO' && embedUrl && isDirectVideo(embedUrl) && (
+                    <div style={{ borderRadius:14, overflow:'hidden', background:'#0f172a', marginBottom:18 }}>
+                      <video src={embedUrl} controls controlsList="nodownload" playsInline
+                        style={{ display:'block', width:'100%', maxHeight:480 }} />
+                    </div>
+                  )}
+                  {activeLesson.contentType === 'VIDEO' && embedUrl && !isDirectVideo(embedUrl) && (
                     <div style={{ position:'relative', paddingTop:'56.25%', borderRadius:14, overflow:'hidden', background:'#0f172a', marginBottom:18 }}>
                       <iframe src={embedUrl} title={activeLesson.title} allowFullScreen
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -284,6 +306,8 @@ export default function LearnPage(): React.ReactElement {
                       )}
                     </div>
                   )}
+
+                  {hasEnrollment && <LessonQA lessonId={activeLesson.id} accentColor={course.color} />}
                 </div>
               )}
             </div>

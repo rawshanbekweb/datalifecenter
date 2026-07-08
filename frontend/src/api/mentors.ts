@@ -24,6 +24,18 @@ export function deleteMentor(id: string | number): Promise<any> {
   return apiFetch(`/mentors/${id}`, { method: 'DELETE' });
 }
 
+export function getMentorMe(): Promise<any> {
+  return apiFetch('/mentors/me');
+}
+
+export function updateMentorMe(data: unknown): Promise<any> {
+  return apiFetch('/mentors/me', { method: 'PATCH', body: JSON.stringify(data) });
+}
+
+export function getMentorCourse(id: string): Promise<any> {
+  return apiFetch(`/mentors/me/courses/${id}`);
+}
+
 export function getMentorDashboard(): Promise<any> {
   return apiFetch('/mentors/me/dashboard');
 }

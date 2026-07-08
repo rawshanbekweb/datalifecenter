@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle, AlertCircle, User, KeyRound } from 'lucide-react';
-import { updateProfile, changePassword } from '../api/auth';
+import { CheckCircle, AlertCircle, User, KeyRound, MailWarning } from 'lucide-react';
+import { updateProfile, changePassword, resendVerification } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 import FileUpload from '../components/common/FileUpload';
 
@@ -35,6 +34,9 @@ export default function ProfilePage(): React.ReactElement {
   const [profileStatus, setProfileStatus] = useState<FormStatus>('idle');
   const [profileError, setProfileError]   = useState<string>('');
 
+  const [resendStatus, setResendStatus] = useState<FormStatus>('idle');
+  const [resendError, setResendError]   = useState<string>('');
+
   const [currentPassword, setCurrentPassword] = useState<string>('');
   const [newPassword, setNewPassword]         = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -51,6 +53,17 @@ export default function ProfilePage(): React.ReactElement {
     } catch (err: unknown) {
       setProfileError((err as Error).message || 'Xatolik yuz berdi');
       setProfileStatus('error');
+    }
+  };
+
+  const resend = async (): Promise<void> => {
+    setResendStatus('loading');
+    try {
+      await resendVerification();
+      setResendStatus('success');
+    } catch (err: unknown) {
+      setResendError((err as Error).message || 'Xatolik yuz berdi');
+      setResendStatus('error');
     }
   };
 
@@ -73,16 +86,37 @@ export default function ProfilePage(): React.ReactElement {
   };
 
   return (
-    <section className="section-light" style={{ padding:'160px 0 104px' }}>
-      <div style={{ maxWidth:640, margin:'0 auto', padding:'0 24px' }}>
-        <Link to="/dashboard" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none', marginBottom:20 }}>
-          <ArrowLeft size={14}/> Kabinetga qaytish
-        </Link>
-
-        <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}>
-          <span className="pill">Profil sozlamalari</span>
-          <h1 className="h-section" style={{ marginBottom:28 }}>Hisob<span className="accent">ingiz</span></h1>
+    <div>
+      <div style={{ maxWidth:640 }}>
+        <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:24 }}>
+          <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:4 }}>
+            Profil <span className="accent">sozlamalari</span>
+          </h1>
+          <p style={{ fontSize:13.5, color:'#64748b' }}>Shaxsiy ma'lumotlar va parolni boshqarish</p>
         </motion.div>
+
+        {user && user.emailVerified === false && (
+          <div className="card" style={{ padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'flex-start', gap:12,
+            background:'#fffbeb', border:'1.5px solid #fde68a' }}>
+            <MailWarning size={18} style={{ color:'#d97706', flexShrink:0, marginTop:2 }}/>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:13.5, fontWeight:700, color:'#92400e' }}>Emailingiz hali tasdiqlanmagan</p>
+              <p style={{ fontSize:12.5, color:'#92400e', marginTop:2 }}>
+                {resendStatus === 'success'
+                  ? 'Tasdiqlash havolasi yuborildi — pochta qutingizni (spamni ham) tekshiring.'
+                  : resendStatus === 'error'
+                    ? resendError
+                    : "Pochta qutingizga yuborilgan havolani bosing yoki qayta yuborishni so'rang."}
+              </p>
+            </div>
+            {resendStatus !== 'success' && (
+              <button type="button" onClick={resend} disabled={resendStatus === 'loading'} className="btn-outline"
+                style={{ fontSize:12, padding:'7px 12px', flexShrink:0, opacity: resendStatus === 'loading' ? 0.7 : 1 }}>
+                {resendStatus === 'loading' ? 'Yuborilmoqda...' : 'Qayta yuborish'}
+              </button>
+            )}
+          </div>
+        )}
 
         <form onSubmit={saveProfile} className="card" style={{ padding:24, marginBottom:20, display:'flex', flexDirection:'column', gap:14 }}>
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:14, fontWeight:800, color:'#0f172a' }}>
@@ -139,6 +173,6 @@ export default function ProfilePage(): React.ReactElement {
           </button>
         </form>
       </div>
-    </section>
+    </div>
   );
 }

@@ -206,16 +206,16 @@ export default function DashboardPage(): React.ReactElement {
   }, []);
 
   return (
-    <section className="section-light" style={{ padding: '160px 0 104px' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px' }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 36 }}>
+    <div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 240 }}>
-              <span className="pill">Shaxsiy kabinet</span>
-              <h1 className="h-section" style={{ marginBottom: 6 }}>Xush kelibsiz, <span className="accent">{user?.name?.split(' ')[0]}</span></h1>
-              <p className="sub" style={{ textAlign: 'left' }}>Kurslaringiz va o'quv jarayoningiz shu yerda</p>
+              <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+                Xush kelibsiz, <span className="accent">{user?.name?.split(' ')[0]}</span>
+              </h1>
+              <p style={{ fontSize: 13.5, color: '#64748b' }}>Kurslaringiz va o'quv jarayoningiz shu yerda</p>
             </div>
-            <Link to="/profile" style={{ textDecoration: 'none' }}>
+            <Link to="/student/profile" style={{ textDecoration: 'none' }}>
               <button className="btn-outline" style={{ fontSize: 13 }}>
                 <Settings size={14} /> Profil sozlamalari
               </button>
@@ -278,7 +278,6 @@ export default function DashboardPage(): React.ReactElement {
             ))}
           </div>
         )}
-      </div>
-    </section>
+    </div>
   );
 }

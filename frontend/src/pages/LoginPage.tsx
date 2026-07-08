@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogIn, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { roleHome } from '../utils/roleHome';
 
 interface LoginForm {
   email: string;
@@ -24,8 +25,8 @@ export default function LoginPage(): React.ReactElement {
     e.preventDefault();
     setStatus('loading');
     try {
-      await login(form);
-      navigate(location.state?.from || '/dashboard', { replace: true });
+      const logged = await login(form);
+      navigate(location.state?.from || roleHome(logged.role), { replace: true });
     } catch (err: any) {
       setErrorMsg(err.message || 'Kirishda xatolik yuz berdi');
       setStatus('error');
@@ -57,7 +58,10 @@ export default function LoginPage(): React.ReactElement {
               <input className="inp" type="email" name="email" value={form.email} onChange={change} required placeholder="you@example.com" />
             </div>
             <div>
-              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Parol</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
+                <label style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>Parol</label>
+                <Link to="/forgot-password" style={{ fontSize: 12, color: '#0ea5e9', fontWeight: 600, textDecoration: 'none' }}>Parolni unutdingizmi?</Link>
+              </div>
               <input className="inp" type="password" name="password" value={form.password} onChange={change} required placeholder="••••••••" />
             </div>
             <button type="submit" disabled={status === 'loading'} className="btn-primary"

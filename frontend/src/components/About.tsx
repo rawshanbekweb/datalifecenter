@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Users, BookOpen, Briefcase, Award, CheckCircle } from 'lucide-react';
 
 interface StatItem {
@@ -37,7 +37,6 @@ const SKILLS: SkillItem[] = [
 ];
 
 export default function About(): React.ReactElement {
-  const inView = useInView(useRef<HTMLElement>(null), { once: true });
   return (
     <section id="about" className="section-gray" style={{ padding: '104px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>

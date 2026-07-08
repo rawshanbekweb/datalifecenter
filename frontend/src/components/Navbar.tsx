@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { roleHome } from '../utils/roleHome';
 import React from 'react';
 
 interface NavItem {
@@ -97,7 +98,7 @@ export default function Navbar(): React.ReactElement {
                     <GraduationCap size={16}/> Mentor
                   </Link>
                 )}
-                <Link to="/dashboard" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>
+                <Link to={roleHome(user.role)} style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>
                   <LayoutDashboard size={16}/> {user.name.split(' ')[0]}
                 </Link>
                 <button onClick={handleLogout} title="Chiqish"
@@ -149,7 +150,7 @@ export default function Navbar(): React.ReactElement {
                     </button>
                   </MotionLink>
                 )}
-                <MotionLink to="/dashboard" onClick={() => setOpen(false)}>
+                <MotionLink to={roleHome(user.role)} onClick={() => setOpen(false)}>
                   <button className="btn-primary" style={{ width: '100%', marginTop: 10, justifyContent: 'center' }}>
                     <LayoutDashboard size={15}/> Shaxsiy kabinet
                   </button>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
-  Newspaper, Handshake, Mail, LogOut, Globe, Menu, X,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Kurslar',           to: '/admin/courses',     icon: BookOpen },
   { label: 'Foydalanuvchilar',  to: '/admin/users',       icon: Users },
   { label: 'Mentorlar',         to: '/admin/mentors',     icon: UserSquare2 },
+  { label: "Mentor so'rovlari", to: '/admin/mentor-requests', icon: Inbox },
   { label: 'Blog',              to: '/admin/blog',        icon: Newspaper },
   { label: 'Hamkorlar',         to: '/admin/partners',    icon: Handshake },
   { label: 'Xabarlar',          to: '/admin/messages',    icon: Mail },

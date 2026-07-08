@@ -63,3 +63,16 @@ export function updateEnrollmentAdmin(
 ): Promise<any> {
   return apiFetch(`/enrollments/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 }
+
+export interface CertificateInfo {
+  certificateNo: string;
+  studentName: string;
+  courseTitle: string;
+  durationMonths: number;
+  completedAt: string | null;
+}
+
+// Ochiq tekshiruv — login talab qilinmaydi
+export function verifyCertificate(no: string): Promise<CertificateInfo> {
+  return apiFetch(`/certificates/${encodeURIComponent(no)}/verify`);
+}

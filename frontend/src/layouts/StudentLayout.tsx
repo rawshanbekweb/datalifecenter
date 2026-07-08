@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, BookOpen, Users, Video, MessageCircleQuestion, Inbox, UserRound, LogOut, Globe, Menu, X,
+  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -13,17 +13,14 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Boshqaruv paneli', to: '/mentor',          icon: LayoutDashboard, end: true },
-  { label: 'Kurslarim',        to: '/mentor/courses',  icon: BookOpen },
-  { label: 'Talabalar',        to: '/mentor/students', icon: Users },
-  { label: 'Jonli darslar',    to: '/mentor/sessions', icon: Video },
-  { label: 'Savol-javob',      to: '/mentor/questions', icon: MessageCircleQuestion },
-  { label: 'Admin bilan aloqa', to: '/mentor/requests', icon: Inbox },
-  { label: 'Profil',           to: '/mentor/profile',  icon: UserRound },
+  { label: 'Boshqaruv paneli', to: '/student',              icon: LayoutDashboard, end: true },
+  { label: 'Jonli darslar',    to: '/student/sessions',     icon: Video },
+  { label: 'Sertifikatlar',    to: '/student/certificates', icon: Award },
+  { label: 'Profil',           to: '/student/profile',      icon: UserRound },
 ];
 
-// Admin panel shell'ining mentor varianti — binafsha aksent bilan
-export default function MentorLayout(): React.ReactElement {
+// Admin/mentor panel shell'ining talaba varianti — moviy aksent bilan
+export default function StudentLayout(): React.ReactElement {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -35,12 +32,12 @@ export default function MentorLayout(): React.ReactElement {
 
   const sidebarContent = (
     <>
-      <Link to="/mentor" onClick={() => setMenuOpen(false)}
+      <Link to="/student" onClick={() => setMenuOpen(false)}
         style={{ display:'flex', alignItems:'center', gap:10, padding:'22px 20px 18px', textDecoration:'none', borderBottom:'1px solid #1e293b' }}>
         <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:34, height:34, borderRadius:10, objectFit:'cover', flexShrink:0 }} />
         <div>
           <p style={{ fontFamily:'Outfit,sans-serif', fontSize:15, fontWeight:800, color:'#f8fafc', lineHeight:1.1 }}>DATA LIFE</p>
-          <p style={{ fontSize:10, fontWeight:700, color:'#a78bfa', textTransform:'uppercase', letterSpacing:'0.08em' }}>Mentor kabineti</p>
+          <p style={{ fontSize:10, fontWeight:700, color:'#38bdf8', textTransform:'uppercase', letterSpacing:'0.08em' }}>Talaba kabineti</p>
         </div>
       </Link>
 
@@ -53,8 +50,8 @@ export default function MentorLayout(): React.ReactElement {
                 display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10,
                 fontSize:13.5, fontWeight:600, textDecoration:'none', transition:'background 0.15s, color 0.15s',
                 color: isActive ? '#f8fafc' : '#94a3b8',
-                background: isActive ? 'rgba(147,51,234,0.22)' : 'transparent',
-                borderLeft: isActive ? '3px solid #9333ea' : '3px solid transparent',
+                background: isActive ? 'rgba(14,165,233,0.22)' : 'transparent',
+                borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
               })}>
               <Icon size={16} /> {item.label}
             </NavLink>
@@ -63,8 +60,8 @@ export default function MentorLayout(): React.ReactElement {
       </nav>
 
       <div style={{ padding:'14px 12px', borderTop:'1px solid #1e293b', display:'flex', flexDirection:'column', gap:2 }}>
-        <Link to="/" style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#94a3b8', textDecoration:'none' }}>
-          <Globe size={16} /> Saytga qaytish
+        <Link to="/courses" style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#94a3b8', textDecoration:'none' }}>
+          <Globe size={16} /> Barcha kurslar
         </Link>
         <button onClick={handleLogout}
           style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#f87171', background:'transparent', border:'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
@@ -77,7 +74,7 @@ export default function MentorLayout(): React.ReactElement {
   return (
     <div style={{ minHeight:'100vh', background:'#f1f5f9', display:'flex' }}>
       {/* Desktop sidebar */}
-      <aside className="mentor-sidebar"
+      <aside className="student-sidebar"
         style={{ width:248, background:'#0f172a', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex:40 }}>
         {sidebarContent}
       </aside>
@@ -93,21 +90,26 @@ export default function MentorLayout(): React.ReactElement {
         </div>
       )}
 
-      <div className="mentor-main" style={{ flex:1, marginLeft:248, display:'flex', flexDirection:'column', minWidth:0 }}>
+      <div className="student-main" style={{ flex:1, marginLeft:248, display:'flex', flexDirection:'column', minWidth:0 }}>
         <header style={{ height:60, background:'#fff', borderBottom:'1px solid #e2e8f0', display:'flex', alignItems:'center', gap:14, padding:'0 24px', position:'sticky', top:0, zIndex:30 }}>
-          <button className="mentor-menu-btn" onClick={() => setMenuOpen((v) => !v)}
+          <button className="student-menu-btn" onClick={() => setMenuOpen((v) => !v)}
             style={{ display:'none', width:36, height:36, borderRadius:9, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', alignItems:'center', justifyContent:'center', color:'#475569' }}>
             {menuOpen ? <X size={17}/> : <Menu size={17}/>}
           </button>
-          <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>Mentor kabineti</p>
+          <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>Talaba kabineti</p>
           <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
             <div style={{ textAlign:'right' }}>
               <p style={{ fontSize:13, fontWeight:700, color:'#0f172a', lineHeight:1.2 }}>{user?.name}</p>
               <p style={{ fontSize:11, color:'#94a3b8' }}>{user?.email}</p>
             </div>
-            <div style={{ width:36, height:36, borderRadius:'50%', background:'#9333ea', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, fontWeight:800, flexShrink:0 }}>
-              {(user?.name || 'M').charAt(0).toUpperCase()}
-            </div>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl as string} alt={user?.name}
+                style={{ width:36, height:36, borderRadius:'50%', objectFit:'cover', flexShrink:0 }} />
+            ) : (
+              <div style={{ width:36, height:36, borderRadius:'50%', background:'#0ea5e9', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, fontWeight:800, flexShrink:0 }}>
+                {(user?.name || 'T').charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
         </header>
 
@@ -118,9 +120,9 @@ export default function MentorLayout(): React.ReactElement {
 
       <style>{`
         @media (max-width: 960px) {
-          .mentor-sidebar { display: none !important; }
-          .mentor-main { margin-left: 0 !important; }
-          .mentor-menu-btn { display: flex !important; }
+          .student-sidebar { display: none !important; }
+          .student-main { margin-left: 0 !important; }
+          .student-menu-btn { display: flex !important; }
         }
       `}</style>
     </div>

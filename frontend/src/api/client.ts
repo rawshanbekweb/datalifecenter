@@ -1,4 +1,5 @@
 import { API_URL } from './config';
+import { getToken } from './token';
 
 export class ApiClientError extends Error {
   status: number;
@@ -24,11 +25,18 @@ export async function apiFetch<T = unknown>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // Token bo'lsa header orqali ham yuboriladi — krossdomen cookie bloklangan
+  // brauzerlarda (Safari) ham autentifikatsiya ishlashi uchun
+  const token = getToken();
   let res: Response;
   try {
     res = await fetch(`${API_URL}${path}`, {
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json', ...(options.headers as Record<string, string>) },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers as Record<string, string>),
+      },
       ...options,
     });
   } catch {

@@ -45,10 +45,12 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
         <div style={{ width:48, height:48, borderRadius:13, display:'flex', alignItems:'center', justifyContent:'center', background:'#fff', border:`1.5px solid ${course.border}`, boxShadow:'0 2px 8px rgba(0,0,0,0.06)' }}>
           <Icon size={22} style={{ color:course.color }} />
         </div>
-        <div style={{ display:'flex', alignItems:'center', gap:4, background:'#fff', padding:'4px 10px', borderRadius:20, border:'1px solid #e2e8f0' }}>
-          <Star size={11} fill={course.color} style={{ color:course.color }} />
-          <span style={{ fontSize:12, fontWeight:700, color:'#0f172a' }}>{course.rating}</span>
-        </div>
+        {Number(course.rating) > 0 && (
+          <div style={{ display:'flex', alignItems:'center', gap:4, background:'#fff', padding:'4px 10px', borderRadius:20, border:'1px solid #e2e8f0' }}>
+            <Star size={11} fill={course.color} style={{ color:course.color }} />
+            <span style={{ fontSize:12, fontWeight:700, color:'#0f172a' }}>{course.rating}</span>
+          </div>
+        )}
       </div>
 
       <h3 style={{ fontSize:16, fontWeight:800, color:'#0f172a', marginBottom:3 }}>{course.title}</h3>
@@ -74,7 +76,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, borderTop:`1px solid ${course.border}` }}>
         <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#94a3b8' }}>
           <Clock size={13} />{course.durationMonths} oy
-          <span style={{ marginLeft:8 }}>{course.studentsCount} ta</span>
+          {course.studentsCount > 0 && <span style={{ marginLeft:8 }}>{course.studentsCount} ta</span>}
         </div>
         <div style={{ display:'flex', gap:7 }}>
           {course.modules && course.modules.length > 0 && (

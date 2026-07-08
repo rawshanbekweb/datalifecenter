@@ -31,17 +31,36 @@ const STATUS_LABELS: Record<MessageStatus, StatusLabel> = {
   ARCHIVED: { label: 'Arxivlangan',      color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
 };
 
+const PAGE_SIZE = 20;
+
+interface MessagesResponse {
+  items: ContactMessage[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
 export default function AdminMessagesPage(): React.ReactElement {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
+  const [page, setPage]         = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [total, setTotal]       = useState<number>(0);
+  const [filter, setFilter]     = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
-    listContactMessages()
-      .then((data: ContactMessage[]) => { if (!cancelled) { setMessages(data); setStatus('ready'); } })
+    setStatus('loading');
+    listContactMessages({ page, limit: PAGE_SIZE, status: filter || undefined })
+      .then((data: MessagesResponse) => {
+        if (!cancelled) {
+          setMessages(data.items);
+          setTotalPages(data.pagination.totalPages);
+          setTotal(data.pagination.total);
+          setStatus('ready');
+        }
+      })
       .catch(() => { if (!cancelled) setStatus('error'); });
     return () => { cancelled = true; };
-  }, []);
+  }, [page, filter]);
 
   const changeStatus = async (id: string, newStatus: string): Promise<void> => {
     const prev = messages;
@@ -53,7 +72,18 @@ export default function AdminMessagesPage(): React.ReactElement {
     }
   };
 
-  const header = <AdminPageHeader title="Xabarlar" sub="Aloqa formasidan kelgan murojaatlar" />;
+  const header = (
+    <div>
+      <AdminPageHeader title="Xabarlar" sub={`Aloqa formasidan kelgan murojaatlar${total ? ` — jami ${total} ta` : ''}`} />
+      <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
+        <select className="inp" style={{ width:'auto', padding:'7px 12px', fontSize:12.5, cursor:'pointer' }}
+          value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }}>
+          <option value="">Barcha holatlar</option>
+          {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{STATUS_LABELS[opt].label}</option>)}
+        </select>
+      </div>
+    </div>
+  );
 
   if (status === 'loading') return <div>{header}<p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p></div>;
   if (status === 'error') return <div>{header}<p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p></div>;
@@ -62,7 +92,7 @@ export default function AdminMessagesPage(): React.ReactElement {
       <div>
         {header}
         <div className="card" style={{ padding:40, textAlign:'center' }}>
-          <p style={{ color:'#64748b', fontSize:14 }}>Hozircha xabarlar yo'q.</p>
+          <p style={{ color:'#64748b', fontSize:14 }}>{filter ? 'Bu holatda xabarlar yo\'q.' : 'Hozircha xabarlar yo\'q.'}</p>
         </div>
       </div>
     );
@@ -96,6 +126,16 @@ export default function AdminMessagesPage(): React.ReactElement {
         );
       })}
       </div>
+
+      {totalPages > 1 && (
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:20 }}>
+          <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page <= 1 ? 0.5 : 1 }}
+            disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Oldingi</button>
+          <span style={{ fontSize:13, color:'#64748b', fontWeight:600 }}>{page} / {totalPages}</span>
+          <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page >= totalPages ? 0.5 : 1 }}
+            disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Keyingi</button>
+        </div>
+      )}
     </div>
   );
 }

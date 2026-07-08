@@ -160,8 +160,12 @@ export default function CourseDetailPage(): React.ReactElement {
 
           <div style={{ display:'flex', gap:24, flexWrap:'wrap', marginTop:24, paddingTop:20, borderTop:`1px solid ${course.border}` }}>
             <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Clock size={14}/> {course.durationMonths} oy</span>
-            <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Star size={14} fill={course.color} style={{ color:course.color }}/> {course.rating}</span>
-            <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {course.studentsCount} talaba</span>
+            {Number(course.rating) > 0 && (
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Star size={14} fill={course.color} style={{ color:course.color }}/> {course.rating}</span>
+            )}
+            {course.studentsCount > 0 && (
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {course.studentsCount} talaba</span>
+            )}
             <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{LEVEL_LABELS[course.level]}</span>
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
               {course.isFree ? 'Bepul' : `${Number(course.price).toLocaleString('uz-UZ')} ${course.currency}`}
