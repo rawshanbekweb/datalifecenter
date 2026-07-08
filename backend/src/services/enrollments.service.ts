@@ -3,7 +3,7 @@ import { prisma } from '../config/prisma';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 import { notify, notifyAdmins } from './notifications.service';
-import { sendPaymentConfirmedEmail } from './email.service';
+import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail } from './email.service';
 import { deleteUploadByUrl } from './storage.service';
 
 export async function createEnrollment(userId: string, courseId: string) {
@@ -98,7 +98,8 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters)
 
 interface UpdateEnrollmentAdminInput {
   status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REFUNDED';
+  paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REJECTED' | 'REFUNDED';
+  rejectionReason?: string;
 }
 
 export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateEnrollmentAdminInput) {
@@ -110,16 +111,23 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     throw ApiError.notFound('Yozilish topilmadi');
   }
 
-  const data: Prisma.EnrollmentUpdateInput = { ...input };
+  const data: Prisma.EnrollmentUpdateInput = {
+    status: input.status,
+    paymentStatus: input.paymentStatus,
+  };
 
-  // To'lov tasdiqlansa kurs avtomatik faollashadi
+  // To'lov tasdiqlansa kurs avtomatik faollashadi, eski rad javobi eskirgan hisoblanadi
   if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
     data.provider = enrollment.provider ?? 'manual';
     data.providerRef = enrollment.providerRef ?? `manual_${Date.now()}`;
     data.amountPaid = enrollment.amountPaid ?? enrollment.course.price;
+    data.rejectionReason = null;
     if (!input.status && enrollment.status === 'PENDING') {
       data.status = 'ACTIVE';
     }
+  }
+  if (input.paymentStatus === 'REJECTED') {
+    data.rejectionReason = input.rejectionReason;
   }
   if (input.status === 'COMPLETED') {
     data.completedAt = enrollment.completedAt ?? new Date();
@@ -149,6 +157,17 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, updated.course.title, courseUrl);
   }
 
+  // To'lov rad etilsa talabaga sabab bilan bildirishnoma va email yuboriladi
+  if (input.paymentStatus === 'REJECTED' && enrollment.paymentStatus !== 'REJECTED') {
+    await notify(updated.userId, {
+      type: 'PAYMENT_REJECTED',
+      title: `To'lov rad etildi: ${updated.course.title}`,
+      body: updated.rejectionReason ?? undefined,
+      link: '/dashboard',
+    });
+    await sendPaymentRejectedEmail(updated.user.email, updated.user.name, updated.course.title, updated.rejectionReason ?? '');
+  }
+
   return updated;
 }
 
@@ -176,7 +195,7 @@ export async function submitReceipt(userId: string, enrollmentId: string, receip
 
   const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
-    data: { receiptUrl, paymentStatus: 'PENDING', provider: 'receipt' },
+    data: { receiptUrl, paymentStatus: 'PENDING', provider: 'receipt', rejectionReason: null },
     include: { course: true },
   });
 

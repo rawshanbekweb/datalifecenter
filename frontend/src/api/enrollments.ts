@@ -59,7 +59,7 @@ export function listEnrollmentsAdmin(params: ListEnrollmentsAdminParams = {}): P
 
 export function updateEnrollmentAdmin(
   id: string,
-  data: { status?: string; paymentStatus?: string }
+  data: { status?: string; paymentStatus?: string; rejectionReason?: string }
 ): Promise<any> {
   return apiFetch(`/enrollments/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 }

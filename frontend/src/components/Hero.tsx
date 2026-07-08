@@ -24,6 +24,22 @@ interface ParticleNode {
   r: number;
 }
 
+interface StatItem {
+  label: string;
+  value: string;
+}
+
+interface HeroProps {
+  settings?: { stats?: StatItem[] };
+}
+
+const DEFAULT_STATS: StatItem[] = [
+  { value: '2,000+', label: 'Bitiruvchilar' },
+  { value: '7+', label: 'Kurslar' },
+  { value: '5+', label: 'Yillik Tajriba' },
+  { value: '09:00–19:00', label: 'Ish Vaqti' },
+];
+
 /* Animated particle canvas — light version */
 function ParticleCanvas(): React.ReactElement {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -102,7 +118,8 @@ const BADGES: BadgeItem[] = [
   { icon: Globe,    label: 'Deployment', value: 'Cloud & DevOps',     bg: '#f0fdf4', border: '#bbf7d0', ic: '#16a34a' },
 ];
 
-export default function Hero(): React.ReactElement {
+export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
+  const stats = settings?.stats?.length ? settings.stats : DEFAULT_STATS;
   return (
     <section id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #faf5ff 100%)' }}>
       {/* Subtle BG circles */}
@@ -150,10 +167,10 @@ export default function Hero(): React.ReactElement {
             {/* Trust badges */}
             <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.52 }}
               style={{ display:'flex', gap:28, paddingTop:28, borderTop:'1px solid #f1f5f9', flexWrap:'wrap' }}>
-              {([['2,000+',"Bitiruvchilar"],['7+','Kurslar'],['5+','Yillik Tajriba'],['09:00–19:00','Ish Vaqti']] as [string, string][]).map(([v,l]) => (
-                <div key={l} style={{ textAlign:'center' }}>
-                  <div style={{ fontSize:22, fontWeight:800, color:'#0f172a' }}>{v}</div>
-                  <div style={{ fontSize:11, color:'#94a3b8', marginTop:2 }}>{l}</div>
+              {stats.map((s: StatItem) => (
+                <div key={s.label} style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#0f172a' }}>{s.value}</div>
+                  <div style={{ fontSize:11, color:'#94a3b8', marginTop:2 }}>{s.label}</div>
                 </div>
               ))}
             </motion.div>

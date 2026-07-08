@@ -1,14 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, BookOpen, Briefcase, Award, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import { resolveIcon } from '../utils/iconMap';
 
-interface StatItem {
-  icon: React.ElementType;
+interface RawStatItem {
+  icon: string;
   value: string;
   label: string;
   color: string;
-  bg: string;
-  border: string;
 }
 
 interface SkillItem {
@@ -16,27 +15,56 @@ interface SkillItem {
   pct: number;
 }
 
-const STATS: StatItem[] = [
-  { icon: Users,     value: '2,000+', label: 'Bitiruvchilar',  color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-  { icon: BookOpen,  value: '7+',     label: 'Kurslar',        color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
-  { icon: Briefcase, value: '180+',   label: 'Loyihalar',      color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-  { icon: Award,     value: '5+',     label: 'Yillik Tajriba', color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+interface SatisfactionItem {
+  value: string;
+  label: string;
+}
+
+interface AboutSettings {
+  stats?: RawStatItem[];
+  features?: string[];
+  skills?: SkillItem[];
+  satisfaction?: SatisfactionItem[];
+}
+
+interface AboutProps {
+  settings?: AboutSettings;
+}
+
+function withAlpha(hex: string, alpha: string): string {
+  return `${hex}${alpha}`;
+}
+
+const DEFAULT_STATS: RawStatItem[] = [
+  { icon: 'Users',     value: '2,000+', label: 'Bitiruvchilar',  color: '#0ea5e9' },
+  { icon: 'BookOpen',  value: '7+',     label: 'Kurslar',        color: '#9333ea' },
+  { icon: 'Briefcase', value: '180+',   label: 'Loyihalar',      color: '#16a34a' },
+  { icon: 'Award',     value: '5+',     label: 'Yillik Tajriba', color: '#d97706' },
 ];
 
-const FEATURES: string[] = [
+const DEFAULT_FEATURES: string[] = [
   'Professional sertifikatlar',   'Real loyihalarda ishlash',
   'Tajribali mentorlar',          "Karera qo'llab-quvvatlash",
   "Zamonaviy o'quv dasturi",      'Kichik guruhlar (max 15)',
 ];
 
-const SKILLS: SkillItem[] = [
+const DEFAULT_SKILLS: SkillItem[] = [
   { label: 'Frontend Development', pct: 95 },
   { label: 'Backend Development',  pct: 88 },
   { label: 'Cyber Security',       pct: 82 },
   { label: 'Mobile Development',   pct: 78 },
 ];
 
-export default function About(): React.ReactElement {
+const DEFAULT_SATISFACTION: SatisfactionItem[] = [
+  { value: '98%', label: 'Satisfaction' },
+  { value: '92%', label: 'Employment' },
+];
+
+export default function About({ settings }: AboutProps = {}): React.ReactElement {
+  const STATS = settings?.stats?.length ? settings.stats : DEFAULT_STATS;
+  const FEATURES = settings?.features?.length ? settings.features : DEFAULT_FEATURES;
+  const SKILLS = settings?.skills?.length ? settings.skills : DEFAULT_SKILLS;
+  const SATISFACTION = settings?.satisfaction?.length ? settings.satisfaction : DEFAULT_SATISFACTION;
   return (
     <section id="about" className="section-gray" style={{ padding: '104px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
@@ -99,10 +127,10 @@ export default function About(): React.ReactElement {
               ))}
 
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:20, paddingTop:20, borderTop:'1px solid #f1f5f9' }}>
-                {([['98%','Satisfaction'],['92%','Employment']] as [string, string][]).map(([v,l]) => (
-                  <div key={l} style={{ textAlign:'center', padding:'14px 0', background:'#f8fafc', borderRadius:12, border:'1px solid #e2e8f0' }}>
-                    <p style={{ fontSize:22, fontWeight:800, color:'#0ea5e9' }}>{v}</p>
-                    <p style={{ fontSize:11, color:'#94a3b8', marginTop:3 }}>{l}</p>
+                {SATISFACTION.map((sf: SatisfactionItem) => (
+                  <div key={sf.label} style={{ textAlign:'center', padding:'14px 0', background:'#f8fafc', borderRadius:12, border:'1px solid #e2e8f0' }}>
+                    <p style={{ fontSize:22, fontWeight:800, color:'#0ea5e9' }}>{sf.value}</p>
+                    <p style={{ fontSize:11, color:'#94a3b8', marginTop:3 }}>{sf.label}</p>
                   </div>
                 ))}
               </div>
@@ -112,13 +140,13 @@ export default function About(): React.ReactElement {
 
         {/* Stats row */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:18 }} className="stats-grid">
-          {STATS.map((s: StatItem, i: number) => {
-            const Icon = s.icon;
+          {STATS.map((s: RawStatItem, i: number) => {
+            const Icon = resolveIcon(s.icon);
             return (
               <motion.div key={s.label} initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true }} transition={{ duration:0.55, delay:i*0.1 }}
                 className="card" style={{ padding:'28px 20px', textAlign:'center', boxShadow:'0 4px 20px rgba(0,0,0,0.06)' }}>
-                <div style={{ width:48, height:48, borderRadius:14, margin:'0 auto 14px', display:'flex', alignItems:'center', justifyContent:'center', background:s.bg, border:`1.5px solid ${s.border}` }}>
+                <div style={{ width:48, height:48, borderRadius:14, margin:'0 auto 14px', display:'flex', alignItems:'center', justifyContent:'center', background:withAlpha(s.color,'12'), border:`1.5px solid ${withAlpha(s.color,'30')}` }}>
                   <Icon size={22} style={{ color:s.color }} />
                 </div>
                 <div style={{ fontSize:36, fontWeight:900, color:'#0f172a', lineHeight:1 }}>{s.value}</div>

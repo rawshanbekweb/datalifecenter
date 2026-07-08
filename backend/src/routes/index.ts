@@ -14,6 +14,8 @@ import sessionsRoutes from './sessions.routes';
 import uploadsRoutes from './uploads.routes';
 import { mentorRequestsRouter, questionsRouter } from './questions.routes';
 import { announcementsRouter, notificationsRouter } from './notifications.routes';
+import siteSettingsRoutes from './siteSettings.routes';
+import testimonialsRoutes from './testimonials.routes';
 import { verifyCertificateHandler } from '../controllers/enrollments.controller';
 
 const router = Router();
@@ -39,5 +41,7 @@ router.use('/questions', questionsRouter);
 router.use('/mentor-requests', mentorRequestsRouter);
 router.use('/notifications', notificationsRouter);
 router.use('/announcements', announcementsRouter);
+router.use('/site-settings', siteSettingsRoutes);
+router.use('/testimonials', testimonialsRoutes);
 
 export default router;

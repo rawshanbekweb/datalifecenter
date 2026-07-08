@@ -100,3 +100,22 @@ export async function sendPaymentConfirmedEmail(
     ),
   });
 }
+
+export async function sendPaymentRejectedEmail(
+  to: string,
+  name: string,
+  courseTitle: string,
+  reason: string
+): Promise<void> {
+  await sendMail({
+    to,
+    subject: `DATA LIFE — to'lov rad etildi: ${courseTitle}`,
+    text: `Salom, ${name}!\n\n"${courseTitle}" kursi uchun yuborgan to'lov chekingiz rad etildi.\nSabab: ${reason}\n\nIltimos, to'g'ri chekni qayta yuklang.`,
+    html: layout(
+      "To'lov rad etildi",
+      `<p style="font-size:14px;color:#475569">Salom, <b>${name}</b>! <b>"${courseTitle}"</b> kursi uchun yuborgan to'lov chekingiz rad etildi.</p>
+       <p style="font-size:14px;color:#0f172a;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px"><b>Sabab:</b> ${reason}</p>
+       <p style="font-size:13px;color:#64748b">Iltimos, to'g'ri to'lov chekini shaxsiy kabinetingizdan qayta yuklang.</p>`
+    ),
+  });
+}

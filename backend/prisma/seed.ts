@@ -37,6 +37,98 @@ const PARTNERS = [
   { name: 'Digital Bridge', category: 'hiring' },
 ];
 
+// Bosh sahifadagi hozirgi hardcoded qiymatlar — birinchi deploy'da sayt
+// bo'sh ko'rinmasligi uchun SiteSetting jadvaliga default sifatida yoziladi.
+const SITE_SETTINGS: { section: string; data: unknown }[] = [
+  {
+    section: 'hero',
+    data: {
+      stats: [
+        { label: 'Bitiruvchilar', value: '2,000+' },
+        { label: 'Kurslar', value: '7+' },
+        { label: 'Yillik Tajriba', value: '5+' },
+        { label: 'Ish Vaqti', value: '09:00–19:00' },
+      ],
+    },
+  },
+  {
+    section: 'about',
+    data: {
+      stats: [
+        { icon: 'Users', label: 'Bitiruvchilar', value: '2,000+', color: '#0ea5e9' },
+        { icon: 'BookOpen', label: 'Kurslar', value: '7+', color: '#9333ea' },
+        { icon: 'Briefcase', label: 'Loyihalar', value: '180+', color: '#16a34a' },
+        { icon: 'Award', label: 'Yillik Tajriba', value: '5+', color: '#d97706' },
+      ],
+      features: [
+        'Professional sertifikatlar',
+        'Real loyihalarda ishlash',
+        'Tajribali mentorlar',
+        "Karera qo'llab-quvvatlash",
+        "Zamonaviy o'quv dasturi",
+        'Kichik guruhlar (max 15)',
+      ],
+      skills: [
+        { label: 'Frontend Development', pct: 95 },
+        { label: 'Backend Development', pct: 88 },
+        { label: 'Cyber Security', pct: 82 },
+        { label: 'Mobile Development', pct: 78 },
+      ],
+      satisfaction: [
+        { value: '98%', label: 'Satisfaction' },
+        { value: '92%', label: 'Employment' },
+      ],
+    },
+  },
+  {
+    section: 'services',
+    data: {
+      items: [
+        { icon: 'Globe', title: 'Web Development', color: '#0ea5e9', desc: 'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.', feats: ['SPA & SSR ilovalar', 'API integratsiya', 'SEO optimizatsiya', 'Performance'] },
+        { icon: 'Smartphone', title: 'Mobile Applications', color: '#9333ea', desc: 'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.', feats: ['Flutter & React Native', 'Native iOS/Android', 'App Store deploy', 'Push notifications'] },
+        { icon: 'Palette', title: 'UI/UX Design', color: '#db2777', desc: "Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha.", feats: ['User Research', 'Wireframing', 'Design Systems', 'Usability Testing'] },
+        { icon: 'Brain', title: 'IT Consulting', color: '#d97706', desc: "Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar.", feats: ['Tech Strategy', 'Digital Transform', 'System Architecture', 'Code Audit'] },
+        { icon: 'Cpu', title: 'Digital Solutions', color: '#16a34a', desc: "Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar.", feats: ['Business Automation', 'Custom Software', 'CRM & ERP', 'Data Analytics'] },
+        { icon: 'BarChart3', title: 'Data Analytics', color: '#0284c7', desc: "Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar.", feats: ['BI Dashboards', 'Real-time Analytics', 'Predictive Models', 'Reports'] },
+      ],
+    },
+  },
+  {
+    section: 'why_us',
+    data: {
+      items: [
+        { icon: 'GraduationCap', title: 'Tajribali Mentorlar', color: '#0ea5e9', stat: '40+', desc: "IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." },
+        { icon: 'Zap', title: "Amaliy Ta'lim", color: '#9333ea', stat: '70%', desc: "Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." },
+        { icon: 'Briefcase', title: 'Real Loyihalar', color: '#16a34a', stat: '180+', desc: "Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." },
+        { icon: 'HeartHandshake', title: "Karera Qo'llab-quvvat", color: '#d97706', stat: '92%', desc: "Resume, intervyu tayyorlash va ish topishda to'liq yordam." },
+        { icon: 'Trophy', title: 'Sertifikatlar', color: '#db2777', stat: '3,000+', desc: "Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." },
+        { icon: 'Users', title: 'Kuchli Hamjamiyat', color: '#0284c7', stat: '2,500+', desc: "DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." },
+      ],
+    },
+  },
+  {
+    section: 'contact',
+    data: {
+      phone: '+998 99 208 11 77',
+      telegram: '@datalife_uz',
+      email: 'info@datalife.uz',
+      address: "Qoraqolpog'iston, Nukus",
+      addressSub: "Amir Temur ko'chasi, 108",
+      hours: [
+        { day: 'Dushanba — Juma', time: '09:00 — 19:00', closed: false },
+        { day: 'Shanba', time: '09:00 — 19:00', closed: false },
+        { day: 'Yakshanba', time: 'Yopiq', closed: true },
+      ],
+    },
+  },
+];
+
+const TESTIMONIALS = [
+  { name: 'Jasur Toshmatov', role: 'Frontend dasturchi, Frontend Dev bitiruvchisi', text: "DATA LIFE'da olgan bilimlarim tufayli 3 oyda ishga joylashdim. Mentorlar juda tajribali va har doim yordam berishga tayyor edi.", rating: 5 },
+  { name: 'Madina Yusupova', role: 'Backend dasturchi, Backend Dev bitiruvchisi', text: "Real loyihalar ustida ishlash imkoniyati eng katta afzallik bo'ldi. Nazariya emas, amaliyotga asoslangan dastur juda foydali.", rating: 5 },
+  { name: 'Bekzod Rahimov', role: 'Cyber Security mutaxassisi', text: "Kurs dasturi zamonaviy va sohadagi haqiqiy talablarga mos. Sertifikat ish beruvchilar orasida yaxshi tan olinadi.", rating: 5 },
+];
+
 async function main() {
   // Production himoyasi: demo parollar va test kontent tasodifan jonli bazaga
   // tushmasligi uchun aniq rozilik talab qilinadi (SEED_FORCE=true)
@@ -175,6 +267,25 @@ async function main() {
     });
   }
   console.log(`Seeded ${BLOG_POSTS.length} blog posts`);
+
+  // Bosh sahifa sozlamalari faqat mavjud bo'lmasa yoziladi — admin panelda
+  // tahrirlangan qiymatlar qayta seed ishga tushirilganda ustidan yozilmasin
+  for (const s of SITE_SETTINGS) {
+    const existing = await prisma.siteSetting.findUnique({ where: { section: s.section } });
+    if (!existing) {
+      await prisma.siteSetting.create({ data: { section: s.section, data: s.data as object } });
+    }
+  }
+  console.log(`Seeded ${SITE_SETTINGS.length} site settings`);
+
+  for (const [i, t] of TESTIMONIALS.entries()) {
+    await prisma.testimonial.upsert({
+      where: { id: `seed-testimonial-${i}` },
+      update: {},
+      create: { id: `seed-testimonial-${i}`, name: t.name, role: t.role, text: t.text, rating: t.rating, order: i },
+    });
+  }
+  console.log(`Seeded ${TESTIMONIALS.length} testimonials`);
 
   const studentPasswordHash = await hashPassword('Student123!');
   await prisma.user.upsert({

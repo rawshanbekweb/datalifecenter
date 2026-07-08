@@ -1,25 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Smartphone, Palette, Brain, Cpu, BarChart3, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { resolveIcon } from '../utils/iconMap';
 
 interface ServiceItem {
-  icon: React.ElementType;
+  icon: string;
   title: string;
   color: string;
   desc: string;
   feats: string[];
 }
 
-const SVCS: ServiceItem[] = [
-  { icon:Globe,      title:'Web Development',    color:'#0ea5e9', desc:'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.',          feats:['SPA & SSR ilovalar','API integratsiya','SEO optimizatsiya','Performance'] },
-  { icon:Smartphone, title:'Mobile Applications', color:'#9333ea', desc:'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.',          feats:['Flutter & React Native','Native iOS/Android','App Store deploy','Push notifications'] },
-  { icon:Palette,    title:'UI/UX Design',        color:'#db2777', desc:"Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha.",          feats:['User Research','Wireframing','Design Systems','Usability Testing'] },
-  { icon:Brain,      title:'IT Consulting',       color:'#d97706', desc:"Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar.",                   feats:['Tech Strategy','Digital Transform','System Architecture','Code Audit'] },
-  { icon:Cpu,        title:'Digital Solutions',   color:'#16a34a', desc:"Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar.",                feats:['Business Automation','Custom Software','CRM & ERP','Data Analytics'] },
-  { icon:BarChart3,  title:'Data Analytics',      color:'#0284c7', desc:"Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar.",               feats:['BI Dashboards','Real-time Analytics','Predictive Models','Reports'] },
+interface ServicesProps {
+  settings?: { items?: ServiceItem[] };
+}
+
+const DEFAULT_SVCS: ServiceItem[] = [
+  { icon:'Globe',      title:'Web Development',    color:'#0ea5e9', desc:'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.',          feats:['SPA & SSR ilovalar','API integratsiya','SEO optimizatsiya','Performance'] },
+  { icon:'Smartphone', title:'Mobile Applications', color:'#9333ea', desc:'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.',          feats:['Flutter & React Native','Native iOS/Android','App Store deploy','Push notifications'] },
+  { icon:'Palette',    title:'UI/UX Design',        color:'#db2777', desc:"Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha.",          feats:['User Research','Wireframing','Design Systems','Usability Testing'] },
+  { icon:'Brain',      title:'IT Consulting',       color:'#d97706', desc:"Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar.",                   feats:['Tech Strategy','Digital Transform','System Architecture','Code Audit'] },
+  { icon:'Cpu',        title:'Digital Solutions',   color:'#16a34a', desc:"Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar.",                feats:['Business Automation','Custom Software','CRM & ERP','Data Analytics'] },
+  { icon:'BarChart3',  title:'Data Analytics',      color:'#0284c7', desc:"Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar.",               feats:['BI Dashboards','Real-time Analytics','Predictive Models','Reports'] },
 ];
 
-export default function Services(): React.ReactElement {
+export default function Services({ settings }: ServicesProps = {}): React.ReactElement {
+  const SVCS = settings?.items?.length ? settings.items : DEFAULT_SVCS;
   return (
     <section id="services" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
@@ -32,7 +38,7 @@ export default function Services(): React.ReactElement {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="svc-grid">
           {SVCS.map((s: ServiceItem, i: number) => {
-            const Icon = s.icon;
+            const Icon = resolveIcon(s.icon);
             return (
               <motion.div key={s.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(i%3)*0.1 }}

@@ -1,25 +1,30 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Zap, Briefcase, HeartHandshake, Trophy, Users } from 'lucide-react';
+import { resolveIcon } from '../utils/iconMap';
 
 interface FeatureItem {
-  icon: React.ElementType;
+  icon: string;
   title: string;
   color: string;
   stat: string;
   desc: string;
 }
 
-const FEATS: FeatureItem[] = [
-  { icon:GraduationCap, title:"Tajribali Mentorlar",     color:'#0ea5e9', stat:'40+',    desc:"IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." },
-  { icon:Zap,           title:"Amaliy Ta'lim",           color:'#9333ea', stat:'70%',    desc:"Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." },
-  { icon:Briefcase,     title:"Real Loyihalar",          color:'#16a34a', stat:'180+',   desc:"Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." },
-  { icon:HeartHandshake,title:"Karera Qo'llab-quvvat",  color:'#d97706', stat:'92%',    desc:"Resume, intervyu tayyorlash va ish topishda to'liq yordam." },
-  { icon:Trophy,        title:"Sertifikatlar",           color:'#db2777', stat:'3,000+', desc:"Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." },
-  { icon:Users,         title:"Kuchli Hamjamiyat",       color:'#0284c7', stat:'2,500+', desc:"DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." },
+interface WhyUsProps {
+  settings?: { items?: FeatureItem[] };
+}
+
+const DEFAULT_FEATS: FeatureItem[] = [
+  { icon:'GraduationCap', title:"Tajribali Mentorlar",     color:'#0ea5e9', stat:'40+',    desc:"IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." },
+  { icon:'Zap',           title:"Amaliy Ta'lim",           color:'#9333ea', stat:'70%',    desc:"Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." },
+  { icon:'Briefcase',     title:"Real Loyihalar",          color:'#16a34a', stat:'180+',   desc:"Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." },
+  { icon:'HeartHandshake',title:"Karera Qo'llab-quvvat",  color:'#d97706', stat:'92%',    desc:"Resume, intervyu tayyorlash va ish topishda to'liq yordam." },
+  { icon:'Trophy',        title:"Sertifikatlar",           color:'#db2777', stat:'3,000+', desc:"Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." },
+  { icon:'Users',         title:"Kuchli Hamjamiyat",       color:'#0284c7', stat:'2,500+', desc:"DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." },
 ];
 
-export default function WhyUs(): React.ReactElement {
+export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement {
+  const FEATS = settings?.items?.length ? settings.items : DEFAULT_FEATS;
   return (
     <section id="why-us" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
@@ -34,7 +39,7 @@ export default function WhyUs(): React.ReactElement {
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="why-grid">
           {FEATS.map((f: FeatureItem, i: number) => {
-            const Icon = f.icon;
+            const Icon = resolveIcon(f.icon);
             return (
               <motion.div key={f.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(i%3)*0.1 }}

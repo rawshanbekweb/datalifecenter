@@ -53,6 +53,8 @@ const AdminMentorsPage = lazy(() => import('./pages/admin/AdminMentorsPage'))
 const AdminMentorRequestsPage = lazy(() => import('./pages/admin/AdminMentorRequestsPage'))
 const AdminPartnersPage = lazy(() => import('./pages/admin/AdminPartnersPage'))
 const AdminBlogPage = lazy(() => import('./pages/admin/AdminBlogPage'))
+const AdminSiteSettingsPage = lazy(() => import('./pages/admin/AdminSiteSettingsPage'))
+const AdminTestimonialsPage = lazy(() => import('./pages/admin/AdminTestimonialsPage'))
 
 function PageFallback(): React.ReactElement {
   return (
@@ -135,6 +137,8 @@ export const router = createBrowserRouter([
       { path: 'mentor-requests', element: s(<AdminMentorRequestsPage />) },
       { path: 'partners', element: s(<AdminPartnersPage />) },
       { path: 'blog', element: s(<AdminBlogPage />) },
+      { path: 'site-settings', element: s(<AdminSiteSettingsPage />) },
+      { path: 'testimonials', element: s(<AdminTestimonialsPage />) },
     ],
   },
 ])

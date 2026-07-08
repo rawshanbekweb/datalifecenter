@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle } from 'lucide-react';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
@@ -26,6 +26,7 @@ interface Enrollment {
   course: CourseInfo;
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: string;
+  rejectionReason?: string | null;
   receiptUrl?: string | null;
   enrolledAt: string;
   progress?: { totalLessons: number; completedLessons: number };
@@ -59,7 +60,8 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
   const Icon = resolveIcon(enrollment.course.iconKey);
   const s = STATUS_LABELS[enrollment.status];
 
-  const awaitingPayment = enrollment.status === 'PENDING' && enrollment.paymentStatus === 'UNPAID';
+  const paymentRejected = enrollment.paymentStatus === 'REJECTED';
+  const awaitingPayment = enrollment.status === 'PENDING' && (enrollment.paymentStatus === 'UNPAID' || paymentRejected);
   const receiptSent     = enrollment.paymentStatus === 'PENDING';
 
   const simulatePayment = async () => {
@@ -139,7 +141,7 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
       {awaitingPayment && (
         <button onClick={() => setPayOpen((v) => !v)} className="btn-primary"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
-          <CreditCard size={13} /> To'lov qilish
+          <CreditCard size={13} /> {paymentRejected ? 'Qayta yuborish' : "To'lov qilish"}
         </button>
       )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
@@ -160,6 +162,15 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
         <Hourglass size={14} style={{ color: '#d97706', flexShrink: 0 }} />
         <p style={{ fontSize: 12.5, fontWeight: 600, color: '#92400e' }}>
           Chek yuborildi — administrator tasdiqlashi bilan kurs ochiladi.
+        </p>
+      </div>
+    )}
+
+    {paymentRejected && (
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 14px', borderRadius: 10, background: '#fef2f2', border: '1px solid #fecaca' }}>
+        <AlertTriangle size={14} style={{ color: '#dc2626', flexShrink: 0, marginTop: 2 }} />
+        <p style={{ fontSize: 12.5, fontWeight: 600, color: '#991b1b' }}>
+          To'lov rad etildi{enrollment.rejectionReason ? `: ${enrollment.rejectionReason}` : ''}. Iltimos, to'g'ri chekni qayta yuklang.
         </p>
       </div>
     )}

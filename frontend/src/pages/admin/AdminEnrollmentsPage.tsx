@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Search, CheckCircle, XCircle, RotateCcw, Receipt } from 'lucide-react';
+import { Search, CheckCircle, XCircle, RotateCcw, Receipt, Ban } from 'lucide-react';
 import { listEnrollmentsAdmin, updateEnrollmentAdmin } from '../../api/enrollments';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 interface AdminEnrollment {
   id: string;
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  paymentStatus: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REFUNDED';
+  paymentStatus: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REJECTED' | 'REFUNDED';
+  rejectionReason?: string | null;
   enrolledAt: string;
   amountPaid?: string | number | null;
   receiptUrl?: string | null;
@@ -26,6 +27,7 @@ const PAYMENT_META: Record<string, { label: string; color: string }> = {
   UNPAID:   { label: "To'lanmagan",     color: '#dc2626' },
   PENDING:  { label: "To'lov kutilmoqda", color: '#d97706' },
   PAID:     { label: "To'langan",       color: '#16a34a' },
+  REJECTED: { label: 'Rad etildi',      color: '#dc2626' },
   REFUNDED: { label: 'Qaytarilgan',     color: '#64748b' },
 };
 
@@ -54,7 +56,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
 
   useEffect(load, [load]);
 
-  const act = async (id: string, data: { status?: string; paymentStatus?: string }): Promise<void> => {
+  const act = async (id: string, data: { status?: string; paymentStatus?: string; rejectionReason?: string }): Promise<void> => {
     setBusyId(id);
     try {
       const updated = await updateEnrollmentAdmin(id, data);
@@ -64,6 +66,12 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
     } finally {
       setBusyId('');
     }
+  };
+
+  const reject = (id: string): void => {
+    const reason = window.prompt("To'lovni rad etish sababini kiriting (talabaga ko'rsatiladi):");
+    if (!reason || !reason.trim()) return;
+    act(id, { paymentStatus: 'REJECTED', rejectionReason: reason.trim() });
   };
 
   return (
@@ -111,6 +119,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
             const p = PAYMENT_META[e.paymentStatus];
             const busy = busyId === e.id;
             const needsApproval = e.status === 'PENDING' && (e.paymentStatus === 'UNPAID' || e.paymentStatus === 'PENDING');
+            const canReject = e.paymentStatus === 'PENDING';
             return (
               <div key={e.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
                 <div style={{ flex:'1 1 200px', minWidth:0 }}>
@@ -122,6 +131,9 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
                   <p style={{ fontSize:12, color: p.color, fontWeight:600 }}>
                     {p.label}{!e.course.isFree && e.course.price ? ` · ${Number(e.course.price).toLocaleString('uz-UZ')} ${e.course.currency}` : ''}
                   </p>
+                  {e.paymentStatus === 'REJECTED' && e.rejectionReason && (
+                    <p style={{ fontSize:11.5, color:'#dc2626', marginTop:2 }}>Sabab: {e.rejectionReason}</p>
+                  )}
                 </div>
                 {e.receiptUrl && (
                   <a href={e.receiptUrl} target="_blank" rel="noreferrer"
@@ -137,6 +149,12 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
                     <button onClick={() => act(e.id, { paymentStatus: 'PAID' })} disabled={busy}
                       className="btn-primary" style={{ fontSize:12, padding:'8px 12px', opacity: busy ? 0.6 : 1 }}>
                       <CheckCircle size={13}/> To'lovni tasdiqlash
+                    </button>
+                  )}
+                  {canReject && (
+                    <button onClick={() => reject(e.id)} disabled={busy}
+                      style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, padding:'8px 12px', borderRadius:10, border:'1px solid #fecaca', background:'#fff', color:'#dc2626', cursor:'pointer', opacity: busy ? 0.6 : 1 }}>
+                      <Ban size={13}/> Rad etish
                     </button>
                   )}
                   {e.status === 'ACTIVE' && (

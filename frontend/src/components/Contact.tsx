@@ -3,15 +3,32 @@ import { motion } from 'framer-motion';
 import { Phone, Send, MapPin, Mail, CheckCircle, Loader, MessageSquare, AlertCircle } from 'lucide-react';
 import { sendContactMessage } from '../api/contact';
 
-interface InfoItem {
+interface StaticInfoItem {
   icon: React.ElementType;
   label: string;
-  value: string;
-  sub: string;
   color: string;
   bg: string;
   border: string;
-  href: string;
+  href: (v: string) => string;
+}
+
+interface HoursItem {
+  day: string;
+  time: string;
+  closed: boolean;
+}
+
+interface ContactSettings {
+  phone?: string;
+  telegram?: string;
+  email?: string;
+  address?: string;
+  addressSub?: string;
+  hours?: HoursItem[];
+}
+
+interface ContactProps {
+  settings?: ContactSettings;
 }
 
 interface FormState {
@@ -24,11 +41,25 @@ interface FormState {
 
 type ContactStatus = 'idle' | 'loading' | 'success' | 'error';
 
-const INFO: InfoItem[] = [
-  { icon:Phone,  label:'Telefon',  value:'+998 99 208 11 77', sub:'Du-Sha, 09:00–19:00',     color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd', href:'tel:+998992081177' },
-  { icon:Send,   label:'Telegram', value:'@datalife_uz',       sub:'Tezkor javob',             color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', href:'https://t.me/datalife_uz' },
-  { icon:Mail,   label:'Email',    value:'info@datalife.uz',   sub:'24 soat ichida javob',     color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0', href:'mailto:info@datalife.uz' },
-  { icon:MapPin, label:'Manzil',   value:'Qoraqolpog\'iston, Nukus',sub:"Amir Temur ko'chasi, 108", color:'#d97706', bg:'#fffbeb', border:'#fde68a', href:'#' },
+const DEFAULT_CONTACT: Required<ContactSettings> = {
+  phone: '+998 99 208 11 77',
+  telegram: '@datalife_uz',
+  email: 'info@datalife.uz',
+  address: "Qoraqolpog'iston, Nukus",
+  addressSub: "Amir Temur ko'chasi, 108",
+  hours: [
+    { day: 'Dushanba — Juma', time: '09:00 — 19:00', closed: false },
+    { day: 'Shanba', time: '09:00 — 19:00', closed: false },
+    { day: 'Yakshanba', time: 'Yopiq', closed: true },
+  ],
+};
+
+// Ikonka/rang doim bir xil qoladi — faqat qiymat (telefon raqami, email va h.k.) admin orqali o'zgaradi
+const INFO_META: StaticInfoItem[] = [
+  { icon:Phone,  label:'Telefon',  color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd', href:(v) => `tel:${v.replace(/\s+/g,'')}` },
+  { icon:Send,   label:'Telegram', color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', href:(v) => `https://t.me/${v.replace(/^@/,'')}` },
+  { icon:Mail,   label:'Email',    color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0', href:(v) => `mailto:${v}` },
+  { icon:MapPin, label:'Manzil',   color:'#d97706', bg:'#fffbeb', border:'#fde68a', href:() => '#' },
 ];
 
 function MapBox(): React.ReactElement {
@@ -55,7 +86,9 @@ function MapBox(): React.ReactElement {
   );
 }
 
-export default function Contact(): React.ReactElement {
+export default function Contact({ settings }: ContactProps = {}): React.ReactElement {
+  const info = { ...DEFAULT_CONTACT, ...settings };
+  const hours = settings?.hours?.length ? settings.hours : DEFAULT_CONTACT.hours;
   const [form, setForm]         = useState<FormState>({ name:'', email:'', phone:'', subject:'', message:'' });
   const [status, setStatus]     = useState<ContactStatus>('idle');
   const [errorMsg, setErrorMsg] = useState<string>('');
@@ -156,10 +189,16 @@ export default function Contact(): React.ReactElement {
           {/* Info */}
           <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}
             style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            {INFO.map((inf: InfoItem) => {
+            {([
+              { ...INFO_META[0], value: info.phone, sub: 'Du-Sha, 09:00–19:00' },
+              { ...INFO_META[1], value: info.telegram, sub: 'Tezkor javob' },
+              { ...INFO_META[2], value: info.email, sub: '24 soat ichida javob' },
+              { ...INFO_META[3], value: info.address, sub: info.addressSub },
+            ]).map((inf) => {
               const Icon = inf.icon;
+              const href = inf.href(inf.value);
               return (
-                <motion.a key={inf.label} href={inf.href} target={inf.href.startsWith('http')?'_blank':undefined} rel="noopener noreferrer"
+                <motion.a key={inf.label} href={href} target={href.startsWith('http')?'_blank':undefined} rel="noopener noreferrer"
                   whileHover={{ x:5 }} style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 18px', borderRadius:16, textDecoration:'none', background:inf.bg, border:`1.5px solid ${inf.border}`, transition:'all 0.25s', boxShadow:'0 2px 10px rgba(0,0,0,0.04)' }}>
                   <div style={{ width:42, height:42, flexShrink:0, borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', background:'#fff', border:`1.5px solid ${inf.border}`, boxShadow:'0 2px 6px rgba(0,0,0,0.06)' }}>
                     <Icon size={18} style={{ color:inf.color }}/>
@@ -175,10 +214,10 @@ export default function Contact(): React.ReactElement {
             <MapBox/>
             <div className="card" style={{ padding:'16px 18px', boxShadow:'0 2px 10px rgba(0,0,0,0.04)' }}>
               <p style={{ fontSize:13, fontWeight:800, color:'#0f172a', marginBottom:12 }}>⏰ Ish Vaqtlari</p>
-              {([['Dushanba — Juma','09:00 — 19:00',false],['Shanba','09:00 — 19:00',false],['Yakshanba','Yopiq',true]] as [string, string, boolean][]).map(([d,t,cl]) => (
-                <div key={d} style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
-                  <span style={{ fontSize:13, color:'#64748b' }}>{d}</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:cl?'#cbd5e1':'#0ea5e9', fontFamily:'JetBrains Mono,monospace' }}>{t}</span>
+              {hours.map((h: HoursItem) => (
+                <div key={h.day} style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
+                  <span style={{ fontSize:13, color:'#64748b' }}>{h.day}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:h.closed?'#cbd5e1':'#0ea5e9', fontFamily:'JetBrains Mono,monospace' }}>{h.time}</span>
                 </div>
               ))}
             </div>
