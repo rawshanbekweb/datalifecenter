@@ -17,6 +17,7 @@ import { announcementsRouter, notificationsRouter } from './notifications.routes
 import siteSettingsRoutes from './siteSettings.routes';
 import testimonialsRoutes from './testimonials.routes';
 import courseReviewsRoutes from './courseReviews.routes';
+import projectsRoutes from './projects.routes';
 import { verifyCertificateHandler } from '../controllers/enrollments.controller';
 
 const router = Router();
@@ -45,5 +46,6 @@ router.use('/announcements', announcementsRouter);
 router.use('/site-settings', siteSettingsRoutes);
 router.use('/testimonials', testimonialsRoutes);
 router.use('/reviews', courseReviewsRoutes);
+router.use('/projects', projectsRoutes);
 
 export default router;

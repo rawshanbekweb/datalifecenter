@@ -37,6 +37,15 @@ const PARTNERS = [
   { name: 'Digital Bridge', category: 'hiring' },
 ];
 
+// Namunaviy loyihalar — skrinshot admin tomonidan haqiqiy rasmga almashtirilishi kutiladi
+// (soxta statistika (foydalanuvchilar soni va h.k.) ATAYIN yo'q — faqat haqiqiy ma'lumot ko'rsatiladi)
+const PROJECTS = [
+  { title: 'EduTech Platform', category: 'Web App', techStack: ['React', 'Node.js', 'PostgreSQL', 'WebRTC'], description: "Full-stack onlayn ta'lim platformasi. Real-time video darslar va quiz tizimi." },
+  { title: 'FinTech Mobile App', category: 'Mobile', techStack: ['Flutter', 'Firebase', 'Stripe', 'BLoC'], description: 'Zamonaviy banking ilovasi. Naqd pul transferi va investitsiya boshqaruvi.' },
+  { title: 'CyberGuard Dashboard', category: 'Security', techStack: ['Python', 'Django', 'Elasticsearch', 'React'], description: 'Enterprise darajadagi kiberxavfsizlik monitoring tizimi.' },
+  { title: 'AI Content Generator', category: 'AI/ML', techStack: ['Python', 'OpenAI', 'FastAPI', 'Next.js'], description: "GPT asosidagi matn va kod generatsiya qiluvchi SaaS platforma." },
+];
+
 // Bosh sahifadagi hozirgi hardcoded qiymatlar — birinchi deploy'da sayt
 // bo'sh ko'rinmasligi uchun SiteSetting jadvaliga default sifatida yoziladi.
 const SITE_SETTINGS: { section: string; data: unknown }[] = [
@@ -243,6 +252,24 @@ async function main() {
     });
   }
   console.log(`Seeded ${PARTNERS.length} partners`);
+
+  for (const [i, p] of PROJECTS.entries()) {
+    await prisma.project.upsert({
+      where: { id: `seed-project-${i}` },
+      update: {},
+      create: {
+        id: `seed-project-${i}`,
+        title: p.title,
+        category: p.category,
+        description: p.description,
+        techStack: p.techStack,
+        screenshotUrl: '/projects/placeholder-screenshot.svg',
+        order: i,
+        featured: i === 0,
+      },
+    });
+  }
+  console.log(`Seeded ${PROJECTS.length} projects`);
 
   for (const [i, p] of BLOG_POSTS.entries()) {
     await prisma.blogPost.upsert({

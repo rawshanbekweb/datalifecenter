@@ -322,6 +322,21 @@ model Partner {
   createdAt  DateTime @default(now())
 }
 
+model Project {
+  id            String   @id @default(cuid())
+  title         String
+  category      String
+  description   String
+  techStack     String[]
+  screenshotUrl String
+  liveUrl       String?
+  repoUrl       String?
+  order         Int      @default(0)
+  featured      Boolean  @default(false)
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
 model Enrollment {
   id              String           @id @default(cuid())
   user            User             @relation(fields: [userId], references: [id])
