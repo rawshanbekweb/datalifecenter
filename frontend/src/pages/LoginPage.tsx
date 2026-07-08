@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogIn, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { roleHome } from '../utils/roleHome';
+import { roleHome, isRouteAllowedForRole } from '../utils/roleHome';
 
 interface LoginForm {
   email: string;
@@ -26,7 +26,9 @@ export default function LoginPage(): React.ReactElement {
     setStatus('loading');
     try {
       const logged = await login(form);
-      navigate(location.state?.from || roleHome(logged.role), { replace: true });
+      const from = location.state?.from;
+      const target = from && isRouteAllowedForRole(from, logged.role) ? from : roleHome(logged.role);
+      navigate(target, { replace: true });
     } catch (err: any) {
       setErrorMsg(err.message || 'Kirishda xatolik yuz berdi');
       setStatus('error');

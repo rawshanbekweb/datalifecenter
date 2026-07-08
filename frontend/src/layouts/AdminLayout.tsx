@@ -33,8 +33,12 @@ export default function AdminLayout(): React.ReactElement {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   const handleLogout = async (): Promise<void> => {
+    // Avval sahifadan chiqamiz, keyin foydalanuvchini tozalaymiz — aks holda
+    // ProtectedRoute hali /admin'da turgan holda user=null'ni ko'rib, joriy
+    // yo'lni location.state.from sifatida saqlab, /login'ga o'tkazib yuboradi
+    // (keyingi login shu eski from'ga qaytarib qo'yishi mumkin edi).
+    navigate('/', { replace: true });
     await logout();
-    navigate('/');
   };
 
   const sidebarContent = (
