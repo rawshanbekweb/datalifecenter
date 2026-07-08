@@ -14,8 +14,28 @@ export async function createContactMessage(input: ContactInput) {
   return prisma.contactMessage.create({ data: input });
 }
 
-export async function listContactMessages() {
-  return prisma.contactMessage.findMany({ orderBy: { createdAt: 'desc' } });
+interface ListMessagesFilters {
+  status?: MessageStatus;
+  page: number;
+  limit: number;
+}
+
+// Ochiq formadan kelgani uchun xabarlar cheksiz o'sadi — pagination majburiy
+export async function listContactMessages(filters: ListMessagesFilters) {
+  const where = filters.status ? { status: filters.status } : {};
+  const [items, total] = await Promise.all([
+    prisma.contactMessage.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip: (filters.page - 1) * filters.limit,
+      take: filters.limit,
+    }),
+    prisma.contactMessage.count({ where }),
+  ]);
+  return {
+    items,
+    pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
+  };
 }
 
 export async function updateContactMessageStatus(id: string, status: MessageStatus) {

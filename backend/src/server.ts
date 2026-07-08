@@ -1,3 +1,5 @@
+// Sentry birinchi bo'lib yuklanishi kerak — keyingi importlardagi xatolarni ham tutadi
+import './config/sentry';
 import { env } from './config/env';
 import app from './app';
 

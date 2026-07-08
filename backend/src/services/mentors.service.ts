@@ -1,6 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { Actor, mentorNotLinkedError, requireMentorId } from '../utils/mentorAccess';
+import { isForeignKeyViolation } from '../utils/prismaErrors';
 
 export async function listMentors() {
   return prisma.mentor.findMany({
@@ -65,6 +67,49 @@ export async function updateMentor(id: string, input: Partial<MentorInput>) {
   return prisma.mentor.update({ where: { id }, data: input });
 }
 
+// Mentor o'z profilini ko'radi
+export async function getMentorMe(userId: string) {
+  const mentor = await prisma.mentor.findUnique({
+    where: { userId },
+    include: { courses: { select: { id: true, title: true, slug: true } } },
+  });
+  if (!mentor) {
+    throw mentorNotLinkedError();
+  }
+  return mentor;
+}
+
+// Mentor o'z profilini tahrirlaydi (faqat ochiq maydonlar — featured/order/userId emas)
+export async function updateMentorMe(
+  userId: string,
+  input: Partial<Pick<MentorInput, 'name' | 'bio' | 'specialty' | 'photoUrl' | 'position' | 'linkedinUrl' | 'githubUrl' | 'telegramUrl'>>
+) {
+  const mentorId = await requireMentorId(userId);
+  return prisma.mentor.update({ where: { id: mentorId }, data: input });
+}
+
+// Kursning to'liq dasturini (modullar va darslar bilan) oladi:
+// mentor faqat o'ziga biriktirilganini, ADMIN istalganini
+export async function getMentorCourse(actor: Actor, courseId: string) {
+  const where: { id: string; mentorId?: string } = { id: courseId };
+  if (actor.role !== 'ADMIN') {
+    where.mentorId = await requireMentorId(actor.userId);
+  }
+  const course = await prisma.course.findFirst({
+    where,
+    include: {
+      modules: {
+        orderBy: { order: 'asc' },
+        include: { lessons: { orderBy: { order: 'asc' } } },
+      },
+    },
+  });
+  if (!course) {
+    throw ApiError.notFound('Kurs topilmadi yoki sizga biriktirilmagan');
+  }
+  return course;
+}
+
 // MENTOR roli uchun shaxsiy kabinet ma'lumotlari
 export async function getMentorDashboard(userId: string) {
   const mentor = await prisma.mentor.findUnique({
@@ -80,10 +125,7 @@ export async function getMentorDashboard(userId: string) {
   });
 
   if (!mentor) {
-    throw ApiError.notFound(
-      "Sizning hisobingizga mentor profili bog'lanmagan. Administratorga murojaat qiling.",
-      'MENTOR_NOT_LINKED'
-    );
+    throw mentorNotLinkedError();
   }
 
   const courseIds = mentor.courses.map((c) => c.id);
@@ -115,10 +157,7 @@ export async function getMentorStudents(userId: string) {
   });
 
   if (!mentor) {
-    throw ApiError.notFound(
-      "Sizning hisobingizga mentor profili bog'lanmagan. Administratorga murojaat qiling.",
-      'MENTOR_NOT_LINKED'
-    );
+    throw mentorNotLinkedError();
   }
 
   const courseIds = mentor.courses.map((c) => c.id);
@@ -177,7 +216,7 @@ export async function deleteMentor(id: string) {
   try {
     await prisma.mentor.delete({ where: { id } });
   } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+    if (isForeignKeyViolation(err)) {
       throw ApiError.conflict("Bu mentorga bog'langan kurslar bor, avval ularni boshqa mentorga o'tkazing", 'MENTOR_HAS_COURSES');
     }
     throw err;

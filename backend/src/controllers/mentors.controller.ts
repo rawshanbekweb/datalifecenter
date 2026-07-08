@@ -4,6 +4,27 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 
+export const getMentorMeHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const mentor = await mentorsService.getMentorMe(req.user.userId);
+  sendSuccess(res, mentor);
+});
+
+export const updateMentorMeHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const mentor = await mentorsService.updateMentorMe(req.user.userId, req.body);
+  sendSuccess(res, mentor);
+});
+
+export const getMentorCourseHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const course = await mentorsService.getMentorCourse(
+    { userId: req.user.userId, role: req.user.role },
+    req.params.id as string
+  );
+  sendSuccess(res, course);
+});
+
 export const mentorDashboardHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
   const dashboard = await mentorsService.getMentorDashboard(req.user.userId);

@@ -38,11 +38,28 @@ const PARTNERS = [
 ];
 
 async function main() {
-  const adminPasswordHash = await hashPassword('Admin123!');
+  // Production himoyasi: demo parollar va test kontent tasodifan jonli bazaga
+  // tushmasligi uchun aniq rozilik talab qilinadi (SEED_FORCE=true)
+  if (process.env.NODE_ENV === 'production' && process.env.SEED_FORCE !== 'true') {
+    console.error(
+      'Seed production muhitida bloklandi.\n' +
+        "Demo hisoblar (Admin123! kabi parollar bilan) jonli bazaga yozilishini oldini olish uchun.\n" +
+        'Agar rostdan ham xohlasangiz: SEED_FORCE=true va ADMIN_PASSWORD=<kuchli parol> bilan ishga tushiring.'
+    );
+    process.exit(1);
+  }
+
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123!';
+  if (process.env.NODE_ENV === 'production' && !process.env.ADMIN_PASSWORD) {
+    console.error('Production seed uchun ADMIN_PASSWORD env o\'zgaruvchisi majburiy.');
+    process.exit(1);
+  }
+
+  const adminPasswordHash = await hashPassword(adminPassword);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@datalife.uz' },
+    where: { email: process.env.ADMIN_EMAIL || 'admin@datalife.uz' },
     update: {},
-    create: { email: 'admin@datalife.uz', name: 'Admin', passwordHash: adminPasswordHash, role: 'ADMIN' },
+    create: { email: process.env.ADMIN_EMAIL || 'admin@datalife.uz', name: 'Admin', passwordHash: adminPasswordHash, role: 'ADMIN' },
   });
   console.log('Admin:', admin.email);
 
@@ -103,20 +120,25 @@ async function main() {
       },
     });
 
-    for (const [i, modTitle] of c.mods.entries()) {
-      const mod = await prisma.module.create({
-        data: { courseId: course.id, title: modTitle, order: i },
-      });
-      await prisma.lesson.create({
-        data: {
-          moduleId: mod.id,
-          title: `${modTitle} — Kirish`,
-          order: 0,
-          contentType: 'VIDEO',
-          durationMinutes: 20,
-          isFreePreview: i === 0,
-        },
-      });
+    // Seed qayta ishga tushirilganda modullar dublikatlanmasligi uchun —
+    // kursda modul bo'lsa, dastur allaqachon yaratilgan deb hisoblaymiz
+    const existingModules = await prisma.module.count({ where: { courseId: course.id } });
+    if (existingModules === 0) {
+      for (const [i, modTitle] of c.mods.entries()) {
+        const mod = await prisma.module.create({
+          data: { courseId: course.id, title: modTitle, order: i },
+        });
+        await prisma.lesson.create({
+          data: {
+            moduleId: mod.id,
+            title: `${modTitle} — Kirish`,
+            order: 0,
+            contentType: 'VIDEO',
+            durationMinutes: 20,
+            isFreePreview: i === 0,
+          },
+        });
+      }
     }
   }
   console.log(`Seeded ${COURSES.length} courses`);
@@ -161,9 +183,13 @@ async function main() {
     create: { email: 'student@datalife.uz', name: 'Test Student', passwordHash: studentPasswordHash, role: 'STUDENT' },
   });
 
-  await prisma.contactMessage.create({
-    data: { name: 'Jasur Aliyev', email: 'jasur@example.com', subject: 'course', message: 'Frontend kursi haqida batafsil ma\'lumot bering.' },
-  });
+  // Qayta seed'da dublikat bo'lmasligi uchun faqat birinchi marta yoziladi
+  const existingDemoMessage = await prisma.contactMessage.findFirst({ where: { email: 'jasur@example.com' } });
+  if (!existingDemoMessage) {
+    await prisma.contactMessage.create({
+      data: { name: 'Jasur Aliyev', email: 'jasur@example.com', subject: 'course', message: 'Frontend kursi haqida batafsil ma\'lumot bering.' },
+    });
+  }
 
   console.log('Seed tugadi.');
 }

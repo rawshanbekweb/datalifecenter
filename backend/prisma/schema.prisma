@@ -63,11 +63,43 @@ model User {
   role         Role         @default(STUDENT)
   isBlocked    Boolean      @default(false)
   avatarUrl    String?
+  // Parol o'zgarganda oshiriladi — eski JWT sessiyalari darhol bekor bo'ladi
+  tokenVersion Int          @default(0)
+  emailVerifiedAt DateTime?
   mentorProfile Mentor?
   enrollments  Enrollment[]
   lessonProgress LessonProgress[]
+  lessonQuestions LessonQuestion[]
+  notifications Notification[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+}
+
+// Email tasdiqlash — parol tiklash bilan bir xil naqsh (faqat hash saqlanadi)
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Parolni tiklash: xom token emas, faqat sha256 hash saqlanadi
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }
 
 model Mentor {
@@ -87,6 +119,7 @@ model Mentor {
   courses       Course[]
   blogPosts     BlogPost[]
   liveSessions  LiveSession[]
+  requests      MentorRequest[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -115,6 +148,7 @@ model Course {
   modules        Module[]
   enrollments    Enrollment[]
   liveSessions   LiveSession[]
+  announcements  Announcement[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
@@ -159,6 +193,91 @@ model Lesson {
   durationMinutes Int?
   isFreePreview   Boolean     @default(false)
   progress        LessonProgress[]
+  questions       LessonQuestion[]
+}
+
+// O'quvchi ↔ mentor muloqoti: dars ostidagi savol-javob
+model LessonQuestion {
+  id         String    @id @default(cuid())
+  lesson     Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId   String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  body       String
+  answer     String?
+  answeredAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([lessonId, createdAt])
+  @@index([userId])
+}
+
+enum MentorRequestStatus {
+  OPEN
+  ANSWERED
+  CLOSED
+}
+
+// Mentor ↔ admin aloqasi: mentorning rasmiy so'rovlari
+model MentorRequest {
+  id        String              @id @default(cuid())
+  mentor    Mentor              @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorId  String
+  subject   String
+  body      String
+  status    MentorRequestStatus @default(OPEN)
+  reply     String?
+  repliedAt DateTime?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([status, createdAt])
+  @@index([mentorId])
+}
+
+enum NotificationType {
+  QUESTION_ANSWERED
+  NEW_QUESTION
+  ENROLLMENT_ACTIVATED
+  RECEIPT_SUBMITTED
+  MENTOR_REQUEST_REPLIED
+  NEW_MENTOR_REQUEST
+  SESSION_SCHEDULED
+  ANNOUNCEMENT
+}
+
+// Kabinet ichidagi bildirishnomalar — har bir yozuv bitta foydalanuvchiga tegishli
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+enum AnnouncementAudience {
+  ALL
+  STUDENTS
+  MENTORS
+}
+
+// Admin e'lonlari — yaratilganda auditoriyaga Notification sifatida tarqatiladi
+model Announcement {
+  id        String               @id @default(cuid())
+  title     String
+  body      String
+  audience  AnnouncementAudience @default(ALL)
+  course    Course?              @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  courseId  String?
+  createdAt DateTime             @default(now())
 }
 
 model LessonProgress {

@@ -1,5 +1,40 @@
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { Actor, canManageCourse } from '../utils/mentorAccess';
+import { deleteUploadByUrl } from './storage.service';
+
+// ADMIN hamma kursni, MENTOR faqat o'ziga biriktirilgan kursni boshqaradi
+async function assertCanManageCourse(courseId: string, actor: Actor) {
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: { id: true, mentor: { select: { userId: true } } },
+  });
+  if (!course) {
+    throw ApiError.notFound('Kurs topilmadi');
+  }
+  if (!canManageCourse(actor, course.mentor?.userId)) {
+    throw ApiError.forbidden("Bu kurs sizga biriktirilmagan");
+  }
+}
+
+async function courseIdOfModule(moduleId: string): Promise<string> {
+  const module = await prisma.module.findUnique({ where: { id: moduleId }, select: { courseId: true } });
+  if (!module) {
+    throw ApiError.notFound('Modul topilmadi');
+  }
+  return module.courseId;
+}
+
+async function courseIdOfLesson(lessonId: string): Promise<string> {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    select: { module: { select: { courseId: true } } },
+  });
+  if (!lesson) {
+    throw ApiError.notFound('Dars topilmadi');
+  }
+  return lesson.module.courseId;
+}
 
 // ---------- Modules ----------
 
@@ -10,11 +45,8 @@ interface ModuleInput {
   order?: number;
 }
 
-export async function createModule(input: ModuleInput) {
-  const course = await prisma.course.findUnique({ where: { id: input.courseId } });
-  if (!course) {
-    throw ApiError.notFound('Kurs topilmadi');
-  }
+export async function createModule(input: ModuleInput, actor: Actor) {
+  await assertCanManageCourse(input.courseId, actor);
 
   let order = input.order;
   if (order === undefined) {
@@ -31,11 +63,8 @@ export async function createModule(input: ModuleInput) {
   });
 }
 
-export async function updateModule(id: string, input: Partial<Omit<ModuleInput, 'courseId'>>) {
-  const module = await prisma.module.findUnique({ where: { id } });
-  if (!module) {
-    throw ApiError.notFound('Modul topilmadi');
-  }
+export async function updateModule(id: string, input: Partial<Omit<ModuleInput, 'courseId'>>, actor: Actor) {
+  await assertCanManageCourse(await courseIdOfModule(id), actor);
   return prisma.module.update({
     where: { id },
     data: input,
@@ -43,12 +72,14 @@ export async function updateModule(id: string, input: Partial<Omit<ModuleInput, 
   });
 }
 
-export async function deleteModule(id: string) {
-  const module = await prisma.module.findUnique({ where: { id } });
-  if (!module) {
-    throw ApiError.notFound('Modul topilmadi');
-  }
+export async function deleteModule(id: string, actor: Actor) {
+  await assertCanManageCourse(await courseIdOfModule(id), actor);
+  // Modul o'chirilganda ichidagi dars videolari xotirada yetim qolmasin
+  const lessons = await prisma.lesson.findMany({ where: { moduleId: id }, select: { videoUrl: true } });
   await prisma.module.delete({ where: { id } });
+  for (const lesson of lessons) {
+    await deleteUploadByUrl(lesson.videoUrl);
+  }
 }
 
 // ---------- Lessons ----------
@@ -63,11 +94,8 @@ interface LessonInput {
   order?: number;
 }
 
-export async function createLesson(moduleId: string, input: LessonInput) {
-  const module = await prisma.module.findUnique({ where: { id: moduleId } });
-  if (!module) {
-    throw ApiError.notFound('Modul topilmadi');
-  }
+export async function createLesson(moduleId: string, input: LessonInput, actor: Actor) {
+  await assertCanManageCourse(await courseIdOfModule(moduleId), actor);
 
   let order = input.order;
   if (order === undefined) {
@@ -92,18 +120,24 @@ export async function createLesson(moduleId: string, input: LessonInput) {
   });
 }
 
-export async function updateLesson(id: string, input: Partial<LessonInput>) {
-  const lesson = await prisma.lesson.findUnique({ where: { id } });
-  if (!lesson) {
-    throw ApiError.notFound('Dars topilmadi');
+export async function updateLesson(id: string, input: Partial<LessonInput>, actor: Actor) {
+  await assertCanManageCourse(await courseIdOfLesson(id), actor);
+
+  // Video almashtirilsa eskisi xotirada yetim qolmasin
+  if (input.videoUrl !== undefined) {
+    const old = await prisma.lesson.findUnique({ where: { id }, select: { videoUrl: true } });
+    if (old?.videoUrl && old.videoUrl !== input.videoUrl) {
+      await deleteUploadByUrl(old.videoUrl);
+    }
   }
+
   return prisma.lesson.update({ where: { id }, data: input });
 }
 
-export async function deleteLesson(id: string) {
-  const lesson = await prisma.lesson.findUnique({ where: { id } });
-  if (!lesson) {
-    throw ApiError.notFound('Dars topilmadi');
-  }
+export async function deleteLesson(id: string, actor: Actor) {
+  await assertCanManageCourse(await courseIdOfLesson(id), actor);
+  const lesson = await prisma.lesson.findUnique({ where: { id }, select: { videoUrl: true } });
   await prisma.lesson.delete({ where: { id } });
+  await deleteUploadByUrl(lesson?.videoUrl);
 }
+

@@ -12,10 +12,15 @@ import { lessonsRouter, modulesRouter } from './curriculum.routes';
 import progressRoutes from './progress.routes';
 import sessionsRoutes from './sessions.routes';
 import uploadsRoutes from './uploads.routes';
+import { mentorRequestsRouter, questionsRouter } from './questions.routes';
+import { announcementsRouter, notificationsRouter } from './notifications.routes';
+import { verifyCertificateHandler } from '../controllers/enrollments.controller';
 
 const router = Router();
 
 router.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
+// Ochiq sertifikat tekshiruvi — ish beruvchilar uchun, login talab qilinmaydi
+router.get('/certificates/:no/verify', verifyCertificateHandler);
 router.use('/auth', authRoutes);
 router.use('/contact', contactRoutes);
 router.use('/courses', coursesRoutes);
@@ -30,5 +35,9 @@ router.use('/lessons', lessonsRouter);
 router.use('/progress', progressRoutes);
 router.use('/sessions', sessionsRoutes);
 router.use('/uploads', uploadsRoutes);
+router.use('/questions', questionsRouter);
+router.use('/mentor-requests', mentorRequestsRouter);
+router.use('/notifications', notificationsRouter);
+router.use('/announcements', announcementsRouter);
 
 export default router;

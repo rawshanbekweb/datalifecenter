@@ -7,6 +7,8 @@ export interface CertificateData {
   completedAt: Date;
   certificateNo: string;
   durationMonths: number;
+  // Ochiq tekshirish sahifasi manzili — PDF pastida ko'rsatiladi
+  verifyUrl?: string;
 }
 
 // Landshaft A4 sertifikat PDF'ini to'g'ridan-to'g'ri response'ga oqizadi
@@ -64,6 +66,11 @@ export function streamCertificatePdf(res: Response, data: CertificateData): void
   doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(12).text('DATA LIFE', W - 290, bottomY, { width: 180, align: 'center' });
   doc.moveTo(W - 290, bottomY + 20).lineTo(W - 110, bottomY + 20).lineWidth(1).stroke('#94a3b8');
   doc.fillColor('#64748b').font('Helvetica').fontSize(10).text("O'quv markazi", W - 290, bottomY + 26, { width: 180, align: 'center' });
+
+  if (data.verifyUrl) {
+    doc.fillColor('#94a3b8').font('Helvetica').fontSize(8.5)
+      .text(`Haqiqiyligini tekshirish: ${data.verifyUrl} (raqam: ${data.certificateNo})`, 0, H - 62, { align: 'center' });
+  }
 
   doc.end();
 }

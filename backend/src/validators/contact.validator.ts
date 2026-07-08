@@ -11,3 +11,9 @@ export const contactMessageSchema = z.object({
 export const updateContactMessageStatusSchema = z.object({
   status: z.enum(['NEW', 'READ', 'REPLIED', 'ARCHIVED']),
 });
+
+export const listContactMessagesQuerySchema = z.object({
+  status: z.enum(['NEW', 'READ', 'REPLIED', 'ARCHIVED']).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});

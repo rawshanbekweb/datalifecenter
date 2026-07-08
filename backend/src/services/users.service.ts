@@ -110,7 +110,8 @@ export async function resetUserPassword(id: string) {
   const tempPassword = Array.from(crypto.randomBytes(10), (b) => alphabet[b % alphabet.length]).join('');
 
   const passwordHash = await hashPassword(tempPassword);
-  await prisma.user.update({ where: { id }, data: { passwordHash } });
+  // tokenVersion oshadi — foydalanuvchining barcha eski sessiyalari bekor bo'ladi
+  await prisma.user.update({ where: { id }, data: { passwordHash, tokenVersion: { increment: 1 } } });
 
   return { tempPassword };
 }

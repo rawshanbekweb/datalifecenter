@@ -54,6 +54,12 @@ export const certificateHandler = asyncHandler(async (req: Request, res: Respons
   streamCertificatePdf(res, data);
 });
 
+// Ochiq endpoint — autentifikatsiya talab qilinmaydi
+export const verifyCertificateHandler = asyncHandler(async (req: Request, res: Response) => {
+  const data = await enrollmentsService.verifyCertificate(req.params.no as string);
+  sendSuccess(res, data);
+});
+
 export const mockPayHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
   const enrollment = await enrollmentsService.mockPayEnrollment(req.user.userId, req.params.id as string);

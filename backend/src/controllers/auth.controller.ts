@@ -15,16 +15,19 @@ const cookieOptions: CookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
+// Token cookie'da HAM, javob tanasida HAM qaytadi: Safari va boshqa brauzerlar
+// krossdomen (vercel.app ↔ onrender.com) cookie'ni bloklaydi — frontend tokenni
+// localStorage'ga olib Authorization header orqali yuboradi.
 export const registerHandler = asyncHandler(async (req: Request, res: Response) => {
   const { user, token } = await authService.register(req.body);
   res.cookie('token', token, cookieOptions);
-  sendSuccess(res, user, 201);
+  sendSuccess(res, { user, token }, 201);
 });
 
 export const loginHandler = asyncHandler(async (req: Request, res: Response) => {
   const { user, token } = await authService.login(req.body);
   res.cookie('token', token, cookieOptions);
-  sendSuccess(res, user);
+  sendSuccess(res, { user, token });
 });
 
 export const logoutHandler = asyncHandler(async (_req: Request, res: Response) => {
@@ -46,6 +49,31 @@ export const updateProfileHandler = asyncHandler(async (req: Request, res: Respo
 
 export const changePasswordHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  await authService.changePassword(req.user.userId, req.body.currentPassword, req.body.newPassword);
-  sendSuccess(res, { message: "Parol o'zgartirildi" });
+  // tokenVersion oshgani uchun joriy sessiyaga yangi token beriladi —
+  // foydalanuvchi o'zi chiqib qolmaydi, boshqa qurilmalardagi sessiyalar bekor bo'ladi
+  const token = await authService.changePassword(req.user.userId, req.body.currentPassword, req.body.newPassword);
+  res.cookie('token', token, cookieOptions);
+  sendSuccess(res, { message: "Parol o'zgartirildi", token });
+});
+
+export const verifyEmailHandler = asyncHandler(async (req: Request, res: Response) => {
+  await authService.verifyEmail(req.body.token);
+  sendSuccess(res, { message: 'Email tasdiqlandi' });
+});
+
+export const resendVerificationHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  await authService.resendVerification(req.user.userId);
+  sendSuccess(res, { message: 'Tasdiqlash havolasi qayta yuborildi' });
+});
+
+export const forgotPasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  await authService.forgotPassword(req.body.email);
+  // Email bazada bor-yo'qligini oshkor qilmaymiz — javob har doim bir xil
+  sendSuccess(res, { message: "Agar bu email ro'yxatdan o'tgan bo'lsa, parolni tiklash havolasi yuborildi" });
+});
+
+export const resetPasswordHandler = asyncHandler(async (req: Request, res: Response) => {
+  await authService.resetPassword(req.body.token, req.body.newPassword);
+  sendSuccess(res, { message: "Parol yangilandi. Endi yangi parol bilan kirishingiz mumkin." });
 });

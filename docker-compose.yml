@@ -1,0 +1,54 @@
+# DATA LIFE backend + PostgreSQL — bitta buyruq bilan ko'tarish:
+#   docker compose up -d --build
+# Demo ma'lumotlar kerak bo'lsa (backend papkasidan, hostdan):
+#   DATABASE_URL="postgresql://datalife:datalife_dev_password@localhost:5433/datalife?schema=public" npm run seed
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: datalife
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-datalife_dev_password}
+      POSTGRES_DB: datalife
+    ports:
+      # Hostdan seed/psql uchun (lokal 5432 band bo'lishi mumkin — 5433 tanlandi)
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U datalife -d datalife']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://datalife:${POSTGRES_PASSWORD:-datalife_dev_password}@db:5432/datalife?schema=public
+      PORT: 4000
+      NODE_ENV: ${NODE_ENV:-development}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      JWT_SECRET: ${JWT_SECRET:-docker-dev-secret-only-change-in-production!!}
+      JWT_EXPIRES_IN: 7d
+      # Ixtiyoriy: email va bulut xotira
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+    ports:
+      - '4000:4000'
+    volumes:
+      # Lokal rejimda yuklangan fayllar konteyner qayta qurilganda yo'qolmasligi uchun
+      - uploads:/app/uploads
+
+volumes:
+  pgdata:
+  uploads:

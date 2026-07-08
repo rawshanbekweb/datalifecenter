@@ -4,6 +4,9 @@ import { env } from '../config/env';
 export interface JwtPayload {
   userId: string;
   role: string;
+  // tokenVersion: parol o'zgarganda bazadagi qiymat oshadi va eski tokenlar
+  // bekor bo'ladi. Eski (tv'siz) tokenlar 0 deb qabul qilinadi.
+  tv?: number;
 }
 
 export function signToken(payload: JwtPayload): string {

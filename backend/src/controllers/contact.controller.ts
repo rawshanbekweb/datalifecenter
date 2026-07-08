@@ -8,8 +8,13 @@ export const createContactMessageHandler = asyncHandler(async (req: Request, res
   sendSuccess(res, message, 201);
 });
 
-export const listContactMessagesHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const messages = await contactService.listContactMessages();
+export const listContactMessagesHandler = asyncHandler(async (req: Request, res: Response) => {
+  const filters = req.validatedQuery as {
+    status?: 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
+    page: number;
+    limit: number;
+  };
+  const messages = await contactService.listContactMessages(filters);
   sendSuccess(res, messages);
 });
 

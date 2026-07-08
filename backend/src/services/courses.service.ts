@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { isForeignKeyViolation } from '../utils/prismaErrors';
 import { slugify } from '../utils/slugify';
 
 interface ListCoursesFilters {
@@ -193,7 +194,7 @@ export async function deleteCourse(id: string) {
   try {
     await prisma.course.delete({ where: { id } });
   } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
+    if (isForeignKeyViolation(err)) {
       throw ApiError.conflict("Bu kursga talabalar yozilgan, avval ularni olib tashlang", 'COURSE_HAS_ENROLLMENTS');
     }
     throw err;

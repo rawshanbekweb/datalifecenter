@@ -24,3 +24,16 @@ export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Joriy parol kerak'),
   newPassword: z.string().min(6, "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak"),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("Email noto'g'ri"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token kerak'),
+  newPassword: z.string().min(6, "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak"),
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, 'Token kerak'),
+});

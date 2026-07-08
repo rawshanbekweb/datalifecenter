@@ -1,6 +1,10 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
+import { notify, notifyAdmins } from './notifications.service';
+import { sendPaymentConfirmedEmail } from './email.service';
+import { deleteUploadByUrl } from './storage.service';
 
 export async function createEnrollment(userId: string, courseId: string) {
   const course = await prisma.course.findFirst({ where: { id: courseId, published: true } });
@@ -121,7 +125,7 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     data.completedAt = enrollment.completedAt ?? new Date();
   }
 
-  return prisma.enrollment.update({
+  const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
     data,
     include: {
@@ -129,13 +133,30 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
       course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
     },
   });
+
+  if (updated.status === 'ACTIVE' && enrollment.status !== 'ACTIVE') {
+    await notify(updated.userId, {
+      type: 'ENROLLMENT_ACTIVATED',
+      title: `Kurs ochildi: ${updated.course.title}`,
+      body: "To'lovingiz tasdiqlandi — darslarni boshlashingiz mumkin.",
+      link: `/learn/${updated.course.slug}`,
+    });
+  }
+
+  // To'lov endi tasdiqlangan bo'lsa talabaga email ham yuboriladi
+  if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
+    const courseUrl = `${env.FRONTEND_URL.replace(/\/+$/, '')}/learn/${updated.course.slug}`;
+    await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, updated.course.title, courseUrl);
+  }
+
+  return updated;
 }
 
 // Talaba to'lov chekini yuboradi — admin tasdiqlashini kutadi
 export async function submitReceipt(userId: string, enrollmentId: string, receiptUrl: string) {
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
-    include: { course: true },
+    include: { course: true, user: { select: { name: true } } },
   });
 
   if (!enrollment || enrollment.userId !== userId) {
@@ -148,11 +169,25 @@ export async function submitReceipt(userId: string, enrollmentId: string, receip
     throw ApiError.conflict("Bu yozilish uchun to'lov allaqachon tasdiqlangan", 'ALREADY_PAID');
   }
 
-  return prisma.enrollment.update({
+  // Yangi chek yuklansa eskisi xotirada yetim qolmasin
+  if (enrollment.receiptUrl && enrollment.receiptUrl !== receiptUrl) {
+    await deleteUploadByUrl(enrollment.receiptUrl);
+  }
+
+  const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: { receiptUrl, paymentStatus: 'PENDING', provider: 'receipt' },
     include: { course: true },
   });
+
+  await notifyAdmins({
+    type: 'RECEIPT_SUBMITTED',
+    title: "Yangi to'lov cheki yuklandi",
+    body: `${enrollment.user.name} — ${enrollment.course.title}`,
+    link: '/admin/enrollments',
+  });
+
+  return updated;
 }
 
 // Sertifikat ma'lumotlari — faqat yakunlangan kurs uchun, egasi yoki admin
@@ -178,6 +213,38 @@ export async function getCertificateData(userId: string, role: string, enrollmen
     durationMonths: enrollment.course.durationMonths,
     completedAt: enrollment.completedAt ?? new Date(),
     certificateNo: `DL-${enrollment.id.slice(-8).toUpperCase()}`,
+    verifyUrl: `${env.FRONTEND_URL.replace(/\/+$/, '')}/verify-certificate`,
+  };
+}
+
+// Ochiq sertifikat tekshiruvi: raqam bo'yicha haqiqiyligini istalgan kishi
+// (masalan, ish beruvchi) tekshira oladi. Raqam enrollment id'sining oxirgi
+// 8 belgisidan yasaladi (getCertificateData bilan bir xil format).
+export async function verifyCertificate(certificateNo: string) {
+  const match = /^DL-([A-Za-z0-9]{8})$/.exec(certificateNo.trim());
+  if (!match) {
+    throw ApiError.notFound('Sertifikat topilmadi yoki raqam formati noto\'g\'ri', 'CERTIFICATE_NOT_FOUND');
+  }
+
+  const suffix = match[1].toLowerCase();
+  const enrollment = await prisma.enrollment.findFirst({
+    where: { id: { endsWith: suffix }, status: 'COMPLETED' },
+    include: {
+      user: { select: { name: true } },
+      course: { select: { title: true, durationMonths: true } },
+    },
+  });
+
+  if (!enrollment) {
+    throw ApiError.notFound('Bunday raqamli haqiqiy sertifikat topilmadi', 'CERTIFICATE_NOT_FOUND');
+  }
+
+  return {
+    certificateNo: `DL-${suffix.toUpperCase()}`,
+    studentName: enrollment.user.name,
+    courseTitle: enrollment.course.title,
+    durationMonths: enrollment.course.durationMonths,
+    completedAt: enrollment.completedAt,
   };
 }
 

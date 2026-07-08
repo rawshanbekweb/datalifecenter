@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { notify } from './notifications.service';
 
 const sessionInclude = {
   course: { select: { id: true, title: true, slug: true, color: true, bg: true, border: true, iconKey: true } },
@@ -62,10 +63,27 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
     mentorId = mentor.id;
   }
 
-  return prisma.liveSession.create({
+  const session = await prisma.liveSession.create({
     data: { ...input, mentorId },
     include: sessionInclude,
   });
+
+  // Kursning faol talabalariga yangi jonli dars haqida xabar
+  const enrollments = await prisma.enrollment.findMany({
+    where: { courseId: input.courseId, status: 'ACTIVE' },
+    select: { userId: true },
+  });
+  await notify(
+    enrollments.map((e) => e.userId),
+    {
+      type: 'SESSION_SCHEDULED',
+      title: `Yangi jonli dars: ${session.title}`,
+      body: `${course.title} — ${new Date(session.startsAt).toLocaleString('uz-UZ')}`,
+      link: '/student/sessions',
+    }
+  );
+
+  return session;
 }
 
 // Talaba: o'zi yozilgan (ACTIVE/COMPLETED) kurslarning yaqin sessiyalari
