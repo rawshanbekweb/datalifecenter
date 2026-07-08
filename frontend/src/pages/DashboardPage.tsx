@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare } from 'lucide-react';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
+import { getMyCourseReview, submitCourseReview } from '../api/reviews';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
@@ -86,6 +87,37 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
     }
   };
 
+  const [reviewOpen, setReviewOpen]   = useState<boolean>(false);
+  const [myReview, setMyReview]       = useState<{ rating: number; comment: string } | null>(null);
+  const [reviewForm, setReviewForm]   = useState<{ rating: number; comment: string }>({ rating: 5, comment: '' });
+  const [reviewState, setReviewState] = useState<'idle' | 'saving' | 'error'>('idle');
+
+  useEffect(() => {
+    if (enrollment.status !== 'COMPLETED') return;
+    let cancelled = false;
+    getMyCourseReview(enrollment.course.slug)
+      .then((review: { rating: number; comment: string } | null) => {
+        if (cancelled || !review) return;
+        setMyReview(review);
+        setReviewForm({ rating: review.rating, comment: review.comment });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [enrollment.status, enrollment.course.slug]);
+
+  const saveReview = async () => {
+    if (!reviewForm.comment.trim()) return;
+    setReviewState('saving');
+    try {
+      const saved = await submitCourseReview(enrollment.course.slug, reviewForm);
+      setMyReview(saved);
+      setReviewOpen(false);
+      setReviewState('idle');
+    } catch {
+      setReviewState('error');
+    }
+  };
+
   const getCertificate = async () => {
     setCertState('loading');
     try {
@@ -136,6 +168,12 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
         <button onClick={getCertificate} disabled={certState === 'loading'} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0, opacity: certState === 'loading' ? 0.7 : 1 }}>
           <Award size={13} /> {certState === 'loading' ? 'Tayyorlanmoqda...' : 'Sertifikat'}
+        </button>
+      )}
+      {enrollment.status === 'COMPLETED' && (
+        <button onClick={() => setReviewOpen((v) => !v)} className="btn-outline"
+          style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
+          <MessageSquare size={13} /> {myReview ? 'Sharhni tahrirlash' : 'Sharh qoldirish'}
         </button>
       )}
       {awaitingPayment && (
@@ -195,6 +233,32 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
           </button>
           {receiptState === 'error' && (
             <span style={{ fontSize: 12, color: '#dc2626' }}>Yuborishda xatolik. Qayta urinib ko'ring.</span>
+          )}
+        </div>
+      </div>
+    )}
+
+    {enrollment.status === 'COMPLETED' && reviewOpen && (
+      <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Reyting</p>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" onClick={() => setReviewForm((f) => ({ ...f, rating: n }))}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
+              <Star size={22} fill={n <= reviewForm.rating ? '#f59e0b' : 'none'} style={{ color: '#f59e0b' }} />
+            </button>
+          ))}
+        </div>
+        <textarea className="inp" rows={3} value={reviewForm.comment}
+          onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
+          placeholder="Kurs haqida fikringizni yozing..." style={{ resize: 'none', marginBottom: 12 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button onClick={saveReview} disabled={!reviewForm.comment.trim() || reviewState === 'saving'} className="btn-primary"
+            style={{ fontSize: 12.5, padding: '9px 16px', opacity: !reviewForm.comment.trim() || reviewState === 'saving' ? 0.6 : 1 }}>
+            {reviewState === 'saving' ? 'Saqlanmoqda...' : 'Sharhni saqlash'}
+          </button>
+          {reviewState === 'error' && (
+            <span style={{ fontSize: 12, color: '#dc2626' }}>Saqlashda xatolik. Qayta urinib ko'ring.</span>
           )}
         </div>
       </div>

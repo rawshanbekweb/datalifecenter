@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -25,6 +25,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Xabarlar',          to: '/admin/messages',    icon: Mail },
   { label: 'Sayt sozlamalari',  to: '/admin/site-settings', icon: Settings },
   { label: 'Sharhlar',          to: '/admin/testimonials', icon: Star },
+  { label: 'Kurs sharhlari',    to: '/admin/course-reviews', icon: MessageSquare },
 ];
 
 export default function AdminLayout(): React.ReactElement {

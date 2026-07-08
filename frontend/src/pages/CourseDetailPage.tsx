@@ -7,6 +7,7 @@ import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/en
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import ComingSoon from '../components/common/ComingSoon';
+import CourseReviews from '../components/courses/CourseReviews';
 
 interface Lesson {
   id: string | number;
@@ -38,6 +39,7 @@ interface CourseDetail {
   bg: string;
   border: string;
   rating?: number | string;
+  reviewsCount?: number;
   level: keyof typeof LEVEL_LABELS;
   price: number | string;
   currency: string;
@@ -191,6 +193,8 @@ export default function CourseDetailPage(): React.ReactElement {
                 ))}
               </div>
             ))}
+
+            <CourseReviews slug={course.slug} rating={course.rating} reviewsCount={course.reviewsCount} color={course.color} />
           </div>
 
           <div>
