@@ -160,7 +160,7 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
 
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
               style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:44 }}>
-              <button className="btn-primary">Start Learning <ArrowRight size={15} /></button>
+              <a href="#contact"><button className="btn-primary">Start Learning <ArrowRight size={15} /></button></a>
               <a href="#contact"><button className="btn-outline">Contact Us</button></a>
             </motion.div>
 

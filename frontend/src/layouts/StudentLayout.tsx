@@ -4,6 +4,7 @@ import {
   LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import NotificationBell from '../components/common/NotificationBell';
 
 interface NavItem {
   label: string;
@@ -102,6 +103,7 @@ export default function StudentLayout(): React.ReactElement {
           </button>
           <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>Talaba kabineti</p>
           <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
+            <NotificationBell />
             <div style={{ textAlign:'right' }}>
               <p style={{ fontSize:13, fontWeight:700, color:'#0f172a', lineHeight:1.2 }}>{user?.name}</p>
               <p style={{ fontSize:11, color:'#94a3b8' }}>{user?.email}</p>

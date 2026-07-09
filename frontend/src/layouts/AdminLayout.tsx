@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import NotificationBell from '../components/common/NotificationBell';
 
 interface NavItem {
   label: string;
@@ -24,6 +25,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Hamkorlar',         to: '/admin/partners',    icon: Handshake },
   { label: 'Loyihalar',         to: '/admin/projects',    icon: LayoutGrid },
   { label: 'Xabarlar',          to: '/admin/messages',    icon: Mail },
+  { label: "E'lonlar",          to: '/admin/announcements', icon: Megaphone },
   { label: 'Sayt sozlamalari',  to: '/admin/site-settings', icon: Settings },
   { label: 'Sharhlar',          to: '/admin/testimonials', icon: Star },
   { label: 'Kurs sharhlari',    to: '/admin/course-reviews', icon: MessageSquare },
@@ -111,6 +113,7 @@ export default function AdminLayout(): React.ReactElement {
           </button>
           <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>Platforma boshqaruvi</p>
           <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
+            <NotificationBell />
             <div style={{ textAlign:'right' }}>
               <p style={{ fontSize:13, fontWeight:700, color:'#0f172a', lineHeight:1.2 }}>{user?.name}</p>
               <p style={{ fontSize:11, color:'#94a3b8' }}>{user?.email}</p>

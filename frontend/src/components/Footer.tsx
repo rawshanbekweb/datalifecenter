@@ -5,21 +5,43 @@ import { GitBranch, MessageCircle, Briefcase, Camera, Play, Send, ArrowRight } f
 interface SocialItem {
   icon: React.ElementType;
   label: string;
+  href: string;
 }
 
-const LINKS: Record<string, string[]> = {
-  'Kurslar':   ['Frontend Dev','Backend Dev','Cyber Security','Mobile Dev','Data Science','Cloud & DevOps'],
-  'Xizmatlar': ['Web Development','Mobile Apps','UI/UX Design','IT Consulting','Digital Solutions'],
-  'Kompaniya': ['Biz Haqimizda','Blog','Loyihalar','Karera','Hamkorlik'],
+interface FooterLink {
+  label: string;
+  href: string;
+}
+
+const LINKS: Record<string, FooterLink[]> = {
+  'Kurslar':   [
+    { label:'Barcha Kurslar', href:'/courses' },
+    { label:'Nima Uchun Biz', href:'/#why-us' },
+  ],
+  'Xizmatlar': [
+    { label:'Web Development', href:'/#services' },
+    { label:'Mobile Apps',     href:'/#services' },
+    { label:'UI/UX Design',    href:'/#services' },
+    { label:'IT Consulting',   href:'/#services' },
+    { label:'Digital Solutions', href:'/#services' },
+  ],
+  'Kompaniya': [
+    { label:'Biz Haqimizda', href:'/about' },
+    { label:'Blog',          href:'/blog' },
+    { label:'Loyihalar',     href:'/#projects' },
+    { label:'Hamkorlik',     href:'/partners' },
+  ],
 };
+// href bo'sh qoldirilgan ikonkalar butunlay ko'rsatilmaydi — haqiqiy sahifa
+// mavjud bo'lganda shu yerga havolani yozish kifoya, boshqa kod o'zgarishi shart emas
 const SOCIALS: SocialItem[] = [
-  { icon:GitBranch,    label:'GitHub'     },
-  { icon:MessageCircle,label:'Twitter/X'  },
-  { icon:Briefcase,    label:'LinkedIn'   },
-  { icon:Camera,       label:'Instagram'  },
-  { icon:Play,         label:'YouTube'    },
-  { icon:Send,         label:'Telegram'   },
-];
+  { icon:GitBranch,    label:'GitHub',    href:'' },
+  { icon:MessageCircle,label:'Twitter/X', href:'' },
+  { icon:Briefcase,    label:'LinkedIn',  href:'' },
+  { icon:Camera,       label:'Instagram', href:'' },
+  { icon:Play,         label:'YouTube',   href:'' },
+  { icon:Send,         label:'Telegram',  href:'' },
+].filter((s) => s.href);
 
 export default function Footer(): React.ReactElement {
   return (
@@ -54,28 +76,30 @@ export default function Footer(): React.ReactElement {
             <p style={{ fontSize:13, color:'rgba(255,255,255,0.4)', lineHeight:1.8, maxWidth:230, marginBottom:20 }}>
               O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash va raqamli mahsulotlar — bizning missiyamiz.
             </p>
-            <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
-              {SOCIALS.map(({ icon:Icon, label }: SocialItem) => (
-                <motion.a key={label} href="#" aria-label={label} title={label} whileHover={{ y:-3 }}
-                  style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.12)', cursor:'pointer', textDecoration:'none', color:'rgba(255,255,255,0.45)', transition:'all 0.2s' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='#0ea5e9'; e.currentTarget.style.color='#fff';}}
-                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.07)'; e.currentTarget.style.color='rgba(255,255,255,0.45)';}}>
-                  <Icon size={13}/>
-                </motion.a>
-              ))}
-            </div>
+            {SOCIALS.length > 0 && (
+              <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
+                {SOCIALS.map(({ icon:Icon, label, href }: SocialItem) => (
+                  <motion.a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} whileHover={{ y:-3 }}
+                    style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.12)', cursor:'pointer', textDecoration:'none', color:'rgba(255,255,255,0.45)', transition:'all 0.2s' }}
+                    onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='#0ea5e9'; e.currentTarget.style.color='#fff';}}
+                    onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.07)'; e.currentTarget.style.color='rgba(255,255,255,0.45)';}}>
+                    <Icon size={13}/>
+                  </motion.a>
+                ))}
+              </div>
+            )}
           </div>
 
-          {Object.entries(LINKS).map(([section, links]: [string, string[]]) => (
+          {Object.entries(LINKS).map(([section, links]: [string, FooterLink[]]) => (
             <div key={section}>
               <h4 style={{ fontSize:12, fontWeight:700, color:'#fff', marginBottom:14, textTransform:'uppercase', letterSpacing:'0.08em' }}>{section}</h4>
               <ul style={{ listStyle:'none', display:'flex', flexDirection:'column', gap:9 }}>
-                {links.map((l: string) => (
-                  <li key={l}>
-                    <a href="#" style={{ fontSize:13, color:'rgba(255,255,255,0.4)', textDecoration:'none', transition:'color 0.2s' }}
+                {links.map((l: FooterLink) => (
+                  <li key={l.label}>
+                    <a href={l.href} style={{ fontSize:13, color:'rgba(255,255,255,0.4)', textDecoration:'none', transition:'color 0.2s' }}
                       onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color='#fff')}
                       onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color='rgba(255,255,255,0.4)')}>
-                      {l}
+                      {l.label}
                     </a>
                   </li>
                 ))}

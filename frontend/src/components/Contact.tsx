@@ -62,26 +62,12 @@ const INFO_META: StaticInfoItem[] = [
   { icon:MapPin, label:'Manzil',   color:'#d97706', bg:'#fffbeb', border:'#fde68a', href:() => '#' },
 ];
 
-function MapBox(): React.ReactElement {
+function MapBox({ query }: { query: string }): React.ReactElement {
+  const src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
   return (
-    <div style={{ borderRadius:16, height:190, position:'relative', overflow:'hidden', background:'#f8fafc', border:'1.5px solid #e2e8f0', display:'flex', alignItems:'center', justifyContent:'center' }}>
-      <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:0.3 }}>
-        {Array.from({length:7}).map((_,i) => <line key={`h${i}`} x1="0" y1={`${(i+1)*12.5}%`} x2="100%" y2={`${(i+1)*12.5}%`} stroke="#0ea5e9" strokeWidth="0.7" strokeDasharray="6,12"/>)}
-        {Array.from({length:9}).map((_,i) => <line key={`v${i}`} x1={`${(i+1)*10}%`} y1="0" x2={`${(i+1)*10}%`} y2="100%" stroke="#0ea5e9" strokeWidth="0.7" strokeDasharray="6,12"/>)}
-      </svg>
-      <motion.div animate={{ y:[-5,0,-5] }} transition={{ duration:2, repeat:Infinity, ease:'easeInOut' }}
-        style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, zIndex:1 }}>
-        <div style={{ width:44, height:44, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#0ea5e9', boxShadow:'0 4px 16px rgba(14,165,233,0.35)' }}>
-          <MapPin size={20} style={{ color:'#fff' }} />
-        </div>
-        <div style={{ background:'#fff', padding:'4px 14px', borderRadius:20, border:'1px solid #e2e8f0', boxShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
-          <span style={{ fontSize:11, color:'#0f172a', fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>DATA LIFE — Toshkent</span>
-        </div>
-      </motion.div>
-      {[1,2].map((i: number) => (
-        <motion.div key={i} style={{ position:'absolute', borderRadius:'50%', border:'1.5px solid rgba(14,165,233,0.35)', width:50+i*36, height:50+i*36 }}
-          animate={{ opacity:[0.5,0,0.5], scale:[1,1.2,1] }} transition={{ duration:2.5, delay:i*0.5, repeat:Infinity }} />
-      ))}
+    <div style={{ borderRadius:16, height:190, overflow:'hidden', border:'1.5px solid #e2e8f0', boxShadow:'0 2px 10px rgba(0,0,0,0.04)' }}>
+      <iframe title="DATA LIFE manzili" src={src} width="100%" height="100%" style={{ border:0, display:'block' }}
+        loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
     </div>
   );
 }
@@ -89,6 +75,8 @@ function MapBox(): React.ReactElement {
 export default function Contact({ settings }: ContactProps = {}): React.ReactElement {
   const info = { ...DEFAULT_CONTACT, ...settings };
   const hours = settings?.hours?.length ? settings.hours : DEFAULT_CONTACT.hours;
+  const mapQuery = [info.address, info.addressSub].filter(Boolean).join(', ');
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
   const [form, setForm]         = useState<FormState>({ name:'', email:'', phone:'', subject:'', message:'' });
   const [status, setStatus]     = useState<ContactStatus>('idle');
   const [errorMsg, setErrorMsg] = useState<string>('');
@@ -193,7 +181,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
               { ...INFO_META[0], value: info.phone, sub: 'Du-Sha, 09:00–19:00' },
               { ...INFO_META[1], value: info.telegram, sub: 'Tezkor javob' },
               { ...INFO_META[2], value: info.email, sub: '24 soat ichida javob' },
-              { ...INFO_META[3], value: info.address, sub: info.addressSub },
+              { ...INFO_META[3], value: info.address, sub: info.addressSub, href: () => mapsUrl },
             ]).map((inf) => {
               const Icon = inf.icon;
               const href = inf.href(inf.value);
@@ -211,7 +199,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
                 </motion.a>
               );
             })}
-            <MapBox/>
+            <MapBox query={mapQuery} />
             <div className="card" style={{ padding:'16px 18px', boxShadow:'0 2px 10px rgba(0,0,0,0.04)' }}>
               <p style={{ fontSize:13, fontWeight:800, color:'#0f172a', marginBottom:12 }}>⏰ Ish Vaqtlari</p>
               {hours.map((h: HoursItem) => (
