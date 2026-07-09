@@ -1,7 +1,7 @@
 import { PaymentTxState } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
-import { confirmEnrollmentPayment, cancelEnrollmentPayment } from '../enrollments.service';
+import { resolveOrder, confirmOrder, cancelOrder, orderRefFromTx, encodeOrderId } from './order';
 
 // PAYME_MERCHANT_ID/PAYME_SECRET_KEY sozlanmasa checkout tugmasi frontendda ko'rinmaydi.
 export const paymeEnabled = Boolean(env.PAYME_MERCHANT_ID && env.PAYME_SECRET_KEY);
@@ -50,17 +50,16 @@ export function verifyPaymeAuth(authHeader: string | undefined): boolean {
   return login === 'Paycom' && key === env.PAYME_SECRET_KEY;
 }
 
-export function buildPaymeCheckoutUrl(enrollmentId: string, amount: number): string {
-  const params = `m=${env.PAYME_MERCHANT_ID};ac.order_id=${enrollmentId};a=${Math.round(amount * 100)}`;
+export function buildPaymeCheckoutUrl(orderId: string, amount: number): string {
+  const params = `m=${env.PAYME_MERCHANT_ID};ac.order_id=${orderId};a=${Math.round(amount * 100)}`;
   const encoded = Buffer.from(params).toString('base64');
   return `https://checkout.paycom.uz/${encoded}`;
 }
 
-async function findEnrollmentForOrder(orderId: string | undefined) {
-  if (!orderId) throw new PaymeError(PAYME_ERROR.ORDER_NOT_FOUND, 'order_id kerak', 'order_id');
-  const enrollment = await prisma.enrollment.findUnique({ where: { id: orderId }, include: { course: true } });
-  if (!enrollment) throw new PaymeError(PAYME_ERROR.ORDER_NOT_FOUND, 'Buyurtma topilmadi', 'order_id');
-  return enrollment;
+async function findOrder(orderId: string | undefined) {
+  const order = await resolveOrder(orderId);
+  if (!order) throw new PaymeError(PAYME_ERROR.ORDER_NOT_FOUND, 'Buyurtma topilmadi', 'order_id');
+  return order;
 }
 
 function assertAmount(amountTiyin: number, price: unknown): void {
@@ -71,11 +70,11 @@ function assertAmount(amountTiyin: number, price: unknown): void {
 }
 
 async function checkPerformTransaction(params: { amount: number; account?: { order_id?: string } }) {
-  const enrollment = await findEnrollmentForOrder(params.account?.order_id);
-  if (enrollment.paymentStatus === 'PAID') {
+  const order = await findOrder(params.account?.order_id);
+  if (order.alreadyPaid) {
     throw new PaymeError(PAYME_ERROR.UNABLE_TO_PERFORM, "Buyurtma allaqachon to'langan");
   }
-  assertAmount(params.amount, enrollment.course.price);
+  assertAmount(params.amount, order.price);
   return { allow: true };
 }
 
@@ -90,15 +89,20 @@ async function createTransaction(params: { id: string; time: number; amount: num
     return { create_time: ms(existing.createTime), transaction: existing.id, state: STATE_TO_PAYME[existing.state] };
   }
 
-  const enrollment = await findEnrollmentForOrder(params.account?.order_id);
-  if (enrollment.paymentStatus === 'PAID') {
+  const order = await findOrder(params.account?.order_id);
+  if (order.alreadyPaid) {
     throw new PaymeError(PAYME_ERROR.UNABLE_TO_PERFORM, "Buyurtma allaqachon to'langan");
   }
-  assertAmount(params.amount, enrollment.course.price);
+  assertAmount(params.amount, order.price);
 
   // Shu buyurtma uchun boshqa faol (bekor qilinmagan) tranzaksiya bo'lmasligi kerak
   const otherActive = await prisma.paymentTransaction.findFirst({
-    where: { enrollmentId: enrollment.id, provider: 'PAYME', state: { in: ['CREATED', 'PERFORMED'] }, providerTxId: { not: params.id } },
+    where: {
+      provider: 'PAYME',
+      state: { in: ['CREATED', 'PERFORMED'] },
+      providerTxId: { not: params.id },
+      ...(order.kind === 'enrollment' ? { enrollmentId: order.id } : { subscriptionId: order.id }),
+    },
   });
   if (otherActive) {
     throw new PaymeError(PAYME_ERROR.UNABLE_TO_PERFORM, "Bu buyurtma uchun boshqa tranzaksiya faol");
@@ -108,8 +112,9 @@ async function createTransaction(params: { id: string; time: number; amount: num
     data: {
       provider: 'PAYME',
       providerTxId: params.id,
-      enrollmentId: enrollment.id,
-      amount: enrollment.course.price ?? 0,
+      enrollmentId: order.kind === 'enrollment' ? order.id : undefined,
+      subscriptionId: order.kind === 'subscription' ? order.id : undefined,
+      amount: order.price,
       state: 'CREATED',
     },
   });
@@ -141,7 +146,7 @@ async function performTransaction(params: { id: string }) {
 
   const performTime = new Date();
   await prisma.paymentTransaction.update({ where: { id: tx.id }, data: { state: 'PERFORMED', performTime } });
-  await confirmEnrollmentPayment(tx.enrollmentId, { provider: 'payme', providerRef: tx.providerTxId, amount: tx.amount });
+  await confirmOrder(orderRefFromTx(tx), { provider: 'payme', providerRef: tx.providerTxId, amount: tx.amount });
 
   return { transaction: tx.id, perform_time: ms(performTime), state: STATE_TO_PAYME.PERFORMED };
 }
@@ -161,7 +166,7 @@ async function cancelTransaction(params: { id: string; reason?: number }) {
     data: { state: nextState, cancelTime, reason: params.reason ?? null },
   });
   if (wasPerformed) {
-    await cancelEnrollmentPayment(tx.enrollmentId);
+    await cancelOrder(orderRefFromTx(tx));
   }
 
   return { transaction: tx.id, cancel_time: ms(cancelTime), state: STATE_TO_PAYME[nextState] };
@@ -189,7 +194,7 @@ async function getStatement(params: { from: number; to: number }) {
       id: tx.providerTxId,
       time: ms(tx.createTime),
       amount: Math.round(Number(tx.amount) * 100),
-      account: { order_id: tx.enrollmentId },
+      account: { order_id: encodeOrderId(orderRefFromTx(tx).kind, orderRefFromTx(tx).id) },
       create_time: ms(tx.createTime),
       perform_time: ms(tx.performTime),
       cancel_time: ms(tx.cancelTime),

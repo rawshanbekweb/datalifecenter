@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import { getReceiptImageUrl } from '../../api/enrollments';
+import { getSubscriptionReceiptImageUrl } from '../../api/subscriptions';
 
 interface ReceiptViewerModalProps {
-  enrollmentId: string;
+  id: string;
+  kind?: 'enrollment' | 'subscription';
   onClose: () => void;
 }
 
-export default function ReceiptViewerModal({ enrollmentId, onClose }: ReceiptViewerModalProps): React.ReactElement {
+export default function ReceiptViewerModal({ id, kind = 'enrollment', onClose }: ReceiptViewerModalProps): React.ReactElement {
   const [imageUrl, setImageUrl] = useState<string>('');
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
     let cancelled = false;
     let objectUrl = '';
-    getReceiptImageUrl(enrollmentId)
+    const load = kind === 'enrollment' ? getReceiptImageUrl : getSubscriptionReceiptImageUrl;
+    load(id)
       .then((url) => {
         if (cancelled) { URL.revokeObjectURL(url); return; }
         objectUrl = url;
@@ -23,7 +26,7 @@ export default function ReceiptViewerModal({ enrollmentId, onClose }: ReceiptVie
       })
       .catch(() => { if (!cancelled) setStatus('error'); });
     return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [enrollmentId]);
+  }, [id, kind]);
 
   return (
     <div onClick={onClose}

@@ -19,6 +19,7 @@ import testimonialsRoutes from './testimonials.routes';
 import courseReviewsRoutes from './courseReviews.routes';
 import projectsRoutes from './projects.routes';
 import paymentsRoutes from './payments.routes';
+import subscriptionsRoutes from './subscriptions.routes';
 import { verifyCertificateHandler } from '../controllers/enrollments.controller';
 
 const router = Router();
@@ -49,5 +50,6 @@ router.use('/testimonials', testimonialsRoutes);
 router.use('/reviews', courseReviewsRoutes);
 router.use('/projects', projectsRoutes);
 router.use('/payments', paymentsRoutes);
+router.use('/subscriptions', subscriptionsRoutes);
 
 export default router;

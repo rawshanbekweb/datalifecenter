@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import NotificationBell from '../components/common/NotificationBell';
@@ -17,6 +17,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Boshqaruv paneli',  to: '/admin',             icon: LayoutDashboard, end: true },
   { label: 'Yozilishlar',       to: '/admin/enrollments', icon: GraduationCap },
+  { label: 'Obunalar',          to: '/admin/subscriptions', icon: Wallet },
   { label: 'Kurslar',           to: '/admin/courses',     icon: BookOpen },
   { label: 'Foydalanuvchilar',  to: '/admin/users',       icon: Users },
   { label: 'Mentorlar',         to: '/admin/mentors',     icon: UserSquare2 },

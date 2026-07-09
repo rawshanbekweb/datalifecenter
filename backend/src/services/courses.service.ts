@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 import { slugify } from '../utils/slugify';
 import { signVideoUrl } from './storage.service';
+import { hasActiveSubscription } from './subscriptions.service';
 
 interface ListCoursesFilters {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -117,6 +118,17 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     enrollment = await prisma.enrollment.findUnique({
       where: { userId_courseId: { userId, courseId: course.id } },
     });
+
+    // Enrollment yo'q, lekin foydalanuvchining faol obunasi bo'lsa — shu kursga ham
+    // avtomatik (lazy) kirish beriladi. Obuna faollashganda barcha NASHR qilingan
+    // kurslarga bir yo'la provisioning qilinadi (subscriptions.service.ts); bu shoxobcha
+    // faqat obunadan KEYIN nashr qilingan kurslar uchun.
+    if (!enrollment && (await hasActiveSubscription(userId))) {
+      enrollment = await prisma.enrollment.create({
+        data: { userId, courseId: course.id, status: 'ACTIVE', paymentStatus: 'FREE', provider: 'subscription' },
+      });
+    }
+
     if (!enrollment) {
       throw ApiError.forbidden("Siz bu kursga yozilmagansiz", 'NOT_ENROLLED');
     }
@@ -125,6 +137,12 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     }
     if (enrollment.status === 'CANCELLED') {
       throw ApiError.forbidden('Yozilishingiz bekor qilingan', 'ENROLLMENT_CANCELLED');
+    }
+    // Obuna orqali berilgan (hali "yakunlanmagan") kirish — obuna muddati tugagan bo'lsa
+    // yopiladi. Tugatilgan kurslar doim ochiq qoladi (allaqachon topshirilgan narsa
+    // qaytarib olinmaydi).
+    if (enrollment.provider === 'subscription' && enrollment.status !== 'COMPLETED' && !(await hasActiveSubscription(userId))) {
+      throw ApiError.forbidden('Obuna muddati tugagan — davom etish uchun yangilang', 'SUBSCRIPTION_EXPIRED');
     }
   }
 

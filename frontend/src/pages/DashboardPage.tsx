@@ -83,7 +83,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
     setGatewayLoading(provider);
     setGatewayError('');
     try {
-      const { url } = await createCheckout(enrollment.id, provider);
+      const { url } = await createCheckout({ kind: 'enrollment', enrollmentId: enrollment.id }, provider);
       window.location.href = url;
     } catch (err: unknown) {
       setGatewayError((err as Error).message || 'Xatolik yuz berdi');

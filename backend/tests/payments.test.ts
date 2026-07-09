@@ -7,6 +7,10 @@ const CLICK_SERVICE_ID = 'test-click-service';
 const CLICK_SECRET_KEY = 'test-click-secret';
 const PAYME_SECRET_KEY = 'test-payme-secret';
 
+function orderId(enrollmentId: string): string {
+  return `enr_${enrollmentId}`;
+}
+
 function clickSign(parts: (string | number)[]): string {
   return crypto.createHash('md5').update(parts.join('')).digest('hex');
 }
@@ -62,11 +66,11 @@ describe('Click to\'lov protokoli', () => {
     const signTime = '2026-01-01 10:00:00';
     const amount = PRICE.toFixed(2);
 
-    const prepareSign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, enrollmentId, amount, '0', signTime]);
+    const prepareSign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, orderId(enrollmentId), amount, '0', signTime]);
     const prepareRes = await request(app).post('/api/payments/click/prepare').type('form').send({
       click_trans_id: clickTransId,
       service_id: CLICK_SERVICE_ID,
-      merchant_trans_id: enrollmentId,
+      merchant_trans_id: orderId(enrollmentId),
       amount,
       action: '0',
       sign_time: signTime,
@@ -75,11 +79,11 @@ describe('Click to\'lov protokoli', () => {
     expect(prepareRes.body.error).toBe(0);
     expect(prepareRes.body.merchant_prepare_id).toBe(Number(clickTransId));
 
-    const completeSign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, enrollmentId, clickTransId, amount, '1', signTime]);
+    const completeSign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, orderId(enrollmentId), clickTransId, amount, '1', signTime]);
     const completeRes = await request(app).post('/api/payments/click/complete').type('form').send({
       click_trans_id: clickTransId,
       service_id: CLICK_SERVICE_ID,
-      merchant_trans_id: enrollmentId,
+      merchant_trans_id: orderId(enrollmentId),
       merchant_prepare_id: clickTransId,
       amount,
       action: '1',
@@ -98,7 +102,7 @@ describe('Click to\'lov protokoli', () => {
     const completeAgain = await request(app).post('/api/payments/click/complete').type('form').send({
       click_trans_id: clickTransId,
       service_id: CLICK_SERVICE_ID,
-      merchant_trans_id: enrollmentId,
+      merchant_trans_id: orderId(enrollmentId),
       merchant_prepare_id: clickTransId,
       amount,
       action: '1',
@@ -114,7 +118,7 @@ describe('Click to\'lov protokoli', () => {
     const res = await request(app).post('/api/payments/click/prepare').type('form').send({
       click_trans_id: `click-${Date.now()}`,
       service_id: CLICK_SERVICE_ID,
-      merchant_trans_id: enrollmentId,
+      merchant_trans_id: orderId(enrollmentId),
       amount: PRICE.toFixed(2),
       action: '0',
       sign_time: '2026-01-01 10:00:00',
@@ -128,12 +132,12 @@ describe('Click to\'lov protokoli', () => {
     const clickTransId = String(Date.now());
     const signTime = '2026-01-01 10:00:00';
     const wrongAmount = '1.00';
-    const sign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, enrollmentId, wrongAmount, '0', signTime]);
+    const sign = clickSign([clickTransId, CLICK_SERVICE_ID, CLICK_SECRET_KEY, orderId(enrollmentId), wrongAmount, '0', signTime]);
 
     const res = await request(app).post('/api/payments/click/prepare').type('form').send({
       click_trans_id: clickTransId,
       service_id: CLICK_SERVICE_ID,
-      merchant_trans_id: enrollmentId,
+      merchant_trans_id: orderId(enrollmentId),
       amount: wrongAmount,
       action: '0',
       sign_time: signTime,
@@ -151,7 +155,7 @@ describe('Payme to\'lov protokoli (JSON-RPC)', () => {
 
   it('CheckPerformTransaction baxtli yo\'l', async () => {
     const enrollmentId = await createPendingEnrollment();
-    const res = await paymeRpc('CheckPerformTransaction', { amount: PRICE * 100, account: { order_id: enrollmentId } });
+    const res = await paymeRpc('CheckPerformTransaction', { amount: PRICE * 100, account: { order_id: orderId(enrollmentId) } });
     expect(res.body.result).toEqual({ allow: true });
   });
 
@@ -163,7 +167,7 @@ describe('Payme to\'lov protokoli (JSON-RPC)', () => {
       id: paymeTxId,
       time: Date.now(),
       amount: PRICE * 100,
-      account: { order_id: enrollmentId },
+      account: { order_id: orderId(enrollmentId) },
     });
     expect(created.body.result.state).toBe(1);
 
@@ -184,7 +188,7 @@ describe('Payme to\'lov protokoli (JSON-RPC)', () => {
   it("to'langan tranzaksiyani CancelTransaction qilish REFUNDED holatiga o'tkazadi", async () => {
     const enrollmentId = await createPendingEnrollment();
     const paymeTxId = `payme-${Date.now()}`;
-    await paymeRpc('CreateTransaction', { id: paymeTxId, time: Date.now(), amount: PRICE * 100, account: { order_id: enrollmentId } });
+    await paymeRpc('CreateTransaction', { id: paymeTxId, time: Date.now(), amount: PRICE * 100, account: { order_id: orderId(enrollmentId) } });
     await paymeRpc('PerformTransaction', { id: paymeTxId });
 
     const cancelled = await paymeRpc('CancelTransaction', { id: paymeTxId, reason: 5 });

@@ -30,6 +30,7 @@ const StudentLayout = lazy(() => import('./layouts/StudentLayout'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const StudentSessionsPage = lazy(() => import('./pages/student/StudentSessionsPage'))
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
 const StudentCertificatesPage = lazy(() => import('./pages/student/StudentCertificatesPage'))
 
 const MentorLayout = lazy(() => import('./layouts/MentorLayout'))
@@ -45,6 +46,7 @@ const MentorRequestsPage = lazy(() => import('./pages/mentor/MentorRequestsPage'
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminEnrollmentsPage = lazy(() => import('./pages/admin/AdminEnrollmentsPage'))
+const AdminSubscriptionsPage = lazy(() => import('./pages/admin/AdminSubscriptionsPage'))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'))
 const AdminMessagesPage = lazy(() => import('./pages/admin/AdminMessagesPage'))
 const AdminAnnouncementsPage = lazy(() => import('./pages/admin/AdminAnnouncementsPage'))
@@ -106,6 +108,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: s(<DashboardPage />) },
       { path: 'sessions', element: s(<StudentSessionsPage />) },
+      { path: 'subscription', element: s(<SubscriptionPage />) },
       { path: 'certificates', element: s(<StudentCertificatesPage />) },
       { path: 'profile', element: s(<ProfilePage />) },
     ],
@@ -132,6 +135,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: s(<AdminDashboardPage />) },
       { path: 'enrollments', element: s(<AdminEnrollmentsPage />) },
+      { path: 'subscriptions', element: s(<AdminSubscriptionsPage />) },
       { path: 'users', element: s(<AdminUsersPage />) },
       { path: 'messages', element: s(<AdminMessagesPage />) },
       { path: 'announcements', element: s(<AdminAnnouncementsPage />) },

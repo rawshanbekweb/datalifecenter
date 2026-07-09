@@ -94,6 +94,10 @@ export async function deleteUser(id: string, actingUserId: string) {
 
   await prisma.$transaction([
     prisma.mentor.updateMany({ where: { userId: id }, data: { userId: null } }),
+    // To'lov tranzaksiyalari Enrollment/Subscription'ni RESTRICT bilan bog'laydi —
+    // avval ular, keyin Enrollment/Subscription, keyin foydalanuvchi o'chiriladi.
+    prisma.paymentTransaction.deleteMany({ where: { OR: [{ enrollment: { userId: id } }, { subscription: { userId: id } }] } }),
+    prisma.subscription.deleteMany({ where: { userId: id } }),
     prisma.enrollment.deleteMany({ where: { userId: id } }),
     prisma.user.delete({ where: { id } }),
   ]);

@@ -185,7 +185,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
       )}
 
       {viewingReceiptId && (
-        <ReceiptViewerModal enrollmentId={viewingReceiptId} onClose={() => setViewingReceiptId('')} />
+        <ReceiptViewerModal id={viewingReceiptId} kind="enrollment" onClose={() => setViewingReceiptId('')} />
       )}
     </div>
   );

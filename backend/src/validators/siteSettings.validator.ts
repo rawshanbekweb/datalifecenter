@@ -56,12 +56,18 @@ export const contactSchema = z.object({
   hours: z.array(z.object({ day: z.string().min(1).max(30), time: z.string().min(1).max(30), closed: z.boolean().default(false) })).min(1).max(7),
 });
 
+export const subscriptionPlanSchema = z.object({
+  price: z.coerce.number().min(0),
+  currency: z.string().min(1).max(10),
+});
+
 export const SECTION_SCHEMAS: Record<string, z.ZodType> = {
   hero: heroSchema,
   about: aboutSchema,
   services: servicesSchema,
   why_us: whyUsSchema,
   contact: contactSchema,
+  subscription_plan: subscriptionPlanSchema,
 };
 
 export const SECTION_NAMES = Object.keys(SECTION_SCHEMAS);

@@ -14,6 +14,7 @@ export async function resetDb(): Promise<void> {
     prisma.notification.deleteMany(),
     prisma.passwordResetToken.deleteMany(),
     prisma.paymentTransaction.deleteMany(),
+    prisma.subscription.deleteMany(),
     prisma.enrollment.deleteMany(),
     prisma.liveSession.deleteMany(),
     prisma.mentorRequest.deleteMany(),

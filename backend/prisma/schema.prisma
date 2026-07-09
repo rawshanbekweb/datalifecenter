@@ -69,6 +69,7 @@ model User {
   emailVerifiedAt DateTime?
   mentorProfile Mentor?
   enrollments  Enrollment[]
+  subscriptions Subscription[]
   lessonProgress LessonProgress[]
   lessonQuestions LessonQuestion[]
   courseReviews CourseReview[]
@@ -268,6 +269,7 @@ enum NotificationType {
   SESSION_SCHEDULED
   ANNOUNCEMENT
   PAYMENT_REJECTED
+  SUBSCRIPTION_ACTIVATED
 }
 
 // Kabinet ichidagi bildirishnomalar — har bir yozuv bitta foydalanuvchiga tegishli
@@ -380,20 +382,54 @@ enum PaymentTxState {
 // Ikkala protokol ham idempotentlikni talab qiladi — bir xil so'rov qayta kelsa
 // bir xil javob qaytarilishi SHART, shuning uchun holat alohida saqlanadi.
 model PaymentTransaction {
-  id           String          @id @default(cuid())
-  provider     PaymentProvider
-  providerTxId String
-  enrollment   Enrollment      @relation(fields: [enrollmentId], references: [id])
-  enrollmentId String
-  amount       Decimal
-  state        PaymentTxState  @default(CREATED)
-  reason       Int?
-  createTime   DateTime        @default(now())
-  performTime  DateTime?
-  cancelTime   DateTime?
+  id             String          @id @default(cuid())
+  provider       PaymentProvider
+  providerTxId   String
+  // Aynan bittasi to'ldiriladi — buyurtma yo kurs yozilishi, yo obuna uchun
+  enrollment     Enrollment?     @relation(fields: [enrollmentId], references: [id])
+  enrollmentId   String?
+  subscription   Subscription?   @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?
+  amount         Decimal
+  state          PaymentTxState  @default(CREATED)
+  reason         Int?
+  createTime     DateTime        @default(now())
+  performTime    DateTime?
+  cancelTime     DateTime?
 
   @@unique([provider, providerTxId])
   @@index([enrollmentId])
+  @@index([subscriptionId])
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  REJECTED
+}
+
+// Oylik obuna — faol bo'lsa barcha nashr qilingan kurslarga kirish beradi.
+// Har bir kurs uchun alohida Enrollment avtomatik provisioning qilinadi
+// (subscriptions.service.ts) — progress/sertifikat/jonli-dars/sharh
+// tizimlariga tegilmasligi uchun.
+model Subscription {
+  id              String               @id @default(cuid())
+  user            User                 @relation(fields: [userId], references: [id])
+  userId          String
+  status          SubscriptionStatus   @default(PENDING)
+  startsAt        DateTime?
+  expiresAt       DateTime?
+  amountPaid      Decimal?
+  provider        String?
+  providerRef     String?
+  receiptUrl      String?
+  rejectionReason String?
+  createdAt       DateTime             @default(now())
+  transactions    PaymentTransaction[]
+
+  @@index([userId])
 }
 
 // Bosh sahifa bo'limlari (hero_stats, about, services, why_us, contact) uchun

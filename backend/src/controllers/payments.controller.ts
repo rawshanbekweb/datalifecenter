@@ -12,8 +12,15 @@ export const paymentConfigHandler = asyncHandler(async (_req: Request, res: Resp
 
 export const createCheckoutHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const { enrollmentId, provider } = req.body as { enrollmentId: string; provider: 'click' | 'payme' };
-  const url = await checkoutService.createCheckout(req.user.userId, enrollmentId, provider);
+  const { enrollmentId, subscriptionId, provider } = req.body as {
+    enrollmentId?: string;
+    subscriptionId?: string;
+    provider: 'click' | 'payme';
+  };
+  const target: checkoutService.CheckoutTarget = enrollmentId
+    ? { kind: 'enrollment', enrollmentId }
+    : { kind: 'subscription', subscriptionId: subscriptionId as string };
+  const url = await checkoutService.createCheckout(req.user.userId, target, provider);
   sendSuccess(res, { url });
 });
 

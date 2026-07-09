@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X,
+  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import NotificationBell from '../components/common/NotificationBell';
@@ -16,6 +16,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Boshqaruv paneli', to: '/student',              icon: LayoutDashboard, end: true },
   { label: 'Jonli darslar',    to: '/student/sessions',     icon: Video },
+  { label: 'Obuna',            to: '/student/subscription', icon: Wallet },
   { label: 'Sertifikatlar',    to: '/student/certificates', icon: Award },
   { label: 'Profil',           to: '/student/profile',      icon: UserRound },
 ];

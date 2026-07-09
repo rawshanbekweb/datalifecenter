@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
-import { confirmEnrollmentPayment, cancelEnrollmentPayment } from '../enrollments.service';
+import { resolveOrder, confirmOrder, cancelOrder, orderRefFromTx, encodeOrderId } from './order';
 
 // CLICK_SERVICE_ID/CLICK_MERCHANT_ID/CLICK_SECRET_KEY sozlanmasa checkout tugmasi
 // frontendda ko'rinmaydi — qo'lda-chek-yuklash oqimi ishlab turaveradi.
@@ -35,12 +35,12 @@ interface ClickParams {
   sign_string: string;
 }
 
-function buildCheckoutUrl(enrollmentId: string, amount: number, returnUrl: string): string {
+function buildCheckoutUrl(orderId: string, amount: number, returnUrl: string): string {
   const params = new URLSearchParams({
     service_id: env.CLICK_SERVICE_ID as string,
     merchant_id: env.CLICK_MERCHANT_ID as string,
     amount: amount.toFixed(2),
-    transaction_param: enrollmentId,
+    transaction_param: orderId,
     return_url: returnUrl,
   });
   return `https://my.click.uz/services/pay?${params.toString()}`;
@@ -77,14 +77,14 @@ export async function handlePrepare(p: ClickParams): Promise<ClickResponse> {
     return { ...base, error: CLICK_ERROR.SIGN_FAILED, error_note: "Imzo mos kelmadi" };
   }
 
-  const enrollment = await prisma.enrollment.findUnique({ where: { id: p.merchant_trans_id }, include: { course: true } });
-  if (!enrollment) {
+  const order = await resolveOrder(p.merchant_trans_id);
+  if (!order) {
     return { ...base, error: CLICK_ERROR.ORDER_NOT_FOUND, error_note: 'Buyurtma topilmadi' };
   }
-  if (enrollment.paymentStatus === 'PAID') {
+  if (order.alreadyPaid) {
     return { ...base, error: CLICK_ERROR.ALREADY_PAID, error_note: 'Allaqachon to\'langan' };
   }
-  if (!amountsMatch(p.amount, enrollment.course.price)) {
+  if (!amountsMatch(p.amount, order.price)) {
     return { ...base, error: CLICK_ERROR.WRONG_AMOUNT, error_note: "Summa mos kelmadi" };
   }
 
@@ -97,8 +97,9 @@ export async function handlePrepare(p: ClickParams): Promise<ClickResponse> {
       data: {
         provider: 'CLICK',
         providerTxId: p.click_trans_id,
-        enrollmentId: enrollment.id,
-        amount: enrollment.course.price ?? 0,
+        enrollmentId: order.kind === 'enrollment' ? order.id : undefined,
+        subscriptionId: order.kind === 'subscription' ? order.id : undefined,
+        amount: order.price,
         state: 'CREATED',
       },
     });
@@ -120,7 +121,9 @@ export async function handleComplete(p: ClickParams): Promise<ClickResponse> {
   const tx = await prisma.paymentTransaction.findUnique({
     where: { provider_providerTxId: { provider: 'CLICK', providerTxId: p.click_trans_id } },
   });
-  if (!tx || tx.enrollmentId !== p.merchant_trans_id) {
+  const ref = tx ? orderRefFromTx(tx) : null;
+  const expectedOrderId = ref ? encodeOrderId(ref.kind, ref.id) : null;
+  if (!tx || !ref || expectedOrderId !== p.merchant_trans_id) {
     return { ...base, error: CLICK_ERROR.TRANSACTION_NOT_FOUND, error_note: 'Tranzaksiya topilmadi' };
   }
 
@@ -131,7 +134,7 @@ export async function handleComplete(p: ClickParams): Promise<ClickResponse> {
         where: { id: tx.id },
         data: { state: tx.state === 'PERFORMED' ? 'CANCELLED_AFTER_PERFORM' : 'CANCELLED', cancelTime: new Date() },
       });
-      await cancelEnrollmentPayment(tx.enrollmentId);
+      await cancelOrder(ref);
     }
     return { ...base, merchant_confirm_id: Number(p.click_trans_id), error: CLICK_ERROR.TRANSACTION_CANCELLED, error_note: 'Tranzaksiya bekor qilingan' };
   }
@@ -146,7 +149,7 @@ export async function handleComplete(p: ClickParams): Promise<ClickResponse> {
   }
 
   await prisma.paymentTransaction.update({ where: { id: tx.id }, data: { state: 'PERFORMED', performTime: new Date() } });
-  await confirmEnrollmentPayment(tx.enrollmentId, {
+  await confirmOrder(ref, {
     provider: 'click',
     providerRef: p.click_trans_id,
     amount: tx.amount,
