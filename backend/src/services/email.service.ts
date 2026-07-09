@@ -1,21 +1,13 @@
-import nodemailer, { Transporter } from 'nodemailer';
 import { env } from '../config/env';
 
-// SMTP sozlanmagan bo'lsa email yuborilmaydi — asosiy oqimlar yiqilmasligi kerak.
+// Brevo API kaliti sozlanmagan bo'lsa email yuborilmaydi — asosiy oqimlar yiqilmasligi kerak.
 // Development'da xat mazmuni konsolga chiqariladi (masalan, parol tiklash havolasi).
-export const emailEnabled = Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS);
+export const emailEnabled = Boolean(env.BREVO_API_KEY);
 
-let transporter: Transporter | null = null;
-if (emailEnabled) {
-  transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_PORT === 465,
-    auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-  });
-}
-
-const FROM = env.SMTP_FROM || `DATA LIFE <${env.SMTP_USER ?? 'no-reply@datalife.uz'}>`;
+const FROM = env.EMAIL_FROM || 'DATA LIFE <no-reply@datalife.uz>';
+const FROM_MATCH = FROM.match(/^(.*)<(.+)>$/);
+const FROM_NAME = (FROM_MATCH?.[1] ?? 'DATA LIFE').trim();
+const FROM_EMAIL = (FROM_MATCH?.[2] ?? FROM).trim();
 
 interface MailInput {
   to: string;
@@ -25,14 +17,31 @@ interface MailInput {
 }
 
 async function sendMail(input: MailInput): Promise<void> {
-  if (!transporter) {
+  if (!emailEnabled) {
     if (env.NODE_ENV !== 'production') {
       console.log(`[email o'chiq] ${input.to} — ${input.subject}\n${input.text}`);
     }
     return;
   }
   try {
-    await transporter.sendMail({ from: FROM, ...input });
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': env.BREVO_API_KEY as string,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { name: FROM_NAME, email: FROM_EMAIL },
+        to: [{ email: input.to }],
+        subject: input.subject,
+        textContent: input.text,
+        htmlContent: input.html,
+      }),
+    });
+    if (!res.ok) {
+      console.error('Email yuborilmadi:', res.status, await res.text().catch(() => ''));
+    }
   } catch (err) {
     // Email yuborilmasa ham API so'rovi muvaffaqiyatli tugashi kerak
     console.error('Email yuborilmadi:', err);

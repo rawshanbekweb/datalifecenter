@@ -9,12 +9,12 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, 'JWT_SECRET kerak'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  // Email (ixtiyoriy) — sozlanmasa email yuborilmaydi, oqimlar yiqilmaydi
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().default(587),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().optional(),
+  // Email (ixtiyoriy) — sozlanmasa email yuborilmaydi, oqimlar yiqilmaydi.
+  // Brevo HTTP API orqali yuboriladi — SMTP relay'dan farqli o'laroq IP
+  // cheklovi yo'q, shuning uchun Render kabi o'zgaruvchan-IP hostingda ham
+  // qayta deploy'dan keyin qo'lda hech narsa qilish shart emas.
+  BREVO_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().optional(),
 
   // Cloudinary (ixtiyoriy) — sozlansa fayllar bulutga yuklanadi (ephemeral hostingda shart)
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
