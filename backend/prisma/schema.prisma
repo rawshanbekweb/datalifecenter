@@ -184,6 +184,9 @@ model LiveSession {
   courseId    String
   mentor      Mentor        @relation(fields: [mentorId], references: [id], onDelete: Cascade)
   mentorId    String
+  // Bo'sh massiv = kursga yozilgan barcha faol o'quvchiga ochiq (standart).
+  // To'ldirilsa — faqat shu userId'lar ko'radi (mentor aniq o'quvchilarni tanlagan).
+  targetStudentIds String[] @default([])
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 

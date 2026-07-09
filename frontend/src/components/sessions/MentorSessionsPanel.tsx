@@ -15,6 +15,13 @@ interface CourseOption {
   title: string;
 }
 
+export interface StudentOption {
+  id: string;
+  name: string;
+  email: string;
+  courseId: string;
+}
+
 interface FormState {
   courseId: string;
   title: string;
@@ -22,9 +29,10 @@ interface FormState {
   meetingUrl: string;
   startsAt: string;
   durationMin: number;
+  targetStudentIds: string[];
 }
 
-const EMPTY_FORM: FormState = { courseId: '', title: '', description: '', meetingUrl: '', startsAt: '', durationMin: 60 };
+const EMPTY_FORM: FormState = { courseId: '', title: '', description: '', meetingUrl: '', startsAt: '', durationMin: 60, targetStudentIds: [] };
 
 function randomJitsiUrl(): string {
   const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -32,7 +40,7 @@ function randomJitsiUrl(): string {
   return `https://meet.jit.si/DataLife-${suffix}`;
 }
 
-export default function MentorSessionsPanel({ courses }: { courses: CourseOption[] }): React.ReactElement {
+export default function MentorSessionsPanel({ courses, students }: { courses: CourseOption[]; students: StudentOption[] }): React.ReactElement {
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
   const [formOpen, setFormOpen] = useState<boolean>(false);
@@ -59,6 +67,7 @@ export default function MentorSessionsPanel({ courses }: { courses: CourseOption
         meetingUrl: form.meetingUrl,
         startsAt: new Date(form.startsAt).toISOString(),
         durationMin: form.durationMin,
+        targetStudentIds: form.targetStudentIds,
       });
       setSessions((prev) => [created, ...prev]);
       setForm(EMPTY_FORM);
@@ -110,7 +119,7 @@ export default function MentorSessionsPanel({ courses }: { courses: CourseOption
       {formOpen && (
         <form onSubmit={submit} className="card" style={{ padding: 20, marginBottom: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
           <select className="inp" required value={form.courseId}
-            onChange={(e) => setForm({ ...form, courseId: e.target.value })}>
+            onChange={(e) => setForm({ ...form, courseId: e.target.value, targetStudentIds: [] })}>
             <option value="">Kursni tanlang...</option>
             {courses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
           </select>
@@ -133,6 +142,33 @@ export default function MentorSessionsPanel({ courses }: { courses: CourseOption
           <textarea className="inp" rows={2} placeholder="Qisqacha tavsif (ixtiyoriy)"
             value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
             style={{ gridColumn: '1 / -1', resize: 'vertical' }} />
+
+          {form.courseId && (() => {
+            const courseStudents = students.filter((s) => s.courseId === form.courseId);
+            if (courseStudents.length === 0) return null;
+            return (
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: 12.5, fontWeight: 700, color: '#334155', marginBottom: 8 }}>
+                  Auditoriya — belgilanmasa hammaga ochiq bo'ladi
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 160, overflowY: 'auto', border: '1.5px solid #e2e8f0', borderRadius: 10, padding: 10 }}>
+                  {courseStudents.map((s) => (
+                    <label key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: '#334155', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={form.targetStudentIds.includes(s.id)}
+                        onChange={(e) => setForm({
+                          ...form,
+                          targetStudentIds: e.target.checked
+                            ? [...form.targetStudentIds, s.id]
+                            : form.targetStudentIds.filter((id) => id !== s.id),
+                        })} />
+                      {s.name} <span style={{ color: '#94a3b8' }}>({s.email})</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           <div style={{ display: 'flex', gap: 8, gridColumn: '1 / -1' }}>
             <button type="submit" className="btn-primary" disabled={saving} style={{ fontSize: 13, opacity: saving ? 0.7 : 1 }}>
               {saving ? 'Saqlanmoqda...' : 'Sessiya yaratish'}
@@ -161,6 +197,9 @@ export default function MentorSessionsPanel({ courses }: { courses: CourseOption
               <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                 <p style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{s.title}</p>
                 <p style={{ fontSize: 12, color: '#64748b' }}>{s.course.title} · {formatSessionTime(s.startsAt, s.durationMin)}</p>
+                <p style={{ fontSize: 11, color: '#9333ea', fontWeight: 600, marginTop: 2 }}>
+                  {s.targetStudentIds.length > 0 ? `${s.targetStudentIds.length} ta o'quvchi uchun` : 'Hammaga ochiq'}
+                </p>
               </div>
               <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>{meta.label}</span>
               <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>

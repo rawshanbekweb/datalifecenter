@@ -7,6 +7,8 @@ export const createSessionSchema = z.object({
   meetingUrl: z.string().url("Uchrashuv havolasi noto'g'ri (https://... formatida bo'lishi kerak)"),
   startsAt: z.coerce.date({ message: "Boshlanish vaqti noto'g'ri" }),
   durationMin: z.coerce.number().int().min(15, 'Kamida 15 daqiqa').max(480, "Ko'pi bilan 8 soat").default(60),
+  // Bo'sh/berilmagan bo'lsa — kursga yozilgan hammaga ochiq (standart)
+  targetStudentIds: z.array(z.string()).optional(),
 });
 
 export const updateSessionSchema = z.object({
@@ -16,4 +18,5 @@ export const updateSessionSchema = z.object({
   startsAt: z.coerce.date({ message: "Boshlanish vaqti noto'g'ri" }).optional(),
   durationMin: z.coerce.number().int().min(15).max(480).optional(),
   status: z.enum(['SCHEDULED', 'LIVE', 'ENDED', 'CANCELLED'], { message: "Holat noto'g'ri" }).optional(),
+  targetStudentIds: z.array(z.string()).optional(),
 });

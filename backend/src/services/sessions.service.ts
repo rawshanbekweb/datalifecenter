@@ -20,6 +20,7 @@ interface CreateSessionInput {
   meetingUrl: string;
   startsAt: Date;
   durationMin: number;
+  targetStudentIds?: string[];
 }
 
 interface UpdateSessionInput {
@@ -29,6 +30,19 @@ interface UpdateSessionInput {
   startsAt?: Date;
   durationMin?: number;
   status?: 'SCHEDULED' | 'LIVE' | 'ENDED' | 'CANCELLED';
+  targetStudentIds?: string[];
+}
+
+// Mentor yuborgan userId'lar orasidan faqat shu kursga haqiqatan ham
+// faol (ACTIVE/COMPLETED) yozilganlarini qoldiradi — boshqa kurs yoki
+// mavjud bo'lmagan foydalanuvchi id'si sessiyaga yozilib qolmasin.
+async function filterEnrolledStudentIds(courseId: string, userIds: string[]): Promise<string[]> {
+  if (userIds.length === 0) return [];
+  const enrollments = await prisma.enrollment.findMany({
+    where: { courseId, userId: { in: userIds }, status: { in: ['ACTIVE', 'COMPLETED'] } },
+    select: { userId: true },
+  });
+  return enrollments.map((e) => e.userId);
 }
 
 // MENTOR roli uchun user hisobiga bog'langan mentor profilini topadi
@@ -63,25 +77,30 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
     mentorId = mentor.id;
   }
 
+  const targetStudentIds = await filterEnrolledStudentIds(input.courseId, input.targetStudentIds ?? []);
+
   const session = await prisma.liveSession.create({
-    data: { ...input, mentorId },
+    data: { ...input, mentorId, targetStudentIds },
     include: sessionInclude,
   });
 
-  // Kursning faol talabalariga yangi jonli dars haqida xabar
-  const enrollments = await prisma.enrollment.findMany({
-    where: { courseId: input.courseId, status: 'ACTIVE' },
-    select: { userId: true },
+  // Auditoriya tanlangan bo'lsa — faqat o'shalarga, aks holda kursning barcha faol talabalariga
+  let recipientIds: string[];
+  if (targetStudentIds.length > 0) {
+    recipientIds = targetStudentIds;
+  } else {
+    const enrollments = await prisma.enrollment.findMany({
+      where: { courseId: input.courseId, status: 'ACTIVE' },
+      select: { userId: true },
+    });
+    recipientIds = enrollments.map((e) => e.userId);
+  }
+  await notify(recipientIds, {
+    type: 'SESSION_SCHEDULED',
+    title: `Yangi jonli dars: ${session.title}`,
+    body: `${course.title} — ${new Date(session.startsAt).toLocaleString('uz-UZ')}`,
+    link: '/student/sessions',
   });
-  await notify(
-    enrollments.map((e) => e.userId),
-    {
-      type: 'SESSION_SCHEDULED',
-      title: `Yangi jonli dars: ${session.title}`,
-      body: `${course.title} — ${new Date(session.startsAt).toLocaleString('uz-UZ')}`,
-      link: '/student/sessions',
-    }
-  );
 
   return session;
 }
@@ -102,6 +121,8 @@ export async function listMySessions(userId: string) {
       courseId: { in: courseIds },
       status: { in: ['SCHEDULED', 'LIVE'] },
       startsAt: { gte: cutoff },
+      // Auditoriya tanlanmagan (bo'sh massiv) — hammaga ochiq; tanlangan bo'lsa faqat o'sha userId'larga
+      OR: [{ targetStudentIds: { isEmpty: true } }, { targetStudentIds: { has: userId } }],
     },
     orderBy: { startsAt: 'asc' },
     take: 20,
@@ -137,8 +158,12 @@ async function getOwnedSession(id: string, actor: Actor) {
 }
 
 export async function updateSession(id: string, input: UpdateSessionInput, actor: Actor) {
-  await getOwnedSession(id, actor);
-  return prisma.liveSession.update({ where: { id }, data: input, include: sessionInclude });
+  const session = await getOwnedSession(id, actor);
+  const data: Prisma.LiveSessionUpdateInput = { ...input };
+  if (input.targetStudentIds !== undefined) {
+    data.targetStudentIds = await filterEnrolledStudentIds(session.courseId, input.targetStudentIds);
+  }
+  return prisma.liveSession.update({ where: { id }, data, include: sessionInclude });
 }
 
 export async function deleteSession(id: string, actor: Actor) {
