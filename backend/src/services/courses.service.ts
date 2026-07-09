@@ -3,6 +3,7 @@ import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 import { slugify } from '../utils/slugify';
+import { signVideoUrl } from './storage.service';
 
 interface ListCoursesFilters {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -64,7 +65,7 @@ export async function getCourseBySlug(slug: string) {
       ...mod,
       lessons: mod.lessons.map((lesson) => ({
         ...lesson,
-        videoUrl: lesson.isFreePreview ? lesson.videoUrl : null,
+        videoUrl: lesson.isFreePreview ? signVideoUrl(lesson.videoUrl) : null,
         content: lesson.isFreePreview ? lesson.content : null,
       })),
     })),
@@ -132,7 +133,15 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     select: { lessonId: true },
   });
 
-  return { course, enrollment, completedLessonIds: progress.map((p) => p.lessonId) };
+  const signedCourse = {
+    ...course,
+    modules: course.modules.map((mod) => ({
+      ...mod,
+      lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signVideoUrl(lesson.videoUrl) })),
+    })),
+  };
+
+  return { course: signedCourse, enrollment, completedLessonIds: progress.map((p) => p.lessonId) };
 }
 
 async function uniqueSlug(title: string, excludeId?: string): Promise<string> {

@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,11 +7,12 @@ import rateLimit from 'express-rate-limit';
 import { corsOptions } from './config/cors';
 import { env } from './config/env';
 import { Sentry, sentryEnabled } from './config/sentry';
-import { UPLOADS_ROOT } from './config/uploads';
+import { IMAGES_DIR, VIDEOS_DIR } from './config/uploads';
 import routes from './routes';
 import { csrfProtect } from './middleware/csrfProtect';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import { verifyLocalVideoToken } from './utils/videoAccess';
 
 const app = express();
 
@@ -24,8 +26,24 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-// Yuklangan fayllar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz
-app.use('/uploads', express.static(UPLOADS_ROOT, { maxAge: '30d', immutable: true, index: false, dotfiles: 'deny' }));
+// Yuklangan rasmlar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz, ochiq qoladi
+app.use('/uploads/images', express.static(IMAGES_DIR, { maxAge: '30d', immutable: true, index: false, dotfiles: 'deny' }));
+
+// Video darslar (lokal disk rejimi) — enrollment tekshiruvidan o'tgan foydalanuvchiga
+// courses.service.ts orqali beriladigan vaqtinchalik ?exp&sig tokensiz ochilmaydi
+// (aks holda pullik kurs videosi hech qanday tekshiruvsiz, muddatsiz oshkor bo'lardi).
+app.get('/uploads/videos/:filename', (req, res) => {
+  const filename = path.basename(req.params.filename);
+  if (!verifyLocalVideoToken(filename, req.query.exp, req.query.sig)) {
+    res.status(403).json({ success: false, error: { message: 'Havola yaroqsiz yoki muddati tugagan', code: 'VIDEO_TOKEN_INVALID' } });
+    return;
+  }
+  res.sendFile(filename, { root: VIDEOS_DIR, maxAge: '6h', dotfiles: 'deny' }, (err) => {
+    if (err && !res.headersSent) {
+      res.status(404).json({ success: false, error: { message: 'Fayl topilmadi', code: 'NOT_FOUND' } });
+    }
+  });
+});
 
 // Umumiy API limiti — bitta IP'dan 15 daqiqada 1000 so'rov (auth route'larida qattiqroq limitlar bor)
 const apiLimiter = rateLimit({

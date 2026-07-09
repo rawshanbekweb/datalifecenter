@@ -3,6 +3,9 @@ import path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { env } from '../config/env';
 import { IMAGES_DIR, VIDEOS_DIR } from '../config/uploads';
+import { signLocalVideoUrl } from '../utils/videoAccess';
+
+const VIDEO_URL_TTL_SECONDS = 6 * 3600;
 
 // Render/Railway kabi ephemeral hostingda lokal disk deploy'da tozalanadi —
 // CLOUDINARY_* sozlansa fayllar bulutga ko'chadi va URL'lar doimiy bo'ladi.
@@ -29,6 +32,10 @@ export async function uploadToCloudinary(
   const options = {
     folder: `datalife/${kind}`,
     resource_type: (kind === 'videos' ? 'video' : 'image') as 'video' | 'image',
+    // Video "authenticated" turida yuklanadi — xom secure_url imzosiz ishlamaydi,
+    // faqat signVideoUrl() bilan generatsiya qilingan vaqtinchalik havola ochadi.
+    // Rasm oldingidek public (type: 'upload') qoladi.
+    ...(kind === 'videos' ? { type: 'authenticated' as const } : {}),
   };
 
   const result: UploadApiResponse =
@@ -45,11 +52,47 @@ export async function uploadToCloudinary(
 
 // Cloudinary URL'idan public_id ni ajratadi:
 // https://res.cloudinary.com/<cloud>/video/upload/v123/datalife/videos/abc.mp4
-//   → { publicId: 'datalife/videos/abc', resourceType: 'video' }
-function parseCloudinaryUrl(url: string): { publicId: string; resourceType: 'image' | 'video' } | null {
-  const match = /res\.cloudinary\.com\/[^/]+\/(image|video)\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/.exec(url);
+//   → { publicId: 'datalife/videos/abc', resourceType: 'video', deliveryType: 'upload' }
+// "authenticated" turidagi video URL'lar /video/authenticated/... ko'rinishida keladi.
+function parseCloudinaryUrl(
+  url: string
+): { publicId: string; resourceType: 'image' | 'video'; deliveryType: 'upload' | 'authenticated' } | null {
+  const match = /res\.cloudinary\.com\/[^/]+\/(image|video)\/(upload|authenticated)\/(?:s--[\w-]+--\/)?(?:v\d+\/)?(.+?)(?:\.\w+)?$/.exec(
+    url
+  );
   if (!match) return null;
-  return { publicId: match[2], resourceType: match[1] as 'image' | 'video' };
+  return {
+    publicId: match[3],
+    resourceType: match[1] as 'image' | 'video',
+    deliveryType: match[2] as 'upload' | 'authenticated',
+  };
+}
+
+// Dars videosining saqlangan (doimiy) URL'ini vaqtinchalik, imzoli havolaga aylantiradi —
+// enrollment tekshiruvidan o'tgan foydalanuvchiga har safar YANGI havola beriladi, shuning
+// uchun oshkor bo'lgan eski havola muddat (TTL) tugagach ishlamay qoladi.
+// Cloudinary — "authenticated" turidagi asset uchun imzoli delivery URL generatsiya qilinadi
+// (tarmoq so'rovisiz, faqat lokal hisoblash). Lokal disk — HMAC token qo'shiladi.
+// YouTube/Vimeo va boshqa tashqi havolalar o'zgarishsiz qaytadi (biz tomondan himoya mumkin emas).
+export function signVideoUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  const cloud = parseCloudinaryUrl(url);
+  if (cloud) {
+    return cloudinary.url(cloud.publicId, {
+      resource_type: cloud.resourceType,
+      type: 'authenticated',
+      sign_url: true,
+      secure: true,
+      expires_at: Math.floor(Date.now() / 1000) + VIDEO_URL_TTL_SECONDS,
+    });
+  }
+
+  if (url.includes('/uploads/videos/')) {
+    return signLocalVideoUrl(url, VIDEO_URL_TTL_SECONDS);
+  }
+
+  return url;
 }
 
 // Endi kerak bo'lmagan faylni (o'chirilgan dars videosi, almashtirilgan chek)
@@ -60,7 +103,10 @@ export async function deleteUploadByUrl(url: string | null | undefined): Promise
     const cloud = parseCloudinaryUrl(url);
     if (cloud) {
       if (cloudinaryEnabled) {
-        await cloudinary.uploader.destroy(cloud.publicId, { resource_type: cloud.resourceType });
+        await cloudinary.uploader.destroy(cloud.publicId, {
+          resource_type: cloud.resourceType,
+          type: cloud.deliveryType,
+        });
       }
       return;
     }
