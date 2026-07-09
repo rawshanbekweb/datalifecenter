@@ -29,7 +29,7 @@ export const deleteMyReviewHandler = asyncHandler(async (req: Request, res: Resp
 
 export const listReviewsAdminHandler = asyncHandler(async (req: Request, res: Response) => {
   const filters = req.validatedQuery as unknown as { page: number; limit: number };
-  const result = await courseReviewsService.listReviewsAdmin(filters);
+  const result = await courseReviewsService.listReviewsAdmin(filters, req.locale);
   sendSuccess(res, result);
 });
 

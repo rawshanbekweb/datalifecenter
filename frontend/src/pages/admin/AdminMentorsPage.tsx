@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, UserCheck } from 'lucide-react';
-import { listMentors, createMentor, updateMentor, deleteMentor } from '../../api/mentors';
+import { listMentorsAdmin, createMentor, updateMentor, deleteMentor } from '../../api/mentors';
 import { listUsers, AdminUser } from '../../api/users';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface MentorFormState {
   id?: string | number;
   name: string;
-  bio: string;
-  specialty: string;
+  bio: LocalizedString;
+  specialty: LocalizedString;
   photoUrl: string;
   linkedinUrl: string;
   githubUrl: string;
@@ -21,8 +23,8 @@ interface MentorFormState {
 interface Mentor {
   id: string | number;
   name: string;
-  bio: string;
-  specialty: string;
+  bio: LocalizedString;
+  specialty: LocalizedString;
   photoUrl?: string | null;
   linkedinUrl?: string | null;
   githubUrl?: string | null;
@@ -35,7 +37,7 @@ interface Mentor {
 
 type Status = 'loading' | 'ready' | 'error';
 
-const emptyForm: MentorFormState = { name:'', bio:'', specialty:'', photoUrl:'', linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false, userId:'' };
+const emptyForm: MentorFormState = { name:'', bio: emptyLocalizedString(), specialty: emptyLocalizedString(), photoUrl:'', linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false, userId:'' };
 
 function initials(name: string): string {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -89,15 +91,9 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ism Familiya *</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
         </div>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Soha *</label>
-          <input className="inp" value={form.specialty} onChange={change('specialty')} required placeholder="Frontend & React" />
-        </div>
+        <LocalizedField label="Soha" required value={form.specialty} onChange={(next) => setForm((f) => ({ ...f, specialty: next }))} placeholder="Frontend & React" />
       </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Bio *</label>
-        <textarea className="inp" rows={3} value={form.bio} onChange={change('bio')} required style={{ resize:'none' }} />
-      </div>
+      <LocalizedField label="Bio" required multiline value={form.bio} onChange={(next) => setForm((f) => ({ ...f, bio: next }))} />
       <FileUpload kind="image" label="Mentor rasmi" value={form.photoUrl}
         onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
@@ -148,7 +144,7 @@ export default function AdminMentorsPage(): React.ReactElement {
 
   const load = (): void => {
     setStatus('loading');
-    Promise.all([listMentors(), listUsers({ limit: 100 })])
+    Promise.all([listMentorsAdmin(), listUsers({ limit: 100 })])
       .then(([m, u]) => { setMentors(m as Mentor[]); setUsers(u.items); setStatus('ready'); })
       .catch(() => setStatus('error'));
   };
@@ -196,7 +192,7 @@ export default function AdminMentorsPage(): React.ReactElement {
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{m.name}</p>
-                <p style={{ fontSize:12, color:'#94a3b8' }}>{m.specialty} · {m.courses?.length || 0} kurs</p>
+                <p style={{ fontSize:12, color:'#94a3b8' }}>{m.specialty.uz} · {m.courses?.length || 0} kurs</p>
               </div>
               {m.userId && (
                 <span className="tag" style={{ display:'flex', alignItems:'center', gap:5, background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a' }}>

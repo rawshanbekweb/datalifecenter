@@ -1,12 +1,14 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { env } from '../config/env';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { notify, notifyAdmins } from './notifications.service';
 import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail } from './email.service';
 import { deleteUploadByUrl } from './storage.service';
 
-export async function createEnrollment(userId: string, courseId: string) {
+export async function createEnrollment(userId: string, courseId: string, locale: SupportedLocale) {
   const course = await prisma.course.findFirst({ where: { id: courseId, published: true } });
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
@@ -32,7 +34,7 @@ export async function createEnrollment(userId: string, courseId: string) {
     prisma.course.update({ where: { id: courseId }, data: { studentsCount: { increment: 1 } } }),
   ]);
 
-  return enrollment;
+  return resolveLocaleDeep(enrollment, locale);
 }
 
 // Xom receiptUrl javobdan olib tashlanadi — chek endi faqat autentifikatsiyalangan
@@ -42,14 +44,14 @@ function hideReceiptUrl<T extends { receiptUrl?: string | null }>(enrollment: T)
   return { ...rest, hasReceipt: Boolean(receiptUrl) };
 }
 
-export async function getMyEnrollments(userId: string) {
+export async function getMyEnrollments(userId: string, locale: SupportedLocale) {
   const enrollments = await prisma.enrollment.findMany({
     where: { userId },
     orderBy: { enrolledAt: 'desc' },
     include: { course: true },
   });
 
-  return Promise.all(
+  const result = await Promise.all(
     enrollments.map(async (enrollment) => {
       const [totalLessons, completedLessons] = await Promise.all([
         prisma.lesson.count({ where: { module: { courseId: enrollment.courseId } } }),
@@ -58,6 +60,7 @@ export async function getMyEnrollments(userId: string) {
       return { ...hideReceiptUrl(enrollment), progress: { totalLessons, completedLessons } };
     })
   );
+  return resolveLocaleDeep(result, locale);
 }
 
 interface ListEnrollmentsAdminFilters {
@@ -68,7 +71,7 @@ interface ListEnrollmentsAdminFilters {
   limit: number;
 }
 
-export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters) {
+export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters, locale: SupportedLocale) {
   const where: Prisma.EnrollmentWhereInput = {
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.paymentStatus ? { paymentStatus: filters.paymentStatus } : {}),
@@ -77,7 +80,7 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters)
           OR: [
             { user: { name: { contains: filters.search, mode: 'insensitive' } } },
             { user: { email: { contains: filters.search, mode: 'insensitive' } } },
-            { course: { title: { contains: filters.search, mode: 'insensitive' } } },
+            { course: { title: { path: ['uz'], string_contains: filters.search, mode: 'insensitive' } } },
           ],
         }
       : {}),
@@ -98,7 +101,7 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters)
   ]);
 
   return {
-    items: items.map(hideReceiptUrl),
+    items: resolveLocaleDeep(items.map(hideReceiptUrl), locale),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
@@ -109,7 +112,7 @@ interface UpdateEnrollmentAdminInput {
   rejectionReason?: string;
 }
 
-export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateEnrollmentAdminInput) {
+export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateEnrollmentAdminInput, locale: SupportedLocale) {
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
     include: { course: true },
@@ -126,7 +129,7 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
       provider: enrollment.provider ?? 'manual',
       providerRef: enrollment.providerRef ?? `manual_${Date.now()}`,
       amount: enrollment.amountPaid ?? enrollment.course.price ?? 0,
-    });
+    }, locale);
   }
 
   const data: Prisma.EnrollmentUpdateInput = {
@@ -153,7 +156,7 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
   if (updated.status === 'ACTIVE' && enrollment.status !== 'ACTIVE') {
     await notify(updated.userId, {
       type: 'ENROLLMENT_ACTIVATED',
-      title: `Kurs ochildi: ${updated.course.title}`,
+      title: `Kurs ochildi: ${toUzText(updated.course.title)}`,
       body: "To'lovingiz tasdiqlandi — darslarni boshlashingiz mumkin.",
       link: `/learn/${updated.course.slug}`,
     });
@@ -163,14 +166,14 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
   if (input.paymentStatus === 'REJECTED' && enrollment.paymentStatus !== 'REJECTED') {
     await notify(updated.userId, {
       type: 'PAYMENT_REJECTED',
-      title: `To'lov rad etildi: ${updated.course.title}`,
+      title: `To'lov rad etildi: ${toUzText(updated.course.title)}`,
       body: updated.rejectionReason ?? undefined,
       link: '/dashboard',
     });
-    await sendPaymentRejectedEmail(updated.user.email, updated.user.name, updated.course.title, updated.rejectionReason ?? '');
+    await sendPaymentRejectedEmail(updated.user.email, updated.user.name, toUzText(updated.course.title), updated.rejectionReason ?? '');
   }
 
-  return updated;
+  return resolveLocaleDeep(updated, locale);
 }
 
 interface ConfirmPaymentInput {
@@ -181,20 +184,21 @@ interface ConfirmPaymentInput {
 
 // To'lov manbasidan qat'iy nazar (admin qo'lda tasdiqlashi, Click/Payme webhook'i)
 // yozilishni faollashtiradigan yagona yadro — status/bildirishnoma/email bir xil bo'lishi uchun.
-export async function confirmEnrollmentPayment(enrollmentId: string, input: ConfirmPaymentInput) {
+export async function confirmEnrollmentPayment(enrollmentId: string, input: ConfirmPaymentInput, locale: SupportedLocale = 'uz') {
   const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId }, include: { course: true } });
   if (!enrollment) {
     throw ApiError.notFound('Yozilish topilmadi');
   }
   // Idempotent — allaqachon to'langan bo'lsa qayta ishlov berilmaydi (webhook'lar qayta so'ralishi mumkin)
   if (enrollment.paymentStatus === 'PAID') {
-    return prisma.enrollment.findUniqueOrThrow({
+    const existing = await prisma.enrollment.findUniqueOrThrow({
       where: { id: enrollmentId },
       include: {
         user: { select: { id: true, name: true, email: true } },
         course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
       },
     });
+    return resolveLocaleDeep(existing, locale);
   }
 
   const wasActive = enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED';
@@ -217,24 +221,24 @@ export async function confirmEnrollmentPayment(enrollmentId: string, input: Conf
   if (!wasActive) {
     await notify(updated.userId, {
       type: 'ENROLLMENT_ACTIVATED',
-      title: `Kurs ochildi: ${updated.course.title}`,
+      title: `Kurs ochildi: ${toUzText(updated.course.title)}`,
       body: "To'lovingiz tasdiqlandi — darslarni boshlashingiz mumkin.",
       link: `/learn/${updated.course.slug}`,
     });
   }
   const courseUrl = `${env.FRONTEND_URL.replace(/\/+$/, '')}/learn/${updated.course.slug}`;
-  await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, updated.course.title, courseUrl);
+  await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, toUzText(updated.course.title), courseUrl);
 
-  return updated;
+  return resolveLocaleDeep(updated, locale);
 }
 
 // To'lov shlyuzi tranzaksiyani bekor qilsa (checkout tugallanmasdan) yoki qaytarsa
 // (to'langandan keyin bekor qilinsa — dispute/chargeback) chaqiriladi.
 // To'lanmasdan bekor qilingan holatda yozilishga tegilmaydi (hali hech narsa o'zgarmagan).
-export async function cancelEnrollmentPayment(enrollmentId: string) {
+export async function cancelEnrollmentPayment(enrollmentId: string, locale: SupportedLocale = 'uz') {
   const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId }, include: { course: true } });
   if (!enrollment || enrollment.paymentStatus !== 'PAID') {
-    return enrollment;
+    return resolveLocaleDeep(enrollment, locale);
   }
 
   const updated = await prisma.enrollment.update({
@@ -248,16 +252,16 @@ export async function cancelEnrollmentPayment(enrollmentId: string) {
 
   await notify(updated.userId, {
     type: 'PAYMENT_REJECTED',
-    title: `To'lov qaytarildi: ${updated.course.title}`,
+    title: `To'lov qaytarildi: ${toUzText(updated.course.title)}`,
     body: "To'lov shlyuzi tomonidan qaytarildi, kursga kirish vaqtincha yopildi.",
     link: '/dashboard',
   });
 
-  return updated;
+  return resolveLocaleDeep(updated, locale);
 }
 
 // Talaba to'lov chekini yuboradi — admin tasdiqlashini kutadi
-export async function submitReceipt(userId: string, enrollmentId: string, receiptUrl: string) {
+export async function submitReceipt(userId: string, enrollmentId: string, receiptUrl: string, locale: SupportedLocale) {
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
     include: { course: true, user: { select: { name: true } } },
@@ -287,11 +291,11 @@ export async function submitReceipt(userId: string, enrollmentId: string, receip
   await notifyAdmins({
     type: 'RECEIPT_SUBMITTED',
     title: "Yangi to'lov cheki yuklandi",
-    body: `${enrollment.user.name} — ${enrollment.course.title}`,
+    body: `${enrollment.user.name} — ${toUzText(enrollment.course.title)}`,
     link: '/admin/enrollments',
   });
 
-  return updated;
+  return resolveLocaleDeep(updated, locale);
 }
 
 export type ReceiptSource = { kind: 'local'; filename: string } | { kind: 'remote'; url: string };
@@ -333,7 +337,7 @@ export async function getCertificateData(userId: string, role: string, enrollmen
 
   return {
     studentName: enrollment.user.name,
-    courseTitle: enrollment.course.title,
+    courseTitle: toUzText(enrollment.course.title),
     durationMonths: enrollment.course.durationMonths,
     completedAt: enrollment.completedAt ?? new Date(),
     certificateNo: `DL-${enrollment.id.slice(-8).toUpperCase()}`,
@@ -366,13 +370,13 @@ export async function verifyCertificate(certificateNo: string) {
   return {
     certificateNo: `DL-${suffix.toUpperCase()}`,
     studentName: enrollment.user.name,
-    courseTitle: enrollment.course.title,
+    courseTitle: toUzText(enrollment.course.title),
     durationMonths: enrollment.course.durationMonths,
     completedAt: enrollment.completedAt,
   };
 }
 
-export async function mockPayEnrollment(userId: string, enrollmentId: string) {
+export async function mockPayEnrollment(userId: string, enrollmentId: string, locale: SupportedLocale) {
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
     include: { course: true },
@@ -385,7 +389,7 @@ export async function mockPayEnrollment(userId: string, enrollmentId: string) {
     throw ApiError.conflict("Bu yozilish uchun to'lov allaqachon amalga oshirilgan", 'ALREADY_PAID');
   }
 
-  return prisma.enrollment.update({
+  const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: {
       status: 'ACTIVE',
@@ -396,4 +400,5 @@ export async function mockPayEnrollment(userId: string, enrollmentId: string) {
     },
     include: { course: true },
   });
+  return resolveLocaleDeep(updated, locale);
 }

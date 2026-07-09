@@ -3,13 +3,15 @@ import { CheckCircle, AlertCircle, UserRound, Link2 } from 'lucide-react';
 import { getMentorMe, updateMentorMe } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import MentorNotLinked from './MentorNotLinked';
 
 interface MentorProfile {
   name: string;
-  bio: string;
-  specialty: string;
-  position: string;
+  bio: LocalizedString;
+  specialty: LocalizedString;
+  position: LocalizedString;
   photoUrl: string;
   linkedinUrl: string;
   githubUrl: string;
@@ -17,7 +19,8 @@ interface MentorProfile {
 }
 
 const EMPTY: MentorProfile = {
-  name: '', bio: '', specialty: '', position: '', photoUrl: '', linkedinUrl: '', githubUrl: '', telegramUrl: '',
+  name: '', bio: emptyLocalizedString(), specialty: emptyLocalizedString(), position: emptyLocalizedString(),
+  photoUrl: '', linkedinUrl: '', githubUrl: '', telegramUrl: '',
 };
 
 const labelStyle: React.CSSProperties = { fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 };
@@ -36,7 +39,8 @@ export default function MentorProfilePage(): React.ReactElement {
       .then((m) => {
         if (cancelled) return;
         setForm({
-          name: m.name || '', bio: m.bio || '', specialty: m.specialty || '', position: m.position || '',
+          name: m.name || '', bio: m.bio || emptyLocalizedString(), specialty: m.specialty || emptyLocalizedString(),
+          position: m.position || emptyLocalizedString(),
           photoUrl: m.photoUrl || '', linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
         });
         setStatus('ready');
@@ -49,8 +53,13 @@ export default function MentorProfilePage(): React.ReactElement {
     return () => { cancelled = true; };
   }, []);
 
-  const set = (key: keyof MentorProfile) => (value: string) => {
+  const set = (key: 'name' | 'photoUrl' | 'linkedinUrl' | 'githubUrl' | 'telegramUrl') => (value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
+    setSaveState('idle');
+  };
+
+  const setLocalized = (key: 'bio' | 'specialty' | 'position') => (next: LocalizedString) => {
+    setForm((f) => ({ ...f, [key]: next }));
     setSaveState('idle');
   };
 
@@ -98,20 +107,10 @@ export default function MentorProfilePage(): React.ReactElement {
               <label style={labelStyle}>Ism *</label>
               <input className="inp" value={form.name} onChange={(e) => set('name')(e.target.value)} required minLength={2} />
             </div>
-            <div>
-              <label style={labelStyle}>Soha * (masalan: Frontend Development)</label>
-              <input className="inp" value={form.specialty} onChange={(e) => set('specialty')(e.target.value)} required minLength={2} />
-            </div>
+            <LocalizedField label="Soha * (masalan: Frontend Development)" required value={form.specialty} onChange={setLocalized('specialty')} />
           </div>
-          <div>
-            <label style={labelStyle}>Lavozim (masalan: Senior Engineer @ Kompaniya)</label>
-            <input className="inp" value={form.position} onChange={(e) => set('position')(e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Bio *</label>
-            <textarea className="inp" rows={4} value={form.bio} onChange={(e) => set('bio')(e.target.value)}
-              required minLength={5} style={{ resize:'vertical' }} />
-          </div>
+          <LocalizedField label="Lavozim (masalan: Senior Engineer @ Kompaniya)" value={form.position} onChange={setLocalized('position')} />
+          <LocalizedField label="Bio" required multiline rows={4} value={form.bio} onChange={setLocalized('bio')} />
           <FileUpload kind="image" label="Profil surati" value={form.photoUrl} onChange={set('photoUrl')} />
 
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:13.5, fontWeight:800, color:'#0f172a', marginTop:6 }}>

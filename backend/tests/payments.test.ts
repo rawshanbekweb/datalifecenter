@@ -31,7 +31,7 @@ const PRICE = 500000;
 async function createPendingEnrollment(): Promise<string> {
   const course = await admin
     .post('/api/courses')
-    .send({ title: `To'lov testi ${Date.now()}-${Math.random()}`, description: "To'lov shlyuzi testi uchun kurs", durationMonths: 1, price: PRICE, published: true })
+    .send({ title: { uz: `To'lov testi ${Date.now()}-${Math.random()}` }, description: { uz: "To'lov shlyuzi testi uchun kurs" }, durationMonths: 1, price: PRICE, published: true })
     .expect(201);
   const enrollment = await student.post('/api/enrollments').send({ courseId: course.body.data.id }).expect(201);
   expect(enrollment.body.data.status).toBe('PENDING');

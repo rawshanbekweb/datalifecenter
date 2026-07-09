@@ -110,10 +110,11 @@ model Mentor {
   user          User?    @relation(fields: [userId], references: [id])
   userId        String?  @unique
   name          String
-  bio           String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  bio           Json
   photoUrl      String?
-  specialty     String
-  position      String?
+  specialty     Json
+  position      Json?
   linkedinUrl   String?
   githubUrl     String?
   telegramUrl   String?
@@ -130,9 +131,10 @@ model Mentor {
 model Course {
   id             String       @id @default(cuid())
   slug           String       @unique
-  title          String
-  subtitle       String?
-  description    String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}. slug doim title.uz'dan hosil qilinadi.
+  title          Json
+  subtitle       Json?
+  description    Json
   iconKey        String
   color          String
   bg             String
@@ -175,8 +177,9 @@ model CourseReview {
 
 model LiveSession {
   id          String        @id @default(cuid())
-  title       String
-  description String?
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title       Json
+  description Json?
   meetingUrl  String
   startsAt    DateTime
   durationMin Int           @default(60)
@@ -198,8 +201,9 @@ model Module {
   id          String   @id @default(cuid())
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId    String
-  title       String
-  description String?
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title       Json
+  description Json?
   order       Int
   lessons     Lesson[]
 }
@@ -208,11 +212,12 @@ model Lesson {
   id              String      @id @default(cuid())
   module          Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId        String
-  title           String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title           Json
   order           Int
   contentType     ContentType @default(VIDEO)
   videoUrl        String?
-  content         String?
+  content         Json?
   durationMinutes Int?
   isFreePreview   Boolean     @default(false)
   progress        LessonProgress[]
@@ -297,8 +302,9 @@ enum AnnouncementAudience {
 // Admin e'lonlari — yaratilganda auditoriyaga Notification sifatida tarqatiladi
 model Announcement {
   id        String               @id @default(cuid())
-  title     String
-  body      String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title     Json
+  body      Json
   audience  AnnouncementAudience @default(ALL)
   course    Course?              @relation(fields: [courseId], references: [id], onDelete: SetNull)
   courseId  String?
@@ -329,9 +335,10 @@ model Partner {
 
 model Project {
   id            String   @id @default(cuid())
-  title         String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title         Json
   category      String
-  description   String
+  description   Json
   techStack     String[]
   screenshotUrl String
   liveUrl       String?
@@ -444,9 +451,10 @@ model SiteSetting {
 model Testimonial {
   id        String   @id @default(cuid())
   name      String
-  role      String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  role      Json
   avatarUrl String?
-  text      String
+  text      Json
   rating    Int      @default(5)
   published Boolean  @default(true)
   order     Int      @default(0)
@@ -467,9 +475,10 @@ model ContactMessage {
 model BlogPost {
   id           String    @id @default(cuid())
   slug         String    @unique
-  title        String
-  excerpt      String
-  content      String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}. slug doim title.uz'dan hosil qilinadi.
+  title        Json
+  excerpt      Json
+  content      Json
   category     String
   iconKey      String
   color        String

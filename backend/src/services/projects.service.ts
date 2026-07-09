@@ -1,11 +1,14 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
 
-export async function listProjects() {
-  return prisma.project.findMany({
+export async function listProjects(locale: SupportedLocale) {
+  const projects = await prisma.project.findMany({
     where: { published: true },
     orderBy: [{ featured: 'desc' }, { order: 'asc' }],
   });
+  return resolveLocaleDeep(projects, locale);
 }
 
 export async function listProjectsAdmin() {
@@ -15,9 +18,9 @@ export async function listProjectsAdmin() {
 }
 
 interface ProjectInput {
-  title: string;
+  title: LocalizedString;
   category: string;
-  description: string;
+  description: LocalizedString;
   techStack: string[];
   screenshotUrl: string;
   liveUrl?: string;

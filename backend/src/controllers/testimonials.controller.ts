@@ -3,8 +3,8 @@ import * as testimonialsService from '../services/testimonials.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 
-export const listTestimonialsHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const testimonials = await testimonialsService.listTestimonials();
+export const listTestimonialsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const testimonials = await testimonialsService.listTestimonials(req.locale);
   sendSuccess(res, testimonials);
 });
 

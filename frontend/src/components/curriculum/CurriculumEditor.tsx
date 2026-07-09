@@ -4,29 +4,31 @@ import { ArrowLeft, Plus, Pencil, Trash2, PlayCircle, FileText, HelpCircle, Clip
 import { createModule, updateModule, deleteModule, createLesson, updateLesson, deleteLesson } from '../../api/courses';
 import AdminPageHeader from '../admin/AdminPageHeader';
 import FileUpload from '../common/FileUpload';
+import LocalizedField from '../admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface LessonItem {
   id: string;
-  title: string;
+  title: LocalizedString;
   order: number;
   contentType: 'VIDEO' | 'TEXT' | 'QUIZ' | 'ASSIGNMENT';
   videoUrl?: string | null;
-  content?: string | null;
+  content?: LocalizedString | null;
   durationMinutes?: number | null;
   isFreePreview: boolean;
 }
 
 interface ModuleItem {
   id: string;
-  title: string;
-  description?: string | null;
+  title: LocalizedString;
+  description?: LocalizedString | null;
   order: number;
   lessons: LessonItem[];
 }
 
 export interface CourseWithCurriculum {
   id: string;
-  title: string;
+  title: LocalizedString;
   modules: ModuleItem[];
 }
 
@@ -44,16 +46,16 @@ const SELECTABLE_CONTENT_TYPES = CONTENT_TYPES.filter((t) => t.value === 'VIDEO'
 
 interface LessonFormState {
   id?: string;
-  title: string;
+  title: LocalizedString;
   contentType: LessonItem['contentType'];
   videoUrl: string;
-  content: string;
+  content: LocalizedString;
   durationMinutes: string;
   isFreePreview: boolean;
 }
 
 const emptyLessonForm: LessonFormState = {
-  title: '', contentType: 'VIDEO', videoUrl: '', content: '', durationMinutes: '', isFreePreview: false,
+  title: emptyLocalizedString(), contentType: 'VIDEO', videoUrl: '', content: emptyLocalizedString(), durationMinutes: '', isFreePreview: false,
 };
 
 interface LessonFormProps {
@@ -76,7 +78,7 @@ function LessonForm({ initial, moduleId, onCancel, onSaved }: LessonFormProps): 
       title: form.title,
       contentType: form.contentType,
       videoUrl: form.videoUrl || null,
-      content: form.content || null,
+      content: form.content.uz ? form.content : null,
       durationMinutes: form.durationMinutes === '' ? null : Number(form.durationMinutes),
       isFreePreview: form.isFreePreview,
     };
@@ -96,9 +98,8 @@ function LessonForm({ initial, moduleId, onCancel, onSaved }: LessonFormProps): 
   return (
     <form onSubmit={submit} style={{ padding:14, borderRadius:12, background:'#f8fafc', border:'1px dashed #cbd5e1', display:'flex', flexDirection:'column', gap:10, marginTop:8 }}>
       {error && <p style={{ fontSize:12.5, color:'#dc2626' }}>{error}</p>}
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:10 }}>
-        <input className="inp" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          placeholder="Dars sarlavhasi *" required style={{ fontSize:13 }} />
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:10, alignItems: 'flex-end' }}>
+        <LocalizedField label="" placeholder="Dars sarlavhasi *" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <select className="inp" value={form.contentType} style={{ fontSize:13 }}
           onChange={(e) => setForm((f) => ({ ...f, contentType: e.target.value as LessonItem['contentType'] }))}>
           {SELECTABLE_CONTENT_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -112,8 +113,9 @@ function LessonForm({ initial, moduleId, onCancel, onSaved }: LessonFormProps): 
           onChange={(url) => setForm((f) => ({ ...f, videoUrl: url }))} />
       )}
       {form.contentType !== 'VIDEO' && (
-        <textarea className="inp" rows={4} value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-          placeholder="Dars matni / topshiriq tavsifi" style={{ fontSize:13, resize:'vertical' }} />
+        <LocalizedField label="" multiline rows={4} value={form.content}
+          onChange={(next) => setForm((f) => ({ ...f, content: next }))}
+          placeholder="Dars matni / topshiriq tavsifi" />
       )}
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:12.5, color:'#334155', cursor:'pointer' }}>
         <input type="checkbox" checked={form.isFreePreview}
@@ -142,7 +144,7 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
   const [course, setCourse] = useState<CourseWithCurriculum | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
-  const [moduleForm, setModuleForm]       = useState<{ id?: string; title: string; description: string } | null>(null);
+  const [moduleForm, setModuleForm]       = useState<{ id?: string; title: LocalizedString; description: LocalizedString } | null>(null);
   const [moduleSaving, setModuleSaving]   = useState<boolean>(false);
   const [lessonForm, setLessonForm]       = useState<{ moduleId: string; form: LessonFormState } | null>(null);
 
@@ -159,10 +161,11 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
     if (!moduleForm) return;
     setModuleSaving(true);
     try {
+      const description = moduleForm.description.uz ? moduleForm.description : null;
       if (moduleForm.id) {
-        await updateModule(moduleForm.id, { title: moduleForm.title, description: moduleForm.description || null });
+        await updateModule(moduleForm.id, { title: moduleForm.title, description });
       } else {
-        await createModule({ courseId, title: moduleForm.title, description: moduleForm.description || null });
+        await createModule({ courseId, title: moduleForm.title, description });
       }
       setModuleForm(null);
       load();
@@ -201,10 +204,10 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
       <Link to={backTo} style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none', marginBottom:14 }}>
         <ArrowLeft size={14}/> {backLabel}
       </Link>
-      <AdminPageHeader title={course.title} sub="Kurs dasturi — modullar va darslar"
+      <AdminPageHeader title={course.title.uz} sub="Kurs dasturi — modullar va darslar"
         actions={
           !moduleForm ? (
-            <button onClick={() => setModuleForm({ title:'', description:'' })} className="btn-primary" style={{ fontSize:13 }}>
+            <button onClick={() => setModuleForm({ title: emptyLocalizedString(), description: emptyLocalizedString() })} className="btn-primary" style={{ fontSize:13 }}>
               <Plus size={15}/> Yangi modul
             </button>
           ) : undefined
@@ -213,10 +216,10 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
       {moduleForm && (
         <form onSubmit={saveModule} className="card" style={{ padding:18, marginBottom:18, display:'flex', flexDirection:'column', gap:10 }}>
           <p style={{ fontSize:13.5, fontWeight:800, color:'#0f172a' }}>{moduleForm.id ? 'Modulni tahrirlash' : 'Yangi modul'}</p>
-          <input className="inp" value={moduleForm.title} required placeholder="Modul sarlavhasi *"
-            onChange={(e) => setModuleForm((f) => f && ({ ...f, title: e.target.value }))} />
-          <input className="inp" value={moduleForm.description} placeholder="Qisqa tavsif (ixtiyoriy)"
-            onChange={(e) => setModuleForm((f) => f && ({ ...f, description: e.target.value }))} />
+          <LocalizedField label="" placeholder="Modul sarlavhasi *" required value={moduleForm.title}
+            onChange={(next) => setModuleForm((f) => f && ({ ...f, title: next }))} />
+          <LocalizedField label="" placeholder="Qisqa tavsif (ixtiyoriy)" value={moduleForm.description}
+            onChange={(next) => setModuleForm((f) => f && ({ ...f, description: next }))} />
           <div style={{ display:'flex', gap:8 }}>
             <button type="submit" disabled={moduleSaving} className="btn-primary" style={{ fontSize:12.5, padding:'8px 14px', opacity: moduleSaving ? 0.6 : 1 }}>
               {moduleSaving ? 'Saqlanmoqda...' : 'Saqlash'}
@@ -240,12 +243,12 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>
                   <span style={{ color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace', marginRight:8 }}>{String(mi + 1).padStart(2, '0')}</span>
-                  {mod.title}
+                  {mod.title.uz}
                 </p>
-                {mod.description && <p style={{ fontSize:12, color:'#94a3b8' }}>{mod.description}</p>}
+                {mod.description?.uz && <p style={{ fontSize:12, color:'#94a3b8' }}>{mod.description.uz}</p>}
               </div>
               <span style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{mod.lessons.length} dars</span>
-              <button onClick={() => setModuleForm({ id: mod.id, title: mod.title, description: mod.description || '' })}
+              <button onClick={() => setModuleForm({ id: mod.id, title: mod.title, description: mod.description || emptyLocalizedString() })}
                 style={{ width:30, height:30, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569', flexShrink:0 }}>
                 <Pencil size={13}/>
               </button>
@@ -263,14 +266,14 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
                 <div key={lesson.id}>
                   <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0 8px 25px', borderTop:'1px solid #f1f5f9' }}>
                     <TypeIcon size={14} style={{ color:'#0ea5e9', flexShrink:0 }} />
-                    <span style={{ flex:1, fontSize:13, color:'#334155', minWidth:0 }}>{lesson.title}</span>
+                    <span style={{ flex:1, fontSize:13, color:'#334155', minWidth:0 }}>{lesson.title.uz}</span>
                     {lesson.isFreePreview && <span className="tag" style={{ borderColor:'#bae6fd', color:'#0ea5e9', fontSize:10.5 }}>Bepul</span>}
                     <span style={{ fontSize:11, color:'#94a3b8', flexShrink:0 }}>{typeMeta.label}{lesson.durationMinutes ? ` · ${lesson.durationMinutes} daq` : ''}</span>
                     <button onClick={() => setLessonForm({
                         moduleId: mod.id,
                         form: {
                           id: lesson.id, title: lesson.title, contentType: lesson.contentType,
-                          videoUrl: lesson.videoUrl || '', content: lesson.content || '',
+                          videoUrl: lesson.videoUrl || '', content: lesson.content || emptyLocalizedString(),
                           durationMinutes: lesson.durationMinutes == null ? '' : String(lesson.durationMinutes),
                           isFreePreview: lesson.isFreePreview,
                         },

@@ -3,20 +3,22 @@ import { Plus, Trash2, AlertCircle, Megaphone } from 'lucide-react';
 import { listAnnouncements, createAnnouncement, deleteAnnouncement, type Announcement } from '../../api/notifications';
 import { listCoursesAdmin } from '../../api/courses';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface CourseOption {
   id: string;
-  title: string;
+  title: LocalizedString;
 }
 
 interface FormState {
-  title: string;
-  body: string;
+  title: LocalizedString;
+  body: LocalizedString;
   audience: Announcement['audience'];
   courseId: string;
 }
 
-const emptyForm: FormState = { title: '', body: '', audience: 'ALL', courseId: '' };
+const emptyForm: FormState = { title: emptyLocalizedString(), body: emptyLocalizedString(), audience: 'ALL', courseId: '' };
 
 const AUDIENCE_LABEL: Record<Announcement['audience'], string> = {
   ALL: 'Hammaga',
@@ -83,14 +85,8 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
             <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
           </div>
         )}
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Sarlavha *</label>
-          <input className="inp" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} required minLength={3} maxLength={200} />
-        </div>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Matn *</label>
-          <textarea className="inp" value={form.body} onChange={(e) => setForm((f) => ({ ...f, body: e.target.value }))} required minLength={5} maxLength={5000} rows={3} style={{ resize:'none' }} />
-        </div>
+        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+        <LocalizedField label="Matn" required multiline value={form.body} onChange={(next) => setForm((f) => ({ ...f, body: next }))} />
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div>
             <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Auditoriya</label>
@@ -106,7 +102,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
             <select className="inp" value={form.courseId}
               onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))} style={{ cursor:'pointer' }}>
               <option value="">— tanlanmagan (yuqoridagi auditoriya ishlatiladi)</option>
-              {courses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+              {courses.map((c) => <option key={c.id} value={c.id}>{c.title.uz}</option>)}
             </select>
           </div>
         </div>

@@ -12,7 +12,7 @@ export const createSessionHandler = asyncHandler(async (req: Request, res: Respo
 
 export const listMySessionsHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const sessions = await sessionsService.listMySessions(req.user.userId);
+  const sessions = await sessionsService.listMySessions(req.user.userId, req.locale);
   sendSuccess(res, sessions);
 });
 

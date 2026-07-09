@@ -26,12 +26,12 @@ beforeAll(async () => {
 
   const course = await admin
     .post('/api/courses')
-    .send({ title: 'Sessiya Testi Kursi', description: 'Jonli dars auditoriyasi testi', durationMonths: 1, price: 0, published: true })
+    .send({ title: { uz: 'Sessiya Testi Kursi' }, description: { uz: 'Jonli dars auditoriyasi testi' }, durationMonths: 1, price: 0, published: true })
     .expect(201);
   courseId = course.body.data.id;
 
   const mentor = await prisma.mentor.create({
-    data: { name: 'Test Mentor', bio: 'Bio matni', specialty: 'Backend', userId: mentorUser.id },
+    data: { name: 'Test Mentor', bio: { uz: 'Bio matni' }, specialty: { uz: 'Backend' }, userId: mentorUser.id },
   });
   await prisma.course.update({ where: { id: courseId }, data: { mentorId: mentor.id } });
 
@@ -55,7 +55,7 @@ describe('Jonli efir auditoriyasi (targetStudentIds)', () => {
   it("auditoriyasiz sessiya barcha yozilgan talabalarga ko'rinadi", async () => {
     const created = await mentorAgent
       .post('/api/sessions')
-      .send({ courseId, title: 'Hammaga ochiq sessiya', meetingUrl: 'https://meet.jit.si/test1', startsAt: futureIso(1), durationMin: 60 })
+      .send({ courseId, title: { uz: 'Hammaga ochiq sessiya' }, meetingUrl: 'https://meet.jit.si/test1', startsAt: futureIso(1), durationMin: 60 })
       .expect(201);
     expect(created.body.data.targetStudentIds).toEqual([]);
 
@@ -73,7 +73,7 @@ describe('Jonli efir auditoriyasi (targetStudentIds)', () => {
       .post('/api/sessions')
       .send({
         courseId,
-        title: 'Faqat A uchun sessiya',
+        title: { uz: 'Faqat A uchun sessiya' },
         meetingUrl: 'https://meet.jit.si/test2',
         startsAt: futureIso(2),
         durationMin: 45,
@@ -99,7 +99,7 @@ describe('Jonli efir auditoriyasi (targetStudentIds)', () => {
       .post('/api/sessions')
       .send({
         courseId,
-        title: 'Soxta id bilan sessiya',
+        title: { uz: 'Soxta id bilan sessiya' },
         meetingUrl: 'https://meet.jit.si/test3',
         startsAt: futureIso(3),
         durationMin: 30,

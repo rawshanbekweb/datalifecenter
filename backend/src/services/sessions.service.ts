@@ -1,6 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep, toJsonInput, toUzText } from '../utils/localizedField';
 import { notify } from './notifications.service';
 
 const sessionInclude = {
@@ -15,8 +17,8 @@ interface Actor {
 
 interface CreateSessionInput {
   courseId: string;
-  title: string;
-  description?: string;
+  title: LocalizedString;
+  description?: LocalizedString | null;
   meetingUrl: string;
   startsAt: Date;
   durationMin: number;
@@ -24,8 +26,8 @@ interface CreateSessionInput {
 }
 
 interface UpdateSessionInput {
-  title?: string;
-  description?: string | null;
+  title?: LocalizedString;
+  description?: LocalizedString | null;
   meetingUrl?: string;
   startsAt?: Date;
   durationMin?: number;
@@ -80,7 +82,7 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
   const targetStudentIds = await filterEnrolledStudentIds(input.courseId, input.targetStudentIds ?? []);
 
   const session = await prisma.liveSession.create({
-    data: { ...input, mentorId, targetStudentIds },
+    data: { ...input, mentorId, targetStudentIds, description: toJsonInput(input.description) },
     include: sessionInclude,
   });
 
@@ -97,16 +99,16 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
   }
   await notify(recipientIds, {
     type: 'SESSION_SCHEDULED',
-    title: `Yangi jonli dars: ${session.title}`,
-    body: `${course.title} — ${new Date(session.startsAt).toLocaleString('uz-UZ')}`,
+    title: `Yangi jonli dars: ${toUzText(session.title)}`,
+    body: `${toUzText(course.title)} — ${new Date(session.startsAt).toLocaleString('uz-UZ')}`,
     link: '/student/sessions',
   });
 
   return session;
 }
 
-// Talaba: o'zi yozilgan (ACTIVE/COMPLETED) kurslarning yaqin sessiyalari
-export async function listMySessions(userId: string) {
+// Talaba: o'zi yozilgan (ACTIVE/COMPLETED) kurslarning yaqin sessiyalari — o'z tiliga tekislanadi
+export async function listMySessions(userId: string, locale: SupportedLocale) {
   const enrollments = await prisma.enrollment.findMany({
     where: { userId, status: { in: ['ACTIVE', 'COMPLETED'] } },
     select: { courseId: true },
@@ -116,7 +118,7 @@ export async function listMySessions(userId: string) {
 
   // Tugagan sessiyalarni ko'rsatmaymiz; boshlangan-lekin-tugamaganlar ko'rinadi
   const cutoff = new Date(Date.now() - 8 * 60 * 60 * 1000);
-  return prisma.liveSession.findMany({
+  const sessions = await prisma.liveSession.findMany({
     where: {
       courseId: { in: courseIds },
       status: { in: ['SCHEDULED', 'LIVE'] },
@@ -128,6 +130,7 @@ export async function listMySessions(userId: string) {
     take: 20,
     include: sessionInclude,
   });
+  return resolveLocaleDeep(sessions, locale);
 }
 
 // Mentor: o'z sessiyalari; Admin: hammasi
@@ -159,7 +162,7 @@ async function getOwnedSession(id: string, actor: Actor) {
 
 export async function updateSession(id: string, input: UpdateSessionInput, actor: Actor) {
   const session = await getOwnedSession(id, actor);
-  const data: Prisma.LiveSessionUpdateInput = { ...input };
+  const data: Prisma.LiveSessionUpdateInput = { ...input, description: toJsonInput(input.description) };
   if (input.targetStudentIds !== undefined) {
     data.targetStudentIds = await filterEnrolledStudentIds(session.courseId, input.targetStudentIds);
   }

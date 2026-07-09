@@ -1,6 +1,8 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
+import { resolveLocaleDeep } from '../utils/localizedField';
 
-export async function getStats() {
+export async function getStats(locale: SupportedLocale) {
   const [
     usersTotal,
     studentsTotal,
@@ -52,7 +54,7 @@ export async function getStats() {
       blogPostsTotal,
       mentorsTotal,
     },
-    recentEnrollments,
+    recentEnrollments: resolveLocaleDeep(recentEnrollments, locale),
     recentMessages,
   };
 }

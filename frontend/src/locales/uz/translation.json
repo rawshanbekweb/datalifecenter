@@ -1,0 +1,65 @@
+{
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "confirm": "Tasdiqlash"
+  },
+  "errors": {
+    "network": "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.",
+    "generic": "Kutilmagan xatolik yuz berdi"
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "about": "Kompaniya",
+    "courses": "Kurslar",
+    "mentors": "Mentorlar",
+    "partners": "Hamkorlar",
+    "blog": "Blog",
+    "contact": "Aloqa",
+    "login": "Kirish",
+    "start": "Boshlash",
+    "logout": "Chiqish",
+    "admin": "Admin",
+    "mentorCabinet": "Mentor",
+    "myCabinet": "Shaxsiy kabinet",
+    "adminPanel": "Admin panel",
+    "mentorCabinetFull": "Mentor kabineti"
+  },
+  "footer": {
+    "description": "O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash va raqamli mahsulotlar — bizning missiyamiz.",
+    "sections": {
+      "courses": "Kurslar",
+      "services": "Xizmatlar",
+      "company": "Kompaniya"
+    },
+    "links": {
+      "allCourses": "Barcha Kurslar",
+      "whyUs": "Nima Uchun Biz",
+      "webDev": "Web Development",
+      "mobileApps": "Mobile Apps",
+      "uiuxDesign": "UI/UX Design",
+      "itConsulting": "IT Consulting",
+      "digitalSolutions": "Digital Solutions",
+      "aboutUs": "Biz Haqimizda",
+      "blog": "Blog",
+      "projects": "Loyihalar",
+      "partnership": "Hamkorlik"
+    },
+    "newsletter": {
+      "title": "IT yangiliklardan xabardor bo'ling",
+      "subtitle": "Haftalik IT yangiliklar, kurs chegirmalari va maqolalar",
+      "placeholder": "Email manzilingiz",
+      "button": "Obuna bo'lish"
+    },
+    "legal": {
+      "privacy": "Maxfiylik",
+      "terms": "Foydalanish Shartlari",
+      "cookie": "Cookie"
+    },
+    "copyright": "© {{year}} DATA LIFE IT Center. Barcha huquqlar himoyalangan.",
+    "systemsOperational": "All systems operational"
+  }
+}

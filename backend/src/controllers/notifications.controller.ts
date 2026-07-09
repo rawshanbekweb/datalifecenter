@@ -34,8 +34,8 @@ export const createAnnouncementHandler = asyncHandler(async (req: Request, res: 
   sendSuccess(res, announcement, 201);
 });
 
-export const listAnnouncementsHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const announcements = await announcementsService.listAnnouncements();
+export const listAnnouncementsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const announcements = await announcementsService.listAnnouncements(req.locale);
   sendSuccess(res, announcements);
 });
 

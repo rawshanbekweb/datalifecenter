@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, Save, CheckCircle, AlertCircle } from 'lucide-react';
-import { getSiteSettings, updateSiteSettingSection } from '../../api/siteSettings';
+import { getSiteSettingsAdmin, updateSiteSettingSection } from '../../api/siteSettings';
 import { ICON_NAMES } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 type SectionKey = 'hero' | 'about' | 'services' | 'why_us' | 'contact';
 
@@ -14,25 +16,25 @@ const TABS: { key: SectionKey; label: string }[] = [
   { key: 'contact', label: 'Aloqa ma\'lumotlari' },
 ];
 
-interface StatItem { label: string; value: string }
-interface AboutStatItem { icon: string; label: string; value: string; color: string }
-interface SkillItem { label: string; pct: number }
-interface SatisfactionItem { value: string; label: string }
-interface ServiceItem { icon: string; title: string; color: string; desc: string; feats: string[] }
-interface WhyUsItem { icon: string; title: string; color: string; stat: string; desc: string }
-interface HoursItem { day: string; time: string; closed: boolean }
+interface StatItem { label: LocalizedString; value: string }
+interface AboutStatItem { icon: string; label: LocalizedString; value: string; color: string }
+interface SkillItem { label: LocalizedString; pct: number }
+interface SatisfactionItem { value: string; label: LocalizedString }
+interface ServiceItem { icon: string; title: LocalizedString; color: string; desc: LocalizedString; feats: LocalizedString[] }
+interface WhyUsItem { icon: string; title: LocalizedString; color: string; stat: string; desc: LocalizedString }
+interface HoursItem { day: LocalizedString; time: string; closed: boolean }
 
 interface HeroData { stats: StatItem[] }
-interface AboutData { stats: AboutStatItem[]; features: string[]; skills: SkillItem[]; satisfaction: SatisfactionItem[] }
+interface AboutData { stats: AboutStatItem[]; features: LocalizedString[]; skills: SkillItem[]; satisfaction: SatisfactionItem[] }
 interface ServicesData { items: ServiceItem[] }
 interface WhyUsData { items: WhyUsItem[] }
-interface ContactData { phone: string; telegram: string; email: string; address: string; addressSub: string; hours: HoursItem[] }
+interface ContactData { phone: string; telegram: string; email: string; address: string; addressSub: LocalizedString; hours: HoursItem[] }
 
 const EMPTY_HERO: HeroData = { stats: [] };
 const EMPTY_ABOUT: AboutData = { stats: [], features: [], skills: [], satisfaction: [] };
 const EMPTY_SERVICES: ServicesData = { items: [] };
 const EMPTY_WHY_US: WhyUsData = { items: [] };
-const EMPTY_CONTACT: ContactData = { phone: '', telegram: '', email: '', address: '', addressSub: '', hours: [] };
+const EMPTY_CONTACT: ContactData = { phone: '', telegram: '', email: '', address: '', addressSub: emptyLocalizedString(), hours: [] };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }): React.ReactElement {
   return (
@@ -83,10 +85,12 @@ function HeroForm({ data, onChange }: { data: HeroData; onChange: (d: HeroData) 
       {data.stats.map((s, i) => (
         <RowCard key={i} onRemove={() => onChange({ ...data, stats: data.stats.filter((_, idx) => idx !== i) })}>
           <Field label="Qiymat"><input className="inp" value={s.value} onChange={(e) => update(i, { value: e.target.value })} /></Field>
-          <Field label="Nom"><input className="inp" value={s.label} onChange={(e) => update(i, { label: e.target.value })} /></Field>
+          <div style={{ flex: 1, minWidth: 160 }}>
+            <LocalizedField label="Nom" value={s.label} onChange={(next) => update(i, { label: next })} />
+          </div>
         </RowCard>
       ))}
-      <AddButton label="Statistika qo'shish" onClick={() => onChange({ ...data, stats: [...data.stats, { value: '', label: '' }] })} />
+      <AddButton label="Statistika qo'shish" onClick={() => onChange({ ...data, stats: [...data.stats, { value: '', label: emptyLocalizedString() }] })} />
     </div>
   );
 }
@@ -99,7 +103,7 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
     onChange({ ...data, skills: data.skills.map((s, idx) => (idx === i ? { ...s, ...patch } : s)) });
   const updateSat = (i: number, patch: Partial<SatisfactionItem>) =>
     onChange({ ...data, satisfaction: data.satisfaction.map((s, idx) => (idx === i ? { ...s, ...patch } : s)) });
-  const updateFeature = (i: number, val: string) =>
+  const updateFeature = (i: number, val: LocalizedString) =>
     onChange({ ...data, features: data.features.map((f, idx) => (idx === i ? val : f)) });
 
   return (
@@ -110,32 +114,38 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
           <RowCard key={i} onRemove={() => onChange({ ...data, stats: data.stats.filter((_, idx) => idx !== i) })}>
             <Field label="Ikonka"><IconSelect value={s.icon} onChange={(v) => updateStat(i, { icon: v })} /></Field>
             <Field label="Qiymat"><input className="inp" value={s.value} onChange={(e) => updateStat(i, { value: e.target.value })} /></Field>
-            <Field label="Nom"><input className="inp" value={s.label} onChange={(e) => updateStat(i, { label: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Nom" value={s.label} onChange={(next) => updateStat(i, { label: next })} />
+            </div>
             <Field label="Rang"><input className="inp" type="color" value={s.color} onChange={(e) => updateStat(i, { color: e.target.value })} style={{ padding: 3, height: 38 }} /></Field>
           </RowCard>
         ))}
-        <AddButton label="Statistika qo'shish" onClick={() => onChange({ ...data, stats: [...data.stats, { icon: 'Users', value: '', label: '', color: '#0ea5e9' }] })} />
+        <AddButton label="Statistika qo'shish" onClick={() => onChange({ ...data, stats: [...data.stats, { icon: 'Users', value: '', label: emptyLocalizedString(), color: '#0ea5e9' }] })} />
       </div>
 
       <div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Afzalliklar ro'yxati</p>
         {data.features.map((f, i) => (
           <RowCard key={i} onRemove={() => onChange({ ...data, features: data.features.filter((_, idx) => idx !== i) })}>
-            <Field label="Matn"><input className="inp" value={f} onChange={(e) => updateFeature(i, e.target.value)} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Matn" value={f} onChange={(next) => updateFeature(i, next)} />
+            </div>
           </RowCard>
         ))}
-        <AddButton label="Afzallik qo'shish" onClick={() => onChange({ ...data, features: [...data.features, ''] })} />
+        <AddButton label="Afzallik qo'shish" onClick={() => onChange({ ...data, features: [...data.features, emptyLocalizedString()] })} />
       </div>
 
       <div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Ko'nikma foizlari</p>
         {data.skills.map((s, i) => (
           <RowCard key={i} onRemove={() => onChange({ ...data, skills: data.skills.filter((_, idx) => idx !== i) })}>
-            <Field label="Nom"><input className="inp" value={s.label} onChange={(e) => updateSkill(i, { label: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Nom" value={s.label} onChange={(next) => updateSkill(i, { label: next })} />
+            </div>
             <Field label="Foiz"><input className="inp" type="number" min={0} max={100} value={s.pct} onChange={(e) => updateSkill(i, { pct: Number(e.target.value) })} /></Field>
           </RowCard>
         ))}
-        <AddButton label="Ko'nikma qo'shish" onClick={() => onChange({ ...data, skills: [...data.skills, { label: '', pct: 50 }] })} />
+        <AddButton label="Ko'nikma qo'shish" onClick={() => onChange({ ...data, skills: [...data.skills, { label: emptyLocalizedString(), pct: 50 }] })} />
       </div>
 
       <div>
@@ -143,10 +153,12 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
         {data.satisfaction.map((s, i) => (
           <RowCard key={i} onRemove={() => onChange({ ...data, satisfaction: data.satisfaction.filter((_, idx) => idx !== i) })}>
             <Field label="Qiymat"><input className="inp" value={s.value} onChange={(e) => updateSat(i, { value: e.target.value })} /></Field>
-            <Field label="Nom"><input className="inp" value={s.label} onChange={(e) => updateSat(i, { label: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Nom" value={s.label} onChange={(next) => updateSat(i, { label: next })} />
+            </div>
           </RowCard>
         ))}
-        <AddButton label="Ko'rsatkich qo'shish" onClick={() => onChange({ ...data, satisfaction: [...data.satisfaction, { value: '', label: '' }] })} />
+        <AddButton label="Ko'rsatkich qo'shish" onClick={() => onChange({ ...data, satisfaction: [...data.satisfaction, { value: '', label: emptyLocalizedString() }] })} />
       </div>
     </div>
   );
@@ -156,43 +168,48 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
 function ServicesForm({ data, onChange }: { data: ServicesData; onChange: (d: ServicesData) => void }): React.ReactElement {
   const update = (i: number, patch: Partial<ServiceItem>) =>
     onChange({ ...data, items: data.items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)) });
-  const updateFeat = (i: number, fi: number, val: string) =>
+  const updateFeat = (i: number, fi: number, val: LocalizedString) =>
     update(i, { feats: data.items[i].feats.map((f, idx) => (idx === fi ? val : f)) });
 
   return (
     <div>
       {data.items.map((it, i) => (
         <div key={i} style={{ padding: 16, borderRadius: 12, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 14 }}>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'flex-end' }}>
             <Field label="Ikonka"><IconSelect value={it.icon} onChange={(v) => update(i, { icon: v })} /></Field>
-            <Field label="Sarlavha"><input className="inp" value={it.title} onChange={(e) => update(i, { title: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Sarlavha" value={it.title} onChange={(next) => update(i, { title: next })} />
+            </div>
             <Field label="Rang"><input className="inp" type="color" value={it.color} onChange={(e) => update(i, { color: e.target.value })} style={{ padding: 3, height: 38 }} /></Field>
             <button type="button" onClick={() => onChange({ ...data, items: data.items.filter((_, idx) => idx !== i) })}
-              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', color: '#dc2626', flexShrink: 0, alignSelf: 'flex-end' }}>
+              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', color: '#dc2626', flexShrink: 0 }}>
               <Trash2 size={14} />
             </button>
           </div>
-          <textarea className="inp" rows={2} value={it.desc} onChange={(e) => update(i, { desc: e.target.value })}
-            placeholder="Tavsif" style={{ marginBottom: 10, resize: 'none' }} />
+          <div style={{ marginBottom: 10 }}>
+            <LocalizedField label="Tavsif" multiline rows={2} value={it.desc} onChange={(next) => update(i, { desc: next })} />
+          </div>
           <p style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, marginBottom: 6 }}>Xususiyatlar</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {it.feats.map((f, fi) => (
-              <div key={fi} style={{ display: 'flex', gap: 8 }}>
-                <input className="inp" value={f} onChange={(e) => updateFeat(i, fi, e.target.value)} style={{ fontSize: 13 }} />
+              <div key={fi} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <LocalizedField label="" value={f} onChange={(next) => updateFeat(i, fi, next)} />
+                </div>
                 <button type="button" onClick={() => update(i, { feats: it.feats.filter((_, idx) => idx !== fi) })}
                   style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', color: '#dc2626', flexShrink: 0 }}>
                   <Trash2 size={12} />
                 </button>
               </div>
             ))}
-            <button type="button" onClick={() => update(i, { feats: [...it.feats, ''] })}
+            <button type="button" onClick={() => update(i, { feats: [...it.feats, emptyLocalizedString()] })}
               className="btn-outline" style={{ fontSize: 12, padding: '6px 12px', alignSelf: 'flex-start' }}>
               <Plus size={12} /> Xususiyat qo'shish
             </button>
           </div>
         </div>
       ))}
-      <AddButton label="Xizmat qo'shish" onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Globe', title: '', color: '#0ea5e9', desc: '', feats: [] }] })} />
+      <AddButton label="Xizmat qo'shish" onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Globe', title: emptyLocalizedString(), color: '#0ea5e9', desc: emptyLocalizedString(), feats: [] }] })} />
     </div>
   );
 }
@@ -204,21 +221,22 @@ function WhyUsForm({ data, onChange }: { data: WhyUsData; onChange: (d: WhyUsDat
     <div>
       {data.items.map((it, i) => (
         <div key={i} style={{ padding: 16, borderRadius: 12, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 14 }}>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10, alignItems: 'flex-end' }}>
             <Field label="Ikonka"><IconSelect value={it.icon} onChange={(v) => update(i, { icon: v })} /></Field>
-            <Field label="Sarlavha"><input className="inp" value={it.title} onChange={(e) => update(i, { title: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Sarlavha" value={it.title} onChange={(next) => update(i, { title: next })} />
+            </div>
             <Field label="Statistika"><input className="inp" value={it.stat} onChange={(e) => update(i, { stat: e.target.value })} placeholder="40+" /></Field>
             <Field label="Rang"><input className="inp" type="color" value={it.color} onChange={(e) => update(i, { color: e.target.value })} style={{ padding: 3, height: 38 }} /></Field>
             <button type="button" onClick={() => onChange({ ...data, items: data.items.filter((_, idx) => idx !== i) })}
-              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', color: '#dc2626', flexShrink: 0, alignSelf: 'flex-end' }}>
+              style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', color: '#dc2626', flexShrink: 0 }}>
               <Trash2 size={14} />
             </button>
           </div>
-          <textarea className="inp" rows={2} value={it.desc} onChange={(e) => update(i, { desc: e.target.value })}
-            placeholder="Tavsif" style={{ resize: 'none' }} />
+          <LocalizedField label="Tavsif" multiline rows={2} value={it.desc} onChange={(next) => update(i, { desc: next })} />
         </div>
       ))}
-      <AddButton label="Karta qo'shish" onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Zap', title: '', color: '#0ea5e9', stat: '', desc: '' }] })} />
+      <AddButton label="Karta qo'shish" onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Zap', title: emptyLocalizedString(), color: '#0ea5e9', stat: '', desc: emptyLocalizedString() }] })} />
     </div>
   );
 }
@@ -234,20 +252,22 @@ function ContactForm({ data, onChange }: { data: ContactData; onChange: (d: Cont
         <Field label="Telegram"><input className="inp" value={data.telegram} onChange={(e) => onChange({ ...data, telegram: e.target.value })} /></Field>
         <Field label="Email"><input className="inp" value={data.email} onChange={(e) => onChange({ ...data, email: e.target.value })} /></Field>
         <Field label="Manzil"><input className="inp" value={data.address} onChange={(e) => onChange({ ...data, address: e.target.value })} /></Field>
-        <Field label="Manzil (qo'shimcha)"><input className="inp" value={data.addressSub} onChange={(e) => onChange({ ...data, addressSub: e.target.value })} /></Field>
+        <LocalizedField label="Manzil (qo'shimcha)" value={data.addressSub} onChange={(next) => onChange({ ...data, addressSub: next })} />
       </div>
       <div>
         <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Ish vaqtlari</p>
         {data.hours.map((h, i) => (
           <RowCard key={i} onRemove={() => onChange({ ...data, hours: data.hours.filter((_, idx) => idx !== i) })}>
-            <Field label="Kun"><input className="inp" value={h.day} onChange={(e) => updateHour(i, { day: e.target.value })} /></Field>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <LocalizedField label="Kun" value={h.day} onChange={(next) => updateHour(i, { day: next })} />
+            </div>
             <Field label="Vaqt"><input className="inp" value={h.time} onChange={(e) => updateHour(i, { time: e.target.value })} /></Field>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#334155', paddingBottom: 9 }}>
               <input type="checkbox" checked={h.closed} onChange={(e) => updateHour(i, { closed: e.target.checked })} /> Yopiq
             </label>
           </RowCard>
         ))}
-        <AddButton label="Kun qo'shish" onClick={() => onChange({ ...data, hours: [...data.hours, { day: '', time: '', closed: false }] })} />
+        <AddButton label="Kun qo'shish" onClick={() => onChange({ ...data, hours: [...data.hours, { day: emptyLocalizedString(), time: '', closed: false }] })} />
       </div>
     </div>
   );
@@ -265,7 +285,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
   const [saveError, setSaveError] = useState<string>('');
 
   useEffect(() => {
-    getSiteSettings().then((data) => {
+    getSiteSettingsAdmin().then((data) => {
       if (data.hero) setHero(data.hero);
       if (data.about) setAbout(data.about);
       if (data.services) setServices(data.services);

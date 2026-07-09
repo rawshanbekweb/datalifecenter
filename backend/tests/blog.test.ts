@@ -11,9 +11,9 @@ beforeAll(async () => {
   admin = await loginAgent('admin@test.uz');
 
   const res = await admin.post('/api/blog').send({
-    title: 'Test Maqolasi',
-    excerpt: 'Qisqacha mazmun',
-    content: "To'liq matn kamida o'n belgidan iborat",
+    title: { uz: 'Test Maqolasi' },
+    excerpt: { uz: 'Qisqacha mazmun' },
+    content: { uz: "To'liq matn kamida o'n belgidan iborat" },
     category: 'Umumiy',
     published: true,
   });

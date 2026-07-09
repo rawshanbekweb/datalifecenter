@@ -3,6 +3,8 @@ import { Plus, Pencil, Trash2, AlertCircle } from 'lucide-react';
 import { listBlogPostsAdmin, createBlogPost, updateBlogPost, deleteBlogPost } from '../../api/blog';
 import { resolveIcon } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 const ICON_KEYS: string[] = ['BookOpen', 'Shield', 'Map', 'Monitor', 'Server', 'Database', 'Cloud'];
 const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
@@ -15,9 +17,9 @@ const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
 
 interface BlogFormState {
   id?: string | number;
-  title: string;
-  excerpt: string;
-  content: string;
+  title: LocalizedString;
+  excerpt: LocalizedString;
+  content: LocalizedString;
   category: string;
   iconKey: string;
   preset: number;
@@ -28,9 +30,9 @@ interface BlogFormState {
 
 interface BlogPost {
   id: string | number;
-  title: string;
-  excerpt: string;
-  content: string;
+  title: LocalizedString;
+  excerpt: LocalizedString;
+  content: LocalizedString;
   category: string;
   iconKey: string;
   color: string;
@@ -46,7 +48,7 @@ interface BlogPost {
 type Status = 'loading' | 'ready' | 'error';
 
 const emptyForm: BlogFormState = {
-  title:'', excerpt:'', content:'', category:'', iconKey:'BookOpen', preset:0,
+  title: emptyLocalizedString(), excerpt: emptyLocalizedString(), content: emptyLocalizedString(), category:'', iconKey:'BookOpen', preset:0,
   readMinutes:5, tags:'', published:false,
 };
 
@@ -103,18 +105,9 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Sarlavha *</label>
-        <input className="inp" value={form.title} onChange={change('title')} required />
-      </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Qisqacha mazmun *</label>
-        <textarea className="inp" rows={2} value={form.excerpt} onChange={change('excerpt')} required style={{ resize:'none' }} />
-      </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Matn *</label>
-        <textarea className="inp" rows={6} value={form.content} onChange={change('content')} required style={{ resize:'none' }} />
-      </div>
+      <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+      <LocalizedField label="Qisqacha mazmun" required multiline rows={2} value={form.excerpt} onChange={(next) => setForm((f) => ({ ...f, excerpt: next }))} />
+      <LocalizedField label="Matn" required multiline rows={6} value={form.content} onChange={(next) => setForm((f) => ({ ...f, content: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Kategoriya *</label>
@@ -213,7 +206,7 @@ export default function AdminBlogPage(): React.ReactElement {
                   <Icon size={18} style={{ color:p.color }} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{p.title}</p>
+                  <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{p.title.uz}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>{p.category} · {p.views} ko'rish</p>
                 </div>
                 <span className="tag" style={{ background: p.published ? '#f0fdf4' : '#f8fafc', borderColor: p.published ? '#bbf7d0' : '#e2e8f0', color: p.published ? '#16a34a' : '#94a3b8' }}>

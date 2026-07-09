@@ -5,6 +5,8 @@ import { listCoursesAdmin, createCourse, updateCourse, deleteCourse } from '../.
 import { listMentors } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 const ICON_KEYS: string[] = ['Monitor', 'Server', 'Shield', 'Smartphone', 'Database', 'Cloud', 'BookOpen'];
 const LEVELS: { value: string; label: string }[] = [
@@ -22,9 +24,9 @@ const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
 
 interface CourseFormState {
   id?: string;
-  title: string;
-  subtitle: string;
-  description: string;
+  title: LocalizedString;
+  subtitle: LocalizedString;
+  description: LocalizedString;
   iconKey: string;
   preset: number;
   price: number;
@@ -42,9 +44,9 @@ interface Mentor {
 
 interface Course {
   id: string;
-  title: string;
-  subtitle?: string;
-  description: string;
+  title: LocalizedString;
+  subtitle?: LocalizedString | null;
+  description: LocalizedString;
   iconKey: string;
   color: string;
   bg: string;
@@ -60,7 +62,7 @@ interface Course {
 }
 
 const emptyForm: CourseFormState = {
-  title:'', subtitle:'', description:'', iconKey:'BookOpen', preset:0,
+  title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
   price:0, durationMonths:1, level:'BEGINNER', tags:'', published:false, mentorId:'',
 };
 
@@ -120,19 +122,10 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
         </div>
       )}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Sarlavha *</label>
-          <input className="inp" value={form.title} onChange={change('title')} required />
-        </div>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Subtitr</label>
-          <input className="inp" value={form.subtitle} onChange={change('subtitle')} />
-        </div>
+        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+        <LocalizedField label="Subtitr" value={form.subtitle} onChange={(next) => setForm((f) => ({ ...f, subtitle: next }))} />
       </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Tavsif *</label>
-        <textarea className="inp" rows={3} value={form.description} onChange={change('description')} required style={{ resize:'none' }} />
-      </div>
+      <LocalizedField label="Tavsif" required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ikonka</label>
@@ -205,7 +198,7 @@ export default function AdminCoursesPage(): React.ReactElement {
   const startEdit = (course: Course): void => {
     const presetIdx = Math.max(0, PRESETS.findIndex((p) => p.color === course.color));
     setEditing({
-      id: course.id, title: course.title, subtitle: course.subtitle || '', description: course.description,
+      id: course.id, title: course.title, subtitle: course.subtitle || emptyLocalizedString(), description: course.description,
       iconKey: course.iconKey, preset: presetIdx === -1 ? 0 : presetIdx, price: Number(course.price) || 0,
       durationMonths: course.durationMonths, level: course.level, tags: (course.tags || []).join(', '),
       published: course.published, mentorId: course.mentorId || '',
@@ -251,7 +244,7 @@ export default function AdminCoursesPage(): React.ReactElement {
                   <Icon size={18} style={{ color:c.color }} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{c.title}</p>
+                  <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{c.title.uz}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>
                     {c.mentor?.name || "Mentor yo'q"} · {c.isFree ? 'Bepul' : `${Number(c.price).toLocaleString('uz-UZ')} UZS`}
                   </p>

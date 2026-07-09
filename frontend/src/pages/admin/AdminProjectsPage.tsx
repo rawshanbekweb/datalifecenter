@@ -3,12 +3,14 @@ import { Plus, Pencil, Trash2, AlertCircle, LayoutGrid, EyeOff } from 'lucide-re
 import { listProjectsAdmin, createProject, updateProject, deleteProject } from '../../api/projects';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface ProjectFormState {
   id?: string;
-  title: string;
+  title: LocalizedString;
   category: string;
-  description: string;
+  description: LocalizedString;
   techStackText: string;
   screenshotUrl: string;
   liveUrl: string;
@@ -20,9 +22,9 @@ interface ProjectFormState {
 
 interface Project {
   id: string;
-  title: string;
+  title: LocalizedString;
   category: string;
-  description: string;
+  description: LocalizedString;
   techStack: string[];
   screenshotUrl: string;
   liveUrl?: string | null;
@@ -36,7 +38,7 @@ interface Project {
 type Status = 'loading' | 'ready' | 'error';
 
 const emptyForm: ProjectFormState = {
-  title: '', category: '', description: '', techStackText: '',
+  title: emptyLocalizedString(), category: '', description: emptyLocalizedString(), techStackText: '',
   screenshotUrl: '/projects/placeholder-screenshot.svg', liveUrl: '', repoUrl: '', liveEmbed: false, featured: false, published: true,
 };
 
@@ -93,19 +95,13 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
         </div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <div>
-          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Sarlavha *</label>
-          <input className="inp" value={form.title} onChange={change('title')} required />
-        </div>
+        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Kategoriya *</label>
           <input className="inp" value={form.category} onChange={change('category')} required placeholder="Web App / Mobile / AI/ML ..." />
         </div>
       </div>
-      <div>
-        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Tavsif *</label>
-        <textarea className="inp" value={form.description} onChange={change('description')} required rows={3} style={{ resize: 'none' }} />
-      </div>
+      <LocalizedField label="Tavsif" required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
       <div>
         <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Texnologiyalar (vergul bilan) *</label>
         <input className="inp" value={form.techStackText} onChange={change('techStackText')} required placeholder="React, Node.js, PostgreSQL" />
@@ -199,9 +195,9 @@ export default function AdminProjectsPage(): React.ReactElement {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {projects.map((p) => (
             <div key={p.id} className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
-              <img src={p.screenshotUrl} alt={p.title} style={{ width: 64, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }} />
+              <img src={p.screenshotUrl} alt={p.title.uz} style={{ width: 64, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{p.title}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{p.title.uz}</p>
                 <p style={{ fontSize: 12, color: '#94a3b8' }}>{p.category}</p>
               </div>
               {p.featured && <span className="tag" style={{ background: '#faf5ff', borderColor: '#e9d5ff', color: '#9333ea' }}>Tavsiya</span>}

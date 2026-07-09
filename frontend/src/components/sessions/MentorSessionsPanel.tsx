@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Video, Plus, Play, Square, Trash2, ExternalLink, Wand2 } from 'lucide-react';
 import {
-  LiveSession,
+  ManagedLiveSession,
   SessionStatus,
   createSession,
   deleteSession,
@@ -9,6 +9,8 @@ import {
   updateSession,
 } from '../../api/sessions';
 import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
+import LocalizedField from '../admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface CourseOption {
   id: string;
@@ -24,15 +26,15 @@ export interface StudentOption {
 
 interface FormState {
   courseId: string;
-  title: string;
-  description: string;
+  title: LocalizedString;
+  description: LocalizedString;
   meetingUrl: string;
   startsAt: string;
   durationMin: number;
   targetStudentIds: string[];
 }
 
-const EMPTY_FORM: FormState = { courseId: '', title: '', description: '', meetingUrl: '', startsAt: '', durationMin: 60, targetStudentIds: [] };
+const EMPTY_FORM: FormState = { courseId: '', title: emptyLocalizedString(), description: emptyLocalizedString(), meetingUrl: '', startsAt: '', durationMin: 60, targetStudentIds: [] };
 
 function randomJitsiUrl(): string {
   const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -41,7 +43,7 @@ function randomJitsiUrl(): string {
 }
 
 export default function MentorSessionsPanel({ courses, students }: { courses: CourseOption[]; students: StudentOption[] }): React.ReactElement {
-  const [sessions, setSessions] = useState<LiveSession[]>([]);
+  const [sessions, setSessions] = useState<ManagedLiveSession[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
   const [formOpen, setFormOpen] = useState<boolean>(false);
   const [form, setForm]         = useState<FormState>(EMPTY_FORM);
@@ -63,7 +65,7 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
       const created = await createSession({
         courseId: form.courseId,
         title: form.title,
-        description: form.description || undefined,
+        description: form.description.uz ? form.description : undefined,
         meetingUrl: form.meetingUrl,
         startsAt: new Date(form.startsAt).toISOString(),
         durationMin: form.durationMin,
@@ -91,8 +93,8 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
     }
   };
 
-  const remove = async (s: LiveSession): Promise<void> => {
-    if (!window.confirm(`"${s.title}" sessiyasi o'chirilsinmi?`)) return;
+  const remove = async (s: ManagedLiveSession): Promise<void> => {
+    if (!window.confirm(`"${s.title.uz}" sessiyasi o'chirilsinmi?`)) return;
     setBusyId(s.id);
     try {
       await deleteSession(s.id);
@@ -123,8 +125,8 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
             <option value="">Kursni tanlang...</option>
             {courses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
           </select>
-          <input className="inp" required minLength={3} placeholder="Sessiya mavzusi"
-            value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          <LocalizedField label="" required placeholder="Sessiya mavzusi"
+            value={form.title} onChange={(next) => setForm({ ...form, title: next })} />
           <input className="inp" type="datetime-local" required
             value={form.startsAt} onChange={(e) => setForm({ ...form, startsAt: e.target.value })} />
           <select className="inp" value={form.durationMin}
@@ -139,9 +141,10 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
               <Wand2 size={13} /> Havola yaratish
             </button>
           </div>
-          <textarea className="inp" rows={2} placeholder="Qisqacha tavsif (ixtiyoriy)"
-            value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-            style={{ gridColumn: '1 / -1', resize: 'vertical' }} />
+          <div style={{ gridColumn: '1 / -1' }}>
+            <LocalizedField label="" multiline rows={2} placeholder="Qisqacha tavsif (ixtiyoriy)"
+              value={form.description} onChange={(next) => setForm({ ...form, description: next })} />
+          </div>
 
           {form.courseId && (() => {
             const courseStudents = students.filter((s) => s.courseId === form.courseId);
@@ -195,8 +198,8 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
           return (
             <div key={s.id} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', opacity: busy ? 0.7 : 1 }}>
               <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-                <p style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{s.title}</p>
-                <p style={{ fontSize: 12, color: '#64748b' }}>{s.course.title} · {formatSessionTime(s.startsAt, s.durationMin)}</p>
+                <p style={{ fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{s.title.uz}</p>
+                <p style={{ fontSize: 12, color: '#64748b' }}>{s.course.title.uz} · {formatSessionTime(s.startsAt, s.durationMin)}</p>
                 <p style={{ fontSize: 11, color: '#9333ea', fontWeight: 600, marginTop: 2 }}>
                   {s.targetStudentIds.length > 0 ? `${s.targetStudentIds.length} ta o'quvchi uchun` : 'Hammaga ochiq'}
                 </p>

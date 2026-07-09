@@ -23,7 +23,7 @@ export const listLessonQuestionsHandler = asyncHandler(async (req: Request, res:
 });
 
 export const listMentorQuestionsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const questions = await questionsService.listMentorQuestions(actorOf(req).userId);
+  const questions = await questionsService.listMentorQuestions(actorOf(req).userId, req.locale);
   sendSuccess(res, questions);
 });
 

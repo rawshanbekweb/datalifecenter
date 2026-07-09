@@ -5,8 +5,14 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 
-export const getSiteSettingsHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const settings = await siteSettingsService.getAllSettings();
+export const getSiteSettingsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const settings = await siteSettingsService.getAllSettings(req.locale);
+  sendSuccess(res, settings);
+});
+
+// Admin tahrirlash paneli — xom (barcha til) ma'lumot
+export const getSiteSettingsAdminHandler = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await siteSettingsService.getAllSettingsAdmin();
   sendSuccess(res, settings);
 });
 

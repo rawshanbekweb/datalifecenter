@@ -1,6 +1,8 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
 import { slugify } from '../utils/slugify';
 
 interface ListBlogFilters {
@@ -9,7 +11,7 @@ interface ListBlogFilters {
   limit: number;
 }
 
-export async function listBlogPosts(filters: ListBlogFilters) {
+export async function listBlogPosts(filters: ListBlogFilters, locale: SupportedLocale) {
   const where: Prisma.BlogPostWhereInput = {
     published: true,
     ...(filters.category ? { category: filters.category } : {}),
@@ -26,17 +28,17 @@ export async function listBlogPosts(filters: ListBlogFilters) {
   ]);
 
   return {
-    items,
+    items: resolveLocaleDeep(items, locale),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
 
-export async function getBlogPostBySlug(slug: string) {
+export async function getBlogPostBySlug(slug: string, locale: SupportedLocale) {
   const post = await prisma.blogPost.findFirst({ where: { slug, published: true } });
   if (!post) {
     throw ApiError.notFound('Maqola topilmadi');
   }
-  return post;
+  return resolveLocaleDeep(post, locale);
 }
 
 // Bitta brauzer/qurilma bir kun ichida sahifani necha marta yangilasa ham
@@ -72,9 +74,9 @@ async function uniqueSlug(title: string, excludeId?: string): Promise<string> {
 }
 
 interface BlogPostInput {
-  title: string;
-  excerpt: string;
-  content: string;
+  title: LocalizedString;
+  excerpt: LocalizedString;
+  content: LocalizedString;
   category: string;
   iconKey: string;
   color: string;
@@ -87,7 +89,7 @@ interface BlogPostInput {
 }
 
 export async function createBlogPost(input: BlogPostInput) {
-  const slug = await uniqueSlug(input.title);
+  const slug = await uniqueSlug(input.title.uz);
   return prisma.blogPost.create({ data: { ...input, slug } });
 }
 
@@ -96,7 +98,8 @@ export async function updateBlogPost(id: string, input: Partial<BlogPostInput>) 
   if (!post) {
     throw ApiError.notFound('Maqola topilmadi');
   }
-  const slug = input.title && input.title !== post.title ? await uniqueSlug(input.title, id) : undefined;
+  const currentTitle = post.title as unknown as LocalizedString;
+  const slug = input.title && input.title.uz !== currentTitle.uz ? await uniqueSlug(input.title.uz, id) : undefined;
   return prisma.blogPost.update({ where: { id }, data: { ...input, ...(slug ? { slug } : {}) } });
 }
 

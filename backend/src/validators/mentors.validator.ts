@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import { localizedString, localizedStringNullish } from './shared/localizedString.validator';
 
 export const createMentorSchema = z.object({
   name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
-  bio: z.string().min(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak"),
-  specialty: z.string().min(2, "Soha kiritilishi shart"),
+  bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak"),
+  specialty: localizedString(2, 'Soha kiritilishi shart'),
   photoUrl: z.string().optional(),
-  position: z.string().optional(),
+  position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
   telegramUrl: z.string().optional(),
@@ -17,10 +18,10 @@ export const createMentorSchema = z.object({
 // Mentor o'z profilini tahrirlaydi — featured/order/userId kabi admin maydonlariga tegmaydi
 export const updateMentorMeSchema = z.object({
   name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
-  bio: z.string().min(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
-  specialty: z.string().min(2, 'Soha kiritilishi shart').optional(),
+  bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  specialty: localizedString(2, 'Soha kiritilishi shart').optional(),
   photoUrl: z.string().optional(),
-  position: z.string().optional(),
+  position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
   telegramUrl: z.string().optional(),
@@ -29,10 +30,10 @@ export const updateMentorMeSchema = z.object({
 // .partial() emas — default'li maydonlar (featured, order) qisman so'rovda qayta yozilib ketmasligi uchun
 export const updateMentorSchema = z.object({
   name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
-  bio: z.string().min(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
-  specialty: z.string().min(2, 'Soha kiritilishi shart').optional(),
+  bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  specialty: localizedString(2, 'Soha kiritilishi shart').optional(),
   photoUrl: z.string().optional(),
-  position: z.string().optional(),
+  position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
   telegramUrl: z.string().optional(),

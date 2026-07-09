@@ -1,17 +1,20 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/localizedField';
 import { Actor, mentorNotLinkedError, requireMentorId } from '../utils/mentorAccess';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 
-export async function listMentors() {
-  return prisma.mentor.findMany({
+export async function listMentors(locale: SupportedLocale) {
+  const mentors = await prisma.mentor.findMany({
     orderBy: [{ featured: 'desc' }, { order: 'asc' }],
     include: { courses: { select: { id: true, title: true, slug: true } } },
   });
+  return resolveLocaleDeep(mentors, locale);
 }
 
-export async function getMentorById(id: string) {
+export async function getMentorById(id: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { id },
     include: { courses: { select: { id: true, title: true, slug: true } } },
@@ -21,15 +24,23 @@ export async function getMentorById(id: string) {
     throw ApiError.notFound('Mentor topilmadi');
   }
 
-  return mentor;
+  return resolveLocaleDeep(mentor, locale);
+}
+
+// Admin tahrirlash paneli uchun — xom {uz,ru,kaa,en} obyektini qaytaradi
+export async function listMentorsAdmin() {
+  return prisma.mentor.findMany({
+    orderBy: [{ featured: 'desc' }, { order: 'asc' }],
+    include: { courses: { select: { id: true, title: true, slug: true } } },
+  });
 }
 
 interface MentorInput {
   name: string;
-  bio: string;
-  specialty: string;
+  bio: LocalizedString;
+  specialty: LocalizedString;
   photoUrl?: string;
-  position?: string;
+  position?: LocalizedString | null;
   linkedinUrl?: string;
   githubUrl?: string;
   telegramUrl?: string;
@@ -53,7 +64,7 @@ export async function createMentor(input: MentorInput) {
   if (input.userId) {
     await assertUserLinkable(input.userId);
   }
-  return prisma.mentor.create({ data: input });
+  return prisma.mentor.create({ data: { ...input, position: toJsonInput(input.position) } as Prisma.MentorUncheckedCreateInput });
 }
 
 export async function updateMentor(id: string, input: Partial<MentorInput>) {
@@ -64,7 +75,10 @@ export async function updateMentor(id: string, input: Partial<MentorInput>) {
   if (input.userId) {
     await assertUserLinkable(input.userId, id);
   }
-  return prisma.mentor.update({ where: { id }, data: input });
+  return prisma.mentor.update({
+    where: { id },
+    data: { ...input, position: toJsonInput(input.position) } as Prisma.MentorUncheckedUpdateInput,
+  });
 }
 
 // Mentor o'z profilini ko'radi
@@ -85,7 +99,10 @@ export async function updateMentorMe(
   input: Partial<Pick<MentorInput, 'name' | 'bio' | 'specialty' | 'photoUrl' | 'position' | 'linkedinUrl' | 'githubUrl' | 'telegramUrl'>>
 ) {
   const mentorId = await requireMentorId(userId);
-  return prisma.mentor.update({ where: { id: mentorId }, data: input });
+  return prisma.mentor.update({
+    where: { id: mentorId },
+    data: { ...input, position: toJsonInput(input.position) } as Prisma.MentorUncheckedUpdateInput,
+  });
 }
 
 // Kursning to'liq dasturini (modullar va darslar bilan) oladi:
@@ -111,7 +128,7 @@ export async function getMentorCourse(actor: Actor, courseId: string) {
 }
 
 // MENTOR roli uchun shaxsiy kabinet ma'lumotlari
-export async function getMentorDashboard(userId: string) {
+export async function getMentorDashboard(userId: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
     include: {
@@ -146,11 +163,14 @@ export async function getMentorDashboard(userId: string) {
     prisma.enrollment.count({ where: { courseId: { in: courseIds }, status: 'ACTIVE' } }),
   ]);
 
-  return { mentor, recentEnrollments, stats: { totalStudents, activeStudents, coursesCount: mentor.courses.length } };
+  return resolveLocaleDeep(
+    { mentor, recentEnrollments, stats: { totalStudents, activeStudents, coursesCount: mentor.courses.length } },
+    locale
+  );
 }
 
 // Mentor kurslaridagi talabalar va ularning dars progressi
-export async function getMentorStudents(userId: string) {
+export async function getMentorStudents(userId: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
     select: { id: true, courses: { select: { id: true } } },
@@ -195,17 +215,20 @@ export async function getMentorStudents(userId: string) {
     completedByUserCourse.set(key, (completedByUserCourse.get(key) ?? 0) + 1);
   }
 
-  return enrollments.map((e) => ({
-    id: e.id,
-    status: e.status,
-    enrolledAt: e.enrolledAt,
-    user: e.user,
-    course: e.course,
-    progress: {
-      totalLessons: totalByCourse.get(e.course.id) ?? 0,
-      completedLessons: completedByUserCourse.get(`${e.user.id}:${e.course.id}`) ?? 0,
-    },
-  }));
+  return resolveLocaleDeep(
+    enrollments.map((e) => ({
+      id: e.id,
+      status: e.status,
+      enrolledAt: e.enrolledAt,
+      user: e.user,
+      course: e.course,
+      progress: {
+        totalLessons: totalByCourse.get(e.course.id) ?? 0,
+        completedLessons: completedByUserCourse.get(`${e.user.id}:${e.course.id}`) ?? 0,
+      },
+    })),
+    locale
+  );
 }
 
 export async function deleteMentor(id: string) {

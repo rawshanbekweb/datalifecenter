@@ -1,10 +1,12 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { notify } from './notifications.service';
 
 interface CreateAnnouncementInput {
-  title: string;
-  body: string;
+  title: LocalizedString;
+  body: LocalizedString;
   audience?: 'ALL' | 'STUDENTS' | 'MENTORS';
   courseId?: string | null;
 }
@@ -42,17 +44,18 @@ export async function createAnnouncement(input: CreateAnnouncementInput) {
 
   await notify(
     users.map((u) => u.id),
-    { type: 'ANNOUNCEMENT', title: announcement.title, body: announcement.body, link: null }
+    { type: 'ANNOUNCEMENT', title: toUzText(announcement.title), body: toUzText(announcement.body), link: null }
   );
 
   return announcement;
 }
 
-export async function listAnnouncements() {
-  return prisma.announcement.findMany({
+export async function listAnnouncements(locale: SupportedLocale) {
+  const announcements = await prisma.announcement.findMany({
     orderBy: { createdAt: 'desc' },
     include: { course: { select: { id: true, title: true } } },
   });
+  return resolveLocaleDeep(announcements, locale);
 }
 
 export async function deleteAnnouncement(id: string) {

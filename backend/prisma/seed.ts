@@ -53,10 +53,10 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
     section: 'hero',
     data: {
       stats: [
-        { label: 'Bitiruvchilar', value: '2,000+' },
-        { label: 'Kurslar', value: '7+' },
-        { label: 'Yillik Tajriba', value: '5+' },
-        { label: 'Ish Vaqti', value: '09:00–19:00' },
+        { label: { uz: 'Bitiruvchilar' }, value: '2,000+' },
+        { label: { uz: 'Kurslar' }, value: '7+' },
+        { label: { uz: 'Yillik Tajriba' }, value: '5+' },
+        { label: { uz: 'Ish Vaqti' }, value: '09:00–19:00' },
       ],
     },
   },
@@ -64,28 +64,28 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
     section: 'about',
     data: {
       stats: [
-        { icon: 'Users', label: 'Bitiruvchilar', value: '2,000+', color: '#0ea5e9' },
-        { icon: 'BookOpen', label: 'Kurslar', value: '7+', color: '#9333ea' },
-        { icon: 'Briefcase', label: 'Loyihalar', value: '180+', color: '#16a34a' },
-        { icon: 'Award', label: 'Yillik Tajriba', value: '5+', color: '#d97706' },
+        { icon: 'Users', label: { uz: 'Bitiruvchilar' }, value: '2,000+', color: '#0ea5e9' },
+        { icon: 'BookOpen', label: { uz: 'Kurslar' }, value: '7+', color: '#9333ea' },
+        { icon: 'Briefcase', label: { uz: 'Loyihalar' }, value: '180+', color: '#16a34a' },
+        { icon: 'Award', label: { uz: 'Yillik Tajriba' }, value: '5+', color: '#d97706' },
       ],
       features: [
-        'Professional sertifikatlar',
-        'Real loyihalarda ishlash',
-        'Tajribali mentorlar',
-        "Karera qo'llab-quvvatlash",
-        "Zamonaviy o'quv dasturi",
-        'Kichik guruhlar (max 15)',
+        { uz: 'Professional sertifikatlar' },
+        { uz: 'Real loyihalarda ishlash' },
+        { uz: 'Tajribali mentorlar' },
+        { uz: "Karera qo'llab-quvvatlash" },
+        { uz: "Zamonaviy o'quv dasturi" },
+        { uz: 'Kichik guruhlar (max 15)' },
       ],
       skills: [
-        { label: 'Frontend Development', pct: 95 },
-        { label: 'Backend Development', pct: 88 },
-        { label: 'Cyber Security', pct: 82 },
-        { label: 'Mobile Development', pct: 78 },
+        { label: { uz: 'Frontend Development' }, pct: 95 },
+        { label: { uz: 'Backend Development' }, pct: 88 },
+        { label: { uz: 'Cyber Security' }, pct: 82 },
+        { label: { uz: 'Mobile Development' }, pct: 78 },
       ],
       satisfaction: [
-        { value: '98%', label: 'Satisfaction' },
-        { value: '92%', label: 'Employment' },
+        { value: '98%', label: { uz: 'Satisfaction' } },
+        { value: '92%', label: { uz: 'Employment' } },
       ],
     },
   },
@@ -93,12 +93,12 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
     section: 'services',
     data: {
       items: [
-        { icon: 'Globe', title: 'Web Development', color: '#0ea5e9', desc: 'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.', feats: ['SPA & SSR ilovalar', 'API integratsiya', 'SEO optimizatsiya', 'Performance'] },
-        { icon: 'Smartphone', title: 'Mobile Applications', color: '#9333ea', desc: 'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.', feats: ['Flutter & React Native', 'Native iOS/Android', 'App Store deploy', 'Push notifications'] },
-        { icon: 'Palette', title: 'UI/UX Design', color: '#db2777', desc: "Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha.", feats: ['User Research', 'Wireframing', 'Design Systems', 'Usability Testing'] },
-        { icon: 'Brain', title: 'IT Consulting', color: '#d97706', desc: "Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar.", feats: ['Tech Strategy', 'Digital Transform', 'System Architecture', 'Code Audit'] },
-        { icon: 'Cpu', title: 'Digital Solutions', color: '#16a34a', desc: "Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar.", feats: ['Business Automation', 'Custom Software', 'CRM & ERP', 'Data Analytics'] },
-        { icon: 'BarChart3', title: 'Data Analytics', color: '#0284c7', desc: "Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar.", feats: ['BI Dashboards', 'Real-time Analytics', 'Predictive Models', 'Reports'] },
+        { icon: 'Globe', title: { uz: 'Web Development' }, color: '#0ea5e9', desc: { uz: 'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.' }, feats: [{ uz: 'SPA & SSR ilovalar' }, { uz: 'API integratsiya' }, { uz: 'SEO optimizatsiya' }, { uz: 'Performance' }] },
+        { icon: 'Smartphone', title: { uz: 'Mobile Applications' }, color: '#9333ea', desc: { uz: 'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.' }, feats: [{ uz: 'Flutter & React Native' }, { uz: 'Native iOS/Android' }, { uz: 'App Store deploy' }, { uz: 'Push notifications' }] },
+        { icon: 'Palette', title: { uz: 'UI/UX Design' }, color: '#db2777', desc: { uz: "Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha." }, feats: [{ uz: 'User Research' }, { uz: 'Wireframing' }, { uz: 'Design Systems' }, { uz: 'Usability Testing' }] },
+        { icon: 'Brain', title: { uz: 'IT Consulting' }, color: '#d97706', desc: { uz: "Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar." }, feats: [{ uz: 'Tech Strategy' }, { uz: 'Digital Transform' }, { uz: 'System Architecture' }, { uz: 'Code Audit' }] },
+        { icon: 'Cpu', title: { uz: 'Digital Solutions' }, color: '#16a34a', desc: { uz: "Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar." }, feats: [{ uz: 'Business Automation' }, { uz: 'Custom Software' }, { uz: 'CRM & ERP' }, { uz: 'Data Analytics' }] },
+        { icon: 'BarChart3', title: { uz: 'Data Analytics' }, color: '#0284c7', desc: { uz: "Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar." }, feats: [{ uz: 'BI Dashboards' }, { uz: 'Real-time Analytics' }, { uz: 'Predictive Models' }, { uz: 'Reports' }] },
       ],
     },
   },
@@ -106,12 +106,12 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
     section: 'why_us',
     data: {
       items: [
-        { icon: 'GraduationCap', title: 'Tajribali Mentorlar', color: '#0ea5e9', stat: '40+', desc: "IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." },
-        { icon: 'Zap', title: "Amaliy Ta'lim", color: '#9333ea', stat: '70%', desc: "Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." },
-        { icon: 'Briefcase', title: 'Real Loyihalar', color: '#16a34a', stat: '180+', desc: "Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." },
-        { icon: 'HeartHandshake', title: "Karera Qo'llab-quvvat", color: '#d97706', stat: '92%', desc: "Resume, intervyu tayyorlash va ish topishda to'liq yordam." },
-        { icon: 'Trophy', title: 'Sertifikatlar', color: '#db2777', stat: '3,000+', desc: "Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." },
-        { icon: 'Users', title: 'Kuchli Hamjamiyat', color: '#0284c7', stat: '2,500+', desc: "DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." },
+        { icon: 'GraduationCap', title: { uz: 'Tajribali Mentorlar' }, color: '#0ea5e9', stat: '40+', desc: { uz: "IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." } },
+        { icon: 'Zap', title: { uz: "Amaliy Ta'lim" }, color: '#9333ea', stat: '70%', desc: { uz: "Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." } },
+        { icon: 'Briefcase', title: { uz: 'Real Loyihalar' }, color: '#16a34a', stat: '180+', desc: { uz: "Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." } },
+        { icon: 'HeartHandshake', title: { uz: "Karera Qo'llab-quvvat" }, color: '#d97706', stat: '92%', desc: { uz: "Resume, intervyu tayyorlash va ish topishda to'liq yordam." } },
+        { icon: 'Trophy', title: { uz: 'Sertifikatlar' }, color: '#db2777', stat: '3,000+', desc: { uz: "Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." } },
+        { icon: 'Users', title: { uz: 'Kuchli Hamjamiyat' }, color: '#0284c7', stat: '2,500+', desc: { uz: "DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." } },
       ],
     },
   },
@@ -122,11 +122,11 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
       telegram: '@datalife_uz',
       email: 'info@datalife.uz',
       address: "Qoraqolpog'iston, Nukus",
-      addressSub: "Amir Temur ko'chasi, 108",
+      addressSub: { uz: "Amir Temur ko'chasi, 108" },
       hours: [
-        { day: 'Dushanba — Juma', time: '09:00 — 19:00', closed: false },
-        { day: 'Shanba', time: '09:00 — 19:00', closed: false },
-        { day: 'Yakshanba', time: 'Yopiq', closed: true },
+        { day: { uz: 'Dushanba — Juma' }, time: '09:00 — 19:00', closed: false },
+        { day: { uz: 'Shanba' }, time: '09:00 — 19:00', closed: false },
+        { day: { uz: 'Yakshanba' }, time: 'Yopiq', closed: true },
       ],
     },
   },
@@ -186,8 +186,8 @@ async function main() {
       create: {
         userId: user.id,
         name: m.name,
-        bio: `${m.name} — DATA LIFE'da ${m.specialty} bo'yicha mentor.`,
-        specialty: m.specialty,
+        bio: { uz: `${m.name} — DATA LIFE'da ${m.specialty} bo'yicha mentor.` },
+        specialty: { uz: m.specialty },
         featured: true,
       },
     });
@@ -202,9 +202,9 @@ async function main() {
       update: { price: c.id === 'ai' ? 3500000 : 0, isFree: c.id !== 'ai' },
       create: {
         slug: slugify(c.title),
-        title: c.title,
-        subtitle: c.sub,
-        description: c.desc,
+        title: { uz: c.title },
+        subtitle: { uz: c.sub },
+        description: { uz: c.desc },
         iconKey: c.icon,
         color: c.color,
         bg: c.bg,
@@ -227,12 +227,12 @@ async function main() {
     if (existingModules === 0) {
       for (const [i, modTitle] of c.mods.entries()) {
         const mod = await prisma.module.create({
-          data: { courseId: course.id, title: modTitle, order: i },
+          data: { courseId: course.id, title: { uz: modTitle }, order: i },
         });
         await prisma.lesson.create({
           data: {
             moduleId: mod.id,
-            title: `${modTitle} — Kirish`,
+            title: { uz: `${modTitle} — Kirish` },
             order: 0,
             contentType: 'VIDEO',
             durationMinutes: 20,
@@ -259,9 +259,9 @@ async function main() {
       update: {},
       create: {
         id: `seed-project-${i}`,
-        title: p.title,
+        title: { uz: p.title },
         category: p.category,
-        description: p.description,
+        description: { uz: p.description },
         techStack: p.techStack,
         screenshotUrl: '/projects/placeholder-screenshot.svg',
         order: i,
@@ -277,9 +277,9 @@ async function main() {
       update: {},
       create: {
         slug: slugify(p.title),
-        title: p.title,
-        excerpt: p.excerpt,
-        content: p.content,
+        title: { uz: p.title },
+        excerpt: { uz: p.excerpt },
+        content: { uz: p.content },
         category: p.cat,
         iconKey: p.icon,
         color: p.color,
@@ -309,7 +309,7 @@ async function main() {
     await prisma.testimonial.upsert({
       where: { id: `seed-testimonial-${i}` },
       update: {},
-      create: { id: `seed-testimonial-${i}`, name: t.name, role: t.role, text: t.text, rating: t.rating, order: i },
+      create: { id: `seed-testimonial-${i}`, name: t.name, role: { uz: t.role }, text: { uz: t.text }, rating: t.rating, order: i },
     });
   }
   console.log(`Seeded ${TESTIMONIALS.length} testimonials`);

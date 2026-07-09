@@ -3,8 +3,8 @@ import * as projectsService from '../services/projects.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 
-export const listProjectsHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const projects = await projectsService.listProjects();
+export const listProjectsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const projects = await projectsService.listProjects(req.locale);
   sendSuccess(res, projects);
 });
 

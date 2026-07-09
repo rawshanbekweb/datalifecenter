@@ -1,11 +1,14 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
 
-export async function listTestimonials() {
-  return prisma.testimonial.findMany({
+export async function listTestimonials(locale: SupportedLocale) {
+  const testimonials = await prisma.testimonial.findMany({
     where: { published: true },
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
   });
+  return resolveLocaleDeep(testimonials, locale);
 }
 
 export async function listTestimonialsAdmin() {
@@ -16,9 +19,9 @@ export async function listTestimonialsAdmin() {
 
 interface TestimonialInput {
   name: string;
-  role: string;
+  role: LocalizedString;
   avatarUrl?: string;
-  text: string;
+  text: LocalizedString;
   rating: number;
   published: boolean;
   order: number;

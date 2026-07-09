@@ -5,6 +5,7 @@ import {
   getMentorCourseHandler,
   getMentorHandler,
   getMentorMeHandler,
+  listMentorsAdminHandler,
   listMentorsHandler,
   mentorDashboardHandler,
   mentorStudentsHandler,
@@ -24,6 +25,8 @@ router.patch('/me', authenticate, authorize('MENTOR', 'ADMIN'), validateBody(upd
 router.get('/me/dashboard', authenticate, authorize('MENTOR', 'ADMIN'), mentorDashboardHandler);
 router.get('/me/students', authenticate, authorize('MENTOR', 'ADMIN'), mentorStudentsHandler);
 router.get('/me/courses/:id', authenticate, authorize('MENTOR', 'ADMIN'), getMentorCourseHandler);
+// Admin tahrirlash paneli — xom (barcha til) ma'lumot, /:id dan OLDIN ro'yxatga olinishi shart
+router.get('/admin', authenticate, authorize('ADMIN'), listMentorsAdminHandler);
 router.post('/', authenticate, authorize('ADMIN'), validateBody(createMentorSchema), createMentorHandler);
 router.get('/:id', getMentorHandler);
 router.put('/:id', authenticate, authorize('ADMIN'), validateBody(updateMentorSchema), updateMentorHandler);

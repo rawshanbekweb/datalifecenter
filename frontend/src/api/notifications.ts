@@ -1,4 +1,5 @@
 import { apiFetch } from './client';
+import { LocalizedString } from '../types/locale';
 
 export interface AppNotification {
   id: string;
@@ -21,8 +22,8 @@ export interface Announcement {
 }
 
 export interface CreateAnnouncementInput {
-  title: string;
-  body: string;
+  title: LocalizedString;
+  body: LocalizedString;
   audience?: Announcement['audience'];
   courseId?: string | null;
 }

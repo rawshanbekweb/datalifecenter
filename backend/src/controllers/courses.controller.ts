@@ -12,12 +12,12 @@ export const listCoursesHandler = asyncHandler(async (req: Request, res: Respons
     page: number;
     limit: number;
   };
-  const result = await coursesService.listCourses(filters);
+  const result = await coursesService.listCourses(filters, req.locale);
   sendSuccess(res, result);
 });
 
 export const getCourseHandler = asyncHandler(async (req: Request, res: Response) => {
-  const course = await coursesService.getCourseBySlug(req.params.slug as string);
+  const course = await coursesService.getCourseBySlug(req.params.slug as string, req.locale);
   sendSuccess(res, course);
 });
 
@@ -26,7 +26,8 @@ export const getCourseLearnHandler = asyncHandler(async (req: Request, res: Resp
   const result = await coursesService.getCourseForLearning(
     req.params.slug as string,
     req.user.userId,
-    req.user.role
+    req.user.role,
+    req.locale
   );
   sendSuccess(res, result);
 });

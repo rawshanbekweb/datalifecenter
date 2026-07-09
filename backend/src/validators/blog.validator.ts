@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { localizedString } from './shared/localizedString.validator';
 
 export const listBlogQuerySchema = z.object({
   category: z.string().optional(),
@@ -7,9 +8,9 @@ export const listBlogQuerySchema = z.object({
 });
 
 export const createBlogPostSchema = z.object({
-  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
-  excerpt: z.string().min(5, "Qisqacha mazmun kamida 5 ta belgidan iborat bo'lishi kerak"),
-  content: z.string().min(10, "Matn kamida 10 ta belgidan iborat bo'lishi kerak"),
+  title: localizedString(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
+  excerpt: localizedString(5, "Qisqacha mazmun kamida 5 ta belgidan iborat bo'lishi kerak"),
+  content: localizedString(10, "Matn kamida 10 ta belgidan iborat bo'lishi kerak"),
   category: z.string().min(1, 'Kategoriya kerak'),
   iconKey: z.string().default('BookOpen'),
   color: z.string().default('#0ea5e9'),
@@ -23,9 +24,9 @@ export const createBlogPostSchema = z.object({
 
 // .partial() emas — default'li maydonlar (published, tags, ranglar) qisman so'rovda qayta yozilib ketmasligi uchun
 export const updateBlogPostSchema = z.object({
-  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
-  excerpt: z.string().min(5, "Qisqacha mazmun kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
-  content: z.string().min(10, "Matn kamida 10 ta belgidan iborat bo'lishi kerak").optional(),
+  title: localizedString(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
+  excerpt: localizedString(5, "Qisqacha mazmun kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  content: localizedString(10, "Matn kamida 10 ta belgidan iborat bo'lishi kerak").optional(),
   category: z.string().min(1, 'Kategoriya kerak').optional(),
   iconKey: z.string().optional(),
   color: z.string().optional(),

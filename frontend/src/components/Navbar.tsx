@@ -1,32 +1,35 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
 import NotificationBell from './common/NotificationBell';
+import LanguageSwitcher from './common/LanguageSwitcher';
 import React from 'react';
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   to: string;
   end?: boolean;
 }
 
 const NAV: NavItem[] = [
-  { label: 'Bosh sahifa', to: '/', end: true },
-  { label: 'Kompaniya',   to: '/about' },
-  { label: 'Kurslar',     to: '/courses' },
-  { label: 'Mentorlar',   to: '/mentors' },
-  { label: 'Hamkorlar',   to: '/partners' },
-  { label: 'Blog',        to: '/blog' },
-  { label: 'Aloqa',       to: '/contact' },
+  { labelKey: 'nav.home', to: '/', end: true },
+  { labelKey: 'nav.about', to: '/about' },
+  { labelKey: 'nav.courses', to: '/courses' },
+  { labelKey: 'nav.mentors', to: '/mentors' },
+  { labelKey: 'nav.partners', to: '/partners' },
+  { labelKey: 'nav.blog', to: '/blog' },
+  { labelKey: 'nav.contact', to: '/contact' },
 ];
 
 const MotionNavLink = motion.create(NavLink);
 const MotionLink = motion.create(Link);
 
 export default function Navbar(): React.ReactElement {
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [open, setOpen]         = useState<boolean>(false);
   const { user, logout }        = useAuth();
@@ -80,38 +83,39 @@ export default function Navbar(): React.ReactElement {
           {/* Desktop nav */}
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }} className="nav-desktop">
             {NAV.map((n: NavItem) => (
-              <NavLink key={n.label} to={n.to} end={n.end} style={linkStyle}>
-                {n.label}
+              <NavLink key={n.labelKey} to={n.to} end={n.end} style={linkStyle}>
+                {t(n.labelKey)}
               </NavLink>
             ))}
           </div>
 
           <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <LanguageSwitcher />
             {user ? (
               <>
                 {user.role === 'ADMIN' && (
                   <Link to="/admin" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#9333ea' }}>
-                    <ShieldCheck size={16}/> Admin
+                    <ShieldCheck size={16}/> {t('nav.admin')}
                   </Link>
                 )}
                 {user.role === 'MENTOR' && (
                   <Link to="/mentor" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#9333ea' }}>
-                    <GraduationCap size={16}/> Mentor
+                    <GraduationCap size={16}/> {t('nav.mentorCabinet')}
                   </Link>
                 )}
                 <Link to={roleHome(user.role)} style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>
                   <LayoutDashboard size={16}/> {user.name.split(' ')[0]}
                 </Link>
                 <NotificationBell />
-                <button onClick={handleLogout} title="Chiqish"
+                <button onClick={handleLogout} title={t('nav.logout')}
                   style={{ display:'flex', alignItems:'center', justifyContent:'center', width:36, height:36, borderRadius:10, background:'#f1f5f9', border:'1.5px solid #e2e8f0', color:'#475569', cursor:'pointer' }}>
                   <LogOut size={15}/>
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" style={{ textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>Kirish</Link>
-                <Link to="/register"><button className="btn-primary" style={{ padding: '10px 22px', fontSize: 14 }}>Boshlash</button></Link>
+                <Link to="/login" style={{ textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>{t('nav.login')}</Link>
+                <Link to="/register"><button className="btn-primary" style={{ padding: '10px 22px', fontSize: 14 }}>{t('nav.start')}</button></Link>
               </>
             )}
           </div>
@@ -130,12 +134,15 @@ export default function Navbar(): React.ReactElement {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             style={{ position: 'fixed', top: 70, left: 12, right: 12, zIndex: 99, background: '#fff', borderRadius: 20, padding: '16px 20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
             {NAV.map((n: NavItem, i: number) => (
-              <MotionNavLink key={n.label} to={n.to} end={n.end} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+              <MotionNavLink key={n.labelKey} to={n.to} end={n.end} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 onClick={() => setOpen(false)}
                 style={{ display: 'block', padding: '12px 4px', textDecoration: 'none', fontWeight: 600, fontSize: 15, color: '#0f172a', borderBottom: i < NAV.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                {n.label}
+                {t(n.labelKey)}
               </MotionNavLink>
             ))}
+            <div style={{ display:'flex', justifyContent:'flex-end', padding:'10px 4px 0' }}>
+              <LanguageSwitcher />
+            </div>
             {user ? (
               <>
                 <div style={{ display:'flex', justifyContent:'flex-end', padding:'6px 4px 0' }}>
@@ -144,33 +151,33 @@ export default function Navbar(): React.ReactElement {
                 {user.role === 'ADMIN' && (
                   <MotionLink to="/admin" onClick={() => setOpen(false)}>
                     <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#9333ea', borderColor:'#e9d5ff' }}>
-                      <ShieldCheck size={15}/> Admin panel
+                      <ShieldCheck size={15}/> {t('nav.adminPanel')}
                     </button>
                   </MotionLink>
                 )}
                 {user.role === 'MENTOR' && (
                   <MotionLink to="/mentor" onClick={() => setOpen(false)}>
                     <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#9333ea', borderColor:'#e9d5ff' }}>
-                      <GraduationCap size={15}/> Mentor kabineti
+                      <GraduationCap size={15}/> {t('nav.mentorCabinetFull')}
                     </button>
                   </MotionLink>
                 )}
                 <MotionLink to={roleHome(user.role)} onClick={() => setOpen(false)}>
                   <button className="btn-primary" style={{ width: '100%', marginTop: 10, justifyContent: 'center' }}>
-                    <LayoutDashboard size={15}/> Shaxsiy kabinet
+                    <LayoutDashboard size={15}/> {t('nav.myCabinet')}
                   </button>
                 </MotionLink>
                 <button onClick={handleLogout} className="btn-outline" style={{ width: '100%', marginTop: 10, justifyContent: 'center' }}>
-                  <LogOut size={15}/> Chiqish
+                  <LogOut size={15}/> {t('nav.logout')}
                 </button>
               </>
             ) : (
               <>
                 <MotionLink to="/login" onClick={() => setOpen(false)}>
-                  <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center' }}>Kirish</button>
+                  <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center' }}>{t('nav.login')}</button>
                 </MotionLink>
                 <MotionLink to="/register" onClick={() => setOpen(false)}>
-                  <button className="btn-primary" style={{ width: '100%', marginTop: 10, justifyContent: 'center' }}>Boshlash</button>
+                  <button className="btn-primary" style={{ width: '100%', marginTop: 10, justifyContent: 'center' }}>{t('nav.start')}</button>
                 </MotionLink>
               </>
             )}

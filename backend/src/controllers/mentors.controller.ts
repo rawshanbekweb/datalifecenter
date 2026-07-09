@@ -27,23 +27,28 @@ export const getMentorCourseHandler = asyncHandler(async (req: Request, res: Res
 
 export const mentorDashboardHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const dashboard = await mentorsService.getMentorDashboard(req.user.userId);
+  const dashboard = await mentorsService.getMentorDashboard(req.user.userId, req.locale);
   sendSuccess(res, dashboard);
 });
 
 export const mentorStudentsHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const students = await mentorsService.getMentorStudents(req.user.userId);
+  const students = await mentorsService.getMentorStudents(req.user.userId, req.locale);
   sendSuccess(res, students);
 });
 
-export const listMentorsHandler = asyncHandler(async (_req: Request, res: Response) => {
-  const mentors = await mentorsService.listMentors();
+export const listMentorsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const mentors = await mentorsService.listMentors(req.locale);
+  sendSuccess(res, mentors);
+});
+
+export const listMentorsAdminHandler = asyncHandler(async (_req: Request, res: Response) => {
+  const mentors = await mentorsService.listMentorsAdmin();
   sendSuccess(res, mentors);
 });
 
 export const getMentorHandler = asyncHandler(async (req: Request, res: Response) => {
-  const mentor = await mentorsService.getMentorById(req.params.id as string);
+  const mentor = await mentorsService.getMentorById(req.params.id as string, req.locale);
   sendSuccess(res, mentor);
 });
 

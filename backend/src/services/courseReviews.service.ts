@@ -1,5 +1,7 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { resolveLocaleDeep } from '../utils/localizedField';
 
 async function findCourseBySlug(slug: string) {
   const course = await prisma.course.findFirst({ where: { slug, published: true } });
@@ -76,7 +78,7 @@ interface ListReviewsAdminFilters {
   limit: number;
 }
 
-export async function listReviewsAdmin(filters: ListReviewsAdminFilters) {
+export async function listReviewsAdmin(filters: ListReviewsAdminFilters, locale: SupportedLocale) {
   const [items, total] = await Promise.all([
     prisma.courseReview.findMany({
       orderBy: { createdAt: 'desc' },
@@ -91,7 +93,7 @@ export async function listReviewsAdmin(filters: ListReviewsAdminFilters) {
   ]);
 
   return {
-    items,
+    items: resolveLocaleDeep(items, locale),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }

@@ -9,7 +9,7 @@ let studentId: string;
 async function publishCourse(title: string): Promise<string> {
   const res = await admin
     .post('/api/courses')
-    .send({ title: `${title} ${Date.now()}-${Math.random()}`, description: "Obuna testi uchun kurs", durationMonths: 1, price: 100000, published: true })
+    .send({ title: { uz: `${title} ${Date.now()}-${Math.random()}` }, description: { uz: "Obuna testi uchun kurs" }, durationMonths: 1, price: 100000, published: true })
     .expect(201);
   return res.body.data.id;
 }
@@ -52,7 +52,7 @@ describe('Obuna (subscription) tizimi', () => {
     // Yuqoridagi testdan keyin student'ning obunasi hali faol
     const newCourse = await admin
       .post('/api/courses')
-      .send({ title: `Keyin nashr qilingan ${Date.now()}`, description: 'Lazy provisioning testi', durationMonths: 1, price: 50000, published: true })
+      .send({ title: { uz: `Keyin nashr qilingan ${Date.now()}` }, description: { uz: 'Lazy provisioning testi' }, durationMonths: 1, price: 50000, published: true })
       .expect(201);
     const slug = newCourse.body.data.slug;
 

@@ -9,12 +9,12 @@ const VIEW_COOKIE_MAX_AGE_MS = 24 * 3600 * 1000;
 
 export const listBlogPostsHandler = asyncHandler(async (req: Request, res: Response) => {
   const filters = req.validatedQuery as unknown as { category?: string; page: number; limit: number };
-  const result = await blogService.listBlogPosts(filters);
+  const result = await blogService.listBlogPosts(filters, req.locale);
   sendSuccess(res, result);
 });
 
 export const getBlogPostHandler = asyncHandler(async (req: Request, res: Response) => {
-  const post = await blogService.getBlogPostBySlug(req.params.slug as string);
+  const post = await blogService.getBlogPostBySlug(req.params.slug as string, req.locale);
 
   // Bir brauzer bir kun ichida sahifani necha marta yangilasa ham,
   // ko'rishlar soni faqat bitta marta oshadi (cookie bilan aniqlanadi).

@@ -10,13 +10,13 @@ import { IMAGES_DIR } from '../config/uploads';
 
 export const createEnrollmentHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const enrollment = await enrollmentsService.createEnrollment(req.user.userId, req.body.courseId);
+  const enrollment = await enrollmentsService.createEnrollment(req.user.userId, req.body.courseId, req.locale);
   sendSuccess(res, enrollment, 201);
 });
 
 export const myEnrollmentsHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const enrollments = await enrollmentsService.getMyEnrollments(req.user.userId);
+  const enrollments = await enrollmentsService.getMyEnrollments(req.user.userId, req.locale);
   sendSuccess(res, enrollments);
 });
 
@@ -28,12 +28,12 @@ export const listEnrollmentsAdminHandler = asyncHandler(async (req: Request, res
     page: number;
     limit: number;
   };
-  const result = await enrollmentsService.listEnrollmentsAdmin(filters);
+  const result = await enrollmentsService.listEnrollmentsAdmin(filters, req.locale);
   sendSuccess(res, result);
 });
 
 export const updateEnrollmentAdminHandler = asyncHandler(async (req: Request, res: Response) => {
-  const enrollment = await enrollmentsService.updateEnrollmentAdmin(req.params.id as string, req.body);
+  const enrollment = await enrollmentsService.updateEnrollmentAdmin(req.params.id as string, req.body, req.locale);
   sendSuccess(res, enrollment);
 });
 
@@ -42,7 +42,8 @@ export const submitReceiptHandler = asyncHandler(async (req: Request, res: Respo
   const enrollment = await enrollmentsService.submitReceipt(
     req.user.userId,
     req.params.id as string,
-    req.body.receiptUrl
+    req.body.receiptUrl,
+    req.locale
   );
   sendSuccess(res, enrollment);
 });
@@ -81,6 +82,6 @@ export const verifyCertificateHandler = asyncHandler(async (req: Request, res: R
 
 export const mockPayHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
-  const enrollment = await enrollmentsService.mockPayEnrollment(req.user.userId, req.params.id as string);
+  const enrollment = await enrollmentsService.mockPayEnrollment(req.user.userId, req.params.id as string, req.locale);
   sendSuccess(res, enrollment);
 });

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { localizedString, localizedStringNullish } from './shared/localizedString.validator';
 
 export const listCoursesQuerySchema = z.object({
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
@@ -9,9 +10,9 @@ export const listCoursesQuerySchema = z.object({
 });
 
 export const createCourseSchema = z.object({
-  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
-  subtitle: z.string().optional(),
-  description: z.string().min(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak"),
+  title: localizedString(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
+  subtitle: localizedStringNullish(),
+  description: localizedString(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak"),
   iconKey: z.string().default('BookOpen'),
   color: z.string().default('#0ea5e9'),
   bg: z.string().default('#f0f9ff'),
@@ -29,9 +30,9 @@ export const createCourseSchema = z.object({
 // .default() qiymatlar qo'llanadi va qisman PUT yuborilganda qolgan maydonlar
 // default'ga qaytib ketadi (published:false bo'lib kurs ro'yxatdan yo'qoladi).
 export const updateCourseSchema = z.object({
-  title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
-  subtitle: z.string().optional(),
-  description: z.string().min(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
+  title: localizedString(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
+  subtitle: localizedStringNullish(),
+  description: localizedString(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
   iconKey: z.string().optional(),
   color: z.string().optional(),
   bg: z.string().optional(),

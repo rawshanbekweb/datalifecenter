@@ -8,6 +8,11 @@ export function listMentors(): Promise<any> {
   return apiFetch('/mentors');
 }
 
+// Admin tahrirlash paneli — xom (barcha til) ma'lumot qaytaradi
+export function listMentorsAdmin(): Promise<any> {
+  return apiFetch('/mentors/admin');
+}
+
 export function getMentorById(id: string | number): Promise<any> {
   return apiFetch(`/mentors/${id}`);
 }

@@ -3,13 +3,15 @@ import { Plus, Pencil, Trash2, AlertCircle, Star, EyeOff } from 'lucide-react';
 import { listTestimonialsAdmin, createTestimonial, updateTestimonial, deleteTestimonial } from '../../api/testimonials';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
+import LocalizedField from '../../components/admin/LocalizedField';
+import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface TestimonialFormState {
   id?: string;
   name: string;
-  role: string;
+  role: LocalizedString;
   avatarUrl: string;
-  text: string;
+  text: LocalizedString;
   rating: number;
   published: boolean;
   order: number;
@@ -18,9 +20,9 @@ interface TestimonialFormState {
 interface Testimonial {
   id: string;
   name: string;
-  role: string;
+  role: LocalizedString;
   avatarUrl?: string | null;
-  text: string;
+  text: LocalizedString;
   rating: number;
   published: boolean;
   order: number;
@@ -29,7 +31,7 @@ interface Testimonial {
 
 type Status = 'loading' | 'ready' | 'error';
 
-const emptyForm: TestimonialFormState = { name:'', role:'', avatarUrl:'', text:'', rating:5, published:true, order:0 };
+const emptyForm: TestimonialFormState = { name:'', role: emptyLocalizedString(), avatarUrl:'', text: emptyLocalizedString(), rating:5, published:true, order:0 };
 
 interface TestimonialFormProps {
   initial: TestimonialFormState;
@@ -78,15 +80,21 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ism *</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
         </div>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Lavozim / tavsif *</label>
-          <input className="inp" value={form.role} onChange={change('role')} required placeholder="Frontend dasturchi, ... bitiruvchisi" />
-        </div>
+        <LocalizedField
+          label="Lavozim / tavsif"
+          required
+          value={form.role}
+          onChange={(next) => setForm((f) => ({ ...f, role: next }))}
+          placeholder="Frontend dasturchi, ... bitiruvchisi"
+        />
       </div>
-      <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Sharh matni *</label>
-        <textarea className="inp" value={form.text} onChange={change('text')} required rows={3} style={{ resize:'none' }} />
-      </div>
+      <LocalizedField
+        label="Sharh matni"
+        required
+        multiline
+        value={form.text}
+        onChange={(next) => setForm((f) => ({ ...f, text: next }))}
+      />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <FileUpload kind="image" label="Rasm (ixtiyoriy)" value={form.avatarUrl}
           onChange={(url) => setForm((f: TestimonialFormState) => ({ ...f, avatarUrl: url }))} />
@@ -168,7 +176,7 @@ export default function AdminTestimonialsPage(): React.ReactElement {
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{t.name}</p>
-                <p style={{ fontSize:12, color:'#94a3b8' }}>{t.role}</p>
+                <p style={{ fontSize:12, color:'#94a3b8' }}>{t.role.uz}</p>
               </div>
               <div style={{ display:'flex', gap:2, flexShrink:0 }}>
                 {Array.from({ length: 5 }).map((_, idx) => (

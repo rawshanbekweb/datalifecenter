@@ -1,5 +1,7 @@
 import { API_URL } from './config';
 import { getToken } from './token';
+import { detectLocale } from '../i18n/locale';
+import i18n from '../i18n/i18n';
 
 export class ApiClientError extends Error {
   status: number;
@@ -34,19 +36,20 @@ export async function apiFetch<T = unknown>(
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-Locale': detectLocale().locale,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers as Record<string, string>),
       },
       ...options,
     });
   } catch {
-    throw new ApiClientError("Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.", 0, 'NETWORK_ERROR');
+    throw new ApiClientError(i18n.t('errors.network'), 0, 'NETWORK_ERROR');
   }
 
   const body: ApiResponse<T> | null = await res.json().catch(() => null);
 
   if (!res.ok || !body?.success) {
-    const message: string = body?.error?.message || 'Kutilmagan xatolik yuz berdi';
+    const message: string = body?.error?.message || i18n.t('errors.generic');
     throw new ApiClientError(message, res.status, body?.error?.code);
   }
 

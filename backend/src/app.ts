@@ -10,6 +10,7 @@ import { Sentry, sentryEnabled } from './config/sentry';
 import { IMAGES_DIR, VIDEOS_DIR } from './config/uploads';
 import routes from './routes';
 import { csrfProtect } from './middleware/csrfProtect';
+import { resolveLocale } from './middleware/locale';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import { verifyLocalVideoToken } from './utils/videoAccess';
@@ -57,7 +58,7 @@ const apiLimiter = rateLimit({
   message: { success: false, error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
 });
 
-app.use('/api', apiLimiter, csrfProtect, routes);
+app.use('/api', apiLimiter, csrfProtect, resolveLocale, routes);
 
 app.use(notFoundHandler);
 // Sentry'ga xatolar bizning errorHandler'dan OLDIN yoziladi (DSN sozlangan bo'lsa)

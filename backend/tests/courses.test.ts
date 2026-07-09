@@ -22,7 +22,7 @@ describe('Kurs CRUD', () => {
   it('admin kurs yaratadi (slug avtomatik)', async () => {
     const res = await admin
       .post('/api/courses')
-      .send({ title: 'Test Kursi', description: 'Test tavsifi kamida besh belgi', durationMonths: 3, price: 0 })
+      .send({ title: { uz: 'Test Kursi' }, description: { uz: 'Test tavsifi kamida besh belgi' }, durationMonths: 3, price: 0 })
       .expect(201);
     courseId = res.body.data.id;
     expect(res.body.data.slug).toBe('test-kursi');
@@ -33,14 +33,14 @@ describe('Kurs CRUD', () => {
   it('student kurs yarata olmaydi (403)', async () => {
     await student
       .post('/api/courses')
-      .send({ title: 'Ruxsatsiz', description: 'Bu yaratilmasligi kerak', durationMonths: 1 })
+      .send({ title: { uz: 'Ruxsatsiz' }, description: { uz: 'Bu yaratilmasligi kerak' }, durationMonths: 1 })
       .expect(403);
   });
 
   it('anonim foydalanuvchi kurs yarata olmaydi (401)', async () => {
     await request(app)
       .post('/api/courses')
-      .send({ title: 'Anonim', description: 'Bu ham yaratilmasligi kerak', durationMonths: 1 })
+      .send({ title: { uz: 'Anonim' }, description: { uz: 'Bu ham yaratilmasligi kerak' }, durationMonths: 1 })
       .expect(401);
   });
 
@@ -66,16 +66,16 @@ describe('Kurs CRUD', () => {
   });
 
   it('admin modul va dars yaratadi', async () => {
-    const mod = await admin.post('/api/modules').send({ courseId, title: '1-modul' }).expect(201);
+    const mod = await admin.post('/api/modules').send({ courseId, title: { uz: '1-modul' } }).expect(201);
     const lesson = await admin
       .post(`/api/modules/${mod.body.data.id}/lessons`)
-      .send({ title: '1-dars', contentType: 'TEXT', content: 'Dars matni' })
+      .send({ title: { uz: '1-dars' }, contentType: 'TEXT', content: { uz: 'Dars matni' } })
       .expect(201);
     expect(lesson.body.data.order).toBe(1);
   });
 
   it('student modul yarata olmaydi (403)', async () => {
-    await student.post('/api/modules').send({ courseId, title: 'Ruxsatsiz modul' }).expect(403);
+    await student.post('/api/modules').send({ courseId, title: { uz: 'Ruxsatsiz modul' } }).expect(403);
   });
 
   it("kursni o'chirish — talabalar yozilgan bo'lsa 409", async () => {

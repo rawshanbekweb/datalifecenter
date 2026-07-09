@@ -1,5 +1,7 @@
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
+import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { Actor, canManageCourse, mentorNotLinkedError } from '../utils/mentorAccess';
 import { excerpt, notify } from './notifications.service';
 
@@ -46,7 +48,7 @@ export async function createQuestion(actor: Actor, input: { lessonId: string; bo
   if (mentorUserId && mentorUserId !== actor.userId) {
     await notify(mentorUserId, {
       type: 'NEW_QUESTION',
-      title: `Yangi savol: ${lesson.title}`,
+      title: `Yangi savol: ${toUzText(lesson.title)}`,
       body: excerpt(input.body),
       link: '/mentor/questions',
     });
@@ -65,7 +67,7 @@ export async function listLessonQuestions(lessonId: string, actor: Actor) {
 }
 
 // Mentor kabineti: o'z kurslaridagi barcha savollar (javobsizlari oldinda)
-export async function listMentorQuestions(userId: string) {
+export async function listMentorQuestions(userId: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
     select: { id: true, courses: { select: { id: true } } },
@@ -76,7 +78,7 @@ export async function listMentorQuestions(userId: string) {
   const courseIds = mentor.courses.map((c) => c.id);
   if (!courseIds.length) return [];
 
-  return prisma.lessonQuestion.findMany({
+  const questions = await prisma.lessonQuestion.findMany({
     where: { lesson: { module: { courseId: { in: courseIds } } } },
     orderBy: [{ answeredAt: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
     include: {
@@ -90,6 +92,7 @@ export async function listMentorQuestions(userId: string) {
       },
     },
   });
+  return resolveLocaleDeep(questions, locale);
 }
 
 export async function answerQuestion(id: string, answer: string, actor: Actor) {
@@ -121,7 +124,7 @@ export async function answerQuestion(id: string, answer: string, actor: Actor) {
   if (question.userId !== actor.userId) {
     await notify(question.userId, {
       type: 'QUESTION_ANSWERED',
-      title: `Savolingizga javob berildi: ${question.lesson.title}`,
+      title: `Savolingizga javob berildi: ${toUzText(question.lesson.title)}`,
       body: excerpt(answer),
       link: `/learn/${question.lesson.module.course.slug}`,
     });

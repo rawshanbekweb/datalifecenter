@@ -1,5 +1,6 @@
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { LocalizedString, toJsonInput } from '../utils/localizedField';
 import { Actor, canManageCourse } from '../utils/mentorAccess';
 import { deleteUploadByUrl } from './storage.service';
 
@@ -40,8 +41,8 @@ async function courseIdOfLesson(lessonId: string): Promise<string> {
 
 interface ModuleInput {
   courseId: string;
-  title: string;
-  description?: string | null;
+  title: LocalizedString;
+  description?: LocalizedString | null;
   order?: number;
 }
 
@@ -58,7 +59,7 @@ export async function createModule(input: ModuleInput, actor: Actor) {
   }
 
   return prisma.module.create({
-    data: { courseId: input.courseId, title: input.title, description: input.description ?? null, order },
+    data: { courseId: input.courseId, title: input.title, description: toJsonInput(input.description ?? null), order },
     include: { lessons: { orderBy: { order: 'asc' } } },
   });
 }
@@ -67,7 +68,7 @@ export async function updateModule(id: string, input: Partial<Omit<ModuleInput, 
   await assertCanManageCourse(await courseIdOfModule(id), actor);
   return prisma.module.update({
     where: { id },
-    data: input,
+    data: { ...input, description: toJsonInput(input.description) },
     include: { lessons: { orderBy: { order: 'asc' } } },
   });
 }
@@ -85,10 +86,10 @@ export async function deleteModule(id: string, actor: Actor) {
 // ---------- Lessons ----------
 
 interface LessonInput {
-  title: string;
+  title: LocalizedString;
   contentType?: 'VIDEO' | 'TEXT' | 'QUIZ' | 'ASSIGNMENT';
   videoUrl?: string | null;
-  content?: string | null;
+  content?: LocalizedString | null;
   durationMinutes?: number | null;
   isFreePreview?: boolean;
   order?: number;
@@ -112,7 +113,7 @@ export async function createLesson(moduleId: string, input: LessonInput, actor: 
       title: input.title,
       contentType: input.contentType ?? 'VIDEO',
       videoUrl: input.videoUrl ?? null,
-      content: input.content ?? null,
+      content: toJsonInput(input.content ?? null),
       durationMinutes: input.durationMinutes ?? null,
       isFreePreview: input.isFreePreview ?? false,
       order,
@@ -131,7 +132,7 @@ export async function updateLesson(id: string, input: Partial<LessonInput>, acto
     }
   }
 
-  return prisma.lesson.update({ where: { id }, data: input });
+  return prisma.lesson.update({ where: { id }, data: { ...input, content: toJsonInput(input.content) } });
 }
 
 export async function deleteLesson(id: string, actor: Actor) {

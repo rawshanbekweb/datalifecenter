@@ -19,16 +19,16 @@ beforeAll(async () => {
   // Pullik, published kurs + 2 darsli dastur
   const course = await admin
     .post('/api/courses')
-    .send({ title: 'Pullik Kurs', description: 'Enrollment oqimi testi uchun', durationMonths: 2, price: 1000000, published: true })
+    .send({ title: { uz: 'Pullik Kurs' }, description: { uz: 'Enrollment oqimi testi uchun' }, durationMonths: 2, price: 1000000, published: true })
     .expect(201);
   courseId = course.body.data.id;
   courseSlug = course.body.data.slug;
 
-  const mod = await admin.post('/api/modules').send({ courseId, title: 'Modul' }).expect(201);
+  const mod = await admin.post('/api/modules').send({ courseId, title: { uz: 'Modul' } }).expect(201);
   for (const title of ['1-dars', '2-dars']) {
     const lesson = await admin
       .post(`/api/modules/${mod.body.data.id}/lessons`)
-      .send({ title, contentType: 'TEXT', content: 'Matn' })
+      .send({ title: { uz: title }, contentType: 'TEXT', content: { uz: 'Matn' } })
       .expect(201);
     lessonIds.push(lesson.body.data.id);
   }

@@ -1,7 +1,9 @@
 import { apiFetch } from './client';
+import { LocalizedString } from '../types/locale';
 
 export type SessionStatus = 'SCHEDULED' | 'LIVE' | 'ENDED' | 'CANCELLED';
 
+// Talaba ko'radigan (o'z tiliga tekislangan) sessiya — GET /sessions/mine
 export interface LiveSession {
   id: string;
   title: string;
@@ -15,10 +17,24 @@ export interface LiveSession {
   targetStudentIds: string[];
 }
 
+// Mentor/admin boshqaruv ko'rinishi — xom (barcha til) ma'lumot, tahrirlash uchun
+export interface ManagedLiveSession {
+  id: string;
+  title: LocalizedString;
+  description?: LocalizedString | null;
+  meetingUrl: string;
+  startsAt: string;
+  durationMin: number;
+  status: SessionStatus;
+  course: { id: string; title: LocalizedString; slug: string; color: string; bg: string; border: string; iconKey: string };
+  mentor: { id: string; name: string; photoUrl?: string | null };
+  targetStudentIds: string[];
+}
+
 export interface CreateSessionInput {
   courseId: string;
-  title: string;
-  description?: string;
+  title: LocalizedString;
+  description?: LocalizedString;
   meetingUrl: string;
   startsAt: string;
   durationMin: number;
@@ -29,15 +45,15 @@ export function getMySessions(): Promise<LiveSession[]> {
   return apiFetch('/sessions/mine');
 }
 
-export function getManagedSessions(): Promise<LiveSession[]> {
+export function getManagedSessions(): Promise<ManagedLiveSession[]> {
   return apiFetch('/sessions/manage');
 }
 
-export function createSession(input: CreateSessionInput): Promise<LiveSession> {
+export function createSession(input: CreateSessionInput): Promise<ManagedLiveSession> {
   return apiFetch('/sessions', { method: 'POST', body: JSON.stringify(input) });
 }
 
-export function updateSession(id: string, input: Partial<CreateSessionInput> & { status?: SessionStatus }): Promise<LiveSession> {
+export function updateSession(id: string, input: Partial<CreateSessionInput> & { status?: SessionStatus }): Promise<ManagedLiveSession> {
   return apiFetch(`/sessions/${id}`, { method: 'PATCH', body: JSON.stringify(input) });
 }
 

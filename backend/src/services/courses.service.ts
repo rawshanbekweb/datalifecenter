@@ -1,7 +1,9 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
+import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/localizedField';
 import { slugify } from '../utils/slugify';
 import { signVideoUrl } from './storage.service';
 import { hasActiveSubscription } from './subscriptions.service';
@@ -14,13 +16,15 @@ interface ListCoursesFilters {
   limit: number;
 }
 
-export async function listCourses(filters: ListCoursesFilters) {
+export async function listCourses(filters: ListCoursesFilters, locale: SupportedLocale) {
   const where: Prisma.CourseWhereInput = {
     published: true,
     ...(filters.level ? { level: filters.level } : {}),
     ...(filters.isFree !== undefined ? { isFree: filters.isFree === 'true' } : {}),
+    // Qidiruv faqat o'zbekcha matnga ishlaydi — ru/kaa/en kontenti bo'yicha
+    // qidiruv hozircha qo'llab-quvvatlanmaydi (bilingan cheklov).
     ...(filters.search
-      ? { title: { contains: filters.search, mode: 'insensitive' } }
+      ? { title: { path: ['uz'], string_contains: filters.search, mode: 'insensitive' } }
       : {}),
   };
 
@@ -39,12 +43,12 @@ export async function listCourses(filters: ListCoursesFilters) {
   ]);
 
   return {
-    items,
+    items: resolveLocaleDeep(items, locale),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
 
-export async function getCourseBySlug(slug: string) {
+export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
   const course = await prisma.course.findFirst({
     where: { slug, published: true },
     include: {
@@ -60,17 +64,20 @@ export async function getCourseBySlug(slug: string) {
     throw ApiError.notFound('Kurs topilmadi');
   }
 
-  return {
-    ...course,
-    modules: course.modules.map((mod) => ({
-      ...mod,
-      lessons: mod.lessons.map((lesson) => ({
-        ...lesson,
-        videoUrl: lesson.isFreePreview ? signVideoUrl(lesson.videoUrl) : null,
-        content: lesson.isFreePreview ? lesson.content : null,
+  return resolveLocaleDeep(
+    {
+      ...course,
+      modules: course.modules.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.map((lesson) => ({
+          ...lesson,
+          videoUrl: lesson.isFreePreview ? signVideoUrl(lesson.videoUrl) : null,
+          content: lesson.isFreePreview ? lesson.content : null,
+        })),
       })),
-    })),
-  };
+    },
+    locale
+  );
 }
 
 export async function listCoursesAdmin() {
@@ -97,7 +104,7 @@ export async function getCourseByIdAdmin(id: string) {
   return course;
 }
 
-export async function getCourseForLearning(slug: string, userId: string, role: string) {
+export async function getCourseForLearning(slug: string, userId: string, role: string, locale: SupportedLocale) {
   const course = await prisma.course.findFirst({
     where: { slug, published: true },
     include: {
@@ -151,13 +158,16 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     select: { lessonId: true },
   });
 
-  const signedCourse = {
-    ...course,
-    modules: course.modules.map((mod) => ({
-      ...mod,
-      lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signVideoUrl(lesson.videoUrl) })),
-    })),
-  };
+  const signedCourse = resolveLocaleDeep(
+    {
+      ...course,
+      modules: course.modules.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signVideoUrl(lesson.videoUrl) })),
+      })),
+    },
+    locale
+  );
 
   return { course: signedCourse, enrollment, completedLessonIds: progress.map((p) => p.lessonId) };
 }
@@ -175,9 +185,9 @@ async function uniqueSlug(title: string, excludeId?: string): Promise<string> {
 }
 
 interface CourseInput {
-  title: string;
-  subtitle?: string;
-  description: string;
+  title: LocalizedString;
+  subtitle?: LocalizedString | null;
+  description: LocalizedString;
   iconKey: string;
   color: string;
   bg: string;
@@ -192,9 +202,14 @@ interface CourseInput {
 }
 
 export async function createCourse(input: CourseInput) {
-  const slug = await uniqueSlug(input.title);
+  const slug = await uniqueSlug(input.title.uz);
   return prisma.course.create({
-    data: { ...input, slug, isFree: input.price <= 0 },
+    data: {
+      ...input,
+      slug,
+      isFree: input.price <= 0,
+      subtitle: toJsonInput(input.subtitle),
+    } as Prisma.CourseUncheckedCreateInput,
   });
 }
 
@@ -204,12 +219,18 @@ export async function updateCourse(id: string, input: Partial<CourseInput>) {
     throw ApiError.notFound('Kurs topilmadi');
   }
 
-  const slug = input.title && input.title !== course.title ? await uniqueSlug(input.title, id) : undefined;
+  const currentTitle = course.title as unknown as LocalizedString;
+  const slug = input.title && input.title.uz !== currentTitle.uz ? await uniqueSlug(input.title.uz, id) : undefined;
   const isFree = input.price !== undefined ? input.price <= 0 : undefined;
 
   return prisma.course.update({
     where: { id },
-    data: { ...input, ...(slug ? { slug } : {}), ...(isFree !== undefined ? { isFree } : {}) },
+    data: {
+      ...input,
+      subtitle: toJsonInput(input.subtitle),
+      ...(slug ? { slug } : {}),
+      ...(isFree !== undefined ? { isFree } : {}),
+    } as Prisma.CourseUncheckedUpdateInput,
   });
 }
 
