@@ -36,7 +36,15 @@ export async function getBlogPostBySlug(slug: string) {
   if (!post) {
     throw ApiError.notFound('Maqola topilmadi');
   }
-  return prisma.blogPost.update({ where: { id: post.id }, data: { views: { increment: 1 } } });
+  return post;
+}
+
+// Bitta brauzer/qurilma bir kun ichida sahifani necha marta yangilasa ham
+// faqat bitta ko'rish sifatida hisoblanishi uchun kontrollerdan cookie
+// tekshiruvidan o'tgandan keyingina chaqiriladi.
+export async function incrementBlogViews(id: string): Promise<number> {
+  const updated = await prisma.blogPost.update({ where: { id }, data: { views: { increment: 1 } } });
+  return updated.views;
 }
 
 export async function listBlogPostsAdmin() {
