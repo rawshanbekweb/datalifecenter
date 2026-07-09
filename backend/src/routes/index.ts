@@ -18,6 +18,7 @@ import siteSettingsRoutes from './siteSettings.routes';
 import testimonialsRoutes from './testimonials.routes';
 import courseReviewsRoutes from './courseReviews.routes';
 import projectsRoutes from './projects.routes';
+import paymentsRoutes from './payments.routes';
 import { verifyCertificateHandler } from '../controllers/enrollments.controller';
 
 const router = Router();
@@ -47,5 +48,6 @@ router.use('/site-settings', siteSettingsRoutes);
 router.use('/testimonials', testimonialsRoutes);
 router.use('/reviews', courseReviewsRoutes);
 router.use('/projects', projectsRoutes);
+router.use('/payments', paymentsRoutes);
 
 export default router;

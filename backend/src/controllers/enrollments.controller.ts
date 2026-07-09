@@ -1,9 +1,12 @@
+import path from 'path';
 import { Request, Response } from 'express';
 import * as enrollmentsService from '../services/enrollments.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 import { streamCertificatePdf } from '../utils/certificate';
+import { fetchRemoteImage } from '../services/storage.service';
+import { IMAGES_DIR } from '../config/uploads';
 
 export const createEnrollmentHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
@@ -42,6 +45,22 @@ export const submitReceiptHandler = asyncHandler(async (req: Request, res: Respo
     req.body.receiptUrl
   );
   sendSuccess(res, enrollment);
+});
+
+export const receiptHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const source = await enrollmentsService.getReceiptSource(req.user.userId, req.user.role, req.params.id as string);
+  if (source.kind === 'local') {
+    res.sendFile(path.basename(source.filename), { root: IMAGES_DIR, dotfiles: 'deny' }, (err) => {
+      if (err && !res.headersSent) {
+        res.status(404).json({ success: false, error: { message: 'Fayl topilmadi', code: 'NOT_FOUND' } });
+      }
+    });
+    return;
+  }
+  const { buffer, contentType } = await fetchRemoteImage(source.url);
+  res.setHeader('Content-Type', contentType);
+  res.send(buffer);
 });
 
 export const certificateHandler = asyncHandler(async (req: Request, res: Response) => {

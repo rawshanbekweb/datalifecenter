@@ -35,6 +35,13 @@ export async function createEnrollment(userId: string, courseId: string) {
   return enrollment;
 }
 
+// Xom receiptUrl javobdan olib tashlanadi — chek endi faqat autentifikatsiyalangan
+// GET /api/enrollments/:id/receipt orqali ko'riladi (getReceiptSource()).
+function hideReceiptUrl<T extends { receiptUrl?: string | null }>(enrollment: T): Omit<T, 'receiptUrl'> & { hasReceipt: boolean } {
+  const { receiptUrl, ...rest } = enrollment;
+  return { ...rest, hasReceipt: Boolean(receiptUrl) };
+}
+
 export async function getMyEnrollments(userId: string) {
   const enrollments = await prisma.enrollment.findMany({
     where: { userId },
@@ -48,7 +55,7 @@ export async function getMyEnrollments(userId: string) {
         prisma.lesson.count({ where: { module: { courseId: enrollment.courseId } } }),
         prisma.lessonProgress.count({ where: { userId, lesson: { module: { courseId: enrollment.courseId } } } }),
       ]);
-      return { ...enrollment, progress: { totalLessons, completedLessons } };
+      return { ...hideReceiptUrl(enrollment), progress: { totalLessons, completedLessons } };
     })
   );
 }
@@ -91,7 +98,7 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters)
   ]);
 
   return {
-    items,
+    items: items.map(hideReceiptUrl),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
@@ -111,21 +118,22 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     throw ApiError.notFound('Yozilish topilmadi');
   }
 
+  // Admin qo'lda "To'lovni tasdiqlash" bosganda ham, Click/Payme webhook'i ham
+  // bir xil yadrodan (confirmEnrollmentPayment) o'tadi — ikkalasida ham bir xil
+  // status/bildirishnoma/email natijasi bo'lishi uchun.
+  if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
+    return confirmEnrollmentPayment(enrollmentId, {
+      provider: enrollment.provider ?? 'manual',
+      providerRef: enrollment.providerRef ?? `manual_${Date.now()}`,
+      amount: enrollment.amountPaid ?? enrollment.course.price ?? 0,
+    });
+  }
+
   const data: Prisma.EnrollmentUpdateInput = {
     status: input.status,
     paymentStatus: input.paymentStatus,
   };
 
-  // To'lov tasdiqlansa kurs avtomatik faollashadi, eski rad javobi eskirgan hisoblanadi
-  if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
-    data.provider = enrollment.provider ?? 'manual';
-    data.providerRef = enrollment.providerRef ?? `manual_${Date.now()}`;
-    data.amountPaid = enrollment.amountPaid ?? enrollment.course.price;
-    data.rejectionReason = null;
-    if (!input.status && enrollment.status === 'PENDING') {
-      data.status = 'ACTIVE';
-    }
-  }
   if (input.paymentStatus === 'REJECTED') {
     data.rejectionReason = input.rejectionReason;
   }
@@ -151,12 +159,6 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     });
   }
 
-  // To'lov endi tasdiqlangan bo'lsa talabaga email ham yuboriladi
-  if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
-    const courseUrl = `${env.FRONTEND_URL.replace(/\/+$/, '')}/learn/${updated.course.slug}`;
-    await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, updated.course.title, courseUrl);
-  }
-
   // To'lov rad etilsa talabaga sabab bilan bildirishnoma va email yuboriladi
   if (input.paymentStatus === 'REJECTED' && enrollment.paymentStatus !== 'REJECTED') {
     await notify(updated.userId, {
@@ -167,6 +169,89 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
     });
     await sendPaymentRejectedEmail(updated.user.email, updated.user.name, updated.course.title, updated.rejectionReason ?? '');
   }
+
+  return updated;
+}
+
+interface ConfirmPaymentInput {
+  provider: string;
+  providerRef: string;
+  amount: Prisma.Decimal | number | string;
+}
+
+// To'lov manbasidan qat'iy nazar (admin qo'lda tasdiqlashi, Click/Payme webhook'i)
+// yozilishni faollashtiradigan yagona yadro — status/bildirishnoma/email bir xil bo'lishi uchun.
+export async function confirmEnrollmentPayment(enrollmentId: string, input: ConfirmPaymentInput) {
+  const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId }, include: { course: true } });
+  if (!enrollment) {
+    throw ApiError.notFound('Yozilish topilmadi');
+  }
+  // Idempotent — allaqachon to'langan bo'lsa qayta ishlov berilmaydi (webhook'lar qayta so'ralishi mumkin)
+  if (enrollment.paymentStatus === 'PAID') {
+    return prisma.enrollment.findUniqueOrThrow({
+      where: { id: enrollmentId },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
+      },
+    });
+  }
+
+  const wasActive = enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED';
+  const updated = await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: {
+      paymentStatus: 'PAID',
+      status: wasActive ? undefined : 'ACTIVE',
+      provider: input.provider,
+      providerRef: input.providerRef,
+      amountPaid: input.amount,
+      rejectionReason: null,
+    },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
+    },
+  });
+
+  if (!wasActive) {
+    await notify(updated.userId, {
+      type: 'ENROLLMENT_ACTIVATED',
+      title: `Kurs ochildi: ${updated.course.title}`,
+      body: "To'lovingiz tasdiqlandi — darslarni boshlashingiz mumkin.",
+      link: `/learn/${updated.course.slug}`,
+    });
+  }
+  const courseUrl = `${env.FRONTEND_URL.replace(/\/+$/, '')}/learn/${updated.course.slug}`;
+  await sendPaymentConfirmedEmail(updated.user.email, updated.user.name, updated.course.title, courseUrl);
+
+  return updated;
+}
+
+// To'lov shlyuzi tranzaksiyani bekor qilsa (checkout tugallanmasdan) yoki qaytarsa
+// (to'langandan keyin bekor qilinsa — dispute/chargeback) chaqiriladi.
+// To'lanmasdan bekor qilingan holatda yozilishga tegilmaydi (hali hech narsa o'zgarmagan).
+export async function cancelEnrollmentPayment(enrollmentId: string) {
+  const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId }, include: { course: true } });
+  if (!enrollment || enrollment.paymentStatus !== 'PAID') {
+    return enrollment;
+  }
+
+  const updated = await prisma.enrollment.update({
+    where: { id: enrollmentId },
+    data: { paymentStatus: 'REFUNDED', status: 'CANCELLED' },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
+    },
+  });
+
+  await notify(updated.userId, {
+    type: 'PAYMENT_REJECTED',
+    title: `To'lov qaytarildi: ${updated.course.title}`,
+    body: "To'lov shlyuzi tomonidan qaytarildi, kursga kirish vaqtincha yopildi.",
+    link: '/dashboard',
+  });
 
   return updated;
 }
@@ -207,6 +292,26 @@ export async function submitReceipt(userId: string, enrollmentId: string, receip
   });
 
   return updated;
+}
+
+export type ReceiptSource = { kind: 'local'; filename: string } | { kind: 'remote'; url: string };
+
+// Chekni faqat egasi yoki admin ko'ra oladi — xom receiptUrl clientga hech qachon
+// chiqmaydi (contoller shu natijaga qarab lokal fayl yoki tashqi URL'ni oqim qiladi).
+export async function getReceiptSource(userId: string, role: string, enrollmentId: string): Promise<ReceiptSource> {
+  const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId }, select: { userId: true, receiptUrl: true } });
+  if (!enrollment || (enrollment.userId !== userId && role !== 'ADMIN')) {
+    throw ApiError.notFound('Yozilish topilmadi');
+  }
+  if (!enrollment.receiptUrl) {
+    throw ApiError.notFound('Chek yuklanmagan');
+  }
+
+  const local = /\/uploads\/images\/([^/?#]+)/.exec(enrollment.receiptUrl);
+  if (local) {
+    return { kind: 'local', filename: local[1] };
+  }
+  return { kind: 'remote', url: enrollment.receiptUrl };
 }
 
 // Sertifikat ma'lumotlari — faqat yakunlangan kurs uchun, egasi yoki admin

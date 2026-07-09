@@ -5,6 +5,7 @@ import {
   listEnrollmentsAdminHandler,
   mockPayHandler,
   myEnrollmentsHandler,
+  receiptHandler,
   submitReceiptHandler,
   updateEnrollmentAdminHandler,
 } from '../controllers/enrollments.controller';
@@ -27,6 +28,7 @@ router.patch('/:id', authorize('ADMIN'), validateBody(updateEnrollmentAdminSchem
 router.post('/', validateBody(createEnrollmentSchema), createEnrollmentHandler);
 router.get('/me', myEnrollmentsHandler);
 router.post('/:id/receipt', validateBody(submitReceiptSchema), submitReceiptHandler);
+router.get('/:id/receipt', receiptHandler);
 router.get('/:id/certificate', certificateHandler);
 router.post('/:id/mock-pay', devOnly, mockPayHandler);
 

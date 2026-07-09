@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Search, CheckCircle, XCircle, RotateCcw, Receipt, Ban } from 'lucide-react';
 import { listEnrollmentsAdmin, updateEnrollmentAdmin } from '../../api/enrollments';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 
 interface AdminEnrollment {
   id: string;
@@ -10,7 +11,7 @@ interface AdminEnrollment {
   rejectionReason?: string | null;
   enrolledAt: string;
   amountPaid?: string | number | null;
-  receiptUrl?: string | null;
+  hasReceipt?: boolean;
   user: { id: string; name: string; email: string };
   course: { id: string; title: string; slug: string; isFree: boolean; price?: string | number | null; currency: string };
 }
@@ -46,6 +47,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
   const [search, setSearch]         = useState<string>('');
   const [query, setQuery]           = useState<string>('');
   const [busyId, setBusyId]         = useState<string>('');
+  const [viewingReceiptId, setViewingReceiptId] = useState<string>('');
 
   const load = useCallback((): void => {
     setStatus('loading');
@@ -135,11 +137,11 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
                     <p style={{ fontSize:11.5, color:'#dc2626', marginTop:2 }}>Sabab: {e.rejectionReason}</p>
                   )}
                 </div>
-                {e.receiptUrl && (
-                  <a href={e.receiptUrl} target="_blank" rel="noreferrer"
-                    style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:'#d97706', textDecoration:'none', flexShrink:0, padding:'6px 10px', borderRadius:8, background:'#fffbeb', border:'1px solid #fde68a' }}>
+                {e.hasReceipt && (
+                  <button onClick={() => setViewingReceiptId(e.id)}
+                    style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:'#d97706', cursor:'pointer', flexShrink:0, padding:'6px 10px', borderRadius:8, background:'#fffbeb', border:'1px solid #fde68a' }}>
                     <Receipt size={13}/> Chekni ko'rish
-                  </a>
+                  </button>
                 )}
                 <p style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{new Date(e.enrolledAt).toLocaleDateString('uz-UZ')}</p>
                 <span className="tag" style={{ background:s.bg, borderColor:s.border, color:s.color, fontWeight:700, flexShrink:0 }}>{s.label}</span>
@@ -180,6 +182,10 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
             );
           })}
         </div>
+      )}
+
+      {viewingReceiptId && (
+        <ReceiptViewerModal enrollmentId={viewingReceiptId} onClose={() => setViewingReceiptId('')} />
       )}
     </div>
   );

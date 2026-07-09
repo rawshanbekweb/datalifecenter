@@ -23,6 +23,14 @@ const envSchema = z.object({
 
   // Sentry (ixtiyoriy) — production'da xatolarni kuzatish
   SENTRY_DSN: z.string().optional(),
+
+  // To'lov shlyuzlari (ixtiyoriy) — sozlanmasa checkout tugmalari frontendda ko'rinmaydi,
+  // qo'lda-chek-yuklash oqimi ishlab turadi (bu ikkinchisi bekor qilinmaydi).
+  CLICK_SERVICE_ID: z.string().optional(),
+  CLICK_MERCHANT_ID: z.string().optional(),
+  CLICK_SECRET_KEY: z.string().optional(),
+  PAYME_MERCHANT_ID: z.string().optional(),
+  PAYME_SECRET_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

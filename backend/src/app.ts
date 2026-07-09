@@ -24,6 +24,8 @@ app.set('trust proxy', 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(cors(corsOptions));
 app.use(express.json());
+// Click webhook'lari application/x-www-form-urlencoded yuboradi (Payme JSON ishlatadi, express.json() yetarli)
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Yuklangan rasmlar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz, ochiq qoladi

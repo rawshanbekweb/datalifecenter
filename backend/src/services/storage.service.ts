@@ -95,6 +95,17 @@ export function signVideoUrl(url: string | null | undefined): string | null {
   return url;
 }
 
+// Cloudinary'dagi (yoki boshqa ochiq manba) rasmni server orqali o'tkazadi — asl URL
+// clientga hech qachon chiqmaydi, faqat bizning autentifikatsiyalangan endpoint ko'rinadi.
+export async function fetchRemoteImage(url: string): Promise<{ buffer: Buffer; contentType: string }> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Rasmni olib bo'lmadi: ${res.status}`);
+  }
+  const buffer = Buffer.from(await res.arrayBuffer());
+  return { buffer, contentType: res.headers.get('content-type') ?? 'image/jpeg' };
+}
+
 // Endi kerak bo'lmagan faylni (o'chirilgan dars videosi, almashtirilgan chek)
 // xotiradan olib tashlaydi. Best-effort: xato asosiy oqimni yiqitmaydi.
 export async function deleteUploadByUrl(url: string | null | undefined): Promise<void> {

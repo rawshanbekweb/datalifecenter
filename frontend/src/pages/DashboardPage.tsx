@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
 import { getMyCourseReview, submitCourseReview } from '../api/reviews';
+import { getPaymentConfig, createCheckout, PaymentConfig } from '../api/payments';
 import { resolveIcon } from '../utils/iconMap';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
@@ -28,7 +29,7 @@ interface Enrollment {
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: string;
   rejectionReason?: string | null;
-  receiptUrl?: string | null;
+  hasReceipt?: boolean;
   enrolledAt: string;
   progress?: { totalLessons: number; completedLessons: number };
 }
@@ -50,14 +51,17 @@ const STATUS_LABELS: Record<string, StatusLabel> = {
 interface EnrollmentRowProps {
   enrollment: Enrollment;
   onPaid: (paid: Enrollment) => void;
+  paymentConfig: PaymentConfig;
 }
 
-function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactElement {
+function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps): React.ReactElement {
   const [payStatus, setPayStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [payOpen, setPayOpen]     = useState<boolean>(false);
   const [receiptUrl, setReceiptUrl] = useState<string>('');
   const [receiptState, setReceiptState] = useState<'idle' | 'sending' | 'error'>('idle');
   const [certState, setCertState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [gatewayLoading, setGatewayLoading] = useState<'click' | 'payme' | ''>('');
+  const [gatewayError, setGatewayError] = useState<string>('');
   const Icon = resolveIcon(enrollment.course.iconKey);
   const s = STATUS_LABELS[enrollment.status];
 
@@ -72,6 +76,18 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
       onPaid(paid);
     } catch {
       setPayStatus('error');
+    }
+  };
+
+  const payWithGateway = async (provider: 'click' | 'payme') => {
+    setGatewayLoading(provider);
+    setGatewayError('');
+    try {
+      const { url } = await createCheckout(enrollment.id, provider);
+      window.location.href = url;
+    } catch (err: unknown) {
+      setGatewayError((err as Error).message || 'Xatolik yuz berdi');
+      setGatewayLoading('');
     }
   };
 
@@ -225,6 +241,29 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
           Karta raqami: <b style={{ color: '#0f172a', letterSpacing: 0.5 }}>{PAYMENT_INFO.cardNumber}</b> ({PAYMENT_INFO.cardOwner})
         </p>
         <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>{PAYMENT_INFO.note}</p>
+
+        {(paymentConfig.click || paymentConfig.payme) && (
+          <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 8 }}>Onlayn to'lash (tezroq):</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {paymentConfig.click && (
+                <button onClick={() => payWithGateway('click')} disabled={gatewayLoading !== ''} className="btn-primary"
+                  style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
+                  <Wallet size={14} /> {gatewayLoading === 'click' ? "Yo'naltirilmoqda..." : "Click orqali to'lash"}
+                </button>
+              )}
+              {paymentConfig.payme && (
+                <button onClick={() => payWithGateway('payme')} disabled={gatewayLoading !== ''} className="btn-primary"
+                  style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
+                  <Wallet size={14} /> {gatewayLoading === 'payme' ? "Yo'naltirilmoqda..." : "Payme orqali to'lash"}
+                </button>
+              )}
+            </div>
+            {gatewayError && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>{gatewayError}</p>}
+            <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 10 }}>...yoki qo'lda o'tkazib, chekni pastda yuklang:</p>
+          </div>
+        )}
+
         <FileUpload value={receiptUrl} onChange={setReceiptUrl} kind="image" label="To'lov cheki (rasm)" />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
           <button onClick={sendReceipt} disabled={!receiptUrl.trim() || receiptState === 'sending'} className="btn-primary"
@@ -271,14 +310,30 @@ export default function DashboardPage(): React.ReactElement {
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [status, setStatus]           = useState<'loading' | 'ready' | 'error'>('loading');
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ click: false, payme: false });
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     let cancelled = false;
     getMyEnrollments()
       .then((data: Enrollment[]) => { if (!cancelled) { setEnrollments(data); setStatus('ready'); } })
       .catch(() => { if (!cancelled) setStatus('error'); });
+    getPaymentConfig()
+      .then((cfg) => { if (!cancelled) setPaymentConfig(cfg); })
+      .catch(() => {});
     return () => { cancelled = true; };
   }, []);
+
+  // Click/Payme'dan qaytgach — webhook so'rov bilan bir vaqtda kelmasligi mumkin,
+  // shuning uchun ro'yxatni bir necha soniyadan keyin qayta yuklaymiz.
+  useEffect(() => {
+    if (searchParams.get('payment') !== 'return') return;
+    setSearchParams((prev) => { prev.delete('payment'); return prev; }, { replace: true });
+    const timer = setTimeout(() => {
+      getMyEnrollments().then((data: Enrollment[]) => setEnrollments(data)).catch(() => {});
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [searchParams, setSearchParams]);
 
   return (
     <div>
@@ -348,7 +403,7 @@ export default function DashboardPage(): React.ReactElement {
         {status === 'ready' && enrollments.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {enrollments.map((e) => (
-              <EnrollmentRow key={e.id} enrollment={e}
+              <EnrollmentRow key={e.id} enrollment={e} paymentConfig={paymentConfig}
                 onPaid={(paid) => setEnrollments((prev) => prev.map((x) => x.id === paid.id ? { ...x, ...paid, progress: paid.progress ?? x.progress } : x))} />
             ))}
           </div>

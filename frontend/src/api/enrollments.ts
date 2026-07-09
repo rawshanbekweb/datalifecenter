@@ -1,5 +1,6 @@
 import { apiFetch } from './client';
 import { API_URL } from './config';
+import { getToken } from './token';
 
 export function createEnrollment(courseId: string | number): Promise<any> {
   return apiFetch('/enrollments', { method: 'POST', body: JSON.stringify({ courseId }) });
@@ -18,6 +19,22 @@ export function submitReceipt(enrollmentId: string, receiptUrl: string): Promise
     method: 'POST',
     body: JSON.stringify({ receiptUrl }),
   });
+}
+
+// Chek rasmini blob sifatida olib, <img>da ko'rsatish uchun vaqtinchalik object URL qaytaradi.
+// Oddiy <img src> ishlatib bo'lmaydi — endpoint autentifikatsiya talab qiladi va Safari'da
+// krossdomen cookie bloklangani uchun Bearer header orqali yuborilishi shart.
+export async function getReceiptImageUrl(enrollmentId: string): Promise<string> {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/enrollments/${enrollmentId}/receipt`, {
+    credentials: 'include',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) {
+    throw new Error("Chekni yuklab bo'lmadi");
+  }
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
 }
 
 // PDF'ni blob sifatida olib, brauzerda yuklab olishni boshlaydi

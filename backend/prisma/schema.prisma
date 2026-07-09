@@ -345,22 +345,55 @@ model Project {
 }
 
 model Enrollment {
-  id              String           @id @default(cuid())
-  user            User             @relation(fields: [userId], references: [id])
+  id              String               @id @default(cuid())
+  user            User                 @relation(fields: [userId], references: [id])
   userId          String
-  course          Course           @relation(fields: [courseId], references: [id])
+  course          Course               @relation(fields: [courseId], references: [id])
   courseId        String
-  status          EnrollmentStatus @default(PENDING)
-  paymentStatus   PaymentStatus    @default(UNPAID)
+  status          EnrollmentStatus     @default(PENDING)
+  paymentStatus   PaymentStatus        @default(UNPAID)
   provider        String?
   providerRef     String?
   amountPaid      Decimal?
   receiptUrl      String?
   rejectionReason String?
-  enrolledAt      DateTime         @default(now())
+  enrolledAt      DateTime             @default(now())
   completedAt     DateTime?
+  transactions    PaymentTransaction[]
 
   @@unique([userId, courseId])
+}
+
+enum PaymentProvider {
+  CLICK
+  PAYME
+}
+
+enum PaymentTxState {
+  CREATED
+  PERFORMED
+  CANCELLED
+  CANCELLED_AFTER_PERFORM
+}
+
+// Payme/Click webhook'lari orqali keladigan to'lov shlyuzi tranzaksiyasi holati.
+// Ikkala protokol ham idempotentlikni talab qiladi — bir xil so'rov qayta kelsa
+// bir xil javob qaytarilishi SHART, shuning uchun holat alohida saqlanadi.
+model PaymentTransaction {
+  id           String          @id @default(cuid())
+  provider     PaymentProvider
+  providerTxId String
+  enrollment   Enrollment      @relation(fields: [enrollmentId], references: [id])
+  enrollmentId String
+  amount       Decimal
+  state        PaymentTxState  @default(CREATED)
+  reason       Int?
+  createTime   DateTime        @default(now())
+  performTime  DateTime?
+  cancelTime   DateTime?
+
+  @@unique([provider, providerTxId])
+  @@index([enrollmentId])
 }
 
 // Bosh sahifa bo'limlari (hero_stats, about, services, why_us, contact) uchun
