@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Radio, Video } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LiveSession, getSession } from '../api/sessions';
 import { useAuth } from '../hooks/useAuth';
 import { SESSION_STATUS_META, formatSessionTime } from '../components/sessions/sessionMeta';
@@ -30,6 +31,7 @@ function jitsiEmbedUrl(url: string, displayName: string): string {
 }
 
 export default function LiveSessionPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [session, setSession] = useState<LiveSession | null>(null);
@@ -43,11 +45,11 @@ export default function LiveSessionPage(): React.ReactElement {
       .then((data) => { if (!cancelled) { setSession(data); setStatus('ready'); } })
       .catch((err: { status?: number; message?: string }) => {
         if (cancelled) return;
-        setErrorMsg(err.message || 'Xatolik yuz berdi');
+        setErrorMsg(err.message || t('common.error'));
         setStatus(err.status === 403 ? 'forbidden' : 'error');
       });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, t]);
 
   const embeddable = useMemo(
     () => (session ? isEmbeddableJitsi(session.meetingUrl) : false),
@@ -55,7 +57,7 @@ export default function LiveSessionPage(): React.ReactElement {
   );
 
   if (status === 'loading') {
-    return <section style={{ padding: '200px 24px 80px', textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</section>;
+    return <section style={{ padding: '200px 24px 80px', textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</section>;
   }
 
   if (status === 'forbidden' || status === 'error' || !session) {
@@ -63,10 +65,10 @@ export default function LiveSessionPage(): React.ReactElement {
       <section style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '160px 24px 80px' }}>
         <div className="card" style={{ padding: 32, maxWidth: 480, textAlign: 'center' }}>
           <p style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
-            {status === 'forbidden' ? 'Kirish huquqi yo\'q' : 'Xatolik yuz berdi'}
+            {status === 'forbidden' ? t('student.live.noAccess') : t('common.error')}
           </p>
           <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 20 }}>{errorMsg}</p>
-          <Link to="/dashboard"><button className="btn-outline"><ArrowLeft size={14} /> Kabinetga qaytish</button></Link>
+          <Link to="/dashboard"><button className="btn-outline"><ArrowLeft size={14} /> {t('cabinet.backToCabinet')}</button></Link>
         </div>
       </section>
     );
@@ -82,7 +84,7 @@ export default function LiveSessionPage(): React.ReactElement {
         {/* Sarlavha paneli */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 14 }}>
           <Link to="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#94a3b8', textDecoration: 'none' }}>
-            <ArrowLeft size={14} /> Kabinet
+            <ArrowLeft size={14} /> {t('cabinet.cabinet')}
           </Link>
           <div style={{ width: 1, height: 16, background: '#334155' }} />
           {isLive
@@ -92,7 +94,7 @@ export default function LiveSessionPage(): React.ReactElement {
             {session.title}
           </p>
           <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>
-            {meta.label}
+            {t(meta.labelKey)}
           </span>
         </div>
         <p style={{ fontSize: 12.5, color: '#94a3b8', marginBottom: 16 }}>
@@ -103,7 +105,7 @@ export default function LiveSessionPage(): React.ReactElement {
           <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #334155', background: '#000' }}>
             <iframe
               title={session.title}
-              src={jitsiEmbedUrl(session.meetingUrl, user?.name || 'Ishtirokchi')}
+              src={jitsiEmbedUrl(session.meetingUrl, user?.name || t('student.live.participant'))}
               allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
               style={{ width: '100%', height: 'calc(100vh - 220px)', minHeight: 480, border: 'none', display: 'block' }}
             />
@@ -113,15 +115,15 @@ export default function LiveSessionPage(): React.ReactElement {
             {canJoin ? (
               <>
                 <p style={{ fontSize: 14, color: '#475569', marginBottom: 18 }}>
-                  Bu dars tashqi platformada ({(() => { try { return new URL(session.meetingUrl).hostname; } catch { return 'havola'; } })()}) o'tkaziladi.
+                  {t('student.live.externalInfo', { host: (() => { try { return new URL(session.meetingUrl).hostname; } catch { return 'URL'; } })() })}
                 </p>
                 <a href={session.meetingUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                  <button className="btn-primary"><ExternalLink size={14} /> Darsga qo'shilish</button>
+                  <button className="btn-primary"><ExternalLink size={14} /> {t('sessions.join')}</button>
                 </a>
               </>
             ) : (
               <p style={{ fontSize: 14, color: '#475569' }}>
-                {session.status === 'ENDED' ? 'Bu jonli dars yakunlangan.' : 'Bu jonli dars bekor qilingan.'}
+                {session.status === 'ENDED' ? t('student.live.ended') : t('student.live.cancelled')}
               </p>
             )}
           </div>

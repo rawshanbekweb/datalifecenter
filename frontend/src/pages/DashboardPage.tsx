@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
 import { getMyCourseReview, submitCourseReview } from '../api/reviews';
 import { getPaymentConfig, createCheckout, PaymentConfig } from '../api/payments';
 import { resolveIcon } from '../utils/iconMap';
+import { formatDate, formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
 import FileUpload from '../components/common/FileUpload';
@@ -35,17 +37,18 @@ interface Enrollment {
 }
 
 interface StatusLabel {
-  label: string;
+  labelKey: string;
   color: string;
   bg: string;
   border: string;
 }
 
+// labelKey render paytida t() qilinadi
 const STATUS_LABELS: Record<string, StatusLabel> = {
-  PENDING:   { label: 'Kutilmoqda',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-  ACTIVE:    { label: 'Faol',           color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-  COMPLETED: { label: 'Yakunlangan',    color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-  CANCELLED: { label: 'Bekor qilingan', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
+  PENDING:   { labelKey: 'student.dashboard.enrollStatus.PENDING',   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+  ACTIVE:    { labelKey: 'student.dashboard.enrollStatus.ACTIVE',    color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+  COMPLETED: { labelKey: 'student.dashboard.enrollStatus.COMPLETED', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+  CANCELLED: { labelKey: 'student.dashboard.enrollStatus.CANCELLED', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
 };
 
 interface EnrollmentRowProps {
@@ -55,6 +58,7 @@ interface EnrollmentRowProps {
 }
 
 function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps): React.ReactElement {
+  const { t } = useTranslation();
   const [payStatus, setPayStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [payOpen, setPayOpen]     = useState<boolean>(false);
   const [receiptUrl, setReceiptUrl] = useState<string>('');
@@ -86,7 +90,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
       const { url } = await createCheckout({ kind: 'enrollment', enrollmentId: enrollment.id }, provider);
       window.location.href = url;
     } catch (err: unknown) {
-      setGatewayError((err as Error).message || 'Xatolik yuz berdi');
+      setGatewayError((err as Error).message || t('common.error'));
       setGatewayLoading('');
     }
   };
@@ -155,7 +159,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 3 }}>{enrollment.course.title}</p>
           <p style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#94a3b8' }}>
-            <Clock size={12} /> Yozilgan sana: {new Date(enrollment.enrolledAt).toLocaleDateString('uz-UZ')}
+            <Clock size={12} /> {t('student.dashboard.enrolledAt')} {formatDate(enrollment.enrolledAt)}
           </p>
           {enrollment.progress && enrollment.progress.totalLessons > 0 && (enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED') && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7 }}>
@@ -167,7 +171,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
                 }} />
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b', flexShrink: 0 }}>
-                {enrollment.progress.completedLessons}/{enrollment.progress.totalLessons} dars
+                {t('student.dashboard.lessonsCount', { done: enrollment.progress.completedLessons, total: enrollment.progress.totalLessons })}
               </span>
             </div>
           )}
@@ -176,26 +180,26 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
       {(enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED') && (
         <Link to={`/learn/${enrollment.course.slug}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
           <button className="btn-primary" style={{ fontSize: 12, padding: '8px 14px' }}>
-            <PlayCircle size={13} /> Davom etish
+            <PlayCircle size={13} /> {t('student.dashboard.continue')}
           </button>
         </Link>
       )}
       {enrollment.status === 'COMPLETED' && (
         <button onClick={getCertificate} disabled={certState === 'loading'} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0, opacity: certState === 'loading' ? 0.7 : 1 }}>
-          <Award size={13} /> {certState === 'loading' ? 'Tayyorlanmoqda...' : 'Sertifikat'}
+          <Award size={13} /> {certState === 'loading' ? t('student.certificates.downloading') : t('student.dashboard.certificate')}
         </button>
       )}
       {enrollment.status === 'COMPLETED' && (
         <button onClick={() => setReviewOpen((v) => !v)} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
-          <MessageSquare size={13} /> {myReview ? 'Sharhni tahrirlash' : 'Sharh qoldirish'}
+          <MessageSquare size={13} /> {myReview ? t('student.dashboard.editReview') : t('student.dashboard.leaveReview')}
         </button>
       )}
       {awaitingPayment && (
         <button onClick={() => setPayOpen((v) => !v)} className="btn-primary"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
-          <CreditCard size={13} /> {paymentRejected ? 'Qayta yuborish' : "To'lov qilish"}
+          <CreditCard size={13} /> {paymentRejected ? t('student.dashboard.resubmit') : t('student.dashboard.pay')}
         </button>
       )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
@@ -204,18 +208,18 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
           <CreditCard size={13} /> {payStatus === 'loading' ? '...' : "[DEV] To'lash"}
         </button>
       )}
-      <span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color, fontWeight: 700, flexShrink: 0 }}>{s.label}</span>
+      <span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color, fontWeight: 700, flexShrink: 0 }}>{t(s.labelKey)}</span>
     </div>
 
     {certState === 'error' && (
-      <p style={{ fontSize: 12, color: '#dc2626' }}>Sertifikatni yuklab bo'lmadi. Qayta urinib ko'ring.</p>
+      <p style={{ fontSize: 12, color: '#dc2626' }}>{t('student.certificates.downloadError')}</p>
     )}
 
     {receiptSent && (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, background: '#fffbeb', border: '1px solid #fde68a' }}>
         <Hourglass size={14} style={{ color: '#d97706', flexShrink: 0 }} />
         <p style={{ fontSize: 12.5, fontWeight: 600, color: '#92400e' }}>
-          Chek yuborildi — administrator tasdiqlashi bilan kurs ochiladi.
+          {t('student.dashboard.receiptSent')}
         </p>
       </div>
     )}
@@ -224,7 +228,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 14px', borderRadius: 10, background: '#fef2f2', border: '1px solid #fecaca' }}>
         <AlertTriangle size={14} style={{ color: '#dc2626', flexShrink: 0, marginTop: 2 }} />
         <p style={{ fontSize: 12.5, fontWeight: 600, color: '#991b1b' }}>
-          To'lov rad etildi{enrollment.rejectionReason ? `: ${enrollment.rejectionReason}` : ''}. Iltimos, to'g'ri chekni qayta yuklang.
+          {t('student.dashboard.rejectedPrefix')}{enrollment.rejectionReason ? `: ${enrollment.rejectionReason}` : ''}. {t('student.dashboard.rejectedSuffix')}
         </p>
       </div>
     )}
@@ -232,46 +236,46 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
     {awaitingPayment && payOpen && (
       <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
         <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
-          To'lov summasi:{' '}
+          {t('payment.amount')}{' '}
           <span style={{ color: enrollment.course.color }}>
-            {enrollment.course.price ? `${Number(enrollment.course.price).toLocaleString('uz-UZ')} ${enrollment.course.currency || 'UZS'}` : '—'}
+            {enrollment.course.price ? `${formatNumber(Number(enrollment.course.price))} ${enrollment.course.currency || 'UZS'}` : '—'}
           </span>
         </p>
         <p style={{ fontSize: 12.5, color: '#475569', marginBottom: 2 }}>
-          Karta raqami: <b style={{ color: '#0f172a', letterSpacing: 0.5 }}>{PAYMENT_INFO.cardNumber}</b> ({PAYMENT_INFO.cardOwner})
+          {t('payment.card')} <b style={{ color: '#0f172a', letterSpacing: 0.5 }}>{PAYMENT_INFO.cardNumber}</b> ({PAYMENT_INFO.cardOwner})
         </p>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>{PAYMENT_INFO.note}</p>
+        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>{t('payment.note')}</p>
 
         {(paymentConfig.click || paymentConfig.payme) && (
           <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 8 }}>Onlayn to'lash (tezroq):</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 8 }}>{t('payment.online')}</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {paymentConfig.click && (
                 <button onClick={() => payWithGateway('click')} disabled={gatewayLoading !== ''} className="btn-primary"
                   style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
-                  <Wallet size={14} /> {gatewayLoading === 'click' ? "Yo'naltirilmoqda..." : "Click orqali to'lash"}
+                  <Wallet size={14} /> {gatewayLoading === 'click' ? t('payment.redirecting') : t('payment.payClick')}
                 </button>
               )}
               {paymentConfig.payme && (
                 <button onClick={() => payWithGateway('payme')} disabled={gatewayLoading !== ''} className="btn-primary"
                   style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
-                  <Wallet size={14} /> {gatewayLoading === 'payme' ? "Yo'naltirilmoqda..." : "Payme orqali to'lash"}
+                  <Wallet size={14} /> {gatewayLoading === 'payme' ? t('payment.redirecting') : t('payment.payPayme')}
                 </button>
               )}
             </div>
             {gatewayError && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>{gatewayError}</p>}
-            <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 10 }}>...yoki qo'lda o'tkazib, chekni pastda yuklang:</p>
+            <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 10 }}>{t('payment.orManual')}</p>
           </div>
         )}
 
-        <FileUpload value={receiptUrl} onChange={setReceiptUrl} kind="image" label="To'lov cheki (rasm)" />
+        <FileUpload value={receiptUrl} onChange={setReceiptUrl} kind="image" label={t('payment.receiptLabel')} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
           <button onClick={sendReceipt} disabled={!receiptUrl.trim() || receiptState === 'sending'} className="btn-primary"
             style={{ fontSize: 12.5, padding: '9px 16px', opacity: !receiptUrl.trim() || receiptState === 'sending' ? 0.6 : 1 }}>
-            {receiptState === 'sending' ? 'Yuborilmoqda...' : 'Chekni yuborish'}
+            {receiptState === 'sending' ? t('common.sending') : t('payment.sendReceipt')}
           </button>
           {receiptState === 'error' && (
-            <span style={{ fontSize: 12, color: '#dc2626' }}>Yuborishda xatolik. Qayta urinib ko'ring.</span>
+            <span style={{ fontSize: 12, color: '#dc2626' }}>{t('payment.sendErrorRetry')}</span>
           )}
         </div>
       </div>
@@ -279,7 +283,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
 
     {enrollment.status === 'COMPLETED' && reviewOpen && (
       <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Reyting</p>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>{t('student.dashboard.rating')}</p>
         <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
           {[1, 2, 3, 4, 5].map((n) => (
             <button key={n} type="button" onClick={() => setReviewForm((f) => ({ ...f, rating: n }))}
@@ -290,14 +294,14 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
         </div>
         <textarea className="inp" rows={3} value={reviewForm.comment}
           onChange={(e) => setReviewForm((f) => ({ ...f, comment: e.target.value }))}
-          placeholder="Kurs haqida fikringizni yozing..." style={{ resize: 'none', marginBottom: 12 }} />
+          placeholder={t('student.dashboard.reviewPlaceholder')} style={{ resize: 'none', marginBottom: 12 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button onClick={saveReview} disabled={!reviewForm.comment.trim() || reviewState === 'saving'} className="btn-primary"
             style={{ fontSize: 12.5, padding: '9px 16px', opacity: !reviewForm.comment.trim() || reviewState === 'saving' ? 0.6 : 1 }}>
-            {reviewState === 'saving' ? 'Saqlanmoqda...' : 'Sharhni saqlash'}
+            {reviewState === 'saving' ? t('common.saving') : t('student.dashboard.saveReview')}
           </button>
           {reviewState === 'error' && (
-            <span style={{ fontSize: 12, color: '#dc2626' }}>Saqlashda xatolik. Qayta urinib ko'ring.</span>
+            <span style={{ fontSize: 12, color: '#dc2626' }}>{t('student.dashboard.saveError')}</span>
           )}
         </div>
       </div>
@@ -307,6 +311,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
 }
 
 export default function DashboardPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [status, setStatus]           = useState<'loading' | 'ready' | 'error'>('loading');
@@ -341,13 +346,13 @@ export default function DashboardPage(): React.ReactElement {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 240 }}>
               <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
-                Xush kelibsiz, <span className="accent">{user?.name?.split(' ')[0]}</span>
+                {t('student.dashboard.welcome')} <span className="accent">{user?.name?.split(' ')[0]}</span>
               </h1>
-              <p style={{ fontSize: 13.5, color: '#64748b' }}>Kurslaringiz va o'quv jarayoningiz shu yerda</p>
+              <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.dashboard.subtitle')}</p>
             </div>
             <Link to="/student/profile" style={{ textDecoration: 'none' }}>
               <button className="btn-outline" style={{ fontSize: 13 }}>
-                <Settings size={14} /> Profil sozlamalari
+                <Settings size={14} /> {t('student.dashboard.profileSettings')}
               </button>
             </Link>
           </div>
@@ -363,10 +368,10 @@ export default function DashboardPage(): React.ReactElement {
           const totalLessons = withProgress.reduce((sum, e) => sum + (e.progress?.totalLessons ?? 0), 0);
           const overallPct = totalLessons > 0 ? Math.round((doneLessons / totalLessons) * 100) : 0;
           const cards = [
-            { label: 'Faol kurslar',        value: String(active),                       icon: BookOpen,     color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-            { label: 'Yakunlangan kurslar', value: String(completed),                    icon: CheckCircle2, color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-            { label: 'Tugatilgan darslar',  value: `${doneLessons}/${totalLessons}`,     icon: PlayCircle,   color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
-            { label: 'Umumiy progress',     value: `${overallPct}%`,                     icon: TrendingUp,   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+            { label: t('student.dashboard.stats.active'),      value: String(active),                   icon: BookOpen,     color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+            { label: t('student.dashboard.stats.completed'),   value: String(completed),                icon: CheckCircle2, color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+            { label: t('student.dashboard.stats.lessonsDone'), value: `${doneLessons}/${totalLessons}`, icon: PlayCircle,   color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
+            { label: t('student.dashboard.stats.overall'),     value: `${overallPct}%`,                 icon: TrendingUp,   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
           ];
           return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14, marginBottom: 28 }}>
@@ -386,15 +391,15 @@ export default function DashboardPage(): React.ReactElement {
           );
         })()}
 
-        {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
-        {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>Ma'lumotlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.</p>}
+        {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+        {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailedBackend')}</p>}
 
         {status === 'ready' && enrollments.length === 0 && (
           <div className="card" style={{ padding: 40, textAlign: 'center' }}>
-            <p style={{ color: '#64748b', fontSize: 14, marginBottom: 20 }}>Siz hali hech qanday kursga yozilmagansiz.</p>
+            <p style={{ color: '#64748b', fontSize: 14, marginBottom: 20 }}>{t('student.dashboard.empty')}</p>
             <Link to="/courses">
               <button className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                Kurslarni ko'rish <ArrowRight size={15} />
+                {t('cabinet.browseCourses')} <ArrowRight size={15} />
               </button>
             </Link>
           </div>

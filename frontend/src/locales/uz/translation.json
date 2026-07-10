@@ -13,7 +13,8 @@
     "all": "Barchasi",
     "free": "Bepul",
     "error": "Xatolik yuz berdi",
-    "loadFailed": "Ma'lumotlarni yuklab bo'lmadi."
+    "loadFailed": "Ma'lumotlarni yuklab bo'lmadi.",
+    "loadFailedBackend": "Ma'lumotlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring."
   },
   "levels": {
     "BEGINNER": "Boshlang'ich",
@@ -337,6 +338,179 @@
       "views": "{{n}} views",
       "readMinutes": "{{n}} daqiqa",
       "continue": "O'qishni davom ettirish"
+    }
+  },
+  "cabinet": {
+    "studentTitle": "Talaba kabineti",
+    "cabinet": "Kabinet",
+    "backToCabinet": "Kabinetga qaytish",
+    "allCourses": "Barcha kurslar",
+    "browseCourses": "Kurslarni ko'rish",
+    "nav": {
+      "dashboard": "Boshqaruv paneli",
+      "sessions": "Jonli darslar",
+      "subscription": "Obuna",
+      "certificates": "Sertifikatlar",
+      "profile": "Profil"
+    }
+  },
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "markAll": "Hammasini o'qilgan qilish",
+    "empty": "Hozircha bildirishnoma yo'q",
+    "timeAgo": {
+      "now": "hozir",
+      "minutes": "{{n}} daq oldin",
+      "hours": "{{n}} soat oldin",
+      "days": "{{n}} kun oldin"
+    }
+  },
+  "upload": {
+    "button": "Yuklash",
+    "error": "Yuklashda xatolik yuz berdi",
+    "imagePlaceholder": "https://... yoki rasm yuklang",
+    "videoPlaceholder": "https://... yoki video yuklang"
+  },
+  "sessions": {
+    "panelTitle": "Jonli darslar",
+    "join": "Darsga qo'shilish",
+    "roomLink": "Xona havolasi",
+    "openRoom": "Xonani ochish",
+    "timeLine": "{{date}}, {{time}} · {{n}} daqiqa",
+    "status": {
+      "SCHEDULED": "Rejalashtirilgan",
+      "LIVE": "Jonli efirda",
+      "ENDED": "Yakunlangan",
+      "CANCELLED": "Bekor qilingan"
+    }
+  },
+  "qa": {
+    "title": "Savol-javob",
+    "placeholder": "Bu dars bo'yicha mentorga savolingiz bormi?",
+    "send": "Yuborish",
+    "sendError": "Savolni yuborib bo'lmadi",
+    "empty": "Bu dars bo'yicha hali savollar yo'q — birinchi bo'lib so'rang.",
+    "mentorAnswer": "Mentor javobi",
+    "awaiting": "Mentor javobi kutilmoqda..."
+  },
+  "payment": {
+    "amount": "To'lov summasi:",
+    "card": "Karta raqami:",
+    "note": "To'lov izohiga ism-familiyangizni yozing, keyin chek rasmini shu yerga yuklang.",
+    "online": "Onlayn to'lash (tezroq):",
+    "redirecting": "Yo'naltirilmoqda...",
+    "payClick": "Click orqali to'lash",
+    "payPayme": "Payme orqali to'lash",
+    "orManual": "...yoki qo'lda o'tkazib, chekni pastda yuklang:",
+    "receiptLabel": "To'lov cheki (rasm)",
+    "sendReceipt": "Chekni yuborish",
+    "sendErrorRetry": "Yuborishda xatolik. Qayta urinib ko'ring."
+  },
+  "student": {
+    "dashboard": {
+      "welcome": "Xush kelibsiz,",
+      "subtitle": "Kurslaringiz va o'quv jarayoningiz shu yerda",
+      "profileSettings": "Profil sozlamalari",
+      "stats": {
+        "active": "Faol kurslar",
+        "completed": "Yakunlangan kurslar",
+        "lessonsDone": "Tugatilgan darslar",
+        "overall": "Umumiy progress"
+      },
+      "empty": "Siz hali hech qanday kursga yozilmagansiz.",
+      "enrollStatus": {
+        "PENDING": "Kutilmoqda",
+        "ACTIVE": "Faol",
+        "COMPLETED": "Yakunlangan",
+        "CANCELLED": "Bekor qilingan"
+      },
+      "enrolledAt": "Yozilgan sana:",
+      "lessonsCount": "{{done}}/{{total}} dars",
+      "continue": "Davom etish",
+      "certificate": "Sertifikat",
+      "editReview": "Sharhni tahrirlash",
+      "leaveReview": "Sharh qoldirish",
+      "resubmit": "Qayta yuborish",
+      "pay": "To'lov qilish",
+      "receiptSent": "Chek yuborildi — administrator tasdiqlashi bilan kurs ochiladi.",
+      "rejectedPrefix": "To'lov rad etildi",
+      "rejectedSuffix": "Iltimos, to'g'ri chekni qayta yuklang.",
+      "rating": "Reyting",
+      "reviewPlaceholder": "Kurs haqida fikringizni yozing...",
+      "saveReview": "Sharhni saqlash",
+      "saveError": "Saqlashda xatolik. Qayta urinib ko'ring."
+    },
+    "profile": {
+      "titleStart": "Profil",
+      "titleAccent": "sozlamalari",
+      "subtitle": "Shaxsiy ma'lumotlar va parolni boshqarish",
+      "emailNotVerified": "Emailingiz hali tasdiqlanmagan",
+      "resendSent": "Tasdiqlash havolasi yuborildi — pochta qutingizni (spamni ham) tekshiring.",
+      "resendHint": "Pochta qutingizga yuborilgan havolani bosing yoki qayta yuborishni so'rang.",
+      "resend": "Qayta yuborish",
+      "personal": "Shaxsiy ma'lumotlar",
+      "saved": "Ma'lumotlar saqlandi",
+      "nameLabel": "Ism",
+      "avatar": "Profil rasmi",
+      "emailLocked": "Email (o'zgartirib bo'lmaydi)",
+      "changePassword": "Parolni o'zgartirish",
+      "passChanged": "Parol muvaffaqiyatli o'zgartirildi",
+      "currentPassword": "Joriy parol",
+      "confirmNewPassword": "Yangi parol (takror)",
+      "mismatch": "Yangi parol takrori mos kelmadi"
+    },
+    "subscription": {
+      "title": "Obuna",
+      "subtitle": "Oylik obuna orqali platformadagi barcha kurslarga kirish oching",
+      "active": "Obuna faol",
+      "accessOpen": "Barcha kurslarga kirish ochiq.",
+      "accessOpenUntil": "Barcha kurslarga kirish ochiq — {{date}} sanagacha amal qiladi.",
+      "receiptSent": "Chek yuborildi — administrator tasdiqlashi bilan obuna faollashadi.",
+      "rejectedPrefix": "Oldingi to'lov rad etildi",
+      "rejectedSuffix": "Qaytadan urinib ko'ring.",
+      "expired": "Obuna muddati tugagan — davom etish uchun yangilang.",
+      "perMonth": "/ oy",
+      "fullAccess": "Barcha kurslarga to'liq kirish — cheklovsiz.",
+      "starting": "Boshlanmoqda...",
+      "subscribe": "Obuna bo'lish"
+    },
+    "learn": {
+      "forbiddenTitle": "Kirish yopiq",
+      "forbiddenSub": "Bu kursni ko'rish uchun avval yozilishingiz kerak.",
+      "toCourse": "Kurs sahifasiga o'tish",
+      "congrats": "Tabriklaymiz! Siz bu kursni to'liq yakunladingiz. 🎉",
+      "noLessons": "Bu kursga hali darslar qo'shilmagan. Tez orada kontent paydo bo'ladi.",
+      "selectLesson": "Darsni tanlang.",
+      "noDuration": "Davomiylik ko'rsatilmagan",
+      "noVideo": "Bu dars uchun video hali yuklanmagan.",
+      "noContent": "Bu dars uchun kontent hali qo'shilmagan.",
+      "lessonDone": "Dars yakunlangan",
+      "unmark": "Belgini olib tashlash",
+      "markDone": "Darsni yakunladim"
+    },
+    "sessions": {
+      "titleStart": "Jonli",
+      "titleAccent": "darslar",
+      "subtitle": "Siz yozilgan kurslar bo'yicha rejalashtirilgan onlayn darslar",
+      "empty": "Hozircha rejalashtirilgan jonli darslar yo'q. Kursga yozilsangiz, mentorlaringiz e'lon qilgan darslar shu yerda ko'rinadi."
+    },
+    "certificates": {
+      "titleStart": "Sertifikat",
+      "titleAccent": "lar",
+      "subtitle": "Yakunlangan kurslaringiz uchun rasmiy sertifikatlar",
+      "downloadError": "Sertifikatni yuklab bo'lmadi. Qayta urinib ko'ring.",
+      "empty": "Hozircha sertifikatlaringiz yo'q. Kursni to'liq yakunlaganingizda sertifikat shu yerda paydo bo'ladi.",
+      "backToCourses": "Kurslarimga qaytish",
+      "completed": "Kurs yakunlangan",
+      "downloading": "Tayyorlanmoqda...",
+      "download": "Sertifikatni yuklab olish"
+    },
+    "live": {
+      "noAccess": "Kirish huquqi yo'q",
+      "participant": "Ishtirokchi",
+      "externalInfo": "Bu dars tashqi platformada ({{host}}) o'tkaziladi.",
+      "ended": "Bu jonli dars yakunlangan.",
+      "cancelled": "Bu jonli dars bekor qilingan."
     }
   }
 }

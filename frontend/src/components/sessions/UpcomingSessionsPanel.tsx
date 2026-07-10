@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Video, Radio } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LiveSession, getMySessions } from '../../api/sessions';
 import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
 
 // Talaba kabinetida yaqinlashayotgan jonli darslar ro'yxati
 export default function UpcomingSessionsPanel(): React.ReactElement | null {
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState<LiveSession[]>([]);
   const [loaded, setLoaded]     = useState<boolean>(false);
 
@@ -22,7 +24,7 @@ export default function UpcomingSessionsPanel(): React.ReactElement | null {
   return (
     <div style={{ marginBottom: 28 }}>
       <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Video size={17} style={{ color: '#9333ea' }} /> Jonli darslar
+        <Video size={17} style={{ color: '#9333ea' }} /> {t('sessions.panelTitle')}
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {sessions.map((s) => {
@@ -44,11 +46,11 @@ export default function UpcomingSessionsPanel(): React.ReactElement | null {
                 {s.description && <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>{s.description}</p>}
               </div>
               <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>
-                {meta.label}
+                {t(meta.labelKey)}
               </span>
               <Link to={`/live/${s.id}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
                 <button className={isLive ? 'btn-primary' : 'btn-outline'} style={{ fontSize: 12.5, padding: '9px 16px' }}>
-                  <Video size={14} /> {isLive ? "Darsga qo'shilish" : 'Xonani ochish'}
+                  <Video size={14} /> {isLive ? t('sessions.join') : t('sessions.openRoom')}
                 </button>
               </Link>
             </div>

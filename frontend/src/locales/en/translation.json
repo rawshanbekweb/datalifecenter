@@ -13,7 +13,8 @@
     "all": "All",
     "free": "Free",
     "error": "Something went wrong",
-    "loadFailed": "Failed to load data."
+    "loadFailed": "Failed to load data.",
+    "loadFailedBackend": "Failed to load data. Check that the backend is running."
   },
   "levels": {
     "BEGINNER": "Beginner",
@@ -337,6 +338,179 @@
       "views": "{{n}} views",
       "readMinutes": "{{n}} min",
       "continue": "Continue reading"
+    }
+  },
+  "cabinet": {
+    "studentTitle": "Student dashboard",
+    "cabinet": "Dashboard",
+    "backToCabinet": "Back to dashboard",
+    "allCourses": "All courses",
+    "browseCourses": "Browse courses",
+    "nav": {
+      "dashboard": "Overview",
+      "sessions": "Live lessons",
+      "subscription": "Subscription",
+      "certificates": "Certificates",
+      "profile": "Profile"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAll": "Mark all as read",
+    "empty": "No notifications yet",
+    "timeAgo": {
+      "now": "just now",
+      "minutes": "{{n}} min ago",
+      "hours": "{{n}} h ago",
+      "days": "{{n}} d ago"
+    }
+  },
+  "upload": {
+    "button": "Upload",
+    "error": "Upload failed",
+    "imagePlaceholder": "https://... or upload an image",
+    "videoPlaceholder": "https://... or upload a video"
+  },
+  "sessions": {
+    "panelTitle": "Live lessons",
+    "join": "Join the lesson",
+    "roomLink": "Room link",
+    "openRoom": "Open room",
+    "timeLine": "{{date}}, {{time}} · {{n}} min",
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "LIVE": "Live now",
+      "ENDED": "Ended",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "qa": {
+    "title": "Q&A",
+    "placeholder": "Have a question for the mentor about this lesson?",
+    "send": "Send",
+    "sendError": "Failed to send the question",
+    "empty": "No questions about this lesson yet — be the first to ask.",
+    "mentorAnswer": "Mentor's answer",
+    "awaiting": "Waiting for the mentor's answer..."
+  },
+  "payment": {
+    "amount": "Payment amount:",
+    "card": "Card number:",
+    "note": "Include your full name in the payment note, then upload a photo of the receipt here.",
+    "online": "Pay online (faster):",
+    "redirecting": "Redirecting...",
+    "payClick": "Pay with Click",
+    "payPayme": "Pay with Payme",
+    "orManual": "...or transfer manually and upload the receipt below:",
+    "receiptLabel": "Payment receipt (image)",
+    "sendReceipt": "Submit receipt",
+    "sendErrorRetry": "Failed to send. Please try again."
+  },
+  "student": {
+    "dashboard": {
+      "welcome": "Welcome,",
+      "subtitle": "Your courses and learning progress live here",
+      "profileSettings": "Profile settings",
+      "stats": {
+        "active": "Active courses",
+        "completed": "Completed courses",
+        "lessonsDone": "Lessons completed",
+        "overall": "Overall progress"
+      },
+      "empty": "You are not enrolled in any course yet.",
+      "enrollStatus": {
+        "PENDING": "Pending",
+        "ACTIVE": "Active",
+        "COMPLETED": "Completed",
+        "CANCELLED": "Cancelled"
+      },
+      "enrolledAt": "Enrolled on:",
+      "lessonsCount": "{{done}}/{{total}} lessons",
+      "continue": "Continue",
+      "certificate": "Certificate",
+      "editReview": "Edit review",
+      "leaveReview": "Leave a review",
+      "resubmit": "Resubmit",
+      "pay": "Pay",
+      "receiptSent": "Receipt sent — the course opens once an administrator confirms it.",
+      "rejectedPrefix": "Payment rejected",
+      "rejectedSuffix": "Please upload a valid receipt again.",
+      "rating": "Rating",
+      "reviewPlaceholder": "Share your thoughts about the course...",
+      "saveReview": "Save review",
+      "saveError": "Failed to save. Please try again."
+    },
+    "profile": {
+      "titleStart": "Profile",
+      "titleAccent": "settings",
+      "subtitle": "Manage your personal details and password",
+      "emailNotVerified": "Your email is not verified yet",
+      "resendSent": "Verification link sent — check your inbox (and spam folder).",
+      "resendHint": "Click the link sent to your inbox or request a new one.",
+      "resend": "Resend",
+      "personal": "Personal details",
+      "saved": "Details saved",
+      "nameLabel": "Name",
+      "avatar": "Profile photo",
+      "emailLocked": "Email (cannot be changed)",
+      "changePassword": "Change password",
+      "passChanged": "Password changed successfully",
+      "currentPassword": "Current password",
+      "confirmNewPassword": "New password (repeat)",
+      "mismatch": "New passwords do not match"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Unlock every course on the platform with a monthly subscription",
+      "active": "Subscription active",
+      "accessOpen": "Access to all courses is open.",
+      "accessOpenUntil": "Access to all courses is open — valid until {{date}}.",
+      "receiptSent": "Receipt sent — the subscription activates once an administrator confirms it.",
+      "rejectedPrefix": "The previous payment was rejected",
+      "rejectedSuffix": "Please try again.",
+      "expired": "Your subscription has expired — renew to continue.",
+      "perMonth": "/ month",
+      "fullAccess": "Full access to all courses — no limits.",
+      "starting": "Starting...",
+      "subscribe": "Subscribe"
+    },
+    "learn": {
+      "forbiddenTitle": "Access restricted",
+      "forbiddenSub": "You need to enroll before you can view this course.",
+      "toCourse": "Go to course page",
+      "congrats": "Congratulations! You have fully completed this course. 🎉",
+      "noLessons": "No lessons have been added to this course yet. Content is coming soon.",
+      "selectLesson": "Select a lesson.",
+      "noDuration": "Duration not specified",
+      "noVideo": "The video for this lesson has not been uploaded yet.",
+      "noContent": "Content for this lesson has not been added yet.",
+      "lessonDone": "Lesson completed",
+      "unmark": "Remove the mark",
+      "markDone": "Mark lesson as done"
+    },
+    "sessions": {
+      "titleStart": "Live",
+      "titleAccent": "lessons",
+      "subtitle": "Scheduled online lessons for the courses you are enrolled in",
+      "empty": "No live lessons are scheduled yet. Enroll in a course and lessons announced by your mentors will appear here."
+    },
+    "certificates": {
+      "titleStart": "My ",
+      "titleAccent": "certificates",
+      "subtitle": "Official certificates for your completed courses",
+      "downloadError": "Failed to download the certificate. Please try again.",
+      "empty": "You have no certificates yet. A certificate appears here once you fully complete a course.",
+      "backToCourses": "Back to my courses",
+      "completed": "Course completed",
+      "downloading": "Preparing...",
+      "download": "Download certificate"
+    },
+    "live": {
+      "noAccess": "No access",
+      "participant": "Participant",
+      "externalInfo": "This lesson is held on an external platform ({{host}}).",
+      "ended": "This live lesson has ended.",
+      "cancelled": "This live lesson was cancelled."
     }
   }
 }

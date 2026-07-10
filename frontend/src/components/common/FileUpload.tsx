@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Upload, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { uploadFile } from '../../api/uploads';
 
 interface FileUploadProps {
@@ -19,6 +20,7 @@ const ACCEPT: Record<FileUploadProps['kind'], string> = {
 // URL kiritish + kompyuterdan yuklash birlashtirilgan maydon.
 // Yuklangandan keyin URL avtomatik to'ldiriladi.
 export default function FileUpload({ value, onChange, kind, label, required, placeholder }: FileUploadProps): React.ReactElement {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError]       = useState<string>('');
@@ -34,7 +36,7 @@ export default function FileUpload({ value, onChange, kind, label, required, pla
       onChange(result.url);
       setDone(true);
     } catch (err: unknown) {
-      setError((err as Error).message || 'Yuklashda xatolik yuz berdi');
+      setError((err as Error).message || t('upload.error'));
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = '';
@@ -53,13 +55,13 @@ export default function FileUpload({ value, onChange, kind, label, required, pla
         )}
         <input className="inp" value={value} required={required} disabled={uploading}
           onChange={(e) => { onChange(e.target.value); setDone(false); }}
-          placeholder={placeholder || (kind === 'image' ? 'https://... yoki rasm yuklang' : 'https://... yoki video yuklang')}
+          placeholder={placeholder || (kind === 'image' ? t('upload.imagePlaceholder') : t('upload.videoPlaceholder'))}
           style={{ flex:1, minWidth:0 }} />
         <button type="button" className="btn-outline" disabled={uploading}
           onClick={() => inputRef.current?.click()}
           style={{ fontSize:12, padding:'9px 13px', flexShrink:0, whiteSpace:'nowrap', opacity: uploading ? 0.6 : 1 }}>
           {done ? <CheckCircle2 size={13} style={{ color:'#16a34a' }} /> : <Upload size={13} />}
-          {uploading ? `${progress}%` : 'Yuklash'}
+          {uploading ? `${progress}%` : t('upload.button')}
         </button>
         <input ref={inputRef} type="file" accept={ACCEPT[kind]} style={{ display:'none' }}
           onChange={(e) => pick(e.target.files?.[0])} />

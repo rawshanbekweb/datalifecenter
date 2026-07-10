@@ -9,6 +9,7 @@ import {
   getManagedSessions,
   updateSession,
 } from '../../api/sessions';
+import i18n from '../../i18n/i18n';
 import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
 import LocalizedField from '../admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
@@ -215,7 +216,7 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
                   {s.targetStudentIds.length > 0 ? `${s.targetStudentIds.length} ta o'quvchi uchun` : 'Hammaga ochiq'}
                 </p>
               </div>
-              <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>{meta.label}</span>
+              <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>{i18n.t(meta.labelKey)}</span>
               <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                 <Link to={`/live/${s.id}`} title="Xonaga kirish (saytda)"
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 9, background: '#f0f9ff', border: '1.5px solid #bae6fd', color: '#0ea5e9' }}>

@@ -13,7 +13,8 @@
     "all": "Barlıǵı",
     "free": "Biypul",
     "error": "Qátelik júz berdi",
-    "loadFailed": "Maǵlıwmatlardı júklep bolmadı."
+    "loadFailed": "Maǵlıwmatlardı júklep bolmadı.",
+    "loadFailedBackend": "Maǵlıwmatlardı júklep bolmadı. Backend iske túsirilgenin tekseriń."
   },
   "levels": {
     "BEGINNER": "Baslanǵısh",
@@ -337,6 +338,179 @@
       "views": "{{n}} kóriw",
       "readMinutes": "{{n}} minut",
       "continue": "Oqıwdı dawam ettiriw"
+    }
+  },
+  "cabinet": {
+    "studentTitle": "Student kabineti",
+    "cabinet": "Kabinet",
+    "backToCabinet": "Kabinetke qaytıw",
+    "allCourses": "Barlıq kurslar",
+    "browseCourses": "Kurslardı kóriw",
+    "nav": {
+      "dashboard": "Basqarıw paneli",
+      "sessions": "Janlı sabaqlar",
+      "subscription": "Jazılım",
+      "certificates": "Sertifikatlar",
+      "profile": "Profil"
+    }
+  },
+  "notifications": {
+    "title": "Bildiriwler",
+    "markAll": "Barlıǵın oqılǵan dep belgilew",
+    "empty": "Házirshe bildiriw joq",
+    "timeAgo": {
+      "now": "házir",
+      "minutes": "{{n}} min burın",
+      "hours": "{{n}} saat burın",
+      "days": "{{n}} kún burın"
+    }
+  },
+  "upload": {
+    "button": "Júklew",
+    "error": "Júklewde qátelik júz berdi",
+    "imagePlaceholder": "https://... yamasa súwret júkleń",
+    "videoPlaceholder": "https://... yamasa video júkleń"
+  },
+  "sessions": {
+    "panelTitle": "Janlı sabaqlar",
+    "join": "Sabaqqa qosılıw",
+    "roomLink": "Bólme siltemesi",
+    "openRoom": "Bólmeni ashıw",
+    "timeLine": "{{date}}, {{time}} · {{n}} minut",
+    "status": {
+      "SCHEDULED": "Rejelestirilgen",
+      "LIVE": "Janlı efirde",
+      "ENDED": "Tamamlanǵan",
+      "CANCELLED": "Biykar etilgen"
+    }
+  },
+  "qa": {
+    "title": "Soraw-juwap",
+    "placeholder": "Bul sabaq boyınsha mentorǵa sorawıńız bar ma?",
+    "send": "Jiberiw",
+    "sendError": "Sorawdı jiberip bolmadı",
+    "empty": "Bul sabaq boyınsha ele sorawlar joq — birinshi bolıp sorań.",
+    "mentorAnswer": "Mentor juwabı",
+    "awaiting": "Mentor juwabı kútilip atır..."
+  },
+  "payment": {
+    "amount": "Tólem summası:",
+    "card": "Karta nomeri:",
+    "note": "Tólem izahına atı-familiyańızdı jazıń, keyin chek súwretin usı jerge júkleń.",
+    "online": "Onlayn tólew (tezirek):",
+    "redirecting": "Baǵdarlanıp atır...",
+    "payClick": "Click arqalı tólew",
+    "payPayme": "Payme arqalı tólew",
+    "orManual": "...yamasa qolda ótkerip, chekti tómende júkleń:",
+    "receiptLabel": "Tólem chegi (súwret)",
+    "sendReceipt": "Chekti jiberiw",
+    "sendErrorRetry": "Jiberiwde qátelik. Qayta urınıp kóriń."
+  },
+  "student": {
+    "dashboard": {
+      "welcome": "Xosh kelipsiz,",
+      "subtitle": "Kurslarıńız hám oqıw procesińiz usı jerde",
+      "profileSettings": "Profil sazlamaları",
+      "stats": {
+        "active": "Aktiv kurslar",
+        "completed": "Tamamlanǵan kurslar",
+        "lessonsDone": "Tamamlanǵan sabaqlar",
+        "overall": "Ulıwma progress"
+      },
+      "empty": "Siz ele hesh qanday kursqa jazılmaǵansız.",
+      "enrollStatus": {
+        "PENDING": "Kútilip atır",
+        "ACTIVE": "Aktiv",
+        "COMPLETED": "Tamamlanǵan",
+        "CANCELLED": "Biykar etilgen"
+      },
+      "enrolledAt": "Jazılǵan sáne:",
+      "lessonsCount": "{{done}}/{{total}} sabaq",
+      "continue": "Dawam etiw",
+      "certificate": "Sertifikat",
+      "editReview": "Pikirdi ózgertiw",
+      "leaveReview": "Pikir qaldırıw",
+      "resubmit": "Qayta jiberiw",
+      "pay": "Tólew",
+      "receiptSent": "Chek jiberildi — administrator tastıyıqlawı menen kurs ashıladı.",
+      "rejectedPrefix": "Tólem qabıl etilmedi",
+      "rejectedSuffix": "Ótinish, durıs chekti qayta júkleń.",
+      "rating": "Reyting",
+      "reviewPlaceholder": "Kurs haqqında pikirińizdi jazıń...",
+      "saveReview": "Pikirdi saqlaw",
+      "saveError": "Saqlawda qátelik. Qayta urınıp kóriń."
+    },
+    "profile": {
+      "titleStart": "Profil",
+      "titleAccent": "sazlamaları",
+      "subtitle": "Jeke maǵlıwmatlar hám paroldı basqarıw",
+      "emailNotVerified": "Emailıńız ele tastıyıqlanbaǵan",
+      "resendSent": "Tastıyıqlaw siltemesi jiberildi — pochta qutıńızdı (spamdı da) tekseriń.",
+      "resendHint": "Pochta qutıńızǵa jiberilgen siltemeni basıń yamasa qayta jiberiwdi sorań.",
+      "resend": "Qayta jiberiw",
+      "personal": "Jeke maǵlıwmatlar",
+      "saved": "Maǵlıwmatlar saqlandı",
+      "nameLabel": "Atı",
+      "avatar": "Profil súwreti",
+      "emailLocked": "Email (ózgertip bolmaydı)",
+      "changePassword": "Paroldı ózgertiw",
+      "passChanged": "Parol tabıslı ózgertildi",
+      "currentPassword": "Házirgi parol",
+      "confirmNewPassword": "Jańa parol (qayta)",
+      "mismatch": "Jańa parol qaytalawı sáykes kelmedi"
+    },
+    "subscription": {
+      "title": "Jazılım",
+      "subtitle": "Aylıq jazılım arqalı platformadaǵı barlıq kurslarǵa kiriwdi ashıń",
+      "active": "Jazılım aktiv",
+      "accessOpen": "Barlıq kurslarǵa kiriw ashıq.",
+      "accessOpenUntil": "Barlıq kurslarǵa kiriw ashıq — {{date}} sánesine shekem kúshke iye.",
+      "receiptSent": "Chek jiberildi — administrator tastıyıqlawı menen jazılım aktivlesedi.",
+      "rejectedPrefix": "Aldınǵı tólem qabıl etilmedi",
+      "rejectedSuffix": "Qaytadan urınıp kóriń.",
+      "expired": "Jazılım múddeti tamamlanǵan — dawam etiw ushın jańalań.",
+      "perMonth": "/ ay",
+      "fullAccess": "Barlıq kurslarǵa tolıq kiriw — sheklewsiz.",
+      "starting": "Baslanıp atır...",
+      "subscribe": "Jazılıw"
+    },
+    "learn": {
+      "forbiddenTitle": "Kiriw jabıq",
+      "forbiddenSub": "Bul kurstı kóriw ushın aldın jazılıwıńız kerek.",
+      "toCourse": "Kurs betine ótiw",
+      "congrats": "Qutlıqlaymız! Siz bul kurstı tolıq tamamladıńız. 🎉",
+      "noLessons": "Bul kursqa ele sabaqlar qosılmaǵan. Jaqın arada kontent payda boladı.",
+      "selectLesson": "Sabaqtı tańlań.",
+      "noDuration": "Dawamlılıq kórsetilmegen",
+      "noVideo": "Bul sabaq ushın video ele júklenbegen.",
+      "noContent": "Bul sabaq ushın kontent ele qosılmaǵan.",
+      "lessonDone": "Sabaq tamamlanǵan",
+      "unmark": "Belgini alıp taslaw",
+      "markDone": "Sabaqtı tamamladım"
+    },
+    "sessions": {
+      "titleStart": "Janlı",
+      "titleAccent": "sabaqlar",
+      "subtitle": "Siz jazılǵan kurslar boyınsha rejelestirilgen onlayn sabaqlar",
+      "empty": "Házirshe rejelestirilgen janlı sabaqlar joq. Kursqa jazılsańız, mentorlarıńız daǵaza etken sabaqlar usı jerde kórinedi."
+    },
+    "certificates": {
+      "titleStart": "Sertifikat",
+      "titleAccent": "lar",
+      "subtitle": "Tamamlanǵan kurslarıńız ushın rásmiy sertifikatlar",
+      "downloadError": "Sertifikattı júklep bolmadı. Qayta urınıp kóriń.",
+      "empty": "Házirshe sertifikatlarıńız joq. Kurstı tolıq tamamlaǵanıńızda sertifikat usı jerde payda boladı.",
+      "backToCourses": "Kurslarıma qaytıw",
+      "completed": "Kurs tamamlanǵan",
+      "downloading": "Tayarlanıp atır...",
+      "download": "Sertifikattı júklep alıw"
+    },
+    "live": {
+      "noAccess": "Kiriw huqıqı joq",
+      "participant": "Qatnasıwshı",
+      "externalInfo": "Bul sabaq sırtqı platformada ({{host}}) ótkeriledi.",
+      "ended": "Bul janlı sabaq tamamlanǵan.",
+      "cancelled": "Bul janlı sabaq biykar etilgen."
     }
   }
 }

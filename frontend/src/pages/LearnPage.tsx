@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, PlayCircle, FileText, HelpCircle, ClipboardList, ChevronDown, ChevronRight, Clock, CheckCircle, Trophy } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getCourseLearn } from '../api/courses';
 import { completeLesson, uncompleteLesson } from '../api/progress';
 import ComingSoon from '../components/common/ComingSoon';
@@ -72,6 +73,7 @@ function toEmbedUrl(url: string): string | null {
 }
 
 export default function LearnPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [course, setCourse]           = useState<LearnCourse | null>(null);
   const [status, setStatus]           = useState<'loading' | 'ready' | 'forbidden' | 'not-found' | 'error'>('loading');
@@ -129,24 +131,24 @@ export default function LearnPage(): React.ReactElement {
   }, [course, activeLessonId]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</section>;
+    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
   }
   if (status === 'forbidden') {
     return (
       <section style={{ padding:'200px 24px 120px', textAlign:'center' }}>
-        <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:10 }}>Kirish yopiq</h1>
-        <p style={{ fontSize:14, color:'#64748b', marginBottom:24 }}>{errorMsg || "Bu kursni ko'rish uchun avval yozilishingiz kerak."}</p>
+        <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:10 }}>{t('student.learn.forbiddenTitle')}</h1>
+        <p style={{ fontSize:14, color:'#64748b', marginBottom:24 }}>{errorMsg || t('student.learn.forbiddenSub')}</p>
         <Link to={`/courses/${slug}`}>
-          <button className="btn-primary">Kurs sahifasiga o'tish</button>
+          <button className="btn-primary">{t('student.learn.toCourse')}</button>
         </Link>
       </section>
     );
   }
   if (status === 'not-found' || (status === 'ready' && !course)) {
-    return <ComingSoon title="Kurs topilmadi" sub="Siz qidirgan kurs mavjud emas yoki o'chirilgan." />;
+    return <ComingSoon title={t('pages.courseDetail.notFoundTitle')} sub={t('pages.courseDetail.notFoundSub')} />;
   }
   if (status === 'error' || !course) {
-    return <ComingSoon title="Xatolik yuz berdi" sub="Kursni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring." />;
+    return <ComingSoon title={t('common.error')} sub={t('pages.courseDetail.errorSub')} />;
   }
 
   const embedUrl = activeLesson?.videoUrl ? toEmbedUrl(activeLesson.videoUrl) : null;
@@ -167,7 +169,7 @@ export default function LearnPage(): React.ReactElement {
       );
       setCourseCompleted(summary.courseCompleted);
     } catch (err: unknown) {
-      alert((err as Error).message || 'Xatolik yuz berdi');
+      alert((err as Error).message || t('common.error'));
     } finally {
       setMarking(false);
     }
@@ -178,12 +180,12 @@ export default function LearnPage(): React.ReactElement {
       <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:14, flexWrap:'wrap', marginBottom:14 }}>
           <Link to="/student" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none' }}>
-            <ArrowLeft size={14}/> Kabinet
+            <ArrowLeft size={14}/> {t('cabinet.cabinet')}
           </Link>
           <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(18px,2.4vw,24px)', fontWeight:800, color:'#0f172a', flex:1, minWidth:200 }}>
             {course.title}
           </h1>
-          {course.mentor && <span className="tag" style={{ borderColor:course.border, color:course.color, fontWeight:700 }}>Mentor: {course.mentor.name}</span>}
+          {course.mentor && <span className="tag" style={{ borderColor:course.border, color:course.color, fontWeight:700 }}>{t('pages.courseDetail.mentor')}: {course.mentor.name}</span>}
         </div>
 
         {totalLessons > 0 && hasEnrollment && (
@@ -191,20 +193,20 @@ export default function LearnPage(): React.ReactElement {
             <div style={{ flex:1, height:8, borderRadius:99, background:'#e2e8f0', overflow:'hidden' }}>
               <div style={{ width:`${progressPct}%`, height:'100%', borderRadius:99, background: courseCompleted ? '#16a34a' : course.color, transition:'width 0.3s' }} />
             </div>
-            <span style={{ fontSize:12.5, fontWeight:700, color:'#475569', flexShrink:0 }}>{completedCount}/{totalLessons} dars · {progressPct}%</span>
+            <span style={{ fontSize:12.5, fontWeight:700, color:'#475569', flexShrink:0 }}>{t('student.dashboard.lessonsCount', { done: completedCount, total: totalLessons })} · {progressPct}%</span>
           </div>
         )}
 
         {courseCompleted && (
           <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 18px', borderRadius:14, background:'#f0fdf4', border:'1.5px solid #bbf7d0', marginBottom:20 }}>
             <Trophy size={20} style={{ color:'#16a34a', flexShrink:0 }} />
-            <p style={{ fontSize:13.5, color:'#16a34a', fontWeight:700 }}>Tabriklaymiz! Siz bu kursni to'liq yakunladingiz. 🎉</p>
+            <p style={{ fontSize:13.5, color:'#16a34a', fontWeight:700 }}>{t('student.learn.congrats')}</p>
           </div>
         )}
 
         {course.modules.length === 0 && (
           <div className="card" style={{ padding:40, textAlign:'center' }}>
-            <p style={{ color:'#64748b', fontSize:14 }}>Bu kursga hali darslar qo'shilmagan. Tez orada kontent paydo bo'ladi.</p>
+            <p style={{ color:'#64748b', fontSize:14 }}>{t('student.learn.noLessons')}</p>
           </div>
         )}
 
@@ -251,12 +253,12 @@ export default function LearnPage(): React.ReactElement {
 
             {/* Dars kontenti */}
             <div className="card" style={{ padding:24, minHeight:400 }}>
-              {!activeLesson && <p style={{ color:'#94a3b8', fontSize:14 }}>Darsni tanlang.</p>}
+              {!activeLesson && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('student.learn.selectLesson')}</p>}
               {activeLesson && (
                 <div>
                   <h2 style={{ fontFamily:'Outfit,sans-serif', fontSize:20, fontWeight:800, color:'#0f172a', marginBottom:6 }}>{activeLesson.title}</h2>
                   <p style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#94a3b8', marginBottom:18 }}>
-                    <Clock size={12}/> {activeLesson.durationMinutes ? `${activeLesson.durationMinutes} daqiqa` : 'Davomiylik ko\'rsatilmagan'}
+                    <Clock size={12}/> {activeLesson.durationMinutes ? t('pages.blogDetail.readMinutes', { n: activeLesson.durationMinutes }) : t('student.learn.noDuration')}
                   </p>
 
                   {activeLesson.contentType === 'VIDEO' && embedUrl && isDirectVideo(embedUrl) && (
@@ -275,7 +277,7 @@ export default function LearnPage(): React.ReactElement {
                   {activeLesson.contentType === 'VIDEO' && !embedUrl && (
                     <div style={{ padding:'40px 20px', borderRadius:14, background:'#f8fafc', border:'1.5px dashed #cbd5e1', textAlign:'center', marginBottom:18 }}>
                       <PlayCircle size={28} style={{ color:'#94a3b8', margin:'0 auto 10px' }} />
-                      <p style={{ fontSize:13, color:'#64748b' }}>Bu dars uchun video hali yuklanmagan.</p>
+                      <p style={{ fontSize:13, color:'#64748b' }}>{t('student.learn.noVideo')}</p>
                     </div>
                   )}
 
@@ -283,7 +285,7 @@ export default function LearnPage(): React.ReactElement {
                     <div style={{ fontSize:14, color:'#334155', lineHeight:1.9, whiteSpace:'pre-wrap' }}>{activeLesson.content}</div>
                   )}
                   {!activeLesson.content && activeLesson.contentType !== 'VIDEO' && (
-                    <p style={{ fontSize:13, color:'#94a3b8' }}>Bu dars uchun kontent hali qo'shilmagan.</p>
+                    <p style={{ fontSize:13, color:'#94a3b8' }}>{t('student.learn.noContent')}</p>
                   )}
 
                   {hasEnrollment && (
@@ -291,17 +293,17 @@ export default function LearnPage(): React.ReactElement {
                       {isActiveCompleted ? (
                         <>
                           <span style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, fontWeight:700, color:'#16a34a' }}>
-                            <CheckCircle size={16}/> Dars yakunlangan
+                            <CheckCircle size={16}/> {t('student.learn.lessonDone')}
                           </span>
                           <button onClick={toggleComplete} disabled={marking} className="btn-outline"
                             style={{ fontSize:12, padding:'8px 14px', opacity: marking ? 0.6 : 1 }}>
-                            Belgini olib tashlash
+                            {t('student.learn.unmark')}
                           </button>
                         </>
                       ) : (
                         <button onClick={toggleComplete} disabled={marking} className="btn-primary"
                           style={{ fontSize:13, opacity: marking ? 0.6 : 1 }}>
-                          <CheckCircle size={15}/> {marking ? 'Saqlanmoqda...' : 'Darsni yakunladim'}
+                          <CheckCircle size={15}/> {marking ? t('common.saving') : t('student.learn.markDone')}
                         </button>
                       )}
                     </div>

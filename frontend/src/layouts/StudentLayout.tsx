@@ -3,27 +3,29 @@ import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   to: string;
   icon: React.ComponentType<{ size?: number | string }>;
   end?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Boshqaruv paneli', to: '/student',              icon: LayoutDashboard, end: true },
-  { label: 'Jonli darslar',    to: '/student/sessions',     icon: Video },
-  { label: 'Obuna',            to: '/student/subscription', icon: Wallet },
-  { label: 'Sertifikatlar',    to: '/student/certificates', icon: Award },
-  { label: 'Profil',           to: '/student/profile',      icon: UserRound },
+  { labelKey: 'cabinet.nav.dashboard',     to: '/student',              icon: LayoutDashboard, end: true },
+  { labelKey: 'cabinet.nav.sessions',      to: '/student/sessions',     icon: Video },
+  { labelKey: 'cabinet.nav.subscription',  to: '/student/subscription', icon: Wallet },
+  { labelKey: 'cabinet.nav.certificates',  to: '/student/certificates', icon: Award },
+  { labelKey: 'cabinet.nav.profile',       to: '/student/profile',      icon: UserRound },
 ];
 
 // Admin/mentor panel shell'ining talaba varianti — moviy aksent bilan
 export default function StudentLayout(): React.ReactElement {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -44,7 +46,7 @@ export default function StudentLayout(): React.ReactElement {
         <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:34, height:34, borderRadius:10, objectFit:'cover', flexShrink:0 }} />
         <div>
           <p style={{ fontFamily:'Outfit,sans-serif', fontSize:15, fontWeight:800, color:'#f8fafc', lineHeight:1.1 }}>DATA LIFE</p>
-          <p style={{ fontSize:10, fontWeight:700, color:'#38bdf8', textTransform:'uppercase', letterSpacing:'0.08em' }}>Talaba kabineti</p>
+          <p style={{ fontSize:10, fontWeight:700, color:'#38bdf8', textTransform:'uppercase', letterSpacing:'0.08em' }}>{t('cabinet.studentTitle')}</p>
         </div>
       </Link>
 
@@ -60,7 +62,7 @@ export default function StudentLayout(): React.ReactElement {
                 background: isActive ? 'rgba(14,165,233,0.22)' : 'transparent',
                 borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
               })}>
-              <Icon size={16} /> {item.label}
+              <Icon size={16} /> {t(item.labelKey)}
             </NavLink>
           );
         })}
@@ -68,11 +70,11 @@ export default function StudentLayout(): React.ReactElement {
 
       <div style={{ padding:'14px 12px', borderTop:'1px solid #1e293b', display:'flex', flexDirection:'column', gap:2 }}>
         <Link to="/courses" style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#94a3b8', textDecoration:'none' }}>
-          <Globe size={16} /> Barcha kurslar
+          <Globe size={16} /> {t('cabinet.allCourses')}
         </Link>
         <button onClick={handleLogout}
           style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#f87171', background:'transparent', border:'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
-          <LogOut size={16} /> Chiqish
+          <LogOut size={16} /> {t('nav.logout')}
         </button>
       </div>
     </>
@@ -103,7 +105,7 @@ export default function StudentLayout(): React.ReactElement {
             style={{ display:'none', width:36, height:36, borderRadius:9, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', alignItems:'center', justifyContent:'center', color:'#475569' }}>
             {menuOpen ? <X size={17}/> : <Menu size={17}/>}
           </button>
-          <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>Talaba kabineti</p>
+          <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>{t('cabinet.studentTitle')}</p>
           <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
             <LanguageSwitcher />
             <NotificationBell />

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n/i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { getMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from '../../api/notifications';
 
@@ -9,15 +11,16 @@ const POLL_MS = 45000;
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diffMs / 60000);
-  if (min < 1) return 'hozir';
-  if (min < 60) return `${min} daq oldin`;
+  if (min < 1) return i18n.t('notifications.timeAgo.now');
+  if (min < 60) return i18n.t('notifications.timeAgo.minutes', { n: min });
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} soat oldin`;
+  if (hr < 24) return i18n.t('notifications.timeAgo.hours', { n: hr });
   const day = Math.floor(hr / 24);
-  return `${day} kun oldin`;
+  return i18n.t('notifications.timeAgo.days', { n: day });
 }
 
 export default function NotificationBell(): React.ReactElement | null {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState<AppNotification[]>([]);
@@ -66,7 +69,7 @@ export default function NotificationBell(): React.ReactElement | null {
 
   return (
     <div ref={boxRef} style={{ position: 'relative' }}>
-      <button onClick={() => setOpen((v) => !v)} title="Bildirishnomalar"
+      <button onClick={() => setOpen((v) => !v)} title={t('notifications.title')}
         style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, background: '#f1f5f9', border: '1.5px solid #e2e8f0', color: '#475569', cursor: 'pointer' }}>
         <Bell size={16} />
         {unreadCount > 0 && (
@@ -79,17 +82,17 @@ export default function NotificationBell(): React.ReactElement | null {
       {open && (
         <div style={{ position: 'absolute', top: 44, right: 0, width: 340, maxWidth: '90vw', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', zIndex: 200, overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid #f1f5f9' }}>
-            <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>Bildirishnomalar</p>
+            <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>{t('notifications.title')}</p>
             {unreadCount > 0 && (
               <button onClick={handleMarkAll} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11.5, fontWeight: 700, color: '#0ea5e9', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}>
-                <CheckCheck size={13} /> Hammasini o'qilgan qilish
+                <CheckCheck size={13} /> {t('notifications.markAll')}
               </button>
             )}
           </div>
 
           <div style={{ maxHeight: 360, overflowY: 'auto' }}>
             {items.length === 0 && (
-              <p style={{ padding: '28px 16px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>Hozircha bildirishnoma yo'q</p>
+              <p style={{ padding: '28px 16px', textAlign: 'center', fontSize: 13, color: '#94a3b8' }}>{t('notifications.empty')}</p>
             )}
             {items.map((n) => (
               <button key={n.id} onClick={() => handleItemClick(n)}
