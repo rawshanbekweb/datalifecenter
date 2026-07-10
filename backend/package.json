@@ -12,6 +12,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "translate:content": "tsx scripts/translate-content.ts",
     "test": "vitest run"
   },
   "engines": {
