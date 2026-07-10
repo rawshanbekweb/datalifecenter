@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 import { ENABLED_LOCALES, LOCALE_LABELS } from '../../i18n/config';
 import { useLocale } from '../../hooks/useLocale';
@@ -6,6 +7,7 @@ import { useLocale } from '../../hooks/useLocale';
 // ENABLED_LOCALES'da bitta til bo'lsa (Stage 0) hech narsa ko'rsatmaydi —
 // yangi til qo'shilishi bilan (config.ts) avtomatik paydo bo'ladi.
 export default function LanguageSwitcher(): React.ReactElement | null {
+  const { t } = useTranslation();
   const { locale, switchLocale } = useLocale();
   const [open, setOpen] = useState(false);
 
@@ -15,7 +17,7 @@ export default function LanguageSwitcher(): React.ReactElement | null {
     <div style={{ position: 'relative' }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        title="Til"
+        title={t('nav.language')}
         style={{
           display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 10,
           background: '#f1f5f9', border: '1.5px solid #e2e8f0', color: '#475569', cursor: 'pointer', fontSize: 13, fontWeight: 600,

@@ -28,7 +28,7 @@ export default function Blog(): React.ReactElement {
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
           <span className="pill" style={{ background:'#f0f9ff', borderColor:'#bae6fd', color:'#0284c7' }}>{t('home.blog.pill')}</span>
-          <h2 className="h-section" style={{ marginBottom:10 }}>Blog & <span className="accent">{t('home.blog.titleAccent')}</span></h2>
+          <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.blog.titleStart')} <span className="accent">{t('home.blog.titleAccent')}</span></h2>
           <p className="sub">{t('home.blog.subtitle')}</p>
         </motion.div>
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 import { listCourseReviews } from '../../api/reviews';
+import { formatDate } from '../../utils/format';
 
 interface Review {
   id: string;
@@ -63,7 +64,7 @@ export default function CourseReviews({ slug, rating, reviewsCount, color = '#0e
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{r.user.name}</p>
-                  <p style={{ fontSize: 11, color: '#94a3b8' }}>{new Date(r.createdAt).toLocaleDateString('uz-UZ')}</p>
+                  <p style={{ fontSize: 11, color: '#94a3b8' }}>{formatDate(r.createdAt)}</p>
                 </div>
                 <div style={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                   {Array.from({ length: 5 }).map((_, idx) => (

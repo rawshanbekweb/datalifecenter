@@ -18,7 +18,7 @@ export function LocaleProvider({ children, locale, basename }: LocaleProviderPro
       switchLocale: (next: Locale) => {
         const path = window.location.pathname.slice(basename.length) || '/';
         const prefix = next === DEFAULT_LOCALE ? '' : `/${next}`;
-        window.location.href = `${prefix}${path}${window.location.search}`;
+        window.location.href = `${prefix}${path}${window.location.search}${window.location.hash}`;
       },
     }),
     [locale, basename]

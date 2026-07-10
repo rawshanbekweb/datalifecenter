@@ -88,6 +88,7 @@
     "contact": "Aloqa",
     "login": "Kirish",
     "start": "Boshlash",
+    "language": "Til",
     "logout": "Chiqish",
     "admin": "Admin",
     "mentorCabinet": "Mentor",
@@ -175,7 +176,7 @@
       "titleStart": "Nima Uchun",
       "subtitle": "Sanoatning eng yaxshi standartlari bilan shaxsiy yondashuvni birlashtiramiz",
       "ctaTitle": "Bugun boshlamoqchimisiz?",
-      "ctaSubtitle": "Bepul konsultatsiya oling va to'g'ri kursni tanla.",
+      "ctaSubtitle": "Bepul konsultatsiya oling va to'g'ri kursni tanlang.",
       "ctaButton": "Bepul Konsultatsiya",
       "ctaCourses": "Kurslarni Ko'rish"
     },
@@ -223,6 +224,7 @@
     },
     "blog": {
       "pill": "Bilimlar Markazi",
+      "titleStart": "Blog &",
       "titleAccent": "Maqolalar",
       "subtitle": "Texnologiya, dasturlash va IT karera bo'yicha so'nggi maqolalar",
       "loadError": "Maqolalarni yuklab bo'lmadi.",
@@ -268,16 +270,16 @@
     },
     "mentors": {
       "pill": "Bizning jamoa",
-      "title": "Mentor",
-      "accent": "larimiz",
+      "title": "Bizning",
+      "accent": "mentorlarimiz",
       "sub": "Sohasining professional mutaxassislari sizga yo'l-yo'riq ko'rsatadi",
       "empty": "Hozircha mentorlar qo'shilmagan.",
       "loadError": "Mentorlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring."
     },
     "partners": {
       "pill": "Ishonchli aloqalar",
-      "title": "Hamkor",
-      "accent": "larimiz",
+      "title": "Bizning",
+      "accent": "hamkorlarimiz",
       "sub": "Biz bilan hamkorlik qiluvchi kompaniyalar va tashkilotlar",
       "empty": "Hozircha hamkorlar qo'shilmagan.",
       "loadError": "Hamkorlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring."

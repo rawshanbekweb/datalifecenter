@@ -19,6 +19,8 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 }
 
 const { locale, basename } = detectLocale()
+// SEO va screen-reader'lar uchun hujjat tili URL'dagi localega mos bo'lishi kerak
+document.documentElement.lang = locale
 const router = createAppRouter(basename)
 
 createRoot(document.getElementById('root')!).render(

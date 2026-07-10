@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Clock, Eye, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug } from '../api/blog';
 import { resolveIcon } from '../utils/iconMap';
+import { formatDate } from '../utils/format';
 import ComingSoon from '../components/common/ComingSoon';
 
 interface BlogPost {
@@ -75,7 +76,7 @@ export default function BlogDetailPage(): React.ReactElement {
           <div style={{ display:'flex', gap:20, flexWrap:'wrap', fontSize:13, color:'#94a3b8', marginBottom:28, paddingBottom:24, borderBottom:'1px solid #f1f5f9' }}>
             <span style={{ display:'flex', alignItems:'center', gap:5 }}><Clock size={13}/> {t('pages.blogDetail.readMinutes', { n: post!.readMinutes })}</span>
             <span style={{ display:'flex', alignItems:'center', gap:5 }}><Eye size={13}/> {t('pages.blogDetail.views', { n: post!.views })}</span>
-            <span>{new Date(post!.publishedAt).toLocaleDateString('uz-UZ', { day:'numeric', month:'long', year:'numeric' })}</span>
+            <span>{formatDate(post!.publishedAt, { day:'numeric', month:'long', year:'numeric' })}</span>
           </div>
 
           <div style={{ fontSize:15, color:'#334155', lineHeight:1.9 }}>

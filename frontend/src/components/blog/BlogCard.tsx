@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
+import { formatDate as formatLocalizedDate } from '../../utils/format';
 
 export interface BlogPostCardData {
   id: string | number;
@@ -33,7 +34,7 @@ function formatViews(n: number): string {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long', year: 'numeric' });
+  return formatLocalizedDate(dateStr, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function BlogCard({ post, index = 0 }: BlogCardProps): React.ReactElement {

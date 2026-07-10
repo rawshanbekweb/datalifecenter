@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { BadgeCheck, AlertCircle, Loader, Award } from 'lucide-react';
 import { verifyCertificate, CertificateInfo } from '../api/enrollments';
+import { formatDate } from '../utils/format';
 
 // Ochiq sahifa: ish beruvchi sertifikat raqamini kiritib haqiqiyligini tekshiradi.
 // PDF pastidagi havola shu sahifaga olib keladi.
@@ -78,7 +79,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
                 <p><b>{t('pages.certificate.number')}:</b> {cert.certificateNo}</p>
                 <p><b>{t('pages.certificate.student')}:</b> {cert.studentName}</p>
                 <p><b>{t('pages.certificate.course')}:</b> {cert.courseTitle} ({t('pages.certificate.program', { n: cert.durationMonths })})</p>
-                {cert.completedAt && <p><b>{t('pages.certificate.completedAt')}:</b> {new Date(cert.completedAt).toLocaleDateString('uz-UZ')}</p>}
+                {cert.completedAt && <p><b>{t('pages.certificate.completedAt')}:</b> {formatDate(cert.completedAt)}</p>}
               </div>
             </motion.div>
           )}

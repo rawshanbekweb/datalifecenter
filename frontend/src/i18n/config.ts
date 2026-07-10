@@ -13,3 +13,12 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   kaa: 'Qaraqalpaqsha',
   en: 'English',
 };
+
+// Intl (sana/son formatlash) uchun BCP-47 teglar. kaa uchun brauzerlarda
+// ma'lumot yo'q — pragmatik ravishda uz-UZ ishlatiladi.
+export const LOCALE_BCP47: Record<Locale, string> = {
+  uz: 'uz-UZ',
+  ru: 'ru-RU',
+  kaa: 'uz-UZ',
+  en: 'en-US',
+};

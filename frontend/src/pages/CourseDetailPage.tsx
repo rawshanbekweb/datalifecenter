@@ -6,6 +6,7 @@ import { Clock, Star, Users, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircl
 import { getCourseBySlug } from '../api/courses';
 import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { resolveIcon } from '../utils/iconMap';
+import { formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import ComingSoon from '../components/common/ComingSoon';
 import CourseReviews from '../components/courses/CourseReviews';
@@ -172,7 +173,7 @@ export default function CourseDetailPage(): React.ReactElement {
             )}
             <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{t(`levels.${course.level}`)}</span>
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
-              {course.isFree ? t('common.free') : `${Number(course.price).toLocaleString('uz-UZ')} ${course.currency}`}
+              {course.isFree ? t('common.free') : `${formatNumber(Number(course.price))} ${course.currency}`}
             </span>
           </div>
         </motion.div>
