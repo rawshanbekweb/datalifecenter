@@ -51,6 +51,16 @@ export default function LiveSessionPage(): React.ReactElement {
     return () => { cancelled = true; };
   }, [id, t]);
 
+  // Rejalashtirilgan sessiya mentor tomonidan boshlanishi (yoki vaqti o'tib
+  // yakunlanishi) ni kutayotganda sahifa o'zi yangilanib turadi
+  useEffect(() => {
+    if (!session || session.status !== 'SCHEDULED') return;
+    const timer = setInterval(() => {
+      getSession(id!).then(setSession).catch(() => {});
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, [id, session]);
+
   const embeddable = useMemo(
     () => (session ? isEmbeddableJitsi(session.meetingUrl) : false),
     [session]
@@ -77,6 +87,8 @@ export default function LiveSessionPage(): React.ReactElement {
   const meta = SESSION_STATUS_META[session.status];
   const isLive = session.status === 'LIVE';
   const canJoin = session.status === 'LIVE' || session.status === 'SCHEDULED';
+  // Boshlanishiga 10 daqiqadan ko'p vaqt bo'lsa — bo'sh xonaga kiritmay, kutish kartasi ko'rsatiladi
+  const isEarly = session.status === 'SCHEDULED' && Date.now() < new Date(session.startsAt).getTime() - 10 * 60_000;
 
   return (
     <section style={{ padding: '110px 0 40px', minHeight: '100vh', background: '#0f172a' }}>
@@ -101,7 +113,16 @@ export default function LiveSessionPage(): React.ReactElement {
           {session.course.title} · {session.mentor.name} · {formatSessionTime(session.startsAt, session.durationMin)}
         </p>
 
-        {canJoin && embeddable ? (
+        {isEarly ? (
+          <div className="card" style={{ padding: 32, textAlign: 'center' }}>
+            <Video size={26} style={{ color: '#94a3b8', margin: '0 auto 10px' }} />
+            <p style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>{t('student.live.notStarted')}</p>
+            <p style={{ fontSize: 13.5, color: '#64748b' }}>
+              {formatSessionTime(session.startsAt, session.durationMin)}
+            </p>
+            <p style={{ fontSize: 12.5, color: '#94a3b8', marginTop: 8 }}>{t('student.live.roomOpens')}</p>
+          </div>
+        ) : canJoin && embeddable ? (
           <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #334155', background: '#000' }}>
             <iframe
               title={session.title}

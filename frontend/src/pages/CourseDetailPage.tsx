@@ -244,6 +244,11 @@ export default function CourseDetailPage(): React.ReactElement {
                       {t('pages.courseDetail.pendingInfo')}
                     </p>
                   </div>
+                  <Link to="/student">
+                    <button className="btn-primary" style={{ width:'100%', justifyContent:'center', marginBottom:14 }}>
+                      <CreditCard size={15}/> {t('pages.courseDetail.goPay')}
+                    </button>
+                  </Link>
                   {import.meta.env.DEV && payStatus !== 'success' && (
                     <button onClick={simulatePayment} disabled={payStatus === 'loading'} className="btn-outline"
                       style={{ width:'100%', justifyContent:'center', opacity: payStatus === 'loading' ? 0.7 : 1 }}>

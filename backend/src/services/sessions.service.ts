@@ -10,6 +10,30 @@ const sessionInclude = {
   mentor: { select: { id: true, name: true, photoUrl: true } },
 } satisfies Prisma.LiveSessionInclude;
 
+// Mentor "yakunlash"ni unutsa ham sessiya abadiy LIVE/SCHEDULED bo'lib qolmasin:
+// rejadagi tugash vaqtidan 1 soat o'tgach o'qishda ENDED sifatida taqdim etiladi
+// (bazaga yozilmaydi — idempotent, cron talab qilmaydi).
+const END_GRACE_MIN = 60;
+
+function isEffectivelyEnded(s: { status: string; startsAt: Date; durationMin: number }): boolean {
+  if (s.status !== 'SCHEDULED' && s.status !== 'LIVE') return false;
+  return Date.now() > s.startsAt.getTime() + (s.durationMin + END_GRACE_MIN) * 60_000;
+}
+
+function presentStatus<T extends { status: string; startsAt: Date; durationMin: number }>(session: T): T {
+  return isEffectivelyEnded(session) ? ({ ...session, status: 'ENDED' } as T) : session;
+}
+
+// Sessiya auditoriyasi: tanlangan bo'lsa faqat o'sha talabalar, aks holda kursning barcha faol talabalari
+async function sessionRecipientIds(courseId: string, targetStudentIds: string[]): Promise<string[]> {
+  if (targetStudentIds.length > 0) return targetStudentIds;
+  const enrollments = await prisma.enrollment.findMany({
+    where: { courseId, status: 'ACTIVE' },
+    select: { userId: true },
+  });
+  return enrollments.map((e) => e.userId);
+}
+
 interface Actor {
   userId: string;
   role: string;
@@ -86,17 +110,7 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
     include: sessionInclude,
   });
 
-  // Auditoriya tanlangan bo'lsa — faqat o'shalarga, aks holda kursning barcha faol talabalariga
-  let recipientIds: string[];
-  if (targetStudentIds.length > 0) {
-    recipientIds = targetStudentIds;
-  } else {
-    const enrollments = await prisma.enrollment.findMany({
-      where: { courseId: input.courseId, status: 'ACTIVE' },
-      select: { userId: true },
-    });
-    recipientIds = enrollments.map((e) => e.userId);
-  }
+  const recipientIds = await sessionRecipientIds(input.courseId, targetStudentIds);
   await notify(recipientIds, {
     type: 'SESSION_SCHEDULED',
     title: `Yangi jonli dars: ${toUzText(session.title)}`,
@@ -130,7 +144,8 @@ export async function listMySessions(userId: string, locale: SupportedLocale) {
     take: 20,
     include: sessionInclude,
   });
-  return resolveLocaleDeep(sessions, locale);
+  // Vaqti allaqachon o'tganlar talaba ro'yxatida chiqmaydi
+  return resolveLocaleDeep(sessions.filter((s) => !isEffectivelyEnded(s)), locale);
 }
 
 // Bitta sessiya — saytdagi jonli efir sahifasi (/live/:id) uchun.
@@ -160,7 +175,7 @@ export async function getSessionForViewer(id: string, actor: Actor, locale: Supp
     }
   }
 
-  return resolveLocaleDeep(session, locale);
+  return resolveLocaleDeep(presentStatus(session), locale);
 }
 
 // Mentor: o'z sessiyalari; Admin: hammasi
@@ -168,12 +183,13 @@ export async function listManagedSessions(actor: Actor) {
   const where: Prisma.LiveSessionWhereInput =
     actor.role === 'ADMIN' ? {} : { mentorId: (await getOwnMentor(actor.userId)).id };
 
-  return prisma.liveSession.findMany({
+  const sessions = await prisma.liveSession.findMany({
     where,
     orderBy: { startsAt: 'desc' },
     take: 100,
     include: sessionInclude,
   });
+  return sessions.map(presentStatus);
 }
 
 async function getOwnedSession(id: string, actor: Actor) {
@@ -196,7 +212,30 @@ export async function updateSession(id: string, input: UpdateSessionInput, actor
   if (input.targetStudentIds !== undefined) {
     data.targetStudentIds = await filterEnrolledStudentIds(session.courseId, input.targetStudentIds);
   }
-  return prisma.liveSession.update({ where: { id }, data, include: sessionInclude });
+  const updated = await prisma.liveSession.update({ where: { id }, data, include: sessionInclude });
+
+  // Efir boshlandi/bekor qilindi — auditoriyaga xabar (tip alohida emas:
+  // NotificationType enum'iga yangi qiymat migratsiya talab qiladi, frontend tipga qaramaydi)
+  if (input.status && input.status !== session.status) {
+    const recipientIds = await sessionRecipientIds(updated.courseId, updated.targetStudentIds);
+    if (input.status === 'LIVE') {
+      await notify(recipientIds, {
+        type: 'SESSION_SCHEDULED',
+        title: `Jonli dars boshlandi: ${toUzText(updated.title)}`,
+        body: toUzText(updated.course.title),
+        link: `/live/${updated.id}`,
+      });
+    } else if (input.status === 'CANCELLED') {
+      await notify(recipientIds, {
+        type: 'SESSION_SCHEDULED',
+        title: `Jonli dars bekor qilindi: ${toUzText(updated.title)}`,
+        body: `${toUzText(updated.course.title)} — ${new Date(updated.startsAt).toLocaleString('uz-UZ')}`,
+        link: '/student/sessions',
+      });
+    }
+  }
+
+  return presentStatus(updated);
 }
 
 export async function deleteSession(id: string, actor: Actor) {

@@ -299,7 +299,8 @@
       "loginAndEnroll": "Log in and enroll",
       "enrolledSuccess": "You have successfully enrolled!",
       "startLessons": "Start lessons",
-      "pendingInfo": "Your request has been received. Online payment is coming soon — for now your enrollment is in \"Pending\" status.",
+      "pendingInfo": "Your request has been received — your enrollment activates after payment. You can pay on the course card in your dashboard.",
+      "goPay": "Go to payment",
       "alreadyEnrolled": "You are already enrolled in this course.",
       "continueLessons": "Continue lessons",
       "freePrompt": "This course is free — you can start right now.",
@@ -374,7 +375,6 @@
   "sessions": {
     "panelTitle": "Live lessons",
     "join": "Join the lesson",
-    "roomLink": "Room link",
     "openRoom": "Open room",
     "timeLine": "{{date}}, {{time}} · {{n}} min",
     "status": {
@@ -508,6 +508,8 @@
     "live": {
       "noAccess": "No access",
       "participant": "Participant",
+      "notStarted": "The lesson has not started yet",
+      "roomOpens": "The room opens 10 minutes before the lesson starts.",
       "externalInfo": "This lesson is held on an external platform ({{host}}).",
       "ended": "This live lesson has ended.",
       "cancelled": "This live lesson was cancelled."

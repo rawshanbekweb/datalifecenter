@@ -299,7 +299,8 @@
       "loginAndEnroll": "Kiriw hám jazılıw",
       "enrolledSuccess": "Tabıslı jazıldıńız!",
       "startLessons": "Sabaqlardı baslaw",
-      "pendingInfo": "Sorawıńız qabıl etildi. Tólem sisteması jaqın arada jalǵanadı — házirshe jazılıwıńız \"Kútilmekte\" halatında.",
+      "pendingInfo": "Sorawıńız qabıl etildi — jazılıwıńız tólemnen keyin aktivlesedi. Tólemdi jeke kabinetińizdegi kurs kartasında ámelge asırıń.",
+      "goPay": "Tólemge ótiw",
       "alreadyEnrolled": "Siz bul kursqa álleqashan jazılǵansız.",
       "continueLessons": "Sabaqlardı dawam ettiriw",
       "freePrompt": "Bul kurs biypul — házir-aq baslawıńız múmkin.",
@@ -374,7 +375,6 @@
   "sessions": {
     "panelTitle": "Janlı sabaqlar",
     "join": "Sabaqqa qosılıw",
-    "roomLink": "Bólme siltemesi",
     "openRoom": "Bólmeni ashıw",
     "timeLine": "{{date}}, {{time}} · {{n}} minut",
     "status": {
@@ -508,6 +508,8 @@
     "live": {
       "noAccess": "Kiriw huqıqı joq",
       "participant": "Qatnasıwshı",
+      "notStarted": "Sabaq ele baslanbaǵan",
+      "roomOpens": "Bólme sabaq baslanıwınan 10 minut aldın ashıladı.",
       "externalInfo": "Bul sabaq sırtqı platformada ({{host}}) ótkeriledi.",
       "ended": "Bul janlı sabaq tamamlanǵan.",
       "cancelled": "Bul janlı sabaq biykar etilgen."

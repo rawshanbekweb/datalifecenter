@@ -299,7 +299,8 @@
       "loginAndEnroll": "Kirish va yozilish",
       "enrolledSuccess": "Muvaffaqiyatli yozildingiz!",
       "startLessons": "Darslarni boshlash",
-      "pendingInfo": "So'rovingiz qabul qilindi. To'lov tizimi tez orada ulanadi — hozircha yozilishingiz \"Kutilmoqda\" holatida.",
+      "pendingInfo": "So'rovingiz qabul qilindi — yozilishingiz to'lovdan so'ng faollashadi. To'lovni shaxsiy kabinetingizdagi kurs kartasida amalga oshiring.",
+      "goPay": "To'lovga o'tish",
       "alreadyEnrolled": "Siz bu kursga allaqachon yozilgansiz.",
       "continueLessons": "Darslarni davom ettirish",
       "freePrompt": "Bu kurs bepul — hoziroq boshlashingiz mumkin.",
@@ -374,7 +375,6 @@
   "sessions": {
     "panelTitle": "Jonli darslar",
     "join": "Darsga qo'shilish",
-    "roomLink": "Xona havolasi",
     "openRoom": "Xonani ochish",
     "timeLine": "{{date}}, {{time}} · {{n}} daqiqa",
     "status": {
@@ -508,6 +508,8 @@
     "live": {
       "noAccess": "Kirish huquqi yo'q",
       "participant": "Ishtirokchi",
+      "notStarted": "Dars hali boshlanmagan",
+      "roomOpens": "Xona dars boshlanishidan 10 daqiqa oldin ochiladi.",
       "externalInfo": "Bu dars tashqi platformada ({{host}}) o'tkaziladi.",
       "ended": "Bu jonli dars yakunlangan.",
       "cancelled": "Bu jonli dars bekor qilingan."

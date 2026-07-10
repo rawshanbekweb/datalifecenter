@@ -109,3 +109,76 @@ describe('Jonli efir auditoriyasi (targetStudentIds)', () => {
     expect(created.body.data.targetStudentIds).toEqual([studentAId]);
   });
 });
+
+describe('Sessiya holatining vaqtga qarab taqdim etilishi', () => {
+  it("vaqti o'tgan SCHEDULED/LIVE sessiya ENDED sifatida ko'rinadi va talaba ro'yxatidan tushadi", async () => {
+    const mentor = await prisma.mentor.findFirstOrThrow();
+    // 3 soat oldin boshlangan 60 daqiqalik sessiya — grace (1 soat) ham o'tgan
+    const stale = await prisma.liveSession.create({
+      data: {
+        courseId,
+        mentorId: mentor.id,
+        title: { uz: "Yakunlash unutilgan sessiya" },
+        meetingUrl: 'https://meet.jit.si/stale',
+        startsAt: new Date(Date.now() - 3 * 3600 * 1000),
+        durationMin: 60,
+        status: 'LIVE',
+      },
+    });
+
+    const list = await studentA.get('/api/sessions/mine').expect(200);
+    expect(list.body.data.some((s: { id: string }) => s.id === stale.id)).toBe(false);
+
+    const single = await studentA.get(`/api/sessions/${stale.id}`).expect(200);
+    expect(single.body.data.status).toBe('ENDED');
+
+    const managed = await mentorAgent.get('/api/sessions/manage').expect(200);
+    const inManaged = managed.body.data.find((s: { id: string }) => s.id === stale.id);
+    expect(inManaged.status).toBe('ENDED');
+
+    // Bazadagi yozuv o'zgarmaydi — faqat taqdimot
+    const raw = await prisma.liveSession.findUniqueOrThrow({ where: { id: stale.id } });
+    expect(raw.status).toBe('LIVE');
+  });
+});
+
+describe('Efir holati o\'zgarganda bildirishnoma', () => {
+  it('LIVE ga o\'tishda auditoriyaga /live havolali xabar boradi', async () => {
+    const created = await mentorAgent
+      .post('/api/sessions')
+      .send({
+        courseId,
+        title: { uz: 'Efirga chiqadigan sessiya' },
+        meetingUrl: 'https://meet.jit.si/golive',
+        startsAt: futureIso(4),
+        durationMin: 60,
+        targetStudentIds: [studentAId],
+      })
+      .expect(201);
+    const sessionId = created.body.data.id;
+
+    const before = await prisma.notification.count({ where: { userId: studentAId, link: `/live/${sessionId}` } });
+    const updated = await mentorAgent.patch(`/api/sessions/${sessionId}`).send({ status: 'LIVE' }).expect(200);
+    expect(updated.body.data.status).toBe('LIVE');
+
+    const after = await prisma.notification.count({ where: { userId: studentAId, link: `/live/${sessionId}` } });
+    expect(after - before).toBe(1);
+
+    // Auditoriyadan tashqaridagi talabaga xabar bormaydi
+    const forB = await prisma.notification.count({ where: { userId: studentBId, link: `/live/${sessionId}` } });
+    expect(forB).toBe(0);
+  });
+
+  it("holat o'zgarmagan oddiy tahrirda bildirishnoma yuborilmaydi", async () => {
+    const created = await mentorAgent
+      .post('/api/sessions')
+      .send({ courseId, title: { uz: 'Tahrir sessiyasi' }, meetingUrl: 'https://meet.jit.si/edit', startsAt: futureIso(5), durationMin: 60 })
+      .expect(201);
+    const sessionId = created.body.data.id;
+
+    const before = await prisma.notification.count({ where: { userId: studentAId } });
+    await mentorAgent.patch(`/api/sessions/${sessionId}`).send({ durationMin: 90 }).expect(200);
+    const after = await prisma.notification.count({ where: { userId: studentAId } });
+    expect(after).toBe(before);
+  });
+});

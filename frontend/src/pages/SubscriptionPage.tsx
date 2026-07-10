@@ -88,10 +88,10 @@ export default function SubscriptionPage(): React.ReactElement {
       const updated = await submitSubscriptionReceipt(subscription.id, receiptUrl.trim());
       setSubscription(updated);
       setReceiptUrl('');
-    } catch {
-      setReceiptState('error');
-    } finally {
       setReceiptState('idle');
+    } catch {
+      // finally'da 'idle'ga qaytarilsa xato xabari hech qachon ko'rinmaydi
+      setReceiptState('error');
     }
   };
 
