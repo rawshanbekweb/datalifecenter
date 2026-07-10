@@ -1,0 +1,342 @@
+{
+  "common": {
+    "loading": "Júklenip atır...",
+    "save": "Saqlaw",
+    "saving": "Saqlanıp atır...",
+    "sending": "Jiberilip atır...",
+    "cancel": "Biykar etiw",
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "confirm": "Tastıyıqlaw",
+    "more": "Tolıǵıraq",
+    "close": "Jabıw",
+    "all": "Barlıǵı",
+    "free": "Biypul",
+    "error": "Qátelik júz berdi",
+    "loadFailed": "Maǵlıwmatlardı júklep bolmadı."
+  },
+  "levels": {
+    "BEGINNER": "Baslanǵısh",
+    "INTERMEDIATE": "Orta",
+    "ADVANCED": "Joqarı"
+  },
+  "errors": {
+    "network": "Serverge jalǵanıp bolmadı. Internet baylanısın tekseriń.",
+    "generic": "Kútilmegen qátelik júz berdi"
+  },
+  "auth": {
+    "password": "Parol",
+    "passwordHint": "Keminde 6 belgi",
+    "login": {
+      "title": "Sistemaǵa kiriw",
+      "subtitle": "DATA LIFE esabıńızǵa kiriń",
+      "error": "Kiriwde qátelik júz berdi",
+      "forgot": "Paroldı umıttıńız ba?",
+      "loading": "Kirilip atır...",
+      "noAccount": "Esabıńız joq pa?",
+      "registerLink": "Dizimnen ótiń"
+    },
+    "register": {
+      "title": "Dizimnen ótiw",
+      "subtitle": "Jańa DATA LIFE esabın jaratıń",
+      "error": "Dizimnen ótiwde qátelik júz berdi",
+      "nameLabel": "Atı Familiyası",
+      "phoneLabel": "Telefon",
+      "loading": "Jaratılıp atır...",
+      "haveAccount": "Esabıńız bar ma?",
+      "loginLink": "Kiriń"
+    },
+    "forgot": {
+      "title": "Paroldı qálpine keltiriw",
+      "subtitle": "Emailıńızǵa qálpine keltiriw siltemesin jiberemiz",
+      "sentTitle": "Silteme jiberildi",
+      "sentPrefix": "Eger",
+      "sentSuffix": "dizimnen ótken bolsa, paroldı qálpine keltiriw siltemesi jiberildi. Pochta qutıńızdı (spam papkasın da) tekseriń. Silteme 30 minut dawamında kúshke iye.",
+      "submit": "Silteme jiberiw",
+      "remember": "Parolıńız esińizde me?"
+    },
+    "reset": {
+      "title": "Jańa parol ornatıw",
+      "subtitle": "Esabıńız ushın jańa parol kiritiń",
+      "invalidLink": "Silteme nadurıs.",
+      "requestAgain": "Parol qálpine keltiriwdi qaytadan sorań",
+      "done": "Parol jańalandı! Endi jańa parol menen kiriwińiz múmkin. Kiriw betine ótkerilip atırsız...",
+      "mismatch": "Paroller birdey emes",
+      "newPassword": "Jańa parol",
+      "confirmPassword": "Paroldı tastıyıqlań",
+      "confirmPlaceholder": "Paroldı qayta kiritiń",
+      "submit": "Paroldı jańalaw",
+      "backToLogin": "Kiriw betine qaytıw"
+    },
+    "verifyEmail": {
+      "title": "Emaildı tastıyıqlaw",
+      "subtitle": "DATA LIFE esabıńızdı aktivlestiriw",
+      "verifying": "Tastıyıqlanıp atır...",
+      "noToken": "Silteme nadurıs — token tabılmadı.",
+      "done": "Emailıńız tastıyıqlandı! Endi platformadan tolıq paydalanıwıńız múmkin.",
+      "errorHint": "Profil betinen tastıyıqlaw siltemesin qayta jiberiwińiz múmkin.",
+      "toProfile": "Profilge ótiw"
+    }
+  },
+  "nav": {
+    "home": "Bas bet",
+    "about": "Kompaniya",
+    "courses": "Kurslar",
+    "mentors": "Mentorlar",
+    "partners": "Sherikler",
+    "blog": "Blog",
+    "contact": "Baylanıs",
+    "login": "Kiriw",
+    "start": "Baslaw",
+    "language": "Til",
+    "logout": "Shıǵıw",
+    "admin": "Admin",
+    "mentorCabinet": "Mentor",
+    "myCabinet": "Jeke kabinet",
+    "adminPanel": "Admin panel",
+    "mentorCabinetFull": "Mentor kabineti"
+  },
+  "footer": {
+    "description": "Ózbekstandaǵı eń zamanagóy IT tálim orayı. Programmalastırıw hám sanlı ónimler — bizdiń missiyamız.",
+    "sections": {
+      "courses": "Kurslar",
+      "services": "Xızmetler",
+      "company": "Kompaniya"
+    },
+    "links": {
+      "allCourses": "Barlıq kurslar",
+      "whyUs": "Ne ushın biz",
+      "webDev": "Web Development",
+      "mobileApps": "Mobile Apps",
+      "uiuxDesign": "UI/UX Design",
+      "itConsulting": "IT Consulting",
+      "digitalSolutions": "Digital Solutions",
+      "aboutUs": "Biz haqqımızda",
+      "blog": "Blog",
+      "projects": "Joybarlar",
+      "partnership": "Sheriklik"
+    },
+    "newsletter": {
+      "title": "IT jańalıqlarınan xabardar bolıń",
+      "subtitle": "Háptelik IT jańalıqları, kurs shegirmeleri hám maqalalar",
+      "placeholder": "Email mánzilińiz",
+      "button": "Jazılıw"
+    },
+    "legal": {
+      "privacy": "Qupıyalıq",
+      "terms": "Paydalanıw shártleri",
+      "cookie": "Cookie"
+    },
+    "copyright": "© {{year}} DATA LIFE IT Center. Barlıq huqıqlar qorǵalǵan.",
+    "systemsOperational": "All systems operational"
+  },
+  "home": {
+    "hero": {
+      "tagline": "IT keleshegin búginnen jaratıń",
+      "description": "Zamanagóy programmalastırıw, jasalma intellekt hám sanlı texnologiyalar boyınsha professional tálim alıń. Real joybarlar hám tájiriybeli mentorlar menen karera qurıń.",
+      "ctaPrimary": "Oqıwdı baslaw",
+      "ctaSecondary": "Baylanısıw",
+      "fallbackStats": {
+        "graduates": "Pitkeriwshiler",
+        "courses": "Kurslar",
+        "experience": "Jıllıq tájiriybe",
+        "hours": "Jumıs waqtı"
+      }
+    },
+    "about": {
+      "pill": "Biz haqqımızda",
+      "titleStart": "Biz",
+      "titleAccent": "haqqımızda",
+      "subtitle": "Ózbekstandaǵı eń innovaciyalıq IT tálim orayı",
+      "headingStart": "Keleshek texnologiyaların",
+      "headingAccent": "búgin úyreniń",
+      "para1": "programmalastırıwdı oqıtıwǵa, sanlı ónimler jaratıwǵa hám keleshek qánigelerin tayarlawǵa qánigelesken zamanagóy IT orayı.",
+      "para2": "Maqsetimiz — hár bir oqıwshını IT sanaatınıń haqıyqıy professional qánigesine aylandırıw.",
+      "fallback": {
+        "graduates": "Pitkeriwshiler",
+        "courses": "Kurslar",
+        "projects": "Joybarlar",
+        "experience": "Jıllıq tájiriybe",
+        "feat1": "Professional sertifikatlar",
+        "feat2": "Real joybarlarda islew",
+        "feat3": "Tájiriybeli mentorlar",
+        "feat4": "Karera qollap-quwatlawı",
+        "feat5": "Zamanagóy oqıw baǵdarlaması",
+        "feat6": "Kishi toparlar (maks 15)"
+      }
+    },
+    "services": {
+      "pill": "Xızmetler",
+      "titleStart": "Xızmet",
+      "titleAccent": "lerimiz",
+      "subtitle": "Sanlı dúnyada tabısqa erisiw ushın barlıq texnologiyalıq xızmetler"
+    },
+    "whyUs": {
+      "pill": "Ne ushın biz",
+      "titleStart": "Ne ushın",
+      "subtitle": "Sanaattıń eń jaqsı standartların jeke qatnas penen birlestiremiz",
+      "ctaTitle": "Búgin baslamaqshımısız?",
+      "ctaSubtitle": "Biypul konsultaciya alıń hám ózińizge say kurstı tańlań.",
+      "ctaButton": "Biypul konsultaciya",
+      "ctaCourses": "Kurslardı kóriw"
+    },
+    "contact": {
+      "pill": "Baylanısıw",
+      "titleStart": "Biz benen",
+      "titleAccent": "baylanısıń",
+      "subtitle": "Sorawlarıńız bar ma? 24 saat ishinde juwap beremiz",
+      "formTitle": "Xabar jiberiń",
+      "formSub": "Biz tez juwap beremiz",
+      "sentTitle": "Xabar jiberildi!",
+      "sentSub": "Jaqın arada siz benen baylanısamız.",
+      "sendAgain": "Jáne jiberiw",
+      "nameLabel": "Atıńız",
+      "namePlaceholder": "Atı Familiyası",
+      "phoneLabel": "Telefon",
+      "subjectLabel": "Tema",
+      "subjectSelect": "Tańlań...",
+      "subjectCourse": "Kurs haqqında",
+      "subjectService": "Xızmet haqqında",
+      "subjectProject": "Joybar haqqında",
+      "subjectOther": "Basqa",
+      "messageLabel": "Xabar",
+      "messagePlaceholder": "Xabarıńızdı jazıń...",
+      "sendButton": "Xabar jiberiw",
+      "phoneSub": "Dúyshembi–shembi, 09:00–19:00",
+      "telegramSub": "Tez juwap",
+      "emailSub": "24 saat ishinde juwap",
+      "addressLabel": "Mánzil",
+      "hoursTitle": "Jumıs waqıtları"
+    },
+    "testimonials": {
+      "pill": "Pikirler",
+      "titleStart": "Studentlerimiz",
+      "titleAccent": "pikiri",
+      "subtitle": "Pitkeriwshilerimiz DATA LIFE haqqında ne deydi"
+    },
+    "courses": {
+      "pill": "Baǵdarlamalarımız",
+      "titleStart": "Kurs",
+      "titleAccent": "larımız",
+      "subtitle": "Hár bir tarawda professional bolıw ushın tolıq baǵdarlamalar",
+      "loadError": "Kurslardı júklep bolmadı. Backend iske túsirilgenin tekseriń.",
+      "allCourses": "Barlıq kurslar"
+    },
+    "blog": {
+      "pill": "Bilimler orayı",
+      "titleStart": "Blog &",
+      "titleAccent": "maqalalar",
+      "subtitle": "Texnologiya, programmalastırıw hám IT karera boyınsha eń sońǵı maqalalar",
+      "loadError": "Maqalalardı júklep bolmadı.",
+      "allPosts": "Barlıq maqalalar"
+    },
+    "projects": {
+      "pill": "Portfolio",
+      "titleStart": "Joybar",
+      "titleAccent": "larımız",
+      "subtitle": "Komandamız tárepinen jaratılǵan real ónimler",
+      "loadError": "Joybarlardı júklep bolmadı.",
+      "all": "Barlıǵı",
+      "visitSite": "Saytqa ótiw",
+      "view": "Kóriw"
+    }
+  },
+  "pages": {
+    "courses": {
+      "pill": "Kurslar katalogı",
+      "title": "Barlıq",
+      "accent": "kurslar",
+      "sub": "Ózińizge sáykes baǵdardı tańlań hám búginnen baslań",
+      "searchPlaceholder": "Kurs izlew...",
+      "allLevels": "Barlıq dárejeler",
+      "allCourses": "Barlıq kurslar",
+      "paid": "Pullı",
+      "empty": "Hesh qanday kurs tabılmadı."
+    },
+    "blog": {
+      "pill": "Knowledge Hub",
+      "title": "Blog &",
+      "accent": "maqalalar",
+      "sub": "Texnologiya, programmalastırıw hám IT karera boyınsha eń sońǵı maqalalar",
+      "empty": "Hesh qanday maqala tabılmadı."
+    },
+    "blogDetail": {
+      "back": "Barlıq maqalalar",
+      "notFoundTitle": "Maqala tabılmadı",
+      "notFoundSub": "Siz izlegen maqala joq yamasa óshirilgen.",
+      "errorSub": "Maqalanı júklep bolmadı. Backend iske túsirilgenin tekseriń.",
+      "readMinutes": "{{n}} minut",
+      "views": "{{n}} kóriw"
+    },
+    "mentors": {
+      "pill": "Bizdiń komanda",
+      "title": "Bizdiń",
+      "accent": "mentorlarımız",
+      "sub": "Óz tarawınıń professional qánigeleri sizge jol-joba kórsetedi",
+      "empty": "Házirshe mentorlar qosılmaǵan.",
+      "loadError": "Mentorlardı júklep bolmadı. Backend iske túsirilgenin tekseriń."
+    },
+    "partners": {
+      "pill": "Isenimli baylanıslar",
+      "title": "Bizdiń",
+      "accent": "sheriklerimiz",
+      "sub": "Biz benen sheriklik etiwshi kompaniyalar hám shólkemler",
+      "empty": "Házirshe sherikler qosılmaǵan.",
+      "loadError": "Sheriklerdi júklep bolmadı. Backend iske túsirilgenin tekseriń."
+    },
+    "courseDetail": {
+      "back": "Barlıq kurslar",
+      "notFoundTitle": "Kurs tabılmadı",
+      "notFoundSub": "Siz izlegen kurs joq yamasa óshirilgen.",
+      "errorSub": "Kurstı júklep bolmadı. Backend iske túsirilgenin tekseriń.",
+      "months": "{{n}} ay",
+      "students": "{{n}} student",
+      "curriculum": "Baǵdarlama quramı ({{n}} sabaq)",
+      "minutesShort": "{{n}} min",
+      "mentor": "Mentor",
+      "loginPrompt": "Kursqa jazılıw ushın esabıńızǵa kiriń.",
+      "loginAndEnroll": "Kiriw hám jazılıw",
+      "enrolledSuccess": "Tabıslı jazıldıńız!",
+      "startLessons": "Sabaqlardı baslaw",
+      "pendingInfo": "Sorawıńız qabıl etildi. Tólem sisteması jaqın arada jalǵanadı — házirshe jazılıwıńız \"Kútilmekte\" halatında.",
+      "alreadyEnrolled": "Siz bul kursqa álleqashan jazılǵansız.",
+      "continueLessons": "Sabaqlardı dawam ettiriw",
+      "freePrompt": "Bul kurs biypul — házir-aq baslawıńız múmkin.",
+      "paidPrompt": "Kursqa jazılıw ushın soraw jiberiń.",
+      "enroll": "Kursqa jazılıw",
+      "reviewsTitle": "Studentler pikiri",
+      "reviewsCount": "{{n}} pikir"
+    },
+    "certificate": {
+      "title": "Sertifikattı tekseriw",
+      "subtitle": "DATA LIFE sertifikatınıń haqıyqıylıǵın tastıyıqlań",
+      "check": "Tekseriw",
+      "valid": "Sertifikat haqıyqıy",
+      "number": "Nomer",
+      "student": "Student",
+      "course": "Kurs",
+      "program": "{{n}} aylıq baǵdarlama",
+      "completedAt": "Tamamlanǵan sáne"
+    },
+    "notFound": {
+      "title": "404 — Bet tabılmadı",
+      "sub": "Siz izlegen bet joq yamasa kóshirilgen."
+    }
+  },
+  "comingSoon": {
+    "backHome": "Bas betke qaytıw"
+  },
+  "cards": {
+    "course": {
+      "modules": "Moduller",
+      "months": "{{n}} ay",
+      "studentsShort": "{{n}} adam",
+      "more": "Kóbirek"
+    },
+    "blog": {
+      "views": "{{n}} kóriw",
+      "readMinutes": "{{n}} minut",
+      "continue": "Oqıwdı dawam ettiriw"
+    }
+  }
+}
