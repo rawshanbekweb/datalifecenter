@@ -2,14 +2,31 @@
   "common": {
     "loading": "Yuklanmoqda...",
     "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "sending": "Yuborilmoqda...",
     "cancel": "Bekor qilish",
     "edit": "Tahrirlash",
     "delete": "O'chirish",
-    "confirm": "Tasdiqlash"
+    "confirm": "Tasdiqlash",
+    "more": "Batafsil",
+    "error": "Xatolik yuz berdi",
+    "loadFailed": "Ma'lumotlarni yuklab bo'lmadi."
   },
   "errors": {
     "network": "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.",
     "generic": "Kutilmagan xatolik yuz berdi"
+  },
+  "auth": {
+    "password": "Parol",
+    "login": {
+      "title": "Tizimga kirish",
+      "subtitle": "DATA LIFE hisobingizga kiring",
+      "error": "Kirishda xatolik yuz berdi",
+      "forgot": "Parolni unutdingizmi?",
+      "loading": "Kirilmoqda...",
+      "noAccount": "Hisobingiz yo'qmi?",
+      "registerLink": "Ro'yxatdan o'ting"
+    }
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -61,5 +78,115 @@
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Barcha huquqlar himoyalangan.",
     "systemsOperational": "All systems operational"
+  },
+  "home": {
+    "hero": {
+      "tagline": "IT kelajagini bugundan yarating",
+      "description": "Zamonaviy dasturlash, sun'iy intellekt va raqamli texnologiyalar bo'yicha professional ta'lim oling. Real loyihalar va tajribali mentorlar bilan karera quring.",
+      "ctaPrimary": "O'qishni boshlash",
+      "ctaSecondary": "Bog'lanish",
+      "fallbackStats": {
+        "graduates": "Bitiruvchilar",
+        "courses": "Kurslar",
+        "experience": "Yillik Tajriba",
+        "hours": "Ish Vaqti"
+      }
+    },
+    "about": {
+      "pill": "Biz Haqimizda",
+      "titleStart": "Biz",
+      "titleAccent": "Haqimizda",
+      "subtitle": "O'zbekistondagi eng innovatsion IT ta'lim markazi",
+      "headingStart": "Kelajak texnologiyalarini",
+      "headingAccent": "bugun o'rganing",
+      "para1": "dasturlash o'qitish, raqamli mahsulotlar yaratish va kelajak mutaxassislarini tayyorlashga ixtisoslashgan zamonaviy IT markazi.",
+      "para2": "Maqsadimiz — har bir o'quvchini IT sanoatining haqiqiy professional mutaxassisiga aylantirish.",
+      "fallback": {
+        "graduates": "Bitiruvchilar",
+        "courses": "Kurslar",
+        "projects": "Loyihalar",
+        "experience": "Yillik Tajriba",
+        "feat1": "Professional sertifikatlar",
+        "feat2": "Real loyihalarda ishlash",
+        "feat3": "Tajribali mentorlar",
+        "feat4": "Karera qo'llab-quvvatlash",
+        "feat5": "Zamonaviy o'quv dasturi",
+        "feat6": "Kichik guruhlar (max 15)"
+      }
+    },
+    "services": {
+      "pill": "Xizmatlar",
+      "titleStart": "Xizmat",
+      "titleAccent": "larimiz",
+      "subtitle": "Raqamli dunyoda muvaffaqiyat qozonish uchun barcha texnologik xizmatlar"
+    },
+    "whyUs": {
+      "pill": "Nega aynan biz",
+      "titleStart": "Nima Uchun",
+      "subtitle": "Sanoatning eng yaxshi standartlari bilan shaxsiy yondashuvni birlashtiramiz",
+      "ctaTitle": "Bugun boshlamoqchimisiz?",
+      "ctaSubtitle": "Bepul konsultatsiya oling va to'g'ri kursni tanla.",
+      "ctaButton": "Bepul Konsultatsiya",
+      "ctaCourses": "Kurslarni Ko'rish"
+    },
+    "contact": {
+      "pill": "Bog'lanish",
+      "titleStart": "Biz Bilan",
+      "titleAccent": "Bog'laning",
+      "subtitle": "Savollaringiz bormi? 24 soat ichida javob beramiz",
+      "formTitle": "Xabar Yuboring",
+      "formSub": "Biz tezda javob beramiz",
+      "sentTitle": "Xabar Yuborildi!",
+      "sentSub": "Tez orada siz bilan bog'lanamiz.",
+      "sendAgain": "Yana yuborish",
+      "nameLabel": "Ismingiz",
+      "namePlaceholder": "Ism Familiya",
+      "phoneLabel": "Telefon",
+      "subjectLabel": "Mavzu",
+      "subjectSelect": "Tanlang...",
+      "subjectCourse": "Kurs haqida",
+      "subjectService": "Xizmat haqida",
+      "subjectProject": "Loyiha haqida",
+      "subjectOther": "Boshqa",
+      "messageLabel": "Xabar",
+      "messagePlaceholder": "Xabaringizni yozing...",
+      "sendButton": "Xabar Yuborish",
+      "phoneSub": "Du-Sha, 09:00–19:00",
+      "telegramSub": "Tezkor javob",
+      "emailSub": "24 soat ichida javob",
+      "addressLabel": "Manzil",
+      "hoursTitle": "Ish Vaqtlari"
+    },
+    "testimonials": {
+      "pill": "Sharhlar",
+      "titleStart": "Talabalarimiz",
+      "titleAccent": "Fikri",
+      "subtitle": "Bitiruvchilarimiz DATA LIFE haqida nima deyishadi"
+    },
+    "courses": {
+      "pill": "Dasturlarimiz",
+      "titleStart": "Kurs",
+      "titleAccent": "larimiz",
+      "subtitle": "Har bir sohada professional bo'lish uchun to'liq dasturlar",
+      "loadError": "Kurslarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
+      "allCourses": "Barcha Kurslar"
+    },
+    "blog": {
+      "pill": "Bilimlar Markazi",
+      "titleAccent": "Maqolalar",
+      "subtitle": "Texnologiya, dasturlash va IT karera bo'yicha so'nggi maqolalar",
+      "loadError": "Maqolalarni yuklab bo'lmadi.",
+      "allPosts": "Barcha Maqolalar"
+    },
+    "projects": {
+      "pill": "Portfolio",
+      "titleStart": "Loyiha",
+      "titleAccent": "larimiz",
+      "subtitle": "Jamoamiz tomonidan yaratilgan real mahsulotlar",
+      "loadError": "Loyihalarni yuklab bo'lmadi.",
+      "all": "Barchasi",
+      "visitSite": "Saytga o'tish",
+      "view": "Ko'rish"
+    }
   }
 }

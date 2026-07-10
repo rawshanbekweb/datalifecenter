@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { resolveIcon } from '../utils/iconMap';
 
@@ -25,15 +26,17 @@ const DEFAULT_SVCS: ServiceItem[] = [
 ];
 
 export default function Services({ settings }: ServicesProps = {}): React.ReactElement {
+  const { t } = useTranslation();
+  // DEFAULT_SVCS — faqat API xatosida ko'rinadigan zaxira kontent, o'zbekcha qoladi
   const SVCS = settings?.items?.length ? settings.items : DEFAULT_SVCS;
   return (
     <section id="services" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
-          <span className="pill" style={{ background:'#fdf2f8', borderColor:'#fbcfe8', color:'#db2777' }}>What We Offer</span>
-          <h2 className="h-section" style={{ marginBottom:10 }}>Xizmat<span className="accent">larimiz</span></h2>
-          <p className="sub">Raqamli dunyoda muvaffaqiyat qozonish uchun barcha texnologik xizmatlar</p>
+          <span className="pill" style={{ background:'#fdf2f8', borderColor:'#fbcfe8', color:'#db2777' }}>{t('home.services.pill')}</span>
+          <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.services.titleStart')}<span className="accent">{t('home.services.titleAccent')}</span></h2>
+          <p className="sub">{t('home.services.subtitle')}</p>
         </motion.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="svc-grid">
@@ -65,7 +68,7 @@ export default function Services({ settings }: ServicesProps = {}): React.ReactE
                 </ul>
 
                 <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:s.color, cursor:'pointer' }}>
-                  Batafsil <ArrowRight size={14} />
+                  {t('common.more')} <ArrowRight size={14} />
                 </div>
               </motion.div>
             );

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Code2, Cpu, Globe, CheckCircle } from 'lucide-react';
 
 interface TerminalLine {
@@ -33,11 +34,12 @@ interface HeroProps {
   settings?: { stats?: StatItem[] };
 }
 
+// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi
 const DEFAULT_STATS: StatItem[] = [
-  { value: '2,000+', label: 'Bitiruvchilar' },
-  { value: '7+', label: 'Kurslar' },
-  { value: '5+', label: 'Yillik Tajriba' },
-  { value: '09:00–19:00', label: 'Ish Vaqti' },
+  { value: '2,000+', label: 'home.hero.fallbackStats.graduates' },
+  { value: '7+', label: 'home.hero.fallbackStats.courses' },
+  { value: '5+', label: 'home.hero.fallbackStats.experience' },
+  { value: '09:00–19:00', label: 'home.hero.fallbackStats.hours' },
 ];
 
 /* Animated particle canvas — light version */
@@ -119,7 +121,10 @@ const BADGES: BadgeItem[] = [
 ];
 
 export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
-  const stats = settings?.stats?.length ? settings.stats : DEFAULT_STATS;
+  const { t } = useTranslation();
+  const stats = settings?.stats?.length
+    ? settings.stats
+    : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
   return (
     <section id="home" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #faf5ff 100%)' }}>
       {/* Subtle BG circles */}
@@ -149,19 +154,18 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
 
             <motion.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
               style={{ fontSize:'clamp(16px,2vw,22px)', fontWeight:600, color:'#334155', marginBottom:10 }}>
-              IT kelajagini bugundan yarating
+              {t('home.hero.tagline')}
             </motion.p>
 
             <motion.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
               style={{ color:'#64748b', fontSize:15, lineHeight:1.85, marginBottom:36, maxWidth:460 }}>
-              Zamonaviy dasturlash, sun'iy intellekt va raqamli texnologiyalar bo'yicha professional ta'lim oling.
-              Real loyihalar va tajribali mentorlar bilan karera quring.
+              {t('home.hero.description')}
             </motion.p>
 
             <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
               style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:44 }}>
-              <a href="#contact"><button className="btn-primary">Start Learning <ArrowRight size={15} /></button></a>
-              <a href="#contact"><button className="btn-outline">Contact Us</button></a>
+              <a href="#contact"><button className="btn-primary">{t('home.hero.ctaPrimary')} <ArrowRight size={15} /></button></a>
+              <a href="#contact"><button className="btn-outline">{t('home.hero.ctaSecondary')}</button></a>
             </motion.div>
 
             {/* Trust badges */}

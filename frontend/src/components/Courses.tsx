@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { listCourses } from '../api/courses';
@@ -9,6 +10,7 @@ import React from 'react';
 type CourseStatus = 'loading' | 'ready' | 'error';
 
 export default function Courses(): React.ReactElement {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<any[]>([]);
   const [status, setStatus]   = useState<CourseStatus>('loading');
 
@@ -25,16 +27,16 @@ export default function Courses(): React.ReactElement {
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
-          <span className="pill">Our Programs</span>
-          <h2 className="h-section" style={{ marginBottom:10 }}>Kurs<span className="accent">larimiz</span></h2>
-          <p className="sub">Har bir sohada professional bo'lish uchun to'liq dasturlar</p>
+          <span className="pill">{t('home.courses.pill')}</span>
+          <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.courses.titleStart')}<span className="accent">{t('home.courses.titleAccent')}</span></h2>
+          <p className="sub">{t('home.courses.subtitle')}</p>
         </motion.div>
 
         {status === 'error' && (
-          <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>Kurslarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.</p>
+          <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.courses.loadError')}</p>
         )}
         {status === 'loading' && (
-          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>
+          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>
         )}
 
         {status === 'ready' && (
@@ -45,7 +47,7 @@ export default function Courses(): React.ReactElement {
 
         <div style={{ textAlign:'center', marginTop:36 }}>
           <Link to="/courses">
-            <button className="btn-dark" style={{ display:'inline-flex', alignItems:'center', gap:8 }}>Barcha Kurslar <ArrowRight size={15}/></button>
+            <button className="btn-dark" style={{ display:'inline-flex', alignItems:'center', gap:8 }}>{t('home.courses.allCourses')} <ArrowRight size={15}/></button>
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Star, Quote } from 'lucide-react';
 import { listTestimonials } from '../api/testimonials';
 
@@ -15,6 +16,7 @@ interface Testimonial {
 type TestimonialsStatus = 'loading' | 'ready' | 'error';
 
 export default function Testimonials(): React.ReactElement | null {
+  const { t } = useTranslation();
   const [items, setItems]   = useState<Testimonial[]>([]);
   const [status, setStatus] = useState<TestimonialsStatus>('loading');
 
@@ -34,12 +36,12 @@ export default function Testimonials(): React.ReactElement | null {
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
-          <span className="pill" style={{ background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a' }}>Testimonials</span>
-          <h2 className="h-section" style={{ marginBottom:10 }}>Talabalarimiz <span className="accent">Fikri</span></h2>
-          <p className="sub">Bitiruvchilarimiz DATA LIFE haqida nima deyishadi</p>
+          <span className="pill" style={{ background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a' }}>{t('home.testimonials.pill')}</span>
+          <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.testimonials.titleStart')} <span className="accent">{t('home.testimonials.titleAccent')}</span></h2>
+          <p className="sub">{t('home.testimonials.subtitle')}</p>
         </motion.div>
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
+        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
 
         {status === 'ready' && (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="testimonials-grid">

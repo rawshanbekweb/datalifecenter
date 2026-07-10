@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { resolveIcon } from '../utils/iconMap';
 
 interface FeatureItem {
@@ -24,17 +25,19 @@ const DEFAULT_FEATS: FeatureItem[] = [
 ];
 
 export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement {
+  const { t } = useTranslation();
+  // DEFAULT_FEATS — faqat API xatosida ko'rinadigan zaxira kontent, o'zbekcha qoladi
   const FEATS = settings?.items?.length ? settings.items : DEFAULT_FEATS;
   return (
     <section id="why-us" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:56 }}>
-          <span className="pill" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#d97706' }}>Why Choose Us</span>
+          <span className="pill" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#d97706' }}>{t('home.whyUs.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>
-            Nima Uchun <span className="accent">DATA LIFE?</span>
+            {t('home.whyUs.titleStart')} <span className="accent">DATA LIFE?</span>
           </h2>
-          <p className="sub">Sanoatning eng yaxshi standartlari bilan shaxsiy yondashuvni birlashtiramiz</p>
+          <p className="sub">{t('home.whyUs.subtitle')}</p>
         </motion.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="why-grid">
@@ -68,15 +71,15 @@ export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement
             background:'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', position:'relative', overflow:'hidden' }}>
             {/* Subtle top accent */}
             <div style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:80, height:2, background:'#0ea5e9', borderRadius:2 }} />
-            <h3 style={{ fontSize:26, fontWeight:800, color:'#fff', marginBottom:10 }}>Bugun boshlamoqchimisiz?</h3>
-            <p style={{ color:'rgba(255,255,255,0.6)', marginBottom:28, fontSize:15 }}>Bepul konsultatsiya oling va to'g'ri kursni tanla.</p>
+            <h3 style={{ fontSize:26, fontWeight:800, color:'#fff', marginBottom:10 }}>{t('home.whyUs.ctaTitle')}</h3>
+            <p style={{ color:'rgba(255,255,255,0.6)', marginBottom:28, fontSize:15 }}>{t('home.whyUs.ctaSubtitle')}</p>
             <div style={{ display:'flex', justifyContent:'center', gap:12, flexWrap:'wrap' }}>
-              <a href="#contact"><button className="btn-primary">Bepul Konsultatsiya</button></a>
+              <a href="#contact"><button className="btn-primary">{t('home.whyUs.ctaButton')}</button></a>
               <a href="#courses" style={{ textDecoration:'none' }}>
                 <button style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'12px 28px', borderRadius:50, background:'rgba(255,255,255,0.1)', color:'#fff', border:'1.5px solid rgba(255,255,255,0.2)', fontWeight:700, fontSize:15, cursor:'pointer', transition:'all 0.25s', fontFamily:'Outfit,sans-serif' }}
                   onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.18)'}}
                   onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.1)'}}>
-                  Kurslarni Ko'rish
+                  {t('home.whyUs.ctaCourses')}
                 </button>
               </a>
             </div>

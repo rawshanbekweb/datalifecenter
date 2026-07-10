@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 import { resolveIcon } from '../utils/iconMap';
 
@@ -35,17 +36,18 @@ function withAlpha(hex: string, alpha: string): string {
   return `${hex}${alpha}`;
 }
 
+// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi
 const DEFAULT_STATS: RawStatItem[] = [
-  { icon: 'Users',     value: '2,000+', label: 'Bitiruvchilar',  color: '#0ea5e9' },
-  { icon: 'BookOpen',  value: '7+',     label: 'Kurslar',        color: '#9333ea' },
-  { icon: 'Briefcase', value: '180+',   label: 'Loyihalar',      color: '#16a34a' },
-  { icon: 'Award',     value: '5+',     label: 'Yillik Tajriba', color: '#d97706' },
+  { icon: 'Users',     value: '2,000+', label: 'home.about.fallback.graduates',  color: '#0ea5e9' },
+  { icon: 'BookOpen',  value: '7+',     label: 'home.about.fallback.courses',    color: '#9333ea' },
+  { icon: 'Briefcase', value: '180+',   label: 'home.about.fallback.projects',   color: '#16a34a' },
+  { icon: 'Award',     value: '5+',     label: 'home.about.fallback.experience', color: '#d97706' },
 ];
 
-const DEFAULT_FEATURES: string[] = [
-  'Professional sertifikatlar',   'Real loyihalarda ishlash',
-  'Tajribali mentorlar',          "Karera qo'llab-quvvatlash",
-  "Zamonaviy o'quv dasturi",      'Kichik guruhlar (max 15)',
+const DEFAULT_FEATURE_KEYS: string[] = [
+  'home.about.fallback.feat1', 'home.about.fallback.feat2',
+  'home.about.fallback.feat3', 'home.about.fallback.feat4',
+  'home.about.fallback.feat5', 'home.about.fallback.feat6',
 ];
 
 const DEFAULT_SKILLS: SkillItem[] = [
@@ -61,8 +63,11 @@ const DEFAULT_SATISFACTION: SatisfactionItem[] = [
 ];
 
 export default function About({ settings }: AboutProps = {}): React.ReactElement {
-  const STATS = settings?.stats?.length ? settings.stats : DEFAULT_STATS;
-  const FEATURES = settings?.features?.length ? settings.features : DEFAULT_FEATURES;
+  const { t } = useTranslation();
+  const STATS = settings?.stats?.length
+    ? settings.stats
+    : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
+  const FEATURES = settings?.features?.length ? settings.features : DEFAULT_FEATURE_KEYS.map((k) => t(k));
   const SKILLS = settings?.skills?.length ? settings.skills : DEFAULT_SKILLS;
   const SATISFACTION = settings?.satisfaction?.length ? settings.satisfaction : DEFAULT_SATISFACTION;
   return (
@@ -72,9 +77,9 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
         {/* Header */}
         <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:64 }}>
-          <span className="pill">About Us</span>
-          <h2 className="h-section" style={{ marginBottom:10 }}>Biz <span className="accent">Haqimizda</span></h2>
-          <p className="sub">O'zbekistondagi eng innovatsion IT ta'lim markazi</p>
+          <span className="pill">{t('home.about.pill')}</span>
+          <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.about.titleStart')} <span className="accent">{t('home.about.titleAccent')}</span></h2>
+          <p className="sub">{t('home.about.subtitle')}</p>
         </motion.div>
 
         {/* Two columns */}
@@ -84,13 +89,13 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
           <motion.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="divider" />
             <h3 style={{ fontSize:28, fontWeight:800, color:'#0f172a', lineHeight:1.35, marginBottom:16 }}>
-              Kelajak texnologiyalarini <span className="accent">bugun o'rganing</span>
+              {t('home.about.headingStart')} <span className="accent">{t('home.about.headingAccent')}</span>
             </h3>
             <p style={{ color:'#64748b', lineHeight:1.85, fontSize:15, marginBottom:14 }}>
-              <strong style={{ color:'#0f172a' }}>DATA LIFE</strong> — dasturlash o'qitish, raqamli mahsulotlar yaratish va kelajak mutaxassislarini tayyorlashga ixtisoslashgan zamonaviy IT markazi.
+              <strong style={{ color:'#0f172a' }}>DATA LIFE</strong> — {t('home.about.para1')}
             </p>
             <p style={{ color:'#64748b', lineHeight:1.85, fontSize:15, marginBottom:28 }}>
-              Maqsadimiz — har bir o'quvchini IT sanoatining haqiqiy professional mutaxassisiga aylantirish.
+              {t('home.about.para2')}
             </p>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px 16px' }}>
               {FEATURES.map((f: string) => (

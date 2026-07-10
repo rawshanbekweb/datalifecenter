@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ExternalLink, GitBranch } from 'lucide-react';
 import { listProjects } from '../api/projects';
 
@@ -28,6 +29,7 @@ function hostnameOf(url?: string | null): string {
 }
 
 function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
+  const { t } = useTranslation();
   const host = hostnameOf(p.liveUrl);
   return (
     <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
@@ -62,10 +64,10 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
               style={{ display: 'block', position: 'relative', aspectRatio: '16/10', overflow: 'hidden', cursor: p.liveUrl ? 'pointer' : 'default', background: '#fff' }}
               className="proj-shot-link">
               {isLive ? (
-                <iframe src={p.liveUrl!} title={`${p.title} — jonli ko'rinish`} loading="lazy" sandbox="allow-scripts allow-same-origin"
+                <iframe src={p.liveUrl!} title={p.title} loading="lazy" sandbox="allow-scripts allow-same-origin"
                   style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }} />
               ) : (
-                <img src={p.screenshotUrl} alt={`${p.title} skrinshoti`} loading="lazy" className="proj-shot-img"
+                <img src={p.screenshotUrl} alt={p.title} loading="lazy" className="proj-shot-img"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block', transition: 'transform 0.4s ease' }} />
               )}
               {p.liveUrl && (
@@ -75,7 +77,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
                     background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s', textDecoration: 'none',
                   }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 50, background: '#fff', fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
-                      Saytga o'tish <ExternalLink size={13} />
+                      {t('home.projects.visitSite')} <ExternalLink size={13} />
                     </span>
                   </a>
                 ) : (
@@ -84,7 +86,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
                     background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s',
                   }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 50, background: '#fff', fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
-                      Saytga o'tish <ExternalLink size={13} />
+                      {t('home.projects.visitSite')} <ExternalLink size={13} />
                     </span>
                   </div>
                 )
@@ -114,7 +116,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
             {p.liveUrl && (
               <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', flex: 1 }}>
                 <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 12, padding: '8px 12px' }}>
-                  Ko'rish <ExternalLink size={12} />
+                  {t('home.projects.view')} <ExternalLink size={12} />
                 </button>
               </a>
             )}
@@ -133,9 +135,11 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
 }
 
 export default function Projects(): React.ReactElement | null {
+  const { t } = useTranslation();
   const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
-  const [active, setActive]     = useState<string>('Barchasi');
+  // 'ALL' — maxsus qiymat, ko'rsatilganda t('home.projects.all') bilan tarjima qilinadi
+  const [active, setActive]     = useState<string>('ALL');
 
   useEffect(() => {
     let cancelled = false;
@@ -145,8 +149,8 @@ export default function Projects(): React.ReactElement | null {
     return () => { cancelled = true; };
   }, []);
 
-  const categories = useMemo(() => ['Barchasi', ...Array.from(new Set(projects.map((p) => p.category)))], [projects]);
-  const list = active === 'Barchasi' ? projects : projects.filter((p) => p.category === active);
+  const categories = useMemo(() => ['ALL', ...Array.from(new Set(projects.map((p) => p.category)))], [projects]);
+  const list = active === 'ALL' ? projects : projects.filter((p) => p.category === active);
 
   if (status !== 'loading' && projects.length === 0) return null;
 
@@ -155,13 +159,13 @@ export default function Projects(): React.ReactElement | null {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: 48 }}>
-          <span className="pill" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>Portfolio</span>
-          <h2 className="h-section" style={{ marginBottom: 10 }}>Loyiha<span className="accent">larimiz</span></h2>
-          <p className="sub">Jamoamiz tomonidan yaratilgan real mahsulotlar</p>
+          <span className="pill" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>{t('home.projects.pill')}</span>
+          <h2 className="h-section" style={{ marginBottom: 10 }}>{t('home.projects.titleStart')}<span className="accent">{t('home.projects.titleAccent')}</span></h2>
+          <p className="sub">{t('home.projects.subtitle')}</p>
         </motion.div>
 
-        {status === 'loading' && <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
-        {status === 'error' && <p style={{ textAlign: 'center', color: '#dc2626', fontSize: 14 }}>Loyihalarni yuklab bo'lmadi.</p>}
+        {status === 'loading' && <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+        {status === 'error' && <p style={{ textAlign: 'center', color: '#dc2626', fontSize: 14 }}>{t('home.projects.loadError')}</p>}
 
         {status === 'ready' && (
           <>
@@ -173,7 +177,7 @@ export default function Projects(): React.ReactElement | null {
                     background: active === c ? '#0f172a' : '#fff', color: active === c ? '#fff' : '#475569',
                     border: active === c ? 'none' : '1.5px solid #e2e8f0', boxShadow: active === c ? '0 4px 14px rgba(0,0,0,0.15)' : 'none',
                   }}>
-                    {c}
+                    {c === 'ALL' ? t('home.projects.all') : c}
                   </button>
                 ))}
               </div>
