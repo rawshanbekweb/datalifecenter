@@ -1,0 +1,340 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "sending": "Sending...",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "more": "Details",
+    "close": "Close",
+    "all": "All",
+    "free": "Free",
+    "error": "Something went wrong",
+    "loadFailed": "Failed to load data."
+  },
+  "levels": {
+    "BEGINNER": "Beginner",
+    "INTERMEDIATE": "Intermediate",
+    "ADVANCED": "Advanced"
+  },
+  "errors": {
+    "network": "Could not connect to the server. Check your internet connection.",
+    "generic": "An unexpected error occurred"
+  },
+  "auth": {
+    "password": "Password",
+    "passwordHint": "At least 6 characters",
+    "login": {
+      "title": "Log in",
+      "subtitle": "Sign in to your DATA LIFE account",
+      "error": "Failed to log in",
+      "forgot": "Forgot password?",
+      "loading": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up"
+    },
+    "register": {
+      "title": "Sign up",
+      "subtitle": "Create a new DATA LIFE account",
+      "error": "Failed to sign up",
+      "nameLabel": "Full name",
+      "phoneLabel": "Phone",
+      "loading": "Creating...",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "We'll email you a reset link",
+      "sentTitle": "Link sent",
+      "sentPrefix": "If",
+      "sentSuffix": "is registered, a password reset link has been sent. Check your inbox (and the spam folder). The link is valid for 30 minutes.",
+      "submit": "Send link",
+      "remember": "Remembered your password?"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "subtitle": "Enter a new password for your account",
+      "invalidLink": "Invalid link.",
+      "requestAgain": "Request a new password reset",
+      "done": "Password updated! You can now log in with your new password. Redirecting to the login page...",
+      "mismatch": "Passwords do not match",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Enter the password again",
+      "submit": "Update password",
+      "backToLogin": "Back to login"
+    },
+    "verifyEmail": {
+      "title": "Email verification",
+      "subtitle": "Activate your DATA LIFE account",
+      "verifying": "Verifying...",
+      "noToken": "Invalid link — token not found.",
+      "done": "Your email has been verified! You now have full access to the platform.",
+      "errorHint": "You can resend the verification link from your profile page.",
+      "toProfile": "Go to profile"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "Company",
+    "courses": "Courses",
+    "mentors": "Mentors",
+    "partners": "Partners",
+    "blog": "Blog",
+    "contact": "Contact",
+    "login": "Log in",
+    "start": "Get started",
+    "logout": "Log out",
+    "admin": "Admin",
+    "mentorCabinet": "Mentor",
+    "myCabinet": "My account",
+    "adminPanel": "Admin panel",
+    "mentorCabinetFull": "Mentor dashboard"
+  },
+  "footer": {
+    "description": "The most modern IT education center in Uzbekistan. Programming and digital products are our mission.",
+    "sections": {
+      "courses": "Courses",
+      "services": "Services",
+      "company": "Company"
+    },
+    "links": {
+      "allCourses": "All Courses",
+      "whyUs": "Why Us",
+      "webDev": "Web Development",
+      "mobileApps": "Mobile Apps",
+      "uiuxDesign": "UI/UX Design",
+      "itConsulting": "IT Consulting",
+      "digitalSolutions": "Digital Solutions",
+      "aboutUs": "About Us",
+      "blog": "Blog",
+      "projects": "Projects",
+      "partnership": "Partnership"
+    },
+    "newsletter": {
+      "title": "Stay up to date with IT news",
+      "subtitle": "Weekly IT news, course discounts and articles",
+      "placeholder": "Your email",
+      "button": "Subscribe"
+    },
+    "legal": {
+      "privacy": "Privacy",
+      "terms": "Terms of Use",
+      "cookie": "Cookie"
+    },
+    "copyright": "© {{year}} DATA LIFE IT Center. All rights reserved.",
+    "systemsOperational": "All systems operational"
+  },
+  "home": {
+    "hero": {
+      "tagline": "Build your IT future starting today",
+      "description": "Get professional education in modern programming, artificial intelligence and digital technologies. Build your career with real projects and experienced mentors.",
+      "ctaPrimary": "Start learning",
+      "ctaSecondary": "Contact us",
+      "fallbackStats": {
+        "graduates": "Graduates",
+        "courses": "Courses",
+        "experience": "Years of Experience",
+        "hours": "Working Hours"
+      }
+    },
+    "about": {
+      "pill": "About Us",
+      "titleStart": "About",
+      "titleAccent": "Us",
+      "subtitle": "The most innovative IT education center in Uzbekistan",
+      "headingStart": "Learn the technologies of the future",
+      "headingAccent": "today",
+      "para1": "a modern IT center specializing in programming education, building digital products and training the specialists of tomorrow.",
+      "para2": "Our goal is to turn every student into a true professional of the IT industry.",
+      "fallback": {
+        "graduates": "Graduates",
+        "courses": "Courses",
+        "projects": "Projects",
+        "experience": "Years of Experience",
+        "feat1": "Professional certificates",
+        "feat2": "Work on real projects",
+        "feat3": "Experienced mentors",
+        "feat4": "Career support",
+        "feat5": "Modern curriculum",
+        "feat6": "Small groups (max 15)"
+      }
+    },
+    "services": {
+      "pill": "Services",
+      "titleStart": "Our ",
+      "titleAccent": "Services",
+      "subtitle": "All the technology services you need to succeed in the digital world"
+    },
+    "whyUs": {
+      "pill": "Why us",
+      "titleStart": "Why",
+      "subtitle": "We combine the industry's best standards with a personal approach",
+      "ctaTitle": "Want to start today?",
+      "ctaSubtitle": "Get a free consultation and choose the right course.",
+      "ctaButton": "Free Consultation",
+      "ctaCourses": "View Courses"
+    },
+    "contact": {
+      "pill": "Get In Touch",
+      "titleStart": "Contact",
+      "titleAccent": "Us",
+      "subtitle": "Have questions? We reply within 24 hours",
+      "formTitle": "Send a Message",
+      "formSub": "We reply quickly",
+      "sentTitle": "Message Sent!",
+      "sentSub": "We will contact you soon.",
+      "sendAgain": "Send again",
+      "nameLabel": "Your name",
+      "namePlaceholder": "Full name",
+      "phoneLabel": "Phone",
+      "subjectLabel": "Subject",
+      "subjectSelect": "Select...",
+      "subjectCourse": "About a course",
+      "subjectService": "About a service",
+      "subjectProject": "About a project",
+      "subjectOther": "Other",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Write your message...",
+      "sendButton": "Send Message",
+      "phoneSub": "Mon–Sat, 09:00–19:00",
+      "telegramSub": "Fast reply",
+      "emailSub": "Reply within 24 hours",
+      "addressLabel": "Address",
+      "hoursTitle": "Working Hours"
+    },
+    "testimonials": {
+      "pill": "Reviews",
+      "titleStart": "Student",
+      "titleAccent": "Reviews",
+      "subtitle": "What our graduates say about DATA LIFE"
+    },
+    "courses": {
+      "pill": "Our Programs",
+      "titleStart": "Our ",
+      "titleAccent": "Courses",
+      "subtitle": "Complete programs to become a professional in every field",
+      "loadError": "Failed to load courses. Check that the backend is running.",
+      "allCourses": "All Courses"
+    },
+    "blog": {
+      "pill": "Knowledge Hub",
+      "titleAccent": "Articles",
+      "subtitle": "The latest articles on technology, programming and IT careers",
+      "loadError": "Failed to load articles.",
+      "allPosts": "All Articles"
+    },
+    "projects": {
+      "pill": "Portfolio",
+      "titleStart": "Our ",
+      "titleAccent": "Projects",
+      "subtitle": "Real products built by our team",
+      "loadError": "Failed to load projects.",
+      "all": "All",
+      "visitSite": "Visit site",
+      "view": "View"
+    }
+  },
+  "pages": {
+    "courses": {
+      "pill": "Course catalog",
+      "title": "All",
+      "accent": "Courses",
+      "sub": "Choose the right track for you and start today",
+      "searchPlaceholder": "Search courses...",
+      "allLevels": "All levels",
+      "allCourses": "All courses",
+      "paid": "Paid",
+      "empty": "No courses found."
+    },
+    "blog": {
+      "pill": "Knowledge Hub",
+      "title": "Blog &",
+      "accent": "Articles",
+      "sub": "The latest articles on technology, programming and IT careers",
+      "empty": "No articles found."
+    },
+    "blogDetail": {
+      "back": "All articles",
+      "notFoundTitle": "Article not found",
+      "notFoundSub": "The article you are looking for does not exist or has been deleted.",
+      "errorSub": "Failed to load the article. Check that the backend is running.",
+      "readMinutes": "{{n}} min",
+      "views": "{{n}} views"
+    },
+    "mentors": {
+      "pill": "Our team",
+      "title": "Our",
+      "accent": "Mentors",
+      "sub": "Professionals in their field will guide you every step of the way",
+      "empty": "No mentors added yet.",
+      "loadError": "Failed to load mentors. Check that the backend is running."
+    },
+    "partners": {
+      "pill": "Trusted connections",
+      "title": "Our",
+      "accent": "Partners",
+      "sub": "Companies and organizations that work with us",
+      "empty": "No partners added yet.",
+      "loadError": "Failed to load partners. Check that the backend is running."
+    },
+    "courseDetail": {
+      "back": "All courses",
+      "notFoundTitle": "Course not found",
+      "notFoundSub": "The course you are looking for does not exist or has been deleted.",
+      "errorSub": "Failed to load the course. Check that the backend is running.",
+      "months": "{{n}} mo",
+      "students": "{{n}} students",
+      "curriculum": "Curriculum ({{n}} lessons)",
+      "minutesShort": "{{n}} min",
+      "mentor": "Mentor",
+      "loginPrompt": "Log in to enroll in this course.",
+      "loginAndEnroll": "Log in and enroll",
+      "enrolledSuccess": "You have successfully enrolled!",
+      "startLessons": "Start lessons",
+      "pendingInfo": "Your request has been received. Online payment is coming soon — for now your enrollment is in \"Pending\" status.",
+      "alreadyEnrolled": "You are already enrolled in this course.",
+      "continueLessons": "Continue lessons",
+      "freePrompt": "This course is free — you can start right now.",
+      "paidPrompt": "Send a request to enroll in this course.",
+      "enroll": "Enroll in course",
+      "reviewsTitle": "Student reviews",
+      "reviewsCount": "{{n}} reviews"
+    },
+    "certificate": {
+      "title": "Verify certificate",
+      "subtitle": "Confirm the authenticity of a DATA LIFE certificate",
+      "check": "Verify",
+      "valid": "Certificate is valid",
+      "number": "Number",
+      "student": "Student",
+      "course": "Course",
+      "program": "{{n}}-month program",
+      "completedAt": "Completion date"
+    },
+    "notFound": {
+      "title": "404 — Page not found",
+      "sub": "The page you are looking for does not exist or has been moved."
+    }
+  },
+  "comingSoon": {
+    "backHome": "Back to home"
+  },
+  "cards": {
+    "course": {
+      "modules": "Modules",
+      "months": "{{n}} mo",
+      "studentsShort": "{{n}} students",
+      "more": "More"
+    },
+    "blog": {
+      "views": "{{n}} views",
+      "readMinutes": "{{n}} min",
+      "continue": "Continue reading"
+    }
+  }
+}
