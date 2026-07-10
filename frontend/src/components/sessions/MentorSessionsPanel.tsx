@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Video, Plus, Play, Square, Trash2, ExternalLink, Wand2 } from 'lucide-react';
 import {
   ManagedLiveSession,
@@ -206,8 +207,12 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
               </div>
               <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>{meta.label}</span>
               <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                <a href={s.meetingUrl} target="_blank" rel="noreferrer" title="Xonaga o'tish"
+                <Link to={`/live/${s.id}`} title="Xonaga kirish (saytda)"
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 9, background: '#f0f9ff', border: '1.5px solid #bae6fd', color: '#0ea5e9' }}>
+                  <Video size={14} />
+                </Link>
+                <a href={s.meetingUrl} target="_blank" rel="noreferrer" title="Tashqi havolada ochish"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: 9, background: '#f8fafc', border: '1.5px solid #e2e8f0', color: '#64748b' }}>
                   <ExternalLink size={14} />
                 </a>
                 {s.status === 'SCHEDULED' && (

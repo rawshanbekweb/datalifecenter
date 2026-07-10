@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createSessionHandler,
   deleteSessionHandler,
+  getSessionHandler,
   listManagedSessionsHandler,
   listMySessionsHandler,
   updateSessionHandler,
@@ -16,6 +17,8 @@ const router = Router();
 router.use(authenticate);
 router.get('/mine', listMySessionsHandler);
 router.get('/manage', authorize('MENTOR', 'ADMIN'), listManagedSessionsHandler);
+// Eslatma: '/:id' aniq yo'llardan KEYIN turishi shart
+router.get('/:id', getSessionHandler);
 router.post('/', authorize('MENTOR', 'ADMIN'), validateBody(createSessionSchema), createSessionHandler);
 router.patch('/:id', authorize('MENTOR', 'ADMIN'), validateBody(updateSessionSchema), updateSessionHandler);
 router.delete('/:id', authorize('MENTOR', 'ADMIN'), deleteSessionHandler);

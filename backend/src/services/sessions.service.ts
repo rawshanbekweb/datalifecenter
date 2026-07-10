@@ -133,6 +133,36 @@ export async function listMySessions(userId: string, locale: SupportedLocale) {
   return resolveLocaleDeep(sessions, locale);
 }
 
+// Bitta sessiya — saytdagi jonli efir sahifasi (/live/:id) uchun.
+// Kirish huquqi: ADMIN — istalgan; sessiya mentorining o'zi; yoki kursga faol
+// yozilgan talaba (auditoriya tanlangan bo'lsa faqat o'sha ro'yxatdagilar).
+export async function getSessionForViewer(id: string, actor: Actor, locale: SupportedLocale) {
+  const session = await prisma.liveSession.findUnique({ where: { id }, include: sessionInclude });
+  if (!session) {
+    throw ApiError.notFound('Sessiya topilmadi');
+  }
+
+  if (actor.role !== 'ADMIN') {
+    const mentor =
+      actor.role === 'MENTOR' ? await prisma.mentor.findUnique({ where: { userId: actor.userId } }) : null;
+    const isOwnerMentor = mentor !== null && session.mentorId === mentor.id;
+
+    if (!isOwnerMentor) {
+      const enrollment = await prisma.enrollment.findFirst({
+        where: { userId: actor.userId, courseId: session.courseId, status: { in: ['ACTIVE', 'COMPLETED'] } },
+        select: { id: true },
+      });
+      const inAudience =
+        session.targetStudentIds.length === 0 || session.targetStudentIds.includes(actor.userId);
+      if (!enrollment || !inAudience) {
+        throw ApiError.forbidden("Bu jonli darsga kirish huquqingiz yo'q", 'SESSION_FORBIDDEN');
+      }
+    }
+  }
+
+  return resolveLocaleDeep(session, locale);
+}
+
 // Mentor: o'z sessiyalari; Admin: hammasi
 export async function listManagedSessions(actor: Actor) {
   const where: Prisma.LiveSessionWhereInput =

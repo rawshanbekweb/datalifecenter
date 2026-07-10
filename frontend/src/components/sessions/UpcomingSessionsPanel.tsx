@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Video, Radio } from 'lucide-react';
 import { LiveSession, getMySessions } from '../../api/sessions';
 import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
@@ -45,11 +46,11 @@ export default function UpcomingSessionsPanel(): React.ReactElement | null {
               <span className="tag" style={{ background: meta.bg, borderColor: meta.border, color: meta.color, fontWeight: 700, flexShrink: 0 }}>
                 {meta.label}
               </span>
-              <a href={s.meetingUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', flexShrink: 0 }}>
+              <Link to={`/live/${s.id}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
                 <button className={isLive ? 'btn-primary' : 'btn-outline'} style={{ fontSize: 12.5, padding: '9px 16px' }}>
-                  <Video size={14} /> {isLive ? "Darsga qo'shilish" : 'Xona havolasi'}
+                  <Video size={14} /> {isLive ? "Darsga qo'shilish" : 'Xonani ochish'}
                 </button>
-              </a>
+              </Link>
             </div>
           );
         })}

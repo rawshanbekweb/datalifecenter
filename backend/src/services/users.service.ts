@@ -62,7 +62,36 @@ export async function updateUserRole(id: string, role: 'STUDENT' | 'MENTOR' | 'A
     throw ApiError.conflict("O'zingizning admin huquqingizni olib tashlay olmaysiz", 'CANNOT_DEMOTE_SELF');
   }
 
-  return prisma.user.update({ where: { id }, data: { role }, select: userSelect });
+  return prisma.$transaction(async (tx) => {
+    const updated = await tx.user.update({ where: { id }, data: { role }, select: userSelect });
+
+    // MENTOR roli ishlashi uchun Mentor yozuvi userId orqali bog'langan bo'lishi
+    // shart (aks holda kabinet MENTOR_NOT_LINKED beradi). Admin rolni almashtirishi
+    // bilanoq kabinet ishlashi uchun avtomatik bog'laymiz:
+    if (role === 'MENTOR') {
+      const linked = await tx.mentor.findUnique({ where: { userId: id } });
+      if (!linked) {
+        // Admin oldindan xuddi shu ism bilan (hali bog'lanmagan) mentor profili
+        // yaratgan bo'lsa — dublikat ochmasdan o'shani bog'laymiz
+        const unlinkedSameName = await tx.mentor.findFirst({ where: { userId: null, name: user.name } });
+        if (unlinkedSameName) {
+          await tx.mentor.update({ where: { id: unlinkedSameName.id }, data: { userId: id } });
+        } else {
+          await tx.mentor.create({
+            data: {
+              userId: id,
+              name: user.name,
+              bio: { uz: `${user.name} — DATA LIFE mentori.` },
+              specialty: { uz: 'Mentor' },
+              featured: false,
+            },
+          });
+        }
+      }
+    }
+
+    return updated;
+  });
 }
 
 export async function setUserBlocked(id: string, blocked: boolean, actingUserId: string) {

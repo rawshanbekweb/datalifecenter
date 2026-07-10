@@ -45,6 +45,11 @@ export function getMySessions(): Promise<LiveSession[]> {
   return apiFetch('/sessions/mine');
 }
 
+// Saytdagi jonli efir sahifasi (/live/:id) uchun — huquq backend'da tekshiriladi
+export function getSession(id: string): Promise<LiveSession> {
+  return apiFetch(`/sessions/${id}`);
+}
+
 export function getManagedSessions(): Promise<ManagedLiveSession[]> {
   return apiFetch('/sessions/manage');
 }

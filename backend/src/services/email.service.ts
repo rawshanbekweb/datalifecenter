@@ -16,13 +16,7 @@ interface MailInput {
   html: string;
 }
 
-async function sendMail(input: MailInput): Promise<void> {
-  if (!emailEnabled) {
-    if (env.NODE_ENV !== 'production') {
-      console.log(`[email o'chiq] ${input.to} — ${input.subject}\n${input.text}`);
-    }
-    return;
-  }
+async function deliver(input: MailInput): Promise<void> {
   try {
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -31,6 +25,9 @@ async function sendMail(input: MailInput): Promise<void> {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
+      // Brevo'ga ulanib bo'lmasa (tarmoq bloklangan/sekin) 8 soniyada uziladi —
+      // undici'ning 10s connect-timeout'ini kutmasdan aniq xato logi qoldiriladi
+      signal: AbortSignal.timeout(8000),
       body: JSON.stringify({
         sender: { name: FROM_NAME, email: FROM_EMAIL },
         to: [{ email: input.to }],
@@ -40,12 +37,24 @@ async function sendMail(input: MailInput): Promise<void> {
       }),
     });
     if (!res.ok) {
-      console.error('Email yuborilmadi:', res.status, await res.text().catch(() => ''));
+      console.error(`Email yuborilmadi (${input.to} — ${input.subject}):`, res.status, await res.text().catch(() => ''));
     }
   } catch (err) {
-    // Email yuborilmasa ham API so'rovi muvaffaqiyatli tugashi kerak
-    console.error('Email yuborilmadi:', err);
+    console.error(`Email yuborilmadi (${input.to} — ${input.subject}):`, err instanceof Error ? err.message : err);
   }
+}
+
+// Fire-and-forget: email yuborish HTTP so'rovni hech qachon bloklamaydi va
+// yiqitmaydi (register/parol tiklash Brevo'ga ulanib bo'lmasa ham darhol javob
+// qaytaradi). Xatolar faqat konsolga yoziladi.
+async function sendMail(input: MailInput): Promise<void> {
+  if (!emailEnabled) {
+    if (env.NODE_ENV !== 'production') {
+      console.log(`[email o'chiq] ${input.to} — ${input.subject}\n${input.text}`);
+    }
+    return;
+  }
+  void deliver(input);
 }
 
 function layout(title: string, bodyHtml: string): string {

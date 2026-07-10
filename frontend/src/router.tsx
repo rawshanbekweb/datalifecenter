@@ -25,6 +25,7 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'))
 const VerifyCertificatePage = lazy(() => import('./pages/VerifyCertificatePage'))
 const LearnPage = lazy(() => import('./pages/LearnPage'))
+const LiveSessionPage = lazy(() => import('./pages/LiveSessionPage'))
 
 const StudentLayout = lazy(() => import('./layouts/StudentLayout'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
@@ -101,6 +102,7 @@ export function createAppRouter(basename: string) {
       { path: 'dashboard', element: <RoleHomeRedirect /> },
       { path: 'profile', element: <Navigate to="/student/profile" replace /> },
       { path: 'learn/:slug', element: <ProtectedRoute>{s(<LearnPage />)}</ProtectedRoute> },
+      { path: 'live/:id', element: <ProtectedRoute>{s(<LiveSessionPage />)}</ProtectedRoute> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

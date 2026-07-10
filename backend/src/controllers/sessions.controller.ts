@@ -22,6 +22,12 @@ export const listManagedSessionsHandler = asyncHandler(async (req: Request, res:
   sendSuccess(res, sessions);
 });
 
+export const getSessionHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const session = await sessionsService.getSessionForViewer(req.params.id as string, req.user, req.locale);
+  sendSuccess(res, session);
+});
+
 export const updateSessionHandler = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
   const session = await sessionsService.updateSession(req.params.id as string, req.body, req.user);
