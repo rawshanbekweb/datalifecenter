@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Clock, Star, Users, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
 import { getCourseBySlug } from '../api/courses';
 import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
@@ -28,6 +29,8 @@ interface CourseMentor {
   bio?: string;
 }
 
+type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+
 interface CourseDetail {
   id: string | number;
   slug: string;
@@ -40,7 +43,7 @@ interface CourseDetail {
   border: string;
   rating?: number | string;
   reviewsCount?: number;
-  level: keyof typeof LEVEL_LABELS;
+  level: CourseLevel;
   price: number | string;
   currency: string;
   isFree: boolean;
@@ -62,9 +65,8 @@ type LoadStatus = 'loading' | 'ready' | 'not-found' | 'error';
 type EnrollStatus = 'idle' | 'loading' | 'success' | 'already' | 'error';
 type PayStatus = 'idle' | 'loading' | 'success' | 'error';
 
-const LEVEL_LABELS = { BEGINNER: "Boshlang'ich", INTERMEDIATE: "O'rta", ADVANCED: 'Yuqori' } as const;
-
 export default function CourseDetailPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const [course, setCourse] = useState<CourseDetail | null>(null);
@@ -101,13 +103,13 @@ export default function CourseDetailPage(): React.ReactElement {
   }, [user, slug]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</section>;
+    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
   }
   if (status === 'error') {
-    return <ComingSoon title="Xatolik yuz berdi" sub="Kursni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring." />;
+    return <ComingSoon title={t('common.error')} sub={t('pages.courseDetail.errorSub')} />;
   }
   if (status === 'not-found' || !course) {
-    return <ComingSoon title="Kurs topilmadi" sub="Siz qidirgan kurs mavjud emas yoki o'chirilgan." />;
+    return <ComingSoon title={t('pages.courseDetail.notFoundTitle')} sub={t('pages.courseDetail.notFoundSub')} />;
   }
 
   const Icon = resolveIcon(course.iconKey);
@@ -123,7 +125,7 @@ export default function CourseDetailPage(): React.ReactElement {
       if (err.code === 'ALREADY_ENROLLED') {
         setEnrollStatus('already');
       } else {
-        setEnrollError(err.message || 'Xatolik yuz berdi');
+        setEnrollError(err.message || t('common.error'));
         setEnrollStatus('error');
       }
     }
@@ -144,7 +146,7 @@ export default function CourseDetailPage(): React.ReactElement {
     <section style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1000, margin:'0 auto', padding:'0 24px' }}>
         <Link to="/courses" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none', marginBottom:24 }}>
-          <ArrowLeft size={14}/> Barcha kurslar
+          <ArrowLeft size={14}/> {t('pages.courseDetail.back')}
         </Link>
 
         <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
@@ -161,23 +163,23 @@ export default function CourseDetailPage(): React.ReactElement {
           </div>
 
           <div style={{ display:'flex', gap:24, flexWrap:'wrap', marginTop:24, paddingTop:20, borderTop:`1px solid ${course.border}` }}>
-            <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Clock size={14}/> {course.durationMonths} oy</span>
+            <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Clock size={14}/> {t('pages.courseDetail.months', { n: course.durationMonths })}</span>
             {Number(course.rating) > 0 && (
               <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Star size={14} fill={course.color} style={{ color:course.color }}/> {course.rating}</span>
             )}
             {course.studentsCount > 0 && (
-              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {course.studentsCount} talaba</span>
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {t('pages.courseDetail.students', { n: course.studentsCount })}</span>
             )}
-            <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{LEVEL_LABELS[course.level]}</span>
+            <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{t(`levels.${course.level}`)}</span>
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
-              {course.isFree ? 'Bepul' : `${Number(course.price).toLocaleString('uz-UZ')} ${course.currency}`}
+              {course.isFree ? t('common.free') : `${Number(course.price).toLocaleString('uz-UZ')} ${course.currency}`}
             </span>
           </div>
         </motion.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:24 }} className="detail-grid">
           <div>
-            <h2 style={{ fontSize:18, fontWeight:800, color:'#0f172a', marginBottom:16 }}>Dastur tarkibi ({totalLessons} dars)</h2>
+            <h2 style={{ fontSize:18, fontWeight:800, color:'#0f172a', marginBottom:16 }}>{t('pages.courseDetail.curriculum', { n: totalLessons })}</h2>
             {course.modules.map((mod, mi) => (
               <div key={mod.id} className="card" style={{ padding:'18px 20px', marginBottom:12 }}>
                 <p style={{ fontSize:13, fontWeight:700, color:'#0f172a', marginBottom:10 }}>
@@ -187,8 +189,8 @@ export default function CourseDetailPage(): React.ReactElement {
                   <div key={lesson.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', fontSize:13, color:'#64748b' }}>
                     {lesson.isFreePreview ? <PlayCircle size={15} style={{ color:course.color }}/> : <Lock size={13} style={{ color:'#cbd5e1' }}/>}
                     <span style={{ flex:1 }}>{lesson.title}</span>
-                    {lesson.isFreePreview && <span className="tag" style={{ borderColor:course.border, color:course.color }}>Bepul</span>}
-                    {lesson.durationMinutes && <span style={{ fontSize:11, color:'#94a3b8' }}>{lesson.durationMinutes} daq</span>}
+                    {lesson.isFreePreview && <span className="tag" style={{ borderColor:course.border, color:course.color }}>{t('common.free')}</span>}
+                    {lesson.durationMinutes && <span style={{ fontSize:11, color:'#94a3b8' }}>{t('pages.courseDetail.minutesShort', { n: lesson.durationMinutes })}</span>}
                   </div>
                 ))}
               </div>
@@ -200,7 +202,7 @@ export default function CourseDetailPage(): React.ReactElement {
           <div>
             {course.mentor && (
               <div className="card" style={{ padding:20, marginBottom:16 }}>
-                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>Mentor</p>
+                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>{t('pages.courseDetail.mentor')}</p>
                 <p style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>{course.mentor.name}</p>
                 <p style={{ fontSize:12, color:course.color, fontWeight:600, marginBottom:8 }}>{course.mentor.specialty}</p>
                 <p style={{ fontSize:12, color:'#64748b', lineHeight:1.7 }}>{course.mentor.bio}</p>
@@ -210,11 +212,11 @@ export default function CourseDetailPage(): React.ReactElement {
               {!user && (
                 <>
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
-                    Kursga yozilish uchun hisobingizga kiring.
+                    {t('pages.courseDetail.loginPrompt')}
                   </p>
                   <Link to="/login" state={{ from: `/courses/${slug}` }}>
                     <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
-                      Kirish va yozilish <ArrowRight size={15}/>
+                      {t('pages.courseDetail.loginAndEnroll')} <ArrowRight size={15}/>
                     </button>
                   </Link>
                 </>
@@ -224,11 +226,11 @@ export default function CourseDetailPage(): React.ReactElement {
                 <div>
                   <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0', marginBottom:14 }}>
                     <CheckCircle size={18} style={{ color:'#16a34a', flexShrink:0 }} />
-                    <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>Muvaffaqiyatli yozildingiz!</p>
+                    <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>{t('pages.courseDetail.enrolledSuccess')}</p>
                   </div>
                   <Link to={`/learn/${slug}`}>
                     <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
-                      <PlayCircle size={15}/> Darslarni boshlash
+                      <PlayCircle size={15}/> {t('pages.courseDetail.startLessons')}
                     </button>
                   </Link>
                 </div>
@@ -238,7 +240,7 @@ export default function CourseDetailPage(): React.ReactElement {
                   <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'12px 14px', borderRadius:12, background:'#fffbeb', border:'1.5px solid #fde68a', marginBottom:14 }}>
                     <CreditCard size={18} style={{ color:'#d97706', flexShrink:0, marginTop:1 }} />
                     <p style={{ fontSize:13, color:'#d97706', fontWeight:600, lineHeight:1.6 }}>
-                      So'rovingiz qabul qilindi. To'lov tizimi tez orada ulanadi — hozircha yozilishingiz "Kutilmoqda" holatida.
+                      {t('pages.courseDetail.pendingInfo')}
                     </p>
                   </div>
                   {import.meta.env.DEV && payStatus !== 'success' && (
@@ -255,7 +257,7 @@ export default function CourseDetailPage(): React.ReactElement {
                       </div>
                       <Link to={`/learn/${slug}`}>
                         <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
-                          <PlayCircle size={15}/> Darslarni boshlash
+                          <PlayCircle size={15}/> {t('pages.courseDetail.startLessons')}
                         </button>
                       </Link>
                     </div>
@@ -266,11 +268,11 @@ export default function CourseDetailPage(): React.ReactElement {
                 <div>
                   <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#f0f9ff', border:'1.5px solid #bae6fd', marginBottom:14 }}>
                     <CheckCircle size={18} style={{ color:'#0ea5e9', flexShrink:0 }} />
-                    <p style={{ fontSize:13, color:'#0ea5e9', fontWeight:600 }}>Siz bu kursga allaqachon yozilgansiz.</p>
+                    <p style={{ fontSize:13, color:'#0ea5e9', fontWeight:600 }}>{t('pages.courseDetail.alreadyEnrolled')}</p>
                   </div>
                   <Link to={`/learn/${slug}`}>
                     <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
-                      <PlayCircle size={15}/> Darslarni davom ettirish
+                      <PlayCircle size={15}/> {t('pages.courseDetail.continueLessons')}
                     </button>
                   </Link>
                 </div>
@@ -284,11 +286,11 @@ export default function CourseDetailPage(): React.ReactElement {
                     </div>
                   )}
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
-                    {course.isFree ? "Bu kurs bepul — hoziroq boshlashingiz mumkin." : "Kursga yozilish uchun so'rov yuboring."}
+                    {course.isFree ? t('pages.courseDetail.freePrompt') : t('pages.courseDetail.paidPrompt')}
                   </p>
                   <button onClick={enroll} disabled={enrollStatus === 'loading'} className="btn-primary"
                     style={{ width:'100%', justifyContent:'center', opacity: enrollStatus === 'loading' ? 0.7 : 1 }}>
-                    {enrollStatus === 'loading' ? 'Yuborilmoqda...' : <>Kursga yozilish <ArrowRight size={15}/></>}
+                    {enrollStatus === 'loading' ? t('common.sending') : <>{t('pages.courseDetail.enroll')} <ArrowRight size={15}/></>}
                   </button>
                 </>
               )}

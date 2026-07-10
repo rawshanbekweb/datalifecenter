@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SectionHeader from '../components/common/SectionHeader';
 import PartnerCard, { PartnerCardData } from '../components/partners/PartnerCard';
 import { listPartners } from '../api/partners';
@@ -8,6 +9,7 @@ type Partner = PartnerCardData;
 type Status = 'loading' | 'ready' | 'error';
 
 export default function PartnersPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
 
@@ -22,12 +24,12 @@ export default function PartnersPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <SectionHeader pill="Ishonchli aloqalar" title="Hamkor" accent="larimiz" sub="Biz bilan hamkorlik qiluvchi kompaniyalar va tashkilotlar" />
+        <SectionHeader pill={t('pages.partners.pill')} title={t('pages.partners.title')} accent={t('pages.partners.accent')} sub={t('pages.partners.sub')} />
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-        {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>Hamkorlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.</p>}
+        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('pages.partners.loadError')}</p>}
         {status === 'ready' && partners.length === 0 && (
-          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Hozircha hamkorlar qo'shilmagan.</p>
+          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.partners.empty')}</p>
         )}
         {status === 'ready' && partners.length > 0 && (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:20 }} className="partners-grid">

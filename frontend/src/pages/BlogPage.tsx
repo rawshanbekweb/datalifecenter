@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SectionHeader from '../components/common/SectionHeader';
 import BlogCard, { BlogPostCardData } from '../components/blog/BlogCard';
 import { listBlogPosts } from '../api/blog';
@@ -8,6 +9,7 @@ type BlogPost = BlogPostCardData;
 type Status = 'loading' | 'ready' | 'error';
 
 export default function BlogPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [category, setCategory] = useState<string>('');
   const [status, setStatus]     = useState<Status>('loading');
@@ -26,7 +28,7 @@ export default function BlogPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <SectionHeader pill="Knowledge Hub" title="Blog &" accent="Maqolalar" sub="Texnologiya, dasturlash va IT karera bo'yicha so'nggi maqolalar" />
+        <SectionHeader pill={t('pages.blog.pill')} title={t('pages.blog.title')} accent={t('pages.blog.accent')} sub={t('pages.blog.sub')} />
 
         {categories.length > 1 && (
           <div style={{ display:'flex', gap:8, justifyContent:'center', flexWrap:'wrap', marginBottom:32 }}>
@@ -35,16 +37,16 @@ export default function BlogPage(): React.ReactElement {
                 style={{ fontSize:12, fontWeight:700, padding:'6px 14px', borderRadius:20, cursor:'pointer',
                   background: category === c ? '#0f172a' : '#fff', color: category === c ? '#fff' : '#475569',
                   border:'1px solid #e2e8f0' }}>
-                {c || 'Barchasi'}
+                {c || t('common.all')}
               </button>
             ))}
           </div>
         )}
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-        {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>Maqolalarni yuklab bo'lmadi.</p>}
+        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.blog.loadError')}</p>}
         {status === 'ready' && posts.length === 0 && (
-          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>Hech qanday maqola topilmadi.</p>
+          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.blog.empty')}</p>
         )}
 
         {status === 'ready' && posts.length > 0 && (

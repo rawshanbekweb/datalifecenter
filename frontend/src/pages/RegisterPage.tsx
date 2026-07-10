@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { UserPlus, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
@@ -13,6 +14,7 @@ interface RegisterForm {
 }
 
 export default function RegisterPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm]     = useState<RegisterForm>({ name: '', email: '', phone: '', password: '' });
@@ -29,7 +31,7 @@ export default function RegisterPage(): React.ReactElement {
       const registered = await register(form);
       navigate(roleHome(registered.role), { replace: true });
     } catch (err: any) {
-      setErrorMsg(err.message || "Ro'yxatdan o'tishda xatolik yuz berdi");
+      setErrorMsg(err.message || t('auth.register.error'));
       setStatus('error');
     }
   };
@@ -41,8 +43,8 @@ export default function RegisterPage(): React.ReactElement {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <div className="icon-box"><UserPlus size={18} style={{ color: '#0ea5e9' }} /></div>
             <div>
-              <p style={{ fontWeight: 800, color: '#0f172a', fontSize: 16 }}>Ro'yxatdan o'tish</p>
-              <p style={{ fontSize: 12, color: '#94a3b8' }}>Yangi DATA LIFE hisobi yarating</p>
+              <p style={{ fontWeight: 800, color: '#0f172a', fontSize: 16 }}>{t('auth.register.title')}</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>{t('auth.register.subtitle')}</p>
             </div>
           </div>
 
@@ -55,29 +57,29 @@ export default function RegisterPage(): React.ReactElement {
               </motion.div>
             )}
             <div>
-              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Ism Familiya</label>
-              <input className="inp" name="name" value={form.name} onChange={change} required placeholder="Ism Familiya" />
+              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('auth.register.nameLabel')}</label>
+              <input className="inp" name="name" value={form.name} onChange={change} required placeholder={t('auth.register.nameLabel')} />
             </div>
             <div>
               <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Email</label>
               <input className="inp" type="email" name="email" value={form.email} onChange={change} required placeholder="you@example.com" />
             </div>
             <div>
-              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Telefon</label>
+              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('auth.register.phoneLabel')}</label>
               <input className="inp" name="phone" value={form.phone} onChange={change} placeholder="+998 90 ..." />
             </div>
             <div>
-              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Parol</label>
-              <input className="inp" type="password" name="password" value={form.password} onChange={change} required minLength={6} placeholder="Kamida 6 ta belgi" />
+              <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('auth.password')}</label>
+              <input className="inp" type="password" name="password" value={form.password} onChange={change} required minLength={6} placeholder={t('auth.passwordHint')} />
             </div>
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, marginTop: 6 }}>
-              {status === 'loading' ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> Yaratilmoqda...</> : "Ro'yxatdan o'tish"}
+              {status === 'loading' ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.register.loading')}</> : t('auth.register.title')}
             </button>
           </form>
 
           <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b', marginTop: 20 }}>
-            Hisobingiz bormi? <Link to="/login" style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'none' }}>Kiring</Link>
+            {t('auth.register.haveAccount')} <Link to="/login" style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'none' }}>{t('auth.register.loginLink')}</Link>
           </p>
         </div>
       </motion.div>

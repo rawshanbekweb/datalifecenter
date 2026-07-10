@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight, Star } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
 
@@ -33,6 +34,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, index = 0 }: CourseCardProps): React.ReactElement {
+  const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
 
@@ -58,13 +60,13 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
       <p style={{ fontSize:13, color:'#64748b', lineHeight:1.75, marginBottom:14, flexGrow:1 }}>{course.description}</p>
 
       <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:14 }}>
-        {course.tags.map((t: string) => <span key={t} className="tag" style={{ background:'#fff', borderColor:course.border, color:course.color }}>{t}</span>)}
+        {course.tags.map((tag: string) => <span key={tag} className="tag" style={{ background:'#fff', borderColor:course.border, color:course.color }}>{tag}</span>)}
       </div>
 
       {open && course.modules && course.modules.length > 0 && (
         <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }}
           style={{ background:'#fff', border:`1px solid ${course.border}`, borderRadius:12, padding:'12px 14px', marginBottom:12 }}>
-          <p style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Modullar</p>
+          <p style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>{t('cards.course.modules')}</p>
           {course.modules.map((m: CourseModule, mi: number) => (
             <p key={m.id} style={{ fontSize:12, color:'#334155', marginBottom:4 }}>
               <span style={{ color:course.color, fontFamily:'JetBrains Mono,monospace', fontSize:11, marginRight:6 }}>0{mi+1}</span>{m.title}
@@ -75,18 +77,18 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
 
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, borderTop:`1px solid ${course.border}` }}>
         <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#94a3b8' }}>
-          <Clock size={13} />{course.durationMonths} oy
-          {course.studentsCount > 0 && <span style={{ marginLeft:8 }}>{course.studentsCount} ta</span>}
+          <Clock size={13} />{t('cards.course.months', { n: course.durationMonths })}
+          {course.studentsCount > 0 && <span style={{ marginLeft:8 }}>{t('cards.course.studentsShort', { n: course.studentsCount })}</span>}
         </div>
         <div style={{ display:'flex', gap:7 }}>
           {course.modules && course.modules.length > 0 && (
             <button onClick={() => setOpen(!open)} style={{ fontSize:11, padding:'5px 12px', borderRadius:20, cursor:'pointer', background:'#fff', color:course.color, border:`1px solid ${course.border}`, fontWeight:600, transition:'all 0.2s' }}>
-              {open ? 'Yopish' : "Ko'proq"}
+              {open ? t('common.close') : t('cards.course.more')}
             </button>
           )}
           <Link to={`/courses/${course.slug}`}>
             <button style={{ fontSize:11, padding:'5px 14px', borderRadius:20, cursor:'pointer', background:course.color, color:'#fff', border:'none', fontWeight:700, display:'flex', alignItems:'center', gap:4 }}>
-              Batafsil <ArrowRight size={11} />
+              {t('common.more')} <ArrowRight size={11} />
             </button>
           </Link>
         </div>

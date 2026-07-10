@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Construction } from 'lucide-react';
 
 interface ComingSoonProps {
@@ -8,6 +9,7 @@ interface ComingSoonProps {
 }
 
 export default function ComingSoon({ title, sub }: ComingSoonProps): React.ReactElement {
+  const { t } = useTranslation();
   return (
     <section style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'160px 24px 80px' }}>
       <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
@@ -21,7 +23,7 @@ export default function ComingSoon({ title, sub }: ComingSoonProps): React.React
         <p style={{ color:'#64748b', fontSize:15, lineHeight:1.75, marginBottom:28 }}>{sub}</p>
         <Link to="/">
           <button className="btn-outline" style={{ display:'inline-flex', alignItems:'center', gap:8 }}>
-            <ArrowLeft size={15}/> Bosh sahifaga qaytish
+            <ArrowLeft size={15}/> {t('comingSoon.backHome')}
           </button>
         </Link>
       </motion.div>

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { BadgeCheck, AlertCircle, Loader, Award } from 'lucide-react';
 import { verifyCertificate, CertificateInfo } from '../api/enrollments';
 
 // Ochiq sahifa: ish beruvchi sertifikat raqamini kiritib haqiqiyligini tekshiradi.
 // PDF pastidagi havola shu sahifaga olib keladi.
 export default function VerifyCertificatePage(): React.ReactElement {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [no, setNo] = useState<string>(searchParams.get('no') || '');
   const [status, setStatus] = useState<'idle' | 'loading' | 'found' | 'error'>('idle');
@@ -21,7 +23,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
       setCert(data);
       setStatus('found');
     } catch (err: any) {
-      setErrorMsg(err.message || 'Xatolik yuz berdi');
+      setErrorMsg(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -45,8 +47,8 @@ export default function VerifyCertificatePage(): React.ReactElement {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <div className="icon-box"><BadgeCheck size={18} style={{ color: '#0ea5e9' }} /></div>
             <div>
-              <p style={{ fontWeight: 800, color: '#0f172a', fontSize: 16 }}>Sertifikatni tekshirish</p>
-              <p style={{ fontSize: 12, color: '#94a3b8' }}>DATA LIFE sertifikati haqiqiyligini tasdiqlang</p>
+              <p style={{ fontWeight: 800, color: '#0f172a', fontSize: 16 }}>{t('pages.certificate.title')}</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>{t('pages.certificate.subtitle')}</p>
             </div>
           </div>
 
@@ -55,7 +57,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
               placeholder="DL-XXXXXXXX" required style={{ flex: 1, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase' }} />
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, flexShrink: 0 }}>
-              {status === 'loading' ? <Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> : 'Tekshirish'}
+              {status === 'loading' ? <Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> : t('pages.certificate.check')}
             </button>
           </form>
 
@@ -70,13 +72,13 @@ export default function VerifyCertificatePage(): React.ReactElement {
             <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
               style={{ padding: '18px 20px', borderRadius: 12, background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
               <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#166534', marginBottom: 12 }}>
-                <Award size={16} /> Sertifikat haqiqiy
+                <Award size={16} /> {t('pages.certificate.valid')}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#166534' }}>
-                <p><b>Raqam:</b> {cert.certificateNo}</p>
-                <p><b>Talaba:</b> {cert.studentName}</p>
-                <p><b>Kurs:</b> {cert.courseTitle} ({cert.durationMonths} oylik dastur)</p>
-                {cert.completedAt && <p><b>Yakunlangan sana:</b> {new Date(cert.completedAt).toLocaleDateString('uz-UZ')}</p>}
+                <p><b>{t('pages.certificate.number')}:</b> {cert.certificateNo}</p>
+                <p><b>{t('pages.certificate.student')}:</b> {cert.studentName}</p>
+                <p><b>{t('pages.certificate.course')}:</b> {cert.courseTitle} ({t('pages.certificate.program', { n: cert.durationMonths })})</p>
+                {cert.completedAt && <p><b>{t('pages.certificate.completedAt')}:</b> {new Date(cert.completedAt).toLocaleDateString('uz-UZ')}</p>}
               </div>
             </motion.div>
           )}

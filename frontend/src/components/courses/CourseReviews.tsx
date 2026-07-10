@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 import { listCourseReviews } from '../../api/reviews';
 
@@ -20,6 +21,7 @@ interface CourseReviewsProps {
 type Status = 'loading' | 'ready' | 'error';
 
 export default function CourseReviews({ slug, rating, reviewsCount, color = '#0ea5e9' }: CourseReviewsProps): React.ReactElement | null {
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [status, setStatus] = useState<Status>('loading');
 
@@ -36,16 +38,16 @@ export default function CourseReviews({ slug, rating, reviewsCount, color = '#0e
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>Talabalar sharhi</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>{t('pages.courseDetail.reviewsTitle')}</h2>
         {Number(rating) > 0 && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#475569' }}>
             <Star size={14} fill={color} style={{ color }} /> {Number(rating).toFixed(1)}
-            {typeof reviewsCount === 'number' && reviewsCount > 0 && ` · ${reviewsCount} ta sharh`}
+            {typeof reviewsCount === 'number' && reviewsCount > 0 && ` · ${t('pages.courseDetail.reviewsCount', { n: reviewsCount })}`}
           </span>
         )}
       </div>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 13 }}>Yuklanmoqda...</p>}
+      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 13 }}>{t('common.loading')}</p>}
 
       {status === 'ready' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

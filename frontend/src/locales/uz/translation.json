@@ -9,8 +9,16 @@
     "delete": "O'chirish",
     "confirm": "Tasdiqlash",
     "more": "Batafsil",
+    "close": "Yopish",
+    "all": "Barchasi",
+    "free": "Bepul",
     "error": "Xatolik yuz berdi",
     "loadFailed": "Ma'lumotlarni yuklab bo'lmadi."
+  },
+  "levels": {
+    "BEGINNER": "Boshlang'ich",
+    "INTERMEDIATE": "O'rta",
+    "ADVANCED": "Yuqori"
   },
   "errors": {
     "network": "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.",
@@ -18,6 +26,7 @@
   },
   "auth": {
     "password": "Parol",
+    "passwordHint": "Kamida 6 ta belgi",
     "login": {
       "title": "Tizimga kirish",
       "subtitle": "DATA LIFE hisobingizga kiring",
@@ -26,6 +35,47 @@
       "loading": "Kirilmoqda...",
       "noAccount": "Hisobingiz yo'qmi?",
       "registerLink": "Ro'yxatdan o'ting"
+    },
+    "register": {
+      "title": "Ro'yxatdan o'tish",
+      "subtitle": "Yangi DATA LIFE hisobi yarating",
+      "error": "Ro'yxatdan o'tishda xatolik yuz berdi",
+      "nameLabel": "Ism Familiya",
+      "phoneLabel": "Telefon",
+      "loading": "Yaratilmoqda...",
+      "haveAccount": "Hisobingiz bormi?",
+      "loginLink": "Kiring"
+    },
+    "forgot": {
+      "title": "Parolni tiklash",
+      "subtitle": "Emailingizga tiklash havolasini yuboramiz",
+      "sentTitle": "Havola yuborildi",
+      "sentPrefix": "Agar",
+      "sentSuffix": "ro'yxatdan o'tgan bo'lsa, parolni tiklash havolasi yuborildi. Pochta qutingizni (spam papkasini ham) tekshiring. Havola 30 daqiqa amal qiladi.",
+      "submit": "Havola yuborish",
+      "remember": "Parolingiz esingizdami?"
+    },
+    "reset": {
+      "title": "Yangi parol o'rnatish",
+      "subtitle": "Hisobingiz uchun yangi parol kiriting",
+      "invalidLink": "Havola noto'g'ri.",
+      "requestAgain": "Parol tiklashni qaytadan so'rang",
+      "done": "Parol yangilandi! Endi yangi parol bilan kirishingiz mumkin. Kirish sahifasiga yo'naltirilmoqdasiz...",
+      "mismatch": "Parollar bir xil emas",
+      "newPassword": "Yangi parol",
+      "confirmPassword": "Parolni tasdiqlang",
+      "confirmPlaceholder": "Parolni qayta kiriting",
+      "submit": "Parolni yangilash",
+      "backToLogin": "Kirish sahifasiga qaytish"
+    },
+    "verifyEmail": {
+      "title": "Email tasdiqlash",
+      "subtitle": "DATA LIFE hisobingizni faollashtirish",
+      "verifying": "Tasdiqlanmoqda...",
+      "noToken": "Havola noto'g'ri — token topilmadi.",
+      "done": "Emailingiz tasdiqlandi! Endi platformadan to'liq foydalanishingiz mumkin.",
+      "errorHint": "Profil sahifasidan tasdiqlash havolasini qayta yuborishingiz mumkin.",
+      "toProfile": "Profilga o'tish"
     }
   },
   "nav": {
@@ -187,6 +237,104 @@
       "all": "Barchasi",
       "visitSite": "Saytga o'tish",
       "view": "Ko'rish"
+    }
+  },
+  "pages": {
+    "courses": {
+      "pill": "Kurslar katalogi",
+      "title": "Barcha",
+      "accent": "kurslar",
+      "sub": "O'zingizga mos yo'nalishni tanlang va bugunoq boshlang",
+      "searchPlaceholder": "Kurs qidirish...",
+      "allLevels": "Barcha darajalar",
+      "allCourses": "Barcha kurslar",
+      "paid": "Pullik",
+      "empty": "Hech qanday kurs topilmadi."
+    },
+    "blog": {
+      "pill": "Knowledge Hub",
+      "title": "Blog &",
+      "accent": "Maqolalar",
+      "sub": "Texnologiya, dasturlash va IT karera bo'yicha so'nggi maqolalar",
+      "empty": "Hech qanday maqola topilmadi."
+    },
+    "blogDetail": {
+      "back": "Barcha maqolalar",
+      "notFoundTitle": "Maqola topilmadi",
+      "notFoundSub": "Siz qidirgan maqola mavjud emas yoki o'chirilgan.",
+      "errorSub": "Maqolani yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
+      "readMinutes": "{{n}} daqiqa",
+      "views": "{{n}} ko'rishlar"
+    },
+    "mentors": {
+      "pill": "Bizning jamoa",
+      "title": "Mentor",
+      "accent": "larimiz",
+      "sub": "Sohasining professional mutaxassislari sizga yo'l-yo'riq ko'rsatadi",
+      "empty": "Hozircha mentorlar qo'shilmagan.",
+      "loadError": "Mentorlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring."
+    },
+    "partners": {
+      "pill": "Ishonchli aloqalar",
+      "title": "Hamkor",
+      "accent": "larimiz",
+      "sub": "Biz bilan hamkorlik qiluvchi kompaniyalar va tashkilotlar",
+      "empty": "Hozircha hamkorlar qo'shilmagan.",
+      "loadError": "Hamkorlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring."
+    },
+    "courseDetail": {
+      "back": "Barcha kurslar",
+      "notFoundTitle": "Kurs topilmadi",
+      "notFoundSub": "Siz qidirgan kurs mavjud emas yoki o'chirilgan.",
+      "errorSub": "Kursni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
+      "months": "{{n}} oy",
+      "students": "{{n}} talaba",
+      "curriculum": "Dastur tarkibi ({{n}} dars)",
+      "minutesShort": "{{n}} daq",
+      "mentor": "Mentor",
+      "loginPrompt": "Kursga yozilish uchun hisobingizga kiring.",
+      "loginAndEnroll": "Kirish va yozilish",
+      "enrolledSuccess": "Muvaffaqiyatli yozildingiz!",
+      "startLessons": "Darslarni boshlash",
+      "pendingInfo": "So'rovingiz qabul qilindi. To'lov tizimi tez orada ulanadi — hozircha yozilishingiz \"Kutilmoqda\" holatida.",
+      "alreadyEnrolled": "Siz bu kursga allaqachon yozilgansiz.",
+      "continueLessons": "Darslarni davom ettirish",
+      "freePrompt": "Bu kurs bepul — hoziroq boshlashingiz mumkin.",
+      "paidPrompt": "Kursga yozilish uchun so'rov yuboring.",
+      "enroll": "Kursga yozilish",
+      "reviewsTitle": "Talabalar sharhi",
+      "reviewsCount": "{{n}} ta sharh"
+    },
+    "certificate": {
+      "title": "Sertifikatni tekshirish",
+      "subtitle": "DATA LIFE sertifikati haqiqiyligini tasdiqlang",
+      "check": "Tekshirish",
+      "valid": "Sertifikat haqiqiy",
+      "number": "Raqam",
+      "student": "Talaba",
+      "course": "Kurs",
+      "program": "{{n}} oylik dastur",
+      "completedAt": "Yakunlangan sana"
+    },
+    "notFound": {
+      "title": "404 — Sahifa topilmadi",
+      "sub": "Siz qidirgan sahifa mavjud emas yoki ko'chirilgan."
+    }
+  },
+  "comingSoon": {
+    "backHome": "Bosh sahifaga qaytish"
+  },
+  "cards": {
+    "course": {
+      "modules": "Modullar",
+      "months": "{{n}} oy",
+      "studentsShort": "{{n}} ta",
+      "more": "Ko'proq"
+    },
+    "blog": {
+      "views": "{{n}} views",
+      "readMinutes": "{{n}} daqiqa",
+      "continue": "O'qishni davom ettirish"
     }
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
 
@@ -36,6 +37,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function BlogCard({ post, index = 0 }: BlogCardProps): React.ReactElement {
+  const { t } = useTranslation();
   const Icon = resolveIcon(post.iconKey);
   return (
     <Link to={`/blog/${post.slug}`} style={{ textDecoration:'none' }}>
@@ -51,12 +53,12 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
           <div style={{ position:'absolute', top:10, left:12 }}>
             <span style={{ fontSize:10, padding:'3px 10px', borderRadius:20, background:post.bg, color:post.color, border:`1px solid ${post.border}`, fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>{post.category}</span>
           </div>
-          <div style={{ position:'absolute', top:12, right:12, fontSize:11, color:'#94a3b8' }}>{formatViews(post.views)} views</div>
+          <div style={{ position:'absolute', top:12, right:12, fontSize:11, color:'#94a3b8' }}>{t('cards.blog.views', { n: formatViews(post.views) })}</div>
         </div>
 
         <div style={{ padding:'16px 18px', display:'flex', flexDirection:'column', flexGrow:1 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:11, color:'#94a3b8', marginBottom:9 }}>
-            <Clock size={11}/>{post.readMinutes} daqiqa · {formatDate(post.publishedAt)}
+            <Clock size={11}/>{t('cards.blog.readMinutes', { n: post.readMinutes })} · {formatDate(post.publishedAt)}
           </div>
           <h3 style={{ fontSize:14, fontWeight:800, color:'#0f172a', lineHeight:1.5, marginBottom:7,
             overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{post.title}</h3>
@@ -64,11 +66,11 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
             overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{post.excerpt}</p>
 
           <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:12 }}>
-            {post.tags.map((t: string) => <span key={t} style={{ fontSize:10, padding:'2px 8px', borderRadius:12, background:'#fff', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'JetBrains Mono,monospace' }}>#{t}</span>)}
+            {post.tags.map((tag: string) => <span key={tag} style={{ fontSize:10, padding:'2px 8px', borderRadius:12, background:'#fff', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'JetBrains Mono,monospace' }}>#{tag}</span>)}
           </div>
 
           <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:post.color }}>
-            O'qishni davom ettirish <ArrowRight size={13}/>
+            {t('cards.blog.continue')} <ArrowRight size={13}/>
           </div>
         </div>
       </motion.article>
