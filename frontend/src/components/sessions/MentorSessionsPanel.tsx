@@ -113,11 +113,21 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
         <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
           <Video size={17} style={{ color: '#9333ea' }} /> Jonli darslar
         </h2>
-        <button className="btn-primary" style={{ fontSize: 12.5, padding: '8px 14px' }}
-          onClick={() => setFormOpen((v) => !v)} disabled={courses.length === 0}>
+        <button className="btn-primary" style={{ fontSize: 12.5, padding: '8px 14px', opacity: courses.length === 0 ? 0.5 : 1 }}
+          onClick={() => setFormOpen((v) => !v)} disabled={courses.length === 0}
+          title={courses.length === 0 ? 'Sessiya yaratish uchun sizga kurs biriktirilgan bo\'lishi kerak' : undefined}>
           <Plus size={14} /> Yangi sessiya
         </button>
       </div>
+
+      {courses.length === 0 && (
+        <div className="card" style={{ padding: '14px 16px', marginBottom: 14, background: '#fffbeb', border: '1.5px solid #fde68a' }}>
+          <p style={{ fontSize: 13, color: '#92400e' }}>
+            Sizga hali kurs biriktirilmagan, shu sababli sessiya yaratib bo'lmaydi. Administrator kurs
+            tahririda (Admin panel → Kurslar) "Mentor" maydonida sizni tanlashi kerak.
+          </p>
+        </div>
+      )}
 
       {formOpen && (
         <form onSubmit={submit} className="card" style={{ padding: 20, marginBottom: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
