@@ -18,3 +18,7 @@ export function formatNumber(value: number): string {
 export function formatTime(value: string | Date, options?: Intl.DateTimeFormatOptions): string {
   return new Date(value).toLocaleTimeString(bcp47(), options ?? { hour: '2-digit', minute: '2-digit' });
 }
+
+export function formatDateTime(value: string | Date, options?: Intl.DateTimeFormatOptions): string {
+  return new Date(value).toLocaleString(bcp47(), options);
+}

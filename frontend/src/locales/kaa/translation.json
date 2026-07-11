@@ -632,5 +632,120 @@
       "deleteTitle": "Óshiriw",
       "confirmDelete": "\"{{title}}\" sessiyası óshirilsinbe?"
     }
+  },
+  "admin": {
+    "panel": "Admin panel",
+    "platformMgmt": "Platforma basqarıwı",
+    "backToSite": "Saytqa qaytıw",
+    "nav": {
+      "dashboard": "Basqarıw paneli",
+      "enrollments": "Jazılıwlar",
+      "subscriptions": "Jazılıwlar (obuna)",
+      "courses": "Kurslar",
+      "users": "Paydalanıwshılar",
+      "mentors": "Mentorlar",
+      "mentorRequests": "Mentor sorawları",
+      "blog": "Blog",
+      "partners": "Sheriklar",
+      "projects": "Joybarlar",
+      "messages": "Xabarlar",
+      "announcements": "Daǵazalar",
+      "siteSettings": "Sayt sazlawları",
+      "testimonials": "Pikirler",
+      "courseReviews": "Kurs pikirleri"
+    },
+    "common": {
+      "all": "Barlıǵı",
+      "prev": "Aldıńǵı",
+      "next": "Keyingi"
+    },
+    "enrollStatus": {
+      "PENDING": "Kútilmekte",
+      "ACTIVE": "Aktiv",
+      "COMPLETED": "Juwmaqlanǵan",
+      "CANCELLED": "Biykar etilgen"
+    },
+    "reqStatus": {
+      "OPEN": "Ashıq",
+      "ANSWERED": "Juwap berilgen",
+      "CLOSED": "Jabıq"
+    },
+    "msgStatus": {
+      "NEW": "Jańa",
+      "READ": "Oqılǵan",
+      "REPLIED": "Juwap berilgen",
+      "ARCHIVED": "Arxivlengen"
+    },
+    "dashboard": {
+      "title": "Basqarıw paneli",
+      "sub": "Platformanıń ulıwma jaǵdayı",
+      "cardUsers": "Paydalanıwshılar",
+      "cardUsersSub": "{{n}} student",
+      "cardCourses": "Kurslar",
+      "cardCoursesSub": "{{n}} járiyalanǵan",
+      "cardEnrollments": "Jazılıwlar",
+      "cardEnrollmentsSub": "{{pending}} kútilmekte · {{active}} aktiv",
+      "cardMessages": "Jańa xabarlar",
+      "cardMessagesSub": "Blog: {{blog}} · Mentorlar: {{mentors}}",
+      "recentEnrollments": "Sońǵı jazılıwlar",
+      "noEnrollments": "Házirshe jazılıwlar joq.",
+      "recentMessages": "Sońǵı xabarlar",
+      "noMessages": "Házirshe xabarlar joq.",
+      "new": "Jańa"
+    },
+    "messages": {
+      "title": "Xabarlar",
+      "sub": "Baylanıs formasınan kelgen múrájatlar",
+      "subCount": "Baylanıs formasınan kelgen múrájatlar — jámi {{n}}",
+      "allStatuses": "Barlıq jaǵdaylar",
+      "emptyFiltered": "Bul jaǵdayda xabarlar joq.",
+      "empty": "Házirshe xabarlar joq.",
+      "subjectLabel": "Tema: {{subject}}"
+    },
+    "reviews": {
+      "title": "Kurs pikirleri",
+      "sub": "Studentler qaldırǵan kurs pikirlerin basqarıw",
+      "empty": "Pikirler tabılmadı.",
+      "hidden": "Jasırılǵan",
+      "hide": "Jasırıw",
+      "show": "Kórsetiw",
+      "confirmDelete": "Pikirdi óshiriwdi tastıyıqlaysızba?"
+    },
+    "mentorRequests": {
+      "title": "Mentor sorawları",
+      "subWaiting": "{{n}} soraw juwap kútpekte",
+      "subDefault": "Mentorlardan kelgen múrájatlar",
+      "empty": "Házirshe mentorlardan sorawlar kelmegen.",
+      "close": "Jabıw",
+      "yourReply": "Sizdiń juwabıńız",
+      "updatePlaceholder": "Juwaptı jańalaw...",
+      "replyPlaceholder": "Juwap jazıń...",
+      "answerBtn": "Juwap beriw"
+    },
+    "announcements": {
+      "title": "Daǵazalar",
+      "sub": "Student yamasa mentorlarǵa bildiriw sıpatında jetkeriletuǵın daǵazalar",
+      "titleField": "Sarlawha",
+      "bodyField": "Tekst",
+      "audience": "Auditoriya",
+      "audienceAll": "Hámmege",
+      "audienceStudents": "Tek studentlerge",
+      "audienceMentors": "Tek mentorlarǵa",
+      "courseTarget": "Belgili kursqa jiberiw (erkin)",
+      "courseNone": "— saylanbaǵan (joqarıdaǵı auditoriya isletiledi)",
+      "send": "Daǵaza jiberiw",
+      "empty": "Álle daǵaza jiberilmegen.",
+      "confirmDelete": "Daǵazanı óshiriwdi tastıyıqlaysızba?",
+      "audAll": "Hámmege",
+      "audStudents": "Studentlerge",
+      "audMentors": "Mentorlarǵa"
+    },
+    "localizedField": {
+      "untranslated": "Awdarılmaǵan — saytta ózbekshe kórinedi."
+    },
+    "receipt": {
+      "title": "Tólem cheki",
+      "loadFailed": "Chekti júklep bolmadı."
+    }
   }
 }

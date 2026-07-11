@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Trash2, AlertCircle, Megaphone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listAnnouncements, createAnnouncement, deleteAnnouncement, type Announcement } from '../../api/notifications';
 import { listCoursesAdmin } from '../../api/courses';
+import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
@@ -20,15 +22,16 @@ interface FormState {
 
 const emptyForm: FormState = { title: emptyLocalizedString(), body: emptyLocalizedString(), audience: 'ALL', courseId: '' };
 
-const AUDIENCE_LABEL: Record<Announcement['audience'], string> = {
-  ALL: 'Hammaga',
-  STUDENTS: 'Talabalarga',
-  MENTORS: 'Mentorlarga',
+const AUDIENCE_LABEL_KEY: Record<Announcement['audience'], string> = {
+  ALL: 'admin.announcements.audAll',
+  STUDENTS: 'admin.announcements.audStudents',
+  MENTORS: 'admin.announcements.audMentors',
 };
 
 type Status = 'loading' | 'ready' | 'error';
 
 export default function AdminAnnouncementsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [items, setItems]     = useState<Announcement[]>([]);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
@@ -59,24 +62,24 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
       setFormStatus('idle');
       load();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setFormStatus('error');
     }
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm("E'lonni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.announcements.confirmDelete'))) return;
     try {
       await deleteAnnouncement(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="E'lonlar" sub="Talaba yoki mentorlarga bildirishnoma sifatida yetkaziladigan e'lonlar" />
+      <AdminPageHeader title={t('admin.announcements.title')} sub={t('admin.announcements.sub')} />
 
       <form onSubmit={submit} className="card" style={{ padding:24, marginBottom:20, display:'flex', flexDirection:'column', gap:12 }}>
         {formStatus === 'error' && (
@@ -85,34 +88,34 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
             <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
           </div>
         )}
-        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
-        <LocalizedField label="Matn" required multiline value={form.body} onChange={(next) => setForm((f) => ({ ...f, body: next }))} />
+        <LocalizedField label={t('admin.announcements.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+        <LocalizedField label={t('admin.announcements.bodyField')} required multiline value={form.body} onChange={(next) => setForm((f) => ({ ...f, body: next }))} />
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
           <div>
-            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Auditoriya</label>
+            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.announcements.audience')}</label>
             <select className="inp" value={form.audience} disabled={!!form.courseId}
               onChange={(e) => setForm((f) => ({ ...f, audience: e.target.value as Announcement['audience'] }))} style={{ cursor:'pointer' }}>
-              <option value="ALL">Hammaga</option>
-              <option value="STUDENTS">Faqat talabalarga</option>
-              <option value="MENTORS">Faqat mentorlarga</option>
+              <option value="ALL">{t('admin.announcements.audienceAll')}</option>
+              <option value="STUDENTS">{t('admin.announcements.audienceStudents')}</option>
+              <option value="MENTORS">{t('admin.announcements.audienceMentors')}</option>
             </select>
           </div>
           <div>
-            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Muayyan kursga yuborish (ixtiyoriy)</label>
+            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.announcements.courseTarget')}</label>
             <select className="inp" value={form.courseId}
               onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))} style={{ cursor:'pointer' }}>
-              <option value="">— tanlanmagan (yuqoridagi auditoriya ishlatiladi)</option>
+              <option value="">{t('admin.announcements.courseNone')}</option>
               {courses.map((c) => <option key={c.id} value={c.id}>{c.title.uz}</option>)}
             </select>
           </div>
         </div>
         <button type="submit" disabled={formStatus==='loading'} className="btn-primary" style={{ opacity: formStatus==='loading'?0.7:1, alignSelf:'flex-start' }}>
-          <Plus size={15}/> {formStatus==='loading' ? 'Yuborilmoqda...' : "E'lon yuborish"}
+          <Plus size={15}/> {formStatus==='loading' ? t('common.sending') : t('admin.announcements.send')}
         </button>
       </form>
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -123,8 +126,8 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a', marginBottom:2 }}>{a.title}</p>
                 <p style={{ fontSize:13, color:'#64748b', lineHeight:1.6, marginBottom:6 }}>{a.body}</p>
                 <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                  <span className="tag">{a.course ? a.course.title : AUDIENCE_LABEL[a.audience]}</span>
-                  <span style={{ fontSize:11, color:'#94a3b8' }}>{new Date(a.createdAt).toLocaleString('uz-UZ')}</span>
+                  <span className="tag">{a.course ? a.course.title : t(AUDIENCE_LABEL_KEY[a.audience])}</span>
+                  <span style={{ fontSize:11, color:'#94a3b8' }}>{formatDateTime(a.createdAt)}</span>
                 </div>
               </div>
               <button onClick={() => remove(a.id)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #fecaca', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#dc2626', flexShrink:0 }}>
@@ -134,7 +137,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
           ))}
           {items.length === 0 && (
             <div className="card" style={{ padding:36, textAlign:'center' }}>
-              <p style={{ color:'#64748b', fontSize:14 }}>Hali e'lon yuborilmagan.</p>
+              <p style={{ color:'#64748b', fontSize:14 }}>{t('admin.announcements.empty')}</p>
             </div>
           )}
         </div>

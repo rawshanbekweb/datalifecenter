@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ENABLED_LOCALES, Locale } from '../../i18n/config';
 import { LocalizedString } from '../../types/locale';
 
@@ -25,6 +26,7 @@ export default function LocalizedField({
   placeholder,
   rows = 3,
 }: LocalizedFieldProps): React.ReactElement {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Locale>('uz');
   const current = value?.[tab] ?? '';
 
@@ -83,7 +85,7 @@ export default function LocalizedField({
       )}
       {tab !== 'uz' && !current && (
         <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-          Tarjima qilinmagan — saytda o'zbekcha ko'rinadi.
+          {t('admin.localizedField.untranslated')}
         </p>
       )}
     </div>

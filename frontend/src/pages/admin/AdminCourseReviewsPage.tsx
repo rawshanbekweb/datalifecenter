@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Trash2, Star, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listReviewsAdmin, updateReviewAdmin, deleteReviewAdmin } from '../../api/reviews';
+import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 interface Review {
@@ -16,6 +18,7 @@ interface Review {
 type Status = 'loading' | 'ready' | 'error';
 
 export default function AdminCourseReviewsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [items, setItems]   = useState<Review[]>([]);
   const [status, setStatus] = useState<Status>('loading');
 
@@ -33,30 +36,30 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
       await updateReviewAdmin(r.id, { published: !r.published });
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm("Sharhni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.reviews.confirmDelete'))) return;
     try {
       await deleteReviewAdmin(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Kurs sharhlari" sub="Talabalar tomonidan qoldirilgan kurs sharhlarini boshqarish" />
+      <AdminPageHeader title={t('admin.reviews.title')} sub={t('admin.reviews.sub')} />
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && items.length === 0 && (
         <div className="card" style={{ padding: 36, textAlign: 'center' }}>
-          <p style={{ color: '#64748b', fontSize: 14 }}>Sharhlar topilmadi.</p>
+          <p style={{ color: '#64748b', fontSize: 14 }}>{t('admin.reviews.empty')}</p>
         </div>
       )}
 
@@ -71,7 +74,7 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
                 </div>
                 <div style={{ flex: '1 1 180px', minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 700, color: '#334155' }}>{r.course.title}</p>
-                  <p style={{ fontSize: 11.5, color: '#94a3b8' }}>{new Date(r.createdAt).toLocaleDateString('uz-UZ')}</p>
+                  <p style={{ fontSize: 11.5, color: '#94a3b8' }}>{formatDate(r.createdAt)}</p>
                 </div>
                 <div style={{ display: 'flex', gap: 1, flexShrink: 0 }}>
                   {Array.from({ length: 5 }).map((_, idx) => (
@@ -80,11 +83,11 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
                 </div>
                 {!r.published && (
                   <span className="tag" style={{ background: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                    <EyeOff size={11} /> Yashirilgan
+                    <EyeOff size={11} /> {t('admin.reviews.hidden')}
                   </span>
                 )}
                 <button onClick={() => togglePublished(r)} className="btn-outline" style={{ fontSize: 12, padding: '8px 12px', flexShrink: 0 }}>
-                  {r.published ? 'Yashirish' : "Ko'rsatish"}
+                  {r.published ? t('admin.reviews.hide') : t('admin.reviews.show')}
                 </button>
                 <button onClick={() => remove(r.id)}
                   style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #fecaca', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626', flexShrink: 0 }}>

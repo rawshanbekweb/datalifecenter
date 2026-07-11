@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listContactMessages, updateContactMessageStatus } from '../../api/contact';
+import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 type MessageStatus = 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
@@ -25,10 +27,10 @@ interface StatusLabel {
 
 const STATUS_OPTIONS: MessageStatus[] = ['NEW', 'READ', 'REPLIED', 'ARCHIVED'];
 const STATUS_LABELS: Record<MessageStatus, StatusLabel> = {
-  NEW:      { label: 'Yangi',            color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-  READ:     { label: "O'qilgan",         color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-  REPLIED:  { label: 'Javob berilgan',   color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-  ARCHIVED: { label: 'Arxivlangan',      color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
+  NEW:      { label: 'admin.msgStatus.NEW',      color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+  READ:     { label: 'admin.msgStatus.READ',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+  REPLIED:  { label: 'admin.msgStatus.REPLIED',  color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+  ARCHIVED: { label: 'admin.msgStatus.ARCHIVED', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
 };
 
 const PAGE_SIZE = 20;
@@ -39,6 +41,7 @@ interface MessagesResponse {
 }
 
 export default function AdminMessagesPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
   const [page, setPage]         = useState<number>(1);
@@ -74,25 +77,25 @@ export default function AdminMessagesPage(): React.ReactElement {
 
   const header = (
     <div>
-      <AdminPageHeader title="Xabarlar" sub={`Aloqa formasidan kelgan murojaatlar${total ? ` — jami ${total} ta` : ''}`} />
+      <AdminPageHeader title={t('admin.messages.title')} sub={total ? t('admin.messages.subCount', { n: total }) : t('admin.messages.sub')} />
       <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
         <select className="inp" style={{ width:'auto', padding:'7px 12px', fontSize:12.5, cursor:'pointer' }}
           value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }}>
-          <option value="">Barcha holatlar</option>
-          {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{STATUS_LABELS[opt].label}</option>)}
+          <option value="">{t('admin.messages.allStatuses')}</option>
+          {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
         </select>
       </div>
     </div>
   );
 
-  if (status === 'loading') return <div>{header}<p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p></div>;
-  if (status === 'error') return <div>{header}<p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p></div>;
+  if (status === 'loading') return <div>{header}<p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p></div>;
+  if (status === 'error') return <div>{header}<p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p></div>;
   if (messages.length === 0) {
     return (
       <div>
         {header}
         <div className="card" style={{ padding:40, textAlign:'center' }}>
-          <p style={{ color:'#64748b', fontSize:14 }}>{filter ? 'Bu holatda xabarlar yo\'q.' : 'Hozircha xabarlar yo\'q.'}</p>
+          <p style={{ color:'#64748b', fontSize:14 }}>{filter ? t('admin.messages.emptyFiltered') : t('admin.messages.empty')}</p>
         </div>
       </div>
     );
@@ -116,12 +119,12 @@ export default function AdminMessagesPage(): React.ReactElement {
               </div>
               <select className="inp" style={{ width:'auto', padding:'6px 10px', fontSize:12, cursor:'pointer', background:s.bg, borderColor:s.border, color:s.color, fontWeight:700 }}
                 value={m.status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => changeStatus(m.id, e.target.value)}>
-                {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{STATUS_LABELS[opt].label}</option>)}
+                {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
               </select>
             </div>
-            {m.subject && <p style={{ fontSize:12, color:'#94a3b8', marginBottom:6 }}>Mavzu: {m.subject}</p>}
+            {m.subject && <p style={{ fontSize:12, color:'#94a3b8', marginBottom:6 }}>{t('admin.messages.subjectLabel', { subject: m.subject })}</p>}
             <p style={{ fontSize:13, color:'#334155', lineHeight:1.7 }}>{m.message}</p>
-            <p style={{ fontSize:11, color:'#cbd5e1', marginTop:10 }}>{new Date(m.createdAt).toLocaleString('uz-UZ')}</p>
+            <p style={{ fontSize:11, color:'#cbd5e1', marginTop:10 }}>{formatDateTime(m.createdAt)}</p>
           </div>
         );
       })}
@@ -130,10 +133,10 @@ export default function AdminMessagesPage(): React.ReactElement {
       {totalPages > 1 && (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:20 }}>
           <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page <= 1 ? 0.5 : 1 }}
-            disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Oldingi</button>
+            disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t('admin.common.prev')}</button>
           <span style={{ fontSize:13, color:'#64748b', fontWeight:600 }}>{page} / {totalPages}</span>
           <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page >= totalPages ? 0.5 : 1 }}
-            disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Keyingi</button>
+            disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t('admin.common.next')}</button>
         </div>
       )}
     </div>

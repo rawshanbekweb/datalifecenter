@@ -632,5 +632,120 @@
       "deleteTitle": "O'chirish",
       "confirmDelete": "\"{{title}}\" sessiyasi o'chirilsinmi?"
     }
+  },
+  "admin": {
+    "panel": "Admin panel",
+    "platformMgmt": "Platforma boshqaruvi",
+    "backToSite": "Saytga qaytish",
+    "nav": {
+      "dashboard": "Boshqaruv paneli",
+      "enrollments": "Yozilishlar",
+      "subscriptions": "Obunalar",
+      "courses": "Kurslar",
+      "users": "Foydalanuvchilar",
+      "mentors": "Mentorlar",
+      "mentorRequests": "Mentor so'rovlari",
+      "blog": "Blog",
+      "partners": "Hamkorlar",
+      "projects": "Loyihalar",
+      "messages": "Xabarlar",
+      "announcements": "E'lonlar",
+      "siteSettings": "Sayt sozlamalari",
+      "testimonials": "Sharhlar",
+      "courseReviews": "Kurs sharhlari"
+    },
+    "common": {
+      "all": "Barchasi",
+      "prev": "Oldingi",
+      "next": "Keyingi"
+    },
+    "enrollStatus": {
+      "PENDING": "Kutilmoqda",
+      "ACTIVE": "Faol",
+      "COMPLETED": "Yakunlangan",
+      "CANCELLED": "Bekor qilingan"
+    },
+    "reqStatus": {
+      "OPEN": "Ochiq",
+      "ANSWERED": "Javob berilgan",
+      "CLOSED": "Yopilgan"
+    },
+    "msgStatus": {
+      "NEW": "Yangi",
+      "READ": "O'qilgan",
+      "REPLIED": "Javob berilgan",
+      "ARCHIVED": "Arxivlangan"
+    },
+    "dashboard": {
+      "title": "Boshqaruv paneli",
+      "sub": "Platformaning umumiy holati",
+      "cardUsers": "Foydalanuvchilar",
+      "cardUsersSub": "{{n}} talaba",
+      "cardCourses": "Kurslar",
+      "cardCoursesSub": "{{n}} chop etilgan",
+      "cardEnrollments": "Yozilishlar",
+      "cardEnrollmentsSub": "{{pending}} kutilmoqda · {{active}} faol",
+      "cardMessages": "Yangi xabarlar",
+      "cardMessagesSub": "Blog: {{blog}} · Mentorlar: {{mentors}}",
+      "recentEnrollments": "Oxirgi yozilishlar",
+      "noEnrollments": "Hozircha yozilishlar yo'q.",
+      "recentMessages": "Oxirgi xabarlar",
+      "noMessages": "Hozircha xabarlar yo'q.",
+      "new": "Yangi"
+    },
+    "messages": {
+      "title": "Xabarlar",
+      "sub": "Aloqa formasidan kelgan murojaatlar",
+      "subCount": "Aloqa formasidan kelgan murojaatlar — jami {{n}} ta",
+      "allStatuses": "Barcha holatlar",
+      "emptyFiltered": "Bu holatda xabarlar yo'q.",
+      "empty": "Hozircha xabarlar yo'q.",
+      "subjectLabel": "Mavzu: {{subject}}"
+    },
+    "reviews": {
+      "title": "Kurs sharhlari",
+      "sub": "Talabalar tomonidan qoldirilgan kurs sharhlarini boshqarish",
+      "empty": "Sharhlar topilmadi.",
+      "hidden": "Yashirilgan",
+      "hide": "Yashirish",
+      "show": "Ko'rsatish",
+      "confirmDelete": "Sharhni o'chirishni tasdiqlaysizmi?"
+    },
+    "mentorRequests": {
+      "title": "Mentor so'rovlari",
+      "subWaiting": "{{n}} ta so'rov javob kutmoqda",
+      "subDefault": "Mentorlardan kelgan murojaatlar",
+      "empty": "Hozircha mentorlardan so'rovlar kelmagan.",
+      "close": "Yopish",
+      "yourReply": "Sizning javobingiz",
+      "updatePlaceholder": "Javobni yangilash...",
+      "replyPlaceholder": "Javob yozing...",
+      "answerBtn": "Javob berish"
+    },
+    "announcements": {
+      "title": "E'lonlar",
+      "sub": "Talaba yoki mentorlarga bildirishnoma sifatida yetkaziladigan e'lonlar",
+      "titleField": "Sarlavha",
+      "bodyField": "Matn",
+      "audience": "Auditoriya",
+      "audienceAll": "Hammaga",
+      "audienceStudents": "Faqat talabalarga",
+      "audienceMentors": "Faqat mentorlarga",
+      "courseTarget": "Muayyan kursga yuborish (ixtiyoriy)",
+      "courseNone": "— tanlanmagan (yuqoridagi auditoriya ishlatiladi)",
+      "send": "E'lon yuborish",
+      "empty": "Hali e'lon yuborilmagan.",
+      "confirmDelete": "E'lonni o'chirishni tasdiqlaysizmi?",
+      "audAll": "Hammaga",
+      "audStudents": "Talabalarga",
+      "audMentors": "Mentorlarga"
+    },
+    "localizedField": {
+      "untranslated": "Tarjima qilinmagan — saytda o'zbekcha ko'rinadi."
+    },
+    "receipt": {
+      "title": "To'lov cheki",
+      "loadFailed": "Chekni yuklab bo'lmadi."
+    }
   }
 }

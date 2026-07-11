@@ -632,5 +632,120 @@
       "deleteTitle": "Delete",
       "confirmDelete": "Delete the session \"{{title}}\"?"
     }
+  },
+  "admin": {
+    "panel": "Admin panel",
+    "platformMgmt": "Platform management",
+    "backToSite": "Back to site",
+    "nav": {
+      "dashboard": "Dashboard",
+      "enrollments": "Enrollments",
+      "subscriptions": "Subscriptions",
+      "courses": "Courses",
+      "users": "Users",
+      "mentors": "Mentors",
+      "mentorRequests": "Mentor requests",
+      "blog": "Blog",
+      "partners": "Partners",
+      "projects": "Projects",
+      "messages": "Messages",
+      "announcements": "Announcements",
+      "siteSettings": "Site settings",
+      "testimonials": "Testimonials",
+      "courseReviews": "Course reviews"
+    },
+    "common": {
+      "all": "All",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "enrollStatus": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "reqStatus": {
+      "OPEN": "Open",
+      "ANSWERED": "Answered",
+      "CLOSED": "Closed"
+    },
+    "msgStatus": {
+      "NEW": "New",
+      "READ": "Read",
+      "REPLIED": "Replied",
+      "ARCHIVED": "Archived"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "sub": "Overall platform status",
+      "cardUsers": "Users",
+      "cardUsersSub": "{{n}} students",
+      "cardCourses": "Courses",
+      "cardCoursesSub": "{{n}} published",
+      "cardEnrollments": "Enrollments",
+      "cardEnrollmentsSub": "{{pending}} pending · {{active}} active",
+      "cardMessages": "New messages",
+      "cardMessagesSub": "Blog: {{blog}} · Mentors: {{mentors}}",
+      "recentEnrollments": "Recent enrollments",
+      "noEnrollments": "No enrollments yet.",
+      "recentMessages": "Recent messages",
+      "noMessages": "No messages yet.",
+      "new": "New"
+    },
+    "messages": {
+      "title": "Messages",
+      "sub": "Inquiries from the contact form",
+      "subCount": "Inquiries from the contact form — {{n}} total",
+      "allStatuses": "All statuses",
+      "emptyFiltered": "No messages in this status.",
+      "empty": "No messages yet.",
+      "subjectLabel": "Subject: {{subject}}"
+    },
+    "reviews": {
+      "title": "Course reviews",
+      "sub": "Manage course reviews left by students",
+      "empty": "No reviews found.",
+      "hidden": "Hidden",
+      "hide": "Hide",
+      "show": "Show",
+      "confirmDelete": "Confirm deleting this review?"
+    },
+    "mentorRequests": {
+      "title": "Mentor requests",
+      "subWaiting": "{{n}} requests awaiting a reply",
+      "subDefault": "Inquiries from mentors",
+      "empty": "No requests from mentors yet.",
+      "close": "Close",
+      "yourReply": "Your reply",
+      "updatePlaceholder": "Update the reply...",
+      "replyPlaceholder": "Write a reply...",
+      "answerBtn": "Reply"
+    },
+    "announcements": {
+      "title": "Announcements",
+      "sub": "Announcements delivered to students or mentors as notifications",
+      "titleField": "Title",
+      "bodyField": "Body",
+      "audience": "Audience",
+      "audienceAll": "Everyone",
+      "audienceStudents": "Students only",
+      "audienceMentors": "Mentors only",
+      "courseTarget": "Send to a specific course (optional)",
+      "courseNone": "— not selected (the audience above is used)",
+      "send": "Send announcement",
+      "empty": "No announcement sent yet.",
+      "confirmDelete": "Confirm deleting this announcement?",
+      "audAll": "Everyone",
+      "audStudents": "Students",
+      "audMentors": "Mentors"
+    },
+    "localizedField": {
+      "untranslated": "Not translated — shown in Uzbek on the site."
+    },
+    "receipt": {
+      "title": "Payment receipt",
+      "loadFailed": "Failed to load the receipt."
+    }
   }
 }

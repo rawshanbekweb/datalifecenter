@@ -632,5 +632,120 @@
       "deleteTitle": "Удалить",
       "confirmDelete": "Удалить сессию «{{title}}»?"
     }
+  },
+  "admin": {
+    "panel": "Админ-панель",
+    "platformMgmt": "Управление платформой",
+    "backToSite": "Вернуться на сайт",
+    "nav": {
+      "dashboard": "Панель управления",
+      "enrollments": "Записи",
+      "subscriptions": "Подписки",
+      "courses": "Курсы",
+      "users": "Пользователи",
+      "mentors": "Менторы",
+      "mentorRequests": "Запросы менторов",
+      "blog": "Блог",
+      "partners": "Партнёры",
+      "projects": "Проекты",
+      "messages": "Сообщения",
+      "announcements": "Объявления",
+      "siteSettings": "Настройки сайта",
+      "testimonials": "Отзывы",
+      "courseReviews": "Отзывы о курсах"
+    },
+    "common": {
+      "all": "Все",
+      "prev": "Назад",
+      "next": "Вперёд"
+    },
+    "enrollStatus": {
+      "PENDING": "Ожидает",
+      "ACTIVE": "Активен",
+      "COMPLETED": "Завершён",
+      "CANCELLED": "Отменён"
+    },
+    "reqStatus": {
+      "OPEN": "Открыт",
+      "ANSWERED": "Отвечен",
+      "CLOSED": "Закрыт"
+    },
+    "msgStatus": {
+      "NEW": "Новое",
+      "READ": "Прочитано",
+      "REPLIED": "Отвечено",
+      "ARCHIVED": "В архиве"
+    },
+    "dashboard": {
+      "title": "Панель управления",
+      "sub": "Общее состояние платформы",
+      "cardUsers": "Пользователи",
+      "cardUsersSub": "{{n}} студентов",
+      "cardCourses": "Курсы",
+      "cardCoursesSub": "{{n}} опубликовано",
+      "cardEnrollments": "Записи",
+      "cardEnrollmentsSub": "{{pending}} ожидает · {{active}} активны",
+      "cardMessages": "Новые сообщения",
+      "cardMessagesSub": "Блог: {{blog}} · Менторы: {{mentors}}",
+      "recentEnrollments": "Последние записи",
+      "noEnrollments": "Пока записей нет.",
+      "recentMessages": "Последние сообщения",
+      "noMessages": "Пока сообщений нет.",
+      "new": "Новое"
+    },
+    "messages": {
+      "title": "Сообщения",
+      "sub": "Обращения из формы обратной связи",
+      "subCount": "Обращения из формы обратной связи — всего {{n}}",
+      "allStatuses": "Все статусы",
+      "emptyFiltered": "В этом статусе сообщений нет.",
+      "empty": "Пока сообщений нет.",
+      "subjectLabel": "Тема: {{subject}}"
+    },
+    "reviews": {
+      "title": "Отзывы о курсах",
+      "sub": "Управление отзывами студентов о курсах",
+      "empty": "Отзывы не найдены.",
+      "hidden": "Скрыт",
+      "hide": "Скрыть",
+      "show": "Показать",
+      "confirmDelete": "Подтвердить удаление отзыва?"
+    },
+    "mentorRequests": {
+      "title": "Запросы менторов",
+      "subWaiting": "{{n}} запросов ждут ответа",
+      "subDefault": "Обращения от менторов",
+      "empty": "Пока запросов от менторов нет.",
+      "close": "Закрыть",
+      "yourReply": "Ваш ответ",
+      "updatePlaceholder": "Обновить ответ...",
+      "replyPlaceholder": "Напишите ответ...",
+      "answerBtn": "Ответить"
+    },
+    "announcements": {
+      "title": "Объявления",
+      "sub": "Объявления, доставляемые студентам или менторам как уведомления",
+      "titleField": "Заголовок",
+      "bodyField": "Текст",
+      "audience": "Аудитория",
+      "audienceAll": "Всем",
+      "audienceStudents": "Только студентам",
+      "audienceMentors": "Только менторам",
+      "courseTarget": "Отправить конкретному курсу (необязательно)",
+      "courseNone": "— не выбрано (используется аудитория выше)",
+      "send": "Отправить объявление",
+      "empty": "Объявления ещё не отправлялись.",
+      "confirmDelete": "Подтвердить удаление объявления?",
+      "audAll": "Всем",
+      "audStudents": "Студентам",
+      "audMentors": "Менторам"
+    },
+    "localizedField": {
+      "untranslated": "Не переведено — на сайте показывается на узбекском."
+    },
+    "receipt": {
+      "title": "Чек об оплате",
+      "loadFailed": "Не удалось загрузить чек."
+    }
   }
 }
