@@ -4,9 +4,10 @@ import { Bell, CheckCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n/i18n';
 import { useAuth } from '../../hooks/useAuth';
-import { getMyNotifications, markAllNotificationsRead, markNotificationRead, type AppNotification } from '../../api/notifications';
+import { getMyNotifications, markAllNotificationsRead, markNotificationRead, subscribeNotifications, type AppNotification } from '../../api/notifications';
 
-const POLL_MS = 45000;
+// SSE asosiy kanal; polling faqat zaxira (SSE uzilib qolgan oraliq uchun)
+const POLL_MS = 180000;
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -32,12 +33,16 @@ export default function NotificationBell(): React.ReactElement | null {
     getMyNotifications().then((res) => { setItems(res.items); setUnreadCount(res.unreadCount); }).catch(() => {});
   };
 
+  // user.id ga bog'lanadi — profil tahriri (user obyekti yangi referens oladi)
+  // SSE ulanishini keraksiz uzib-ulab yubormasligi uchun
   useEffect(() => {
     if (!user) return;
     load();
+    const unsubscribe = subscribeNotifications(load);
     const t = setInterval(load, POLL_MS);
-    return () => clearInterval(t);
-  }, [user]);
+    return () => { unsubscribe(); clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     if (!open) return;

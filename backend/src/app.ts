@@ -54,7 +54,9 @@ const apiLimiter = rateLimit({
   limit: 1000,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => env.NODE_ENV === 'test',
+  // SSE oqimi uzoq yashaydi va uzilganda backoff bilan qayta ulanadi — har ulanish
+  // limitga sanalsa umumiy NAT ortidagi IP butun API'dan bloklanib qolardi
+  skip: (req) => env.NODE_ENV === 'test' || req.path === '/notifications/stream',
   message: { success: false, error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
 });
 

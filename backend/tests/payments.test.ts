@@ -153,6 +153,18 @@ describe('Payme to\'lov protokoli (JSON-RPC)', () => {
     expect(res.body.error.code).toBe(-32504);
   });
 
+  it("bo'sh parol (Paycom:) bilan auth o'tmaydi — timing-safe compare regressiyasi", async () => {
+    const emptyPw = `Basic ${Buffer.from('Paycom:').toString('base64')}`;
+    const res = await paymeRpc('CheckPerformTransaction', { amount: 1, account: { order_id: 'x' } }, 1, emptyPw);
+    expect(res.body.error.code).toBe(-32504);
+  });
+
+  it("noto'g'ri login (X:sir) bilan auth o'tmaydi", async () => {
+    const wrongLogin = `Basic ${Buffer.from(`X:${PAYME_SECRET_KEY}`).toString('base64')}`;
+    const res = await paymeRpc('CheckPerformTransaction', { amount: 1, account: { order_id: 'x' } }, 1, wrongLogin);
+    expect(res.body.error.code).toBe(-32504);
+  });
+
   it('CheckPerformTransaction baxtli yo\'l', async () => {
     const enrollmentId = await createPendingEnrollment();
     const res = await paymeRpc('CheckPerformTransaction', { amount: PRICE * 100, account: { order_id: orderId(enrollmentId) } });

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
@@ -64,9 +65,19 @@ export async function register(input: RegisterInput) {
   }
 
   const passwordHash = await hashPassword(input.password);
-  const user = await prisma.user.create({
-    data: { name: input.name, email: input.email, passwordHash, phone: input.phone },
-  });
+  let user;
+  try {
+    user = await prisma.user.create({
+      data: { name: input.name, email: input.email, passwordHash, phone: input.phone },
+    });
+  } catch (err) {
+    // Tekshiruv bilan yaratish orasida boshqa so'rov ulgurgan bo'lishi mumkin (poyga) —
+    // unique constraint xatosi 500 emas, xuddi yuqoridagi kabi 409 bo'lib qaytsin
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+      throw ApiError.conflict('Bu email allaqachon ro\'yxatdan o\'tgan', 'EMAIL_TAKEN');
+    }
+    throw err;
+  }
 
   await issueVerificationEmail(user.id, user.email, user.name);
 
@@ -74,9 +85,14 @@ export async function register(input: RegisterInput) {
   return { user: toPublicUser(user), token };
 }
 
+// Email bazada bo'lmaganda ham bcrypt solishtiruvi bajarilishi uchun soxta hash —
+// aks holda javob vaqti farqidan email ro'yxatda bor-yo'qligini bilib olish mumkin
+const DUMMY_HASH_PROMISE = hashPassword(crypto.randomBytes(16).toString('hex'));
+
 export async function login(input: LoginInput) {
   const user = await prisma.user.findUnique({ where: { email: input.email } });
   if (!user) {
+    await comparePassword(input.password, await DUMMY_HASH_PROMISE);
     throw ApiError.unauthorized('Email yoki parol noto\'g\'ri', 'INVALID_CREDENTIALS');
   }
 

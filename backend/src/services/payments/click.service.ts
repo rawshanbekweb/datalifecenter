@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
+import { safeCompare } from '../../utils/safeCompare';
 import { resolveOrder, confirmOrder, cancelOrder, orderRefFromTx, encodeOrderId } from './order';
 
 // CLICK_SERVICE_ID/CLICK_MERCHANT_ID/CLICK_SECRET_KEY sozlanmasa checkout tugmasi
@@ -47,11 +48,14 @@ function buildCheckoutUrl(orderId: string, amount: number, returnUrl: string): s
 }
 
 function verifySign(p: ClickParams, isComplete: boolean): boolean {
+  // Sir sozlanmagan bo'lsa imzo ochiq ma'lumotdan hisoblanib forge qilinishi mumkin —
+  // shu holatda hech qanday webhook qabul qilinmaydi (checkout ham o'chiq bo'ladi)
+  if (!env.CLICK_SECRET_KEY) return false;
   const parts = isComplete
     ? [p.click_trans_id, p.service_id, env.CLICK_SECRET_KEY, p.merchant_trans_id, p.merchant_prepare_id ?? '', p.amount, p.action, p.sign_time]
     : [p.click_trans_id, p.service_id, env.CLICK_SECRET_KEY, p.merchant_trans_id, p.amount, p.action, p.sign_time];
   const expected = crypto.createHash('md5').update(parts.join('')).digest('hex');
-  return expected === p.sign_string;
+  return typeof p.sign_string === 'string' && safeCompare(expected, p.sign_string);
 }
 
 function amountsMatch(a: string, b: unknown): boolean {

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { env } from '../config/env';
+import { safeCompare } from './safeCompare';
 
 // Lokal disk'dagi video fayllarni himoyalash uchun HMAC asosidagi vaqtinchalik token.
 // Cloudinary'dagi "authenticated" turidagi imzoli URL'larga o'xshash maqsad: bir marta
@@ -23,9 +24,5 @@ export function verifyLocalVideoToken(filename: string, exp: unknown, sig: unkno
   const expNum = Number(exp);
   if (!Number.isFinite(expNum) || expNum < Math.floor(Date.now() / 1000)) return false;
 
-  const expected = sign(filename, expNum);
-  const expectedBuf = Buffer.from(expected, 'hex');
-  const actualBuf = Buffer.from(sig, 'hex');
-  if (expectedBuf.length !== actualBuf.length) return false;
-  return crypto.timingSafeEqual(expectedBuf, actualBuf);
+  return safeCompare(sign(filename, expNum), sig);
 }

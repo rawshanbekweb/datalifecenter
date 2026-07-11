@@ -1,5 +1,6 @@
 import { NotificationType } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { pushNotifyEvent } from './notificationStream';
 
 export interface NotifyInput {
   type: NotificationType;
@@ -21,6 +22,8 @@ export async function notify(userIds: string | string[], input: NotifyInput): Pr
     await prisma.notification.createMany({
       data: ids.map((userId) => ({ userId, ...input })),
     });
+    // Ochiq SSE ulanishlarga xabar — mijoz ro'yxatni qayta yuklaydi
+    pushNotifyEvent(ids);
   } catch (err) {
     console.error('Bildirishnoma yozilmadi:', err);
   }

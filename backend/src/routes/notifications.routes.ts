@@ -6,6 +6,7 @@ import {
   listMyNotificationsHandler,
   markAllNotificationsReadHandler,
   markNotificationReadHandler,
+  streamNotificationsHandler,
 } from '../controllers/notifications.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
@@ -16,6 +17,7 @@ import { createAnnouncementSchema } from '../validators/announcements.validator'
 export const notificationsRouter = Router();
 notificationsRouter.use(authenticate);
 notificationsRouter.get('/', listMyNotificationsHandler);
+notificationsRouter.get('/stream', streamNotificationsHandler);
 notificationsRouter.patch('/read-all', markAllNotificationsReadHandler);
 notificationsRouter.patch('/:id/read', markNotificationReadHandler);
 

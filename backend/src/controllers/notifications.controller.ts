@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as notificationsService from '../services/notifications.service';
 import * as announcementsService from '../services/announcements.service';
+import { addStreamClient } from '../services/notificationStream';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
@@ -26,6 +27,25 @@ export const markAllNotificationsReadHandler = asyncHandler(async (req: Request,
   await notificationsService.markAllRead(userIdOf(req));
   sendSuccess(res, { read: true });
 });
+
+// SSE oqimi: ulanish ochiq qoladi, yangi bildirishnoma yozilganda 'notify'
+// hodisasi keladi — mijoz shunda ro'yxatni qayta so'raydi
+export const streamNotificationsHandler = (req: Request, res: Response): void => {
+  const userId = userIdOf(req);
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  // Nginx kabi proxy'lar SSE'ni buferlab qo'ymasligi uchun
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+  res.write(': connected\n\n');
+
+  // addStreamClient heartbeat'ni ham boshqaradi; qaytgan funksiya ulanish
+  // uzilganda taymerni tozalab, ro'yxatdan chiqaradi
+  const close = addStreamClient(userId, res);
+  req.on('close', close);
+};
 
 // ---------- E'lonlar (admin) ----------
 

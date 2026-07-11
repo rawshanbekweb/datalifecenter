@@ -1,6 +1,7 @@
 import { PaymentTxState } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
+import { safeCompare } from '../../utils/safeCompare';
 import { resolveOrder, confirmOrder, cancelOrder, orderRefFromTx, encodeOrderId } from './order';
 
 // PAYME_MERCHANT_ID/PAYME_SECRET_KEY sozlanmasa checkout tugmasi frontendda ko'rinmaydi.
@@ -44,10 +45,13 @@ function ms(d: Date | null | undefined): number {
 }
 
 export function verifyPaymeAuth(authHeader: string | undefined): boolean {
+  // Sir sozlanmagan bo'lsa hech kim autentifikatsiyadan o'ta olmasligi kerak —
+  // aks holda bo'sh parol bo'sh sir bilan mos kelib ketardi (safeCompare('','')=true)
+  if (!env.PAYME_SECRET_KEY) return false;
   if (!authHeader?.startsWith('Basic ')) return false;
   const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
   const [login, key] = decoded.split(':');
-  return login === 'Paycom' && key === env.PAYME_SECRET_KEY;
+  return login === 'Paycom' && typeof key === 'string' && safeCompare(key, env.PAYME_SECRET_KEY);
 }
 
 export function buildPaymeCheckoutUrl(orderId: string, amount: number): string {
