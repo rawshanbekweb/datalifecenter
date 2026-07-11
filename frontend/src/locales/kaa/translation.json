@@ -930,6 +930,78 @@
       "publish": "Járiyalaw",
       "empty": "Pikirler tabılmadı.",
       "confirmDelete": "Pikirdi óshiriwdi tastıyıqlaysızba?"
+    },
+    "siteSettings": {
+      "title": "Sayt sazlawları",
+      "sub": "Bas bettegi statistika, kartalar hám baylanıs maǵlıwmatların basqarıw",
+      "saved": "Saqlandı",
+      "tabs": {
+        "hero": "Bas bet statistikası",
+        "about": "Biz haqqımızda",
+        "services": "Xızmetler",
+        "why_us": "Nege biz",
+        "contact": "Baylanıs maǵlıwmatları"
+      },
+      "f": {
+        "value": "Mánis",
+        "name": "Atı",
+        "icon": "Ikonka",
+        "color": "Reń",
+        "title": "Sarlawha",
+        "desc": "Tásiriplew",
+        "text": "Tekst",
+        "pct": "Payız"
+      },
+      "heroHint": "Bas bet hero bóliminde isenim statistikası (mısalı \"2,000+ Pitkeriwshiler\").",
+      "addStat": "Statistika qosıw",
+      "aboutStatsCards": "Statistika kartaları",
+      "aboutFeatures": "Artıqmashılıqlar dizimi",
+      "aboutSkills": "Kónlikpe payızları",
+      "aboutSatisfaction": "Qanaatlanıw kórsetkishleri",
+      "addFeature": "Artıqmashılıq qosıw",
+      "addSkill": "Kónlikpe qosıw",
+      "addIndicator": "Kórsetkish qosıw",
+      "servicesFeatures": "Ózgeshelikler",
+      "addFeat": "Ózgeshelik qosıw",
+      "addService": "Xızmet qosıw",
+      "whyStat": "Statistika",
+      "addCard": "Karta qosıw",
+      "phone": "Telefon",
+      "telegram": "Telegram",
+      "email": "Email",
+      "address": "Mánzil",
+      "addressSub": "Mánzil (qosımsha)",
+      "hoursTitle": "Jumıs waqıtları",
+      "day": "Kún",
+      "time": "Waqıt",
+      "closed": "Jabıq",
+      "addDay": "Kún qosıw"
+    },
+    "curriculum": {
+      "loadFailed": "Kurstı júklep bolmadı.",
+      "sub": "Kurs baǵdarlaması — modullar hám sabaqlar",
+      "newModule": "Jańa modul",
+      "editModule": "Moduldı redaktorlaw",
+      "moduleTitlePlaceholder": "Modul sarlawhası *",
+      "moduleDescPlaceholder": "Qısqa tásiriplew (erkin)",
+      "emptyModules": "Bul kursta ele modullar joq. Birinshi moduldı qosıń.",
+      "lessonCount": "{{n}} sabaq",
+      "confirmDeleteModule": "Modul hám onıń barlıq sabaqları óshiriledi. Dawam etesizbe?",
+      "confirmDeleteLesson": "Sabaqtı óshiriwdi tastıyıqlaysızba?",
+      "addLesson": "Sabaq qosıw",
+      "lessonTitlePlaceholder": "Sabaq sarlawhası *",
+      "durationPlaceholder": "Minut",
+      "durationShort": "{{n}} min",
+      "videoPlaceholder": "YouTube siltemesi yamasa video fayl júkleń",
+      "contentPlaceholder": "Sabaq teksti / tapsırma tásiriplewi",
+      "freePreview": "Biypul kóriw (jazılmaǵan paydalanıwshılar da kóredi)",
+      "freeTag": "Biypul",
+      "types": {
+        "VIDEO": "Video",
+        "TEXT": "Tekst",
+        "QUIZ": "Test",
+        "ASSIGNMENT": "Tapsırma"
+      }
     }
   }
 }

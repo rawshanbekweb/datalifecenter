@@ -930,6 +930,78 @@
       "publish": "Nashr qilish",
       "empty": "Sharhlar topilmadi.",
       "confirmDelete": "Sharhni o'chirishni tasdiqlaysizmi?"
+    },
+    "siteSettings": {
+      "title": "Sayt sozlamalari",
+      "sub": "Bosh sahifadagi statistika, kartalar va aloqa ma'lumotlarini boshqarish",
+      "saved": "Saqlandi",
+      "tabs": {
+        "hero": "Bosh sahifa statistikasi",
+        "about": "Biz haqimizda",
+        "services": "Xizmatlar",
+        "why_us": "Nega biz",
+        "contact": "Aloqa ma'lumotlari"
+      },
+      "f": {
+        "value": "Qiymat",
+        "name": "Nom",
+        "icon": "Ikonka",
+        "color": "Rang",
+        "title": "Sarlavha",
+        "desc": "Tavsif",
+        "text": "Matn",
+        "pct": "Foiz"
+      },
+      "heroHint": "Bosh sahifa hero bo'limidagi ishonch statistikasi (masalan \"2,000+ Bitiruvchilar\").",
+      "addStat": "Statistika qo'shish",
+      "aboutStatsCards": "Statistika kartalari",
+      "aboutFeatures": "Afzalliklar ro'yxati",
+      "aboutSkills": "Ko'nikma foizlari",
+      "aboutSatisfaction": "Qoniqish ko'rsatkichlari",
+      "addFeature": "Afzallik qo'shish",
+      "addSkill": "Ko'nikma qo'shish",
+      "addIndicator": "Ko'rsatkich qo'shish",
+      "servicesFeatures": "Xususiyatlar",
+      "addFeat": "Xususiyat qo'shish",
+      "addService": "Xizmat qo'shish",
+      "whyStat": "Statistika",
+      "addCard": "Karta qo'shish",
+      "phone": "Telefon",
+      "telegram": "Telegram",
+      "email": "Email",
+      "address": "Manzil",
+      "addressSub": "Manzil (qo'shimcha)",
+      "hoursTitle": "Ish vaqtlari",
+      "day": "Kun",
+      "time": "Vaqt",
+      "closed": "Yopiq",
+      "addDay": "Kun qo'shish"
+    },
+    "curriculum": {
+      "loadFailed": "Kursni yuklab bo'lmadi.",
+      "sub": "Kurs dasturi — modullar va darslar",
+      "newModule": "Yangi modul",
+      "editModule": "Modulni tahrirlash",
+      "moduleTitlePlaceholder": "Modul sarlavhasi *",
+      "moduleDescPlaceholder": "Qisqa tavsif (ixtiyoriy)",
+      "emptyModules": "Bu kursda hali modullar yo'q. Birinchi modulni qo'shing.",
+      "lessonCount": "{{n}} dars",
+      "confirmDeleteModule": "Modul va uning barcha darslari o'chiriladi. Davom etasizmi?",
+      "confirmDeleteLesson": "Darsni o'chirishni tasdiqlaysizmi?",
+      "addLesson": "Dars qo'shish",
+      "lessonTitlePlaceholder": "Dars sarlavhasi *",
+      "durationPlaceholder": "Daqiqa",
+      "durationShort": "{{n}} daq",
+      "videoPlaceholder": "YouTube havolasi yoki video fayl yuklang",
+      "contentPlaceholder": "Dars matni / topshiriq tavsifi",
+      "freePreview": "Bepul ko'rish (yozilmagan foydalanuvchilar ham ko'radi)",
+      "freeTag": "Bepul",
+      "types": {
+        "VIDEO": "Video",
+        "TEXT": "Matn",
+        "QUIZ": "Test",
+        "ASSIGNMENT": "Vazifa"
+      }
     }
   }
 }

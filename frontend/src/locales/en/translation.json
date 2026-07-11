@@ -930,6 +930,78 @@
       "publish": "Publish",
       "empty": "No testimonials found.",
       "confirmDelete": "Confirm deleting this testimonial?"
+    },
+    "siteSettings": {
+      "title": "Site settings",
+      "sub": "Manage the home page statistics, cards and contact details",
+      "saved": "Saved",
+      "tabs": {
+        "hero": "Home statistics",
+        "about": "About us",
+        "services": "Services",
+        "why_us": "Why us",
+        "contact": "Contact details"
+      },
+      "f": {
+        "value": "Value",
+        "name": "Name",
+        "icon": "Icon",
+        "color": "Color",
+        "title": "Title",
+        "desc": "Description",
+        "text": "Text",
+        "pct": "Percent"
+      },
+      "heroHint": "Trust statistics in the home page hero section (e.g. \"2,000+ Graduates\").",
+      "addStat": "Add statistic",
+      "aboutStatsCards": "Statistics cards",
+      "aboutFeatures": "Advantages list",
+      "aboutSkills": "Skill percentages",
+      "aboutSatisfaction": "Satisfaction indicators",
+      "addFeature": "Add advantage",
+      "addSkill": "Add skill",
+      "addIndicator": "Add indicator",
+      "servicesFeatures": "Features",
+      "addFeat": "Add feature",
+      "addService": "Add service",
+      "whyStat": "Statistic",
+      "addCard": "Add card",
+      "phone": "Phone",
+      "telegram": "Telegram",
+      "email": "Email",
+      "address": "Address",
+      "addressSub": "Address (extra)",
+      "hoursTitle": "Working hours",
+      "day": "Day",
+      "time": "Time",
+      "closed": "Closed",
+      "addDay": "Add day"
+    },
+    "curriculum": {
+      "loadFailed": "Failed to load the course.",
+      "sub": "Course curriculum — modules and lessons",
+      "newModule": "New module",
+      "editModule": "Edit module",
+      "moduleTitlePlaceholder": "Module title *",
+      "moduleDescPlaceholder": "Short description (optional)",
+      "emptyModules": "This course has no modules yet. Add the first module.",
+      "lessonCount": "{{n}} lessons",
+      "confirmDeleteModule": "The module and all its lessons will be deleted. Continue?",
+      "confirmDeleteLesson": "Confirm deleting this lesson?",
+      "addLesson": "Add lesson",
+      "lessonTitlePlaceholder": "Lesson title *",
+      "durationPlaceholder": "Minutes",
+      "durationShort": "{{n}} min",
+      "videoPlaceholder": "YouTube link or upload a video file",
+      "contentPlaceholder": "Lesson text / assignment description",
+      "freePreview": "Free preview (unenrolled users can also view)",
+      "freeTag": "Free",
+      "types": {
+        "VIDEO": "Video",
+        "TEXT": "Text",
+        "QUIZ": "Quiz",
+        "ASSIGNMENT": "Assignment"
+      }
     }
   }
 }
