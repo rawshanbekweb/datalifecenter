@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getCourseLearn } from '../api/courses';
 import { completeLesson, uncompleteLesson } from '../api/progress';
 import ComingSoon from '../components/common/ComingSoon';
+import LessonVideo from '../components/common/LessonVideo';
 import LessonQA from '../components/questions/LessonQA';
 
 interface LearnLesson {
@@ -40,37 +41,6 @@ const TYPE_ICONS: Record<LearnLesson['contentType'], React.ComponentType<{ size?
   QUIZ: HelpCircle,
   ASSIGNMENT: ClipboardList,
 };
-
-// To'g'ridan-to'g'ri video fayl (mp4/webm) — <video> tegi bilan ochiladi
-function isDirectVideo(url: string): boolean {
-  return /\.(mp4|webm)(\?|$)/i.test(url) || url.includes('/uploads/videos/');
-}
-
-// YouTube/Vimeo havolalarini embed ko'rinishiga o'giradi.
-// Pullik kontent uchun tavsiya: YouTube'da "unlisted" video — havolasiz topilmaydi
-// va to'g'ridan-to'g'ri yuklab olib bo'lmaydi.
-function toEmbedUrl(url: string): string | null {
-  try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtube.com')) {
-      // watch?v=ID, shorts/ID, live/ID, embed/ID — hammasi qo'llab-quvvatlanadi
-      const id =
-        u.searchParams.get('v') ||
-        u.pathname.match(/^\/(?:shorts|live|embed)\/([\w-]{6,})/)?.[1];
-      return id ? `https://www.youtube.com/embed/${id}` : url;
-    }
-    if (u.hostname === 'youtu.be') {
-      return `https://www.youtube.com/embed${u.pathname}`;
-    }
-    if (u.hostname.includes('vimeo.com') && !u.hostname.includes('player.')) {
-      const id = u.pathname.match(/\/(\d+)/)?.[1];
-      return id ? `https://player.vimeo.com/video/${id}` : url;
-    }
-    return url;
-  } catch {
-    return null;
-  }
-}
 
 export default function LearnPage(): React.ReactElement {
   const { t } = useTranslation();
@@ -151,7 +121,6 @@ export default function LearnPage(): React.ReactElement {
     return <ComingSoon title={t('common.error')} sub={t('pages.courseDetail.errorSub')} />;
   }
 
-  const embedUrl = activeLesson?.videoUrl ? toEmbedUrl(activeLesson.videoUrl) : null;
   const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
   const completedCount = completedIds.length;
   const progressPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
@@ -261,20 +230,10 @@ export default function LearnPage(): React.ReactElement {
                     <Clock size={12}/> {activeLesson.durationMinutes ? t('pages.blogDetail.readMinutes', { n: activeLesson.durationMinutes }) : t('student.learn.noDuration')}
                   </p>
 
-                  {activeLesson.contentType === 'VIDEO' && embedUrl && isDirectVideo(embedUrl) && (
-                    <div style={{ borderRadius:14, overflow:'hidden', background:'#0f172a', marginBottom:18 }}>
-                      <video src={embedUrl} controls controlsList="nodownload" playsInline
-                        style={{ display:'block', width:'100%', maxHeight:480 }} />
-                    </div>
+                  {activeLesson.contentType === 'VIDEO' && activeLesson.videoUrl && (
+                    <LessonVideo url={activeLesson.videoUrl} title={activeLesson.title} />
                   )}
-                  {activeLesson.contentType === 'VIDEO' && embedUrl && !isDirectVideo(embedUrl) && (
-                    <div style={{ position:'relative', paddingTop:'56.25%', borderRadius:14, overflow:'hidden', background:'#0f172a', marginBottom:18 }}>
-                      <iframe src={embedUrl} title={activeLesson.title} allowFullScreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        style={{ position:'absolute', inset:0, width:'100%', height:'100%', border:'none' }} />
-                    </div>
-                  )}
-                  {activeLesson.contentType === 'VIDEO' && !embedUrl && (
+                  {activeLesson.contentType === 'VIDEO' && !activeLesson.videoUrl && (
                     <div style={{ padding:'40px 20px', borderRadius:14, background:'#f8fafc', border:'1.5px dashed #cbd5e1', textAlign:'center', marginBottom:18 }}>
                       <PlayCircle size={28} style={{ color:'#94a3b8', margin:'0 auto 10px' }} />
                       <p style={{ fontSize:13, color:'#64748b' }}>{t('student.learn.noVideo')}</p>
