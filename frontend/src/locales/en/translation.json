@@ -514,5 +514,123 @@
       "ended": "This live lesson has ended.",
       "cancelled": "This live lesson was cancelled."
     }
+  },
+  "mentor": {
+    "title": "Mentor cabinet",
+    "backToSite": "Back to site",
+    "nav": {
+      "dashboard": "Dashboard",
+      "courses": "My courses",
+      "students": "Students",
+      "sessions": "Live lessons",
+      "questions": "Q&A",
+      "requests": "Contact admin",
+      "profile": "Profile"
+    },
+    "notLinked": {
+      "title": "Mentor profile not linked",
+      "message": "No mentor profile is linked to your account. Please contact an administrator."
+    },
+    "home": {
+      "welcome": "Welcome, {{name}}",
+      "sub": "Your courses and students are here",
+      "statCourses": "My courses",
+      "statTotalStudents": "Total students",
+      "statActiveStudents": "Active students",
+      "myCourses": "My courses",
+      "noCourseAssigned": "No course is assigned to you yet. An administrator must select you as a mentor when creating a course.",
+      "recentEnrollments": "Recent enrollments",
+      "noEnrollments": "No one has enrolled in your courses yet.",
+      "moduleCount": "{{modules}} modules · {{students}} students",
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "enrollStatus": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "courses": {
+      "title": "My courses",
+      "sub": "Courses assigned to you — manage their curriculum here",
+      "empty": "No course is assigned to you yet. Once an administrator assigns a course, it will appear here.",
+      "moduleUnit": "{{n}} modules",
+      "studentUnit": "{{n}} students",
+      "notPublished": "Not published",
+      "curriculum": "Curriculum"
+    },
+    "students": {
+      "title": "Students",
+      "sub": "Students in your courses and their lesson progress",
+      "empty": "No active students in your courses yet.",
+      "completed": "Completed",
+      "studying": "Studying"
+    },
+    "questions": {
+      "title": "Q&A",
+      "subWaiting": "{{n}} questions awaiting an answer",
+      "subDefault": "Your students' lesson questions",
+      "empty": "No questions yet. When students ask a question on a lesson page, you'll see them here.",
+      "answered": "Answered",
+      "awaiting": "Awaiting answer",
+      "placeholder": "Write your answer...",
+      "answerBtn": "Answer",
+      "sendError": "Failed to send the answer"
+    },
+    "requests": {
+      "title": "Contact admin",
+      "sub": "Send a request about a course, curriculum or organizational matters",
+      "newRequest": "New request",
+      "subjectPlaceholder": "Subject * (e.g. need to add a new module)",
+      "bodyPlaceholder": "Request details *",
+      "send": "Send",
+      "empty": "No requests yet. To reach an administrator, click the \"New request\" button.",
+      "adminReply": "Admin reply",
+      "sendError": "Failed to send the request",
+      "status": {
+        "OPEN": "Open",
+        "ANSWERED": "Answered",
+        "CLOSED": "Closed"
+      }
+    },
+    "profile": {
+      "title": "My mentor profile",
+      "sub": "Information shown on the site's \"Mentors\" page",
+      "publicProfile": "Public profile",
+      "saved": "Profile saved",
+      "name": "Name *",
+      "specialty": "Field * (e.g. Frontend Development)",
+      "position": "Position (e.g. Senior Engineer @ Company)",
+      "bio": "Bio",
+      "photo": "Profile photo",
+      "socialLinks": "Social links"
+    },
+    "sessionsPanel": {
+      "pageSub": "Schedule and manage sessions",
+      "title": "Live lessons",
+      "newSession": "New session",
+      "needCourseTitle": "You must have a course assigned to create a session",
+      "noCourseWarn": "No course is assigned to you yet, so you can't create a session. An administrator must select you in the \"Mentor\" field when editing a course (Admin panel → Courses).",
+      "selectCourse": "Select a course...",
+      "sessionTopic": "Session topic",
+      "minutes": "{{n}} minutes",
+      "meetingPlaceholder": "Meeting link (Zoom, Google Meet, Jitsi...)",
+      "genLink": "Generate link",
+      "genLinkTitle": "Generate a free Jitsi room link",
+      "descPlaceholder": "Short description (optional)",
+      "audienceLabel": "Audience — if none selected, open to everyone",
+      "createSession": "Create session",
+      "emptyList": "No live lesson scheduled yet. Create an online meeting for your students with the \"New session\" button.",
+      "loadError": "Failed to load sessions.",
+      "forNStudents": "For {{n}} students",
+      "openToAll": "Open to everyone",
+      "joinInSite": "Join room (on site)",
+      "openExternal": "Open external link",
+      "start": "Start broadcast",
+      "end": "End broadcast",
+      "deleteTitle": "Delete",
+      "confirmDelete": "Delete the session \"{{title}}\"?"
+    }
   }
 }

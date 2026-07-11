@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CheckCircle, AlertCircle, UserRound, Link2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getMentorMe, updateMentorMe } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
@@ -27,6 +28,7 @@ const labelStyle: React.CSSProperties = { fontSize:12, color:'#475569', fontWeig
 
 // Mentor ommaviy profilini (saytdagi "Mentorlar" sahifasida ko'rinadigan) tahrirlaydi
 export default function MentorProfilePage(): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<MentorProfile>(EMPTY);
   const [status, setStatus] = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState<string>('');
@@ -70,29 +72,29 @@ export default function MentorProfilePage(): React.ReactElement {
       await updateMentorMe(form);
       setSaveState('success');
     } catch (err: unknown) {
-      setSaveError((err as Error).message || 'Xatolik yuz berdi');
+      setSaveError((err as Error).message || t('common.error'));
       setSaveState('error');
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Mentor profilim" sub="Saytdagi 'Mentorlar' sahifasida ko'rinadigan ma'lumotlaringiz" />
+      <AdminPageHeader title={t('mentor.profile.title')} sub={t('mentor.profile.sub')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 
       {status === 'ready' && (
         <form onSubmit={save} className="card" style={{ padding:24, maxWidth:640, display:'flex', flexDirection:'column', gap:14 }}>
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:14, fontWeight:800, color:'#0f172a' }}>
-            <UserRound size={16} style={{ color:'#9333ea' }}/> Ommaviy profil
+            <UserRound size={16} style={{ color:'#9333ea' }}/> {t('mentor.profile.publicProfile')}
           </p>
 
           {saveState === 'success' && (
             <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderRadius:12, background:'#f0fdf4', border:'1.5px solid #bbf7d0' }}>
               <CheckCircle size={15} style={{ color:'#16a34a', flexShrink:0 }}/>
-              <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>Profil saqlandi</p>
+              <p style={{ fontSize:13, color:'#16a34a', fontWeight:600 }}>{t('mentor.profile.saved')}</p>
             </div>
           )}
           {saveState === 'error' && (
@@ -104,17 +106,17 @@ export default function MentorProfilePage(): React.ReactElement {
 
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             <div>
-              <label style={labelStyle}>Ism *</label>
+              <label style={labelStyle}>{t('mentor.profile.name')}</label>
               <input className="inp" value={form.name} onChange={(e) => set('name')(e.target.value)} required minLength={2} />
             </div>
-            <LocalizedField label="Soha * (masalan: Frontend Development)" required value={form.specialty} onChange={setLocalized('specialty')} />
+            <LocalizedField label={t('mentor.profile.specialty')} required value={form.specialty} onChange={setLocalized('specialty')} />
           </div>
-          <LocalizedField label="Lavozim (masalan: Senior Engineer @ Kompaniya)" value={form.position} onChange={setLocalized('position')} />
-          <LocalizedField label="Bio" required multiline rows={4} value={form.bio} onChange={setLocalized('bio')} />
-          <FileUpload kind="image" label="Profil surati" value={form.photoUrl} onChange={set('photoUrl')} />
+          <LocalizedField label={t('mentor.profile.position')} value={form.position} onChange={setLocalized('position')} />
+          <LocalizedField label={t('mentor.profile.bio')} required multiline rows={4} value={form.bio} onChange={setLocalized('bio')} />
+          <FileUpload kind="image" label={t('mentor.profile.photo')} value={form.photoUrl} onChange={set('photoUrl')} />
 
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:13.5, fontWeight:800, color:'#0f172a', marginTop:6 }}>
-            <Link2 size={15} style={{ color:'#0ea5e9' }}/> Ijtimoiy havolalar
+            <Link2 size={15} style={{ color:'#0ea5e9' }}/> {t('mentor.profile.socialLinks')}
           </p>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
             <div>
@@ -133,7 +135,7 @@ export default function MentorProfilePage(): React.ReactElement {
 
           <button type="submit" disabled={saveState === 'saving'} className="btn-primary"
             style={{ alignSelf:'flex-start', opacity: saveState === 'saving' ? 0.7 : 1 }}>
-            {saveState === 'saving' ? 'Saqlanmoqda...' : 'Saqlash'}
+            {saveState === 'saving' ? t('common.saving') : t('common.save')}
           </button>
         </form>
       )}

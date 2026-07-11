@@ -514,5 +514,123 @@
       "ended": "Bu jonli dars yakunlangan.",
       "cancelled": "Bu jonli dars bekor qilingan."
     }
+  },
+  "mentor": {
+    "title": "Mentor kabineti",
+    "backToSite": "Saytga qaytish",
+    "nav": {
+      "dashboard": "Boshqaruv paneli",
+      "courses": "Kurslarim",
+      "students": "Talabalar",
+      "sessions": "Jonli darslar",
+      "questions": "Savol-javob",
+      "requests": "Admin bilan aloqa",
+      "profile": "Profil"
+    },
+    "notLinked": {
+      "title": "Mentor profili bog'lanmagan",
+      "message": "Sizning hisobingizga mentor profili bog'lanmagan. Administratorga murojaat qiling."
+    },
+    "home": {
+      "welcome": "Xush kelibsiz, {{name}}",
+      "sub": "Kurslaringiz va talabalaringiz shu yerda",
+      "statCourses": "Kurslarim",
+      "statTotalStudents": "Jami talabalar",
+      "statActiveStudents": "Faol talabalar",
+      "myCourses": "Kurslarim",
+      "noCourseAssigned": "Sizga hali kurs biriktirilmagan. Administrator kurs yaratishda sizni mentor sifatida tanlashi kerak.",
+      "recentEnrollments": "Oxirgi yozilishlar",
+      "noEnrollments": "Kurslaringizga hali hech kim yozilmagan.",
+      "moduleCount": "{{modules}} modul · {{students}} talaba",
+      "published": "Chop etilgan",
+      "draft": "Qoralama"
+    },
+    "enrollStatus": {
+      "PENDING": "Kutilmoqda",
+      "ACTIVE": "Faol",
+      "COMPLETED": "Yakunlangan",
+      "CANCELLED": "Bekor qilingan"
+    },
+    "courses": {
+      "title": "Kurslarim",
+      "sub": "Sizga biriktirilgan kurslar — dasturini shu yerdan boshqarasiz",
+      "empty": "Sizga hali kurs biriktirilmagan. Administrator kurs biriktirgach, u shu yerda ko'rinadi.",
+      "moduleUnit": "{{n}} modul",
+      "studentUnit": "{{n}} talaba",
+      "notPublished": "Nashr qilinmagan",
+      "curriculum": "Kurs dasturi"
+    },
+    "students": {
+      "title": "Talabalar",
+      "sub": "Kurslaringizdagi talabalar va ularning dars progressi",
+      "empty": "Kurslaringizda hali faol talabalar yo'q.",
+      "completed": "Yakunladi",
+      "studying": "O'qimoqda"
+    },
+    "questions": {
+      "title": "Savol-javob",
+      "subWaiting": "{{n}} ta savol javob kutmoqda",
+      "subDefault": "O'quvchilaringizning dars savollari",
+      "empty": "Hozircha savollar yo'q. O'quvchilar dars sahifasida savol qoldirsa, shu yerda ko'rasiz.",
+      "answered": "Javob berilgan",
+      "awaiting": "Javob kutilmoqda",
+      "placeholder": "Javobingizni yozing...",
+      "answerBtn": "Javob berish",
+      "sendError": "Javobni yuborib bo'lmadi"
+    },
+    "requests": {
+      "title": "Admin bilan aloqa",
+      "sub": "Kurs, dastur yoki tashkiliy masalalar bo'yicha so'rov yuboring",
+      "newRequest": "Yangi so'rov",
+      "subjectPlaceholder": "Mavzu * (masalan: Yangi modul qo'shish kerak)",
+      "bodyPlaceholder": "So'rov tafsilotlari *",
+      "send": "Yuborish",
+      "empty": "Hozircha so'rovlar yo'q. Administratorga murojaat qilish uchun \"Yangi so'rov\" tugmasini bosing.",
+      "adminReply": "Admin javobi",
+      "sendError": "So'rovni yuborib bo'lmadi",
+      "status": {
+        "OPEN": "Ochiq",
+        "ANSWERED": "Javob berilgan",
+        "CLOSED": "Yopilgan"
+      }
+    },
+    "profile": {
+      "title": "Mentor profilim",
+      "sub": "Saytdagi 'Mentorlar' sahifasida ko'rinadigan ma'lumotlaringiz",
+      "publicProfile": "Ommaviy profil",
+      "saved": "Profil saqlandi",
+      "name": "Ism *",
+      "specialty": "Soha * (masalan: Frontend Development)",
+      "position": "Lavozim (masalan: Senior Engineer @ Kompaniya)",
+      "bio": "Bio",
+      "photo": "Profil surati",
+      "socialLinks": "Ijtimoiy havolalar"
+    },
+    "sessionsPanel": {
+      "pageSub": "Sessiyalarni rejalashtirish va boshqarish",
+      "title": "Jonli darslar",
+      "newSession": "Yangi sessiya",
+      "needCourseTitle": "Sessiya yaratish uchun sizga kurs biriktirilgan bo'lishi kerak",
+      "noCourseWarn": "Sizga hali kurs biriktirilmagan, shu sababli sessiya yaratib bo'lmaydi. Administrator kurs tahririda (Admin panel → Kurslar) \"Mentor\" maydonida sizni tanlashi kerak.",
+      "selectCourse": "Kursni tanlang...",
+      "sessionTopic": "Sessiya mavzusi",
+      "minutes": "{{n}} daqiqa",
+      "meetingPlaceholder": "Uchrashuv havolasi (Zoom, Google Meet, Jitsi...)",
+      "genLink": "Havola yaratish",
+      "genLinkTitle": "Bepul Jitsi xonasi havolasini yaratish",
+      "descPlaceholder": "Qisqacha tavsif (ixtiyoriy)",
+      "audienceLabel": "Auditoriya — belgilanmasa hammaga ochiq bo'ladi",
+      "createSession": "Sessiya yaratish",
+      "emptyList": "Hali jonli dars rejalashtirilmagan. \"Yangi sessiya\" tugmasi orqali talabalaringiz uchun onlayn uchrashuv yarating.",
+      "loadError": "Sessiyalarni yuklab bo'lmadi.",
+      "forNStudents": "{{n}} ta o'quvchi uchun",
+      "openToAll": "Hammaga ochiq",
+      "joinInSite": "Xonaga kirish (saytda)",
+      "openExternal": "Tashqi havolada ochish",
+      "start": "Efirni boshlash",
+      "end": "Efirni yakunlash",
+      "deleteTitle": "O'chirish",
+      "confirmDelete": "\"{{title}}\" sessiyasi o'chirilsinmi?"
+    }
   }
 }

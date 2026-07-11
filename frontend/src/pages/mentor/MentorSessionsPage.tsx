@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getMentorDashboard, getMentorStudents } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorSessionsPanel, { StudentOption } from '../../components/sessions/MentorSessionsPanel';
@@ -10,6 +11,7 @@ interface CourseOption {
 }
 
 export default function MentorSessionsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [students, setStudents] = useState<StudentOption[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
@@ -34,10 +36,10 @@ export default function MentorSessionsPage(): React.ReactElement {
 
   return (
     <div>
-      <AdminPageHeader title="Jonli darslar" sub="Sessiyalarni rejalashtirish va boshqarish" />
+      <AdminPageHeader title={t('mentor.sessionsPanel.title')} sub={t('mentor.sessionsPanel.pageSub')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 
       {status === 'ready' && <MentorSessionsPanel courses={courses} students={students} />}

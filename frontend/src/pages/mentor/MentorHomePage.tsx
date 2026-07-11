@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Users, GraduationCap, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getMentorDashboard } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
 import { useAuth } from '../../hooks/useAuth';
+import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
 
@@ -36,14 +38,15 @@ interface MentorDashboardData {
   stats: { totalStudents: number; activeStudents: number; coursesCount: number };
 }
 
-const STATUS_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  PENDING:   { label: 'Kutilmoqda',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-  ACTIVE:    { label: 'Faol',           color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
-  COMPLETED: { label: 'Yakunlangan',    color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-  CANCELLED: { label: 'Bekor qilingan', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
+const STATUS_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
+  PENDING:   { labelKey: 'mentor.enrollStatus.PENDING',   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+  ACTIVE:    { labelKey: 'mentor.enrollStatus.ACTIVE',    color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+  COMPLETED: { labelKey: 'mentor.enrollStatus.COMPLETED', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+  CANCELLED: { labelKey: 'mentor.enrollStatus.CANCELLED', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0' },
 };
 
 export default function MentorHomePage(): React.ReactElement {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [data, setData]     = useState<MentorDashboardData | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
@@ -64,20 +67,20 @@ export default function MentorHomePage(): React.ReactElement {
   return (
     <div>
       <AdminPageHeader
-        title={`Xush kelibsiz, ${user?.name?.split(' ')[0] || 'Mentor'}`}
-        sub="Kurslaringiz va talabalaringiz shu yerda" />
+        title={t('mentor.home.welcome', { name: user?.name?.split(' ')[0] || 'Mentor' })}
+        sub={t('mentor.home.sub')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 
       {status === 'ready' && data && (
         <>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:14, marginBottom:28 }}>
             {[
-              { label:'Kurslarim', value:data.stats.coursesCount, icon:BookOpen, color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
-              { label:'Jami talabalar', value:data.stats.totalStudents, icon:Users, color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
-              { label:'Faol talabalar', value:data.stats.activeStudents, icon:GraduationCap, color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
+              { label:t('mentor.home.statCourses'), value:data.stats.coursesCount, icon:BookOpen, color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
+              { label:t('mentor.home.statTotalStudents'), value:data.stats.totalStudents, icon:Users, color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
+              { label:t('mentor.home.statActiveStudents'), value:data.stats.activeStudents, icon:GraduationCap, color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
             ].map((card) => {
               const Icon = card.icon;
               return (
@@ -92,10 +95,10 @@ export default function MentorHomePage(): React.ReactElement {
             })}
           </div>
 
-          <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>Kurslarim</h2>
+          <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>{t('mentor.home.myCourses')}</h2>
           {data.mentor.courses.length === 0 && (
             <div className="card" style={{ padding:28, textAlign:'center', marginBottom:28 }}>
-              <p style={{ fontSize:13.5, color:'#64748b' }}>Sizga hali kurs biriktirilmagan. Administrator kurs yaratishda sizni mentor sifatida tanlashi kerak.</p>
+              <p style={{ fontSize:13.5, color:'#64748b' }}>{t('mentor.home.noCourseAssigned')}</p>
             </div>
           )}
           <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:32 }}>
@@ -109,10 +112,10 @@ export default function MentorHomePage(): React.ReactElement {
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <p style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>{c.title}</p>
-                    <p style={{ fontSize:12, color:'#64748b' }}>{c._count.modules} modul · {c._count.enrollments} talaba</p>
+                    <p style={{ fontSize:12, color:'#64748b' }}>{t('mentor.home.moduleCount', { modules: c._count.modules, students: c._count.enrollments })}</p>
                   </div>
                   <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#fff', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8', flexShrink:0 }}>
-                    {c.published ? 'Chop etilgan' : 'Qoralama'}
+                    {c.published ? t('mentor.home.published') : t('mentor.home.draft')}
                   </span>
                   <ArrowRight size={15} style={{ color:c.color, flexShrink:0 }} />
                 </Link>
@@ -120,10 +123,10 @@ export default function MentorHomePage(): React.ReactElement {
             })}
           </div>
 
-          <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>Oxirgi yozilishlar</h2>
+          <h2 style={{ fontSize:17, fontWeight:800, color:'#0f172a', marginBottom:14 }}>{t('mentor.home.recentEnrollments')}</h2>
           {data.recentEnrollments.length === 0 && (
             <div className="card" style={{ padding:28, textAlign:'center' }}>
-              <p style={{ fontSize:13.5, color:'#64748b' }}>Kurslaringizga hali hech kim yozilmagan.</p>
+              <p style={{ fontSize:13.5, color:'#64748b' }}>{t('mentor.home.noEnrollments')}</p>
             </div>
           )}
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -136,8 +139,8 @@ export default function MentorHomePage(): React.ReactElement {
                     <p style={{ fontSize:11.5, color:'#94a3b8' }}>{e.user.email}</p>
                   </div>
                   <p style={{ flex:'1 1 160px', fontSize:12.5, fontWeight:600, color:'#475569', minWidth:0 }}>{e.course.title}</p>
-                  <p style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{new Date(e.enrolledAt).toLocaleDateString('uz-UZ')}</p>
-                  <span className="tag" style={{ background:s.bg, borderColor:s.border, color:s.color, fontWeight:700, flexShrink:0 }}>{s.label}</span>
+                  <p style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{formatDate(e.enrolledAt)}</p>
+                  <span className="tag" style={{ background:s.bg, borderColor:s.border, color:s.color, fontWeight:700, flexShrink:0 }}>{t(s.labelKey)}</span>
                 </div>
               );
             })}

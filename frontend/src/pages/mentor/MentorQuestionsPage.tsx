@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { MessageCircleQuestion, Send, CornerDownRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LessonQuestion, answerQuestion, getMentorQuestions } from '../../api/questions';
+import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
 
 // Mentor kurslaridagi o'quvchi savollari — javob berish shu yerdan
 export default function MentorQuestionsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<LessonQuestion[]>([]);
   const [status, setStatus]       = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg]   = useState<string>('');
@@ -33,7 +36,7 @@ export default function MentorQuestionsPage(): React.ReactElement {
       setQuestions((prev) => prev.map((q) => q.id === id ? { ...q, answer: updated.answer, answeredAt: updated.answeredAt } : q));
       setDrafts((prev) => ({ ...prev, [id]: '' }));
     } catch (err: unknown) {
-      alert((err as Error).message || 'Javobni yuborib bo\'lmadi');
+      alert((err as Error).message || t('mentor.questions.sendError'));
     } finally {
       setSendingId(null);
     }
@@ -43,18 +46,18 @@ export default function MentorQuestionsPage(): React.ReactElement {
 
   return (
     <div>
-      <AdminPageHeader title="Savol-javob"
-        sub={unanswered > 0 ? `${unanswered} ta savol javob kutmoqda` : "O'quvchilaringizning dars savollari"} />
+      <AdminPageHeader title={t('mentor.questions.title')}
+        sub={unanswered > 0 ? t('mentor.questions.subWaiting', { n: unanswered }) : t('mentor.questions.subDefault')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 
       {status === 'ready' && questions.length === 0 && (
         <div className="card" style={{ padding:40, textAlign:'center' }}>
           <MessageCircleQuestion size={28} style={{ color:'#cbd5e1', marginBottom:12 }} />
           <p style={{ color:'#64748b', fontSize:14 }}>
-            Hozircha savollar yo'q. O'quvchilar dars sahifasida savol qoldirsa, shu yerda ko'rasiz.
+            {t('mentor.questions.empty')}
           </p>
         </div>
       )}
@@ -70,13 +73,13 @@ export default function MentorQuestionsPage(): React.ReactElement {
                 <div style={{ flex:1, minWidth:160 }}>
                   <p style={{ fontSize:13, fontWeight:800, color:'#0f172a' }}>{q.user.name}</p>
                   <p style={{ fontSize:11.5, color:'#94a3b8' }}>
-                    {q.lesson?.module.course.title} · {q.lesson?.title} · {new Date(q.createdAt).toLocaleDateString('uz-UZ')}
+                    {q.lesson?.module.course.title} · {q.lesson?.title} · {formatDate(q.createdAt)}
                   </p>
                 </div>
                 <span className="tag" style={q.answer
                   ? { background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a', fontWeight:700, flexShrink:0 }
                   : { background:'#fffbeb', borderColor:'#fde68a', color:'#d97706', fontWeight:700, flexShrink:0 }}>
-                  {q.answer ? 'Javob berilgan' : 'Javob kutilmoqda'}
+                  {q.answer ? t('mentor.questions.answered') : t('mentor.questions.awaiting')}
                 </span>
               </div>
 
@@ -90,11 +93,11 @@ export default function MentorQuestionsPage(): React.ReactElement {
               ) : (
                 <div style={{ display:'flex', gap:8 }}>
                   <input className="inp" value={drafts[q.id] || ''} style={{ flex:1, fontSize:13 }}
-                    placeholder="Javobingizni yozing..."
+                    placeholder={t('mentor.questions.placeholder')}
                     onChange={(e) => setDrafts((prev) => ({ ...prev, [q.id]: e.target.value }))} />
                   <button onClick={() => sendAnswer(q.id)} disabled={!(drafts[q.id] || '').trim() || sendingId === q.id}
                     className="btn-primary" style={{ fontSize:12.5, padding:'9px 16px', flexShrink:0, opacity: !(drafts[q.id] || '').trim() || sendingId === q.id ? 0.6 : 1 }}>
-                    <Send size={13}/> {sendingId === q.id ? '...' : 'Javob berish'}
+                    <Send size={13}/> {sendingId === q.id ? '...' : t('mentor.questions.answerBtn')}
                   </button>
                 </div>
               )}

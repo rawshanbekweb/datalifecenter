@@ -514,5 +514,123 @@
       "ended": "Bul janlı sabaq tamamlanǵan.",
       "cancelled": "Bul janlı sabaq biykar etilgen."
     }
+  },
+  "mentor": {
+    "title": "Mentor kabineti",
+    "backToSite": "Saytqa qaytıw",
+    "nav": {
+      "dashboard": "Basqarıw paneli",
+      "courses": "Kurslarım",
+      "students": "Studentler",
+      "sessions": "Janlı sabaqlar",
+      "questions": "Soraw-juwap",
+      "requests": "Admin menen baylanıs",
+      "profile": "Profil"
+    },
+    "notLinked": {
+      "title": "Mentor profili baylanıspaǵan",
+      "message": "Sizdiń esabıńızǵa mentor profili baylanıspaǵan. Administratorǵa múrájat etiń."
+    },
+    "home": {
+      "welcome": "Xosh kelipsiz, {{name}}",
+      "sub": "Kurslarıńız hám studentlerińiz usı jerde",
+      "statCourses": "Kurslarım",
+      "statTotalStudents": "Ulıwma studentler",
+      "statActiveStudents": "Aktiv studentler",
+      "myCourses": "Kurslarım",
+      "noCourseAssigned": "Sizge álle kurs biriktirilmegen. Administrator kurs jaratıwda sizdi mentor sıpatında saylawı kerek.",
+      "recentEnrollments": "Sońǵı jazılıwlar",
+      "noEnrollments": "Kurslarıńızǵa álle hesh kim jazılmaǵan.",
+      "moduleCount": "{{modules}} modul · {{students}} student",
+      "published": "Járiyalanǵan",
+      "draft": "Qaralama"
+    },
+    "enrollStatus": {
+      "PENDING": "Kútilmekte",
+      "ACTIVE": "Aktiv",
+      "COMPLETED": "Juwmaqlanǵan",
+      "CANCELLED": "Biykar etilgen"
+    },
+    "courses": {
+      "title": "Kurslarım",
+      "sub": "Sizge biriktirilgen kurslar — baǵdarlamasın usı jerden basqarasız",
+      "empty": "Sizge álle kurs biriktirilmegen. Administrator kurs biriktirgennen keyin, ol usı jerde kórinedi.",
+      "moduleUnit": "{{n}} modul",
+      "studentUnit": "{{n}} student",
+      "notPublished": "Járiyalanbaǵan",
+      "curriculum": "Kurs baǵdarlaması"
+    },
+    "students": {
+      "title": "Studentler",
+      "sub": "Kurslarıńızdaǵı studentler hám olardıń sabaq progressi",
+      "empty": "Kurslarıńızda álle aktiv studentler joq.",
+      "completed": "Juwmaqladı",
+      "studying": "Oqımaqta"
+    },
+    "questions": {
+      "title": "Soraw-juwap",
+      "subWaiting": "{{n}} soraw juwap kútpekte",
+      "subDefault": "Studentlerińizdiń sabaq sorawları",
+      "empty": "Házirshe sorawlar joq. Studentler sabaq betinde soraw qaldırsa, usı jerde kóresiz.",
+      "answered": "Juwap berilgen",
+      "awaiting": "Juwap kútilmekte",
+      "placeholder": "Juwabıńızdı jazıń...",
+      "answerBtn": "Juwap beriw",
+      "sendError": "Juwaptı jiberip bolmadı"
+    },
+    "requests": {
+      "title": "Admin menen baylanıs",
+      "sub": "Kurs, baǵdarlama yamasa shólkemlestiriw máseleleri boyınsha soraw jiberiń",
+      "newRequest": "Jańa soraw",
+      "subjectPlaceholder": "Tema * (mısalı: Jańa modul qosıw kerek)",
+      "bodyPlaceholder": "Soraw tápsilatları *",
+      "send": "Jiberiw",
+      "empty": "Házirshe sorawlar joq. Administratorǵa múrájat etiw ushın \"Jańa soraw\" túymesin basıń.",
+      "adminReply": "Admin juwabı",
+      "sendError": "Sorawdı jiberip bolmadı",
+      "status": {
+        "OPEN": "Ashıq",
+        "ANSWERED": "Juwap berilgen",
+        "CLOSED": "Jabıq"
+      }
+    },
+    "profile": {
+      "title": "Mentor profilim",
+      "sub": "Sayttaǵı 'Mentorlar' betinde kórinetuǵın maǵlıwmatlarıńız",
+      "publicProfile": "Ashıq profil",
+      "saved": "Profil saqlandı",
+      "name": "Atı *",
+      "specialty": "Tarawı * (mısalı: Frontend Development)",
+      "position": "Lawazım (mısalı: Senior Engineer @ Kompaniya)",
+      "bio": "Bio",
+      "photo": "Profil súwreti",
+      "socialLinks": "Social silteler"
+    },
+    "sessionsPanel": {
+      "pageSub": "Sessiyalardı rejalastırıw hám basqarıw",
+      "title": "Janlı sabaqlar",
+      "newSession": "Jańa sessiya",
+      "needCourseTitle": "Sessiya jaratıw ushın sizge kurs biriktirilgen bolıwı kerek",
+      "noCourseWarn": "Sizge álle kurs biriktirilmegen, sonlıqtan sessiya jaratıp bolmaydı. Administrator kurs redaktorlawında (Admin panel → Kurslar) \"Mentor\" maydanında sizdi saylawı kerek.",
+      "selectCourse": "Kurstı saylań...",
+      "sessionTopic": "Sessiya teması",
+      "minutes": "{{n}} minut",
+      "meetingPlaceholder": "Ushırasıw siltemesi (Zoom, Google Meet, Jitsi...)",
+      "genLink": "Silteme jaratıw",
+      "genLinkTitle": "Biypul Jitsi bólme siltemesin jaratıw",
+      "descPlaceholder": "Qısqasha tásiriplew (erkin)",
+      "audienceLabel": "Auditoriya — belgilenbese hámmege ashıq boladı",
+      "createSession": "Sessiya jaratıw",
+      "emptyList": "Álle janlı sabaq rejalastırılmaǵan. \"Jańa sessiya\" túymesi arqalı studentlerińiz ushın onlayn ushırasıw jaratıń.",
+      "loadError": "Sessiyalardı júklep bolmadı.",
+      "forNStudents": "{{n}} student ushın",
+      "openToAll": "Hámmege ashıq",
+      "joinInSite": "Bólmege kiriw (saytta)",
+      "openExternal": "Sırtqı siltemede ashıw",
+      "start": "Efirdi baslaw",
+      "end": "Efirdi juwmaqlaw",
+      "deleteTitle": "Óshiriw",
+      "confirmDelete": "\"{{title}}\" sessiyası óshirilsinbe?"
+    }
   }
 }

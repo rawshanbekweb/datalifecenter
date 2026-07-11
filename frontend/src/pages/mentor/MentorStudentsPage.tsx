@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getMentorStudents } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
@@ -13,6 +14,7 @@ interface StudentProgressRow {
 }
 
 export default function MentorStudentsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [students, setStudents] = useState<StudentProgressRow[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState<string>('');
@@ -31,15 +33,15 @@ export default function MentorStudentsPage(): React.ReactElement {
 
   return (
     <div>
-      <AdminPageHeader title="Talabalar" sub="Kurslaringizdagi talabalar va ularning dars progressi" />
+      <AdminPageHeader title={t('mentor.students.title')} sub={t('mentor.students.sub')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 
       {status === 'ready' && students.length === 0 && (
         <div className="card" style={{ padding:36, textAlign:'center' }}>
-          <p style={{ fontSize:13.5, color:'#64748b' }}>Kurslaringizda hali faol talabalar yo'q.</p>
+          <p style={{ fontSize:13.5, color:'#64748b' }}>{t('mentor.students.empty')}</p>
         </div>
       )}
 
@@ -71,7 +73,7 @@ export default function MentorStudentsPage(): React.ReactElement {
                   color: done ? '#16a34a' : '#9333ea',
                   fontWeight:700, flexShrink:0,
                 }}>
-                  {done ? 'Yakunladi' : "O'qimoqda"}
+                  {done ? t('mentor.students.completed') : t('mentor.students.studying')}
                 </span>
               </div>
             );
