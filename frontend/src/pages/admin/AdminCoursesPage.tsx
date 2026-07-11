@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, AlertCircle, ListTree } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listCoursesAdmin, createCourse, updateCourse, deleteCourse } from '../../api/courses';
 import { listMentors } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
+import { formatNumber } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 const ICON_KEYS: string[] = ['Monitor', 'Server', 'Shield', 'Smartphone', 'Database', 'Cloud', 'BookOpen'];
-const LEVELS: { value: string; label: string }[] = [
-  { value: 'BEGINNER', label: "Boshlang'ich" },
-  { value: 'INTERMEDIATE', label: "O'rta" },
-  { value: 'ADVANCED', label: 'Yuqori' },
+// daraja nomi umumiy `levels.*` (Stage 2) orqali t() bilan chiqadi
+const LEVELS: { value: string; labelKey: string }[] = [
+  { value: 'BEGINNER', labelKey: 'levels.BEGINNER' },
+  { value: 'INTERMEDIATE', labelKey: 'levels.INTERMEDIATE' },
+  { value: 'ADVANCED', labelKey: 'levels.ADVANCED' },
 ];
-const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
-  { name: "Ko'k",      color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
-  { name: 'Binafsha',  color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
-  { name: 'Yashil',    color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
-  { name: 'Amber',     color:'#d97706', bg:'#fffbeb', border:'#fde68a' },
-  { name: 'Pushti',    color:'#db2777', bg:'#fdf2f8', border:'#fbcfe8' },
+const PRESETS: { nameKey: string; color: string; bg: string; border: string }[] = [
+  { nameKey: 'admin.colors.blue',   color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
+  { nameKey: 'admin.colors.purple', color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
+  { nameKey: 'admin.colors.green',  color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
+  { nameKey: 'admin.colors.amber',  color:'#d97706', bg:'#fffbeb', border:'#fde68a' },
+  { nameKey: 'admin.colors.pink',   color:'#db2777', bg:'#fdf2f8', border:'#fbcfe8' },
 ];
 
 interface CourseFormState {
@@ -74,6 +77,7 @@ interface CourseFormProps {
 }
 
 function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<CourseFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -108,7 +112,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       }
       onSaved();
     } catch (err: unknown) {
-      setError((err as Error).message || 'Xatolik yuz berdi');
+      setError((err as Error).message || t('common.error'));
       setStatus('error');
     }
   };
@@ -122,65 +126,66 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
         </div>
       )}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
-        <LocalizedField label="Subtitr" value={form.subtitle} onChange={(next) => setForm((f) => ({ ...f, subtitle: next }))} />
+        <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+        <LocalizedField label={t('admin.courses.fSubtitle')} value={form.subtitle} onChange={(next) => setForm((f) => ({ ...f, subtitle: next }))} />
       </div>
-      <LocalizedField label="Tavsif" required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
+      <LocalizedField label={t('admin.form.descField')} required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ikonka</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.iconLabel')}</label>
           <select className="inp" value={form.iconKey} onChange={change('iconKey')}>
             {ICON_KEYS.map((k) => <option key={k} value={k}>{k}</option>)}
           </select>
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Rang</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.colorLabel')}</label>
           <select className="inp" value={form.preset} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm((f) => ({ ...f, preset: Number(e.target.value) }))}>
-            {PRESETS.map((p, i) => <option key={p.name} value={i}>{p.name}</option>)}
+            {PRESETS.map((p, i) => <option key={p.nameKey} value={i}>{t(p.nameKey)}</option>)}
           </select>
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Daraja</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fLevel')}</label>
           <select className="inp" value={form.level} onChange={change('level')}>
-            {LEVELS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+            {LEVELS.map((l) => <option key={l.value} value={l.value}>{t(l.labelKey)}</option>)}
           </select>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Narx (UZS, bepul = 0)</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fPrice')}</label>
           <input className="inp" type="number" min="0" value={form.price} onChange={change('price')} />
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Davomiylik (oy)</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fDuration')}</label>
           <input className="inp" type="number" min="1" value={form.durationMonths} onChange={change('durationMonths')} required />
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Mentor</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fMentor')}</label>
           <select className="inp" value={form.mentorId} onChange={change('mentorId')}>
-            <option value="">Tanlanmagan</option>
+            <option value="">{t('admin.courses.mentorNone')}</option>
             {mentors.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
         </div>
       </div>
       <div>
-        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Teglar (vergul bilan)</label>
-        <input className="inp" value={form.tags} onChange={change('tags')} placeholder="React, TypeScript, ..." />
+        <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fTags')}</label>
+        <input className="inp" value={form.tags} onChange={change('tags')} placeholder={t('admin.courses.tagsPlaceholder')} />
       </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
-        <input type="checkbox" checked={form.published} onChange={change('published')} /> Chop etilgan (saytda ko'rinadi)
+        <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.courses.published')}
       </label>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
-          {status==='loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status==='loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminCoursesPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [status, setStatus]   = useState<'loading' | 'ready' | 'error'>('loading');
@@ -206,22 +211,22 @@ export default function AdminCoursesPage(): React.ReactElement {
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm("Kursni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.courses.confirmDelete'))) return;
     try {
       await deleteCourse(id);
       load();
     } catch (err: unknown) {
-      alert((err as Error).message || 'Xatolik yuz berdi');
+      alert((err as Error).message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Kurslar" sub="Kurslarni yaratish, tahrirlash va dasturini boshqarish"
+      <AdminPageHeader title={t('admin.courses.title')} sub={t('admin.courses.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
-              <Plus size={15}/> Yangi kurs
+              <Plus size={15}/> {t('admin.courses.newBtn')}
             </button>
           ) : undefined
         } />
@@ -231,8 +236,8 @@ export default function AdminCoursesPage(): React.ReactElement {
           onSaved={() => { setEditing(null); load(); }} />
       )}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -246,15 +251,15 @@ export default function AdminCoursesPage(): React.ReactElement {
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{c.title.uz}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>
-                    {c.mentor?.name || "Mentor yo'q"} · {c.isFree ? 'Bepul' : `${Number(c.price).toLocaleString('uz-UZ')} UZS`}
+                    {c.mentor?.name || t('admin.courses.noMentor')} · {c.isFree ? t('common.free') : t('admin.courses.priceUnit', { price: formatNumber(Number(c.price)) })}
                   </p>
                 </div>
                 <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#f8fafc', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8' }}>
-                  {c.published ? 'Chop etilgan' : 'Qoralama'}
+                  {c.published ? t('admin.tags.published') : t('admin.tags.draft')}
                 </span>
-                <Link to={`/admin/courses/${c.id}/curriculum`} title="Kurs dasturi (modul/darslar)"
+                <Link to={`/admin/courses/${c.id}/curriculum`} title={t('admin.courses.curriculumTitle')}
                   style={{ display:'flex', alignItems:'center', gap:6, height:32, padding:'0 10px', borderRadius:8, border:'1px solid #bae6fd', background:'#f0f9ff', color:'#0ea5e9', fontSize:12, fontWeight:700, textDecoration:'none' }}>
-                  <ListTree size={14}/> Dastur
+                  <ListTree size={14}/> {t('admin.courses.curriculum')}
                 </Link>
                 <button onClick={() => startEdit(c)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                   <Pencil size={14}/>

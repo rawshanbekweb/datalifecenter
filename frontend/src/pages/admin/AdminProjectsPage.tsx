@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, LayoutGrid, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listProjectsAdmin, createProject, updateProject, deleteProject } from '../../api/projects';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
@@ -49,6 +50,7 @@ interface ProjectFormProps {
 }
 
 function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<ProjectFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -81,7 +83,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
       }
       onSaved();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -95,59 +97,58 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
         </div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+        <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <div>
-          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Kategoriya *</label>
-          <input className="inp" value={form.category} onChange={change('category')} required placeholder="Web App / Mobile / AI/ML ..." />
+          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.form.categoryReq')}</label>
+          <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.projects.categoryPlaceholder')} />
         </div>
       </div>
-      <LocalizedField label="Tavsif" required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
+      <LocalizedField label={t('admin.form.descField')} required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
       <div>
-        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Texnologiyalar (vergul bilan) *</label>
-        <input className="inp" value={form.techStackText} onChange={change('techStackText')} required placeholder="React, Node.js, PostgreSQL" />
+        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.projects.fTech')}</label>
+        <input className="inp" value={form.techStackText} onChange={change('techStackText')} required placeholder={t('admin.projects.techPlaceholder')} />
       </div>
-      <FileUpload kind="image" label="Skrinshot (kursning/loyihaning birinchi sahifasi) *" required value={form.screenshotUrl}
+      <FileUpload kind="image" label={t('admin.projects.fScreenshot')} required value={form.screenshotUrl}
         onChange={(url) => setForm((f: ProjectFormState) => ({ ...f, screenshotUrl: url }))} />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Sayt havolasi</label>
+          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.projects.fLiveUrl')}</label>
           <input className="inp" value={form.liveUrl} onChange={change('liveUrl')} placeholder="https://..." />
         </div>
         <div>
-          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Kod (GitHub) havolasi</label>
+          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.projects.fRepoUrl')}</label>
           <input className="inp" value={form.repoUrl} onChange={change('repoUrl')} placeholder="https://github.com/..." />
         </div>
       </div>
       <div>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#334155', cursor: form.liveUrl ? 'pointer' : 'not-allowed', opacity: form.liveUrl ? 1 : 0.5 }}>
           <input type="checkbox" checked={form.liveEmbed} disabled={!form.liveUrl} onChange={change('liveEmbed')} />
-          Skrinshot o'rniga saytni jonli (live) ko'rsatish
+          {t('admin.projects.liveEmbedCheck')}
         </label>
         <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 4, lineHeight: 1.6 }}>
-          Kartada skrinshot o'rniga sayt to'g'ridan-to'g'ri iframe orqali yuklanadi. Ba'zi saytlar xavfsizlik sozlamalari
-          tufayli iframe ichida umuman ochilmasligi mumkin — shunday holatda bo'sh joy ko'rinadi, buni yoqishdan oldin
-          sinab ko'ring va muammo bo'lsa o'chirib, skrinshotdan foydalaning.
+          {t('admin.projects.liveEmbedHint')}
         </p>
       </div>
       <div style={{ display: 'flex', gap: 20 }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#334155', cursor: 'pointer' }}>
-          <input type="checkbox" checked={form.featured} onChange={change('featured')} /> Tavsiya etilgan
+          <input type="checkbox" checked={form.featured} onChange={change('featured')} /> {t('admin.projects.featuredCheck')}
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#334155', cursor: 'pointer' }}>
-          <input type="checkbox" checked={form.published} onChange={change('published')} /> Saytda ko'rsatilsin
+          <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.projects.publishedCheck')}
         </label>
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
         <button type="submit" disabled={status === 'loading'} className="btn-primary" style={{ opacity: status === 'loading' ? 0.7 : 1 }}>
-          {status === 'loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status === 'loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminProjectsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [projects, setProjects] = useState<Project[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
   const [editing, setEditing]   = useState<ProjectFormState | null>(null);
@@ -166,30 +167,30 @@ export default function AdminProjectsPage(): React.ReactElement {
   });
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm("Loyihani o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.projects.confirmDelete'))) return;
     try {
       await deleteProject(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Loyihalar" sub="Bosh sahifadagi portfolio loyihalarini boshqarish"
+      <AdminPageHeader title={t('admin.projects.title')} sub={t('admin.projects.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize: 13 }}>
-              <Plus size={15} /> Yangi loyiha
+              <Plus size={15} /> {t('admin.projects.newBtn')}
             </button>
           ) : undefined
         } />
 
       {editing && <ProjectForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -200,11 +201,11 @@ export default function AdminProjectsPage(): React.ReactElement {
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{p.title.uz}</p>
                 <p style={{ fontSize: 12, color: '#94a3b8' }}>{p.category}</p>
               </div>
-              {p.featured && <span className="tag" style={{ background: '#faf5ff', borderColor: '#e9d5ff', color: '#9333ea' }}>Tavsiya</span>}
-              {p.liveEmbed && <span className="tag" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>Live</span>}
+              {p.featured && <span className="tag" style={{ background: '#faf5ff', borderColor: '#e9d5ff', color: '#9333ea' }}>{t('admin.tags.featured')}</span>}
+              {p.liveEmbed && <span className="tag" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>{t('admin.tags.live')}</span>}
               {!p.published && (
                 <span className="tag" style={{ background: '#f8fafc', borderColor: '#e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <EyeOff size={11} /> Yashirilgan
+                  <EyeOff size={11} /> {t('admin.tags.hidden')}
                 </span>
               )}
               <button onClick={() => startEdit(p)} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>
@@ -218,7 +219,7 @@ export default function AdminProjectsPage(): React.ReactElement {
           {projects.length === 0 && (
             <div className="card" style={{ padding: 36, textAlign: 'center' }}>
               <LayoutGrid size={28} style={{ color: '#cbd5e1', marginBottom: 10 }} />
-              <p style={{ color: '#64748b', fontSize: 14 }}>Loyihalar topilmadi.</p>
+              <p style={{ color: '#64748b', fontSize: 14 }}>{t('admin.projects.empty')}</p>
             </div>
           )}
         </div>

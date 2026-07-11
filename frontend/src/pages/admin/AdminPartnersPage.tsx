@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, Building2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listPartners, createPartner, updatePartner, deletePartner } from '../../api/partners';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
@@ -34,6 +35,7 @@ interface PartnerFormProps {
 }
 
 function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<PartnerFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -54,7 +56,7 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
       }
       onSaved();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -69,36 +71,37 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
       )}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Nomi *</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.partners.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Kategoriya *</label>
-          <input className="inp" value={form.category} onChange={change('category')} required placeholder="hiring / tech / education" />
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.categoryReq')}</label>
+          <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.partners.categoryPlaceholder')} />
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <FileUpload kind="image" label="Logotip *" required value={form.logoUrl}
+        <FileUpload kind="image" label={t('admin.partners.fLogo')} required value={form.logoUrl}
           onChange={(url) => setForm((f: PartnerFormState) => ({ ...f, logoUrl: url }))} />
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Veb-sayt</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.partners.fWebsite')}</label>
           <input className="inp" value={form.websiteUrl} onChange={change('websiteUrl')} placeholder="https://..." />
         </div>
       </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
-        <input type="checkbox" checked={form.featured} onChange={change('featured')} /> Tavsiya etilgan (birinchi ko'rsatiladi)
+        <input type="checkbox" checked={form.featured} onChange={change('featured')} /> {t('admin.form.featuredCheck')}
       </label>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
-          {status==='loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status==='loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminPartnersPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
   const [editing, setEditing]   = useState<PartnerFormState | null>(null);
@@ -115,30 +118,30 @@ export default function AdminPartnersPage(): React.ReactElement {
   });
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm("Hamkorni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.partners.confirmDelete'))) return;
     try {
       await deletePartner(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Hamkorlar" sub="Hamkor tashkilotlarni boshqarish"
+      <AdminPageHeader title={t('admin.partners.title')} sub={t('admin.partners.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
-              <Plus size={15}/> Yangi hamkor
+              <Plus size={15}/> {t('admin.partners.newBtn')}
             </button>
           ) : undefined
         } />
 
       {editing && <PartnerForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -151,7 +154,7 @@ export default function AdminPartnersPage(): React.ReactElement {
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{p.name}</p>
                 <p style={{ fontSize:12, color:'#94a3b8' }}>{p.category}</p>
               </div>
-              {p.featured && <span className="tag" style={{ background:'#faf5ff', borderColor:'#e9d5ff', color:'#9333ea' }}>Tavsiya</span>}
+              {p.featured && <span className="tag" style={{ background:'#faf5ff', borderColor:'#e9d5ff', color:'#9333ea' }}>{t('admin.tags.featured')}</span>}
               <button onClick={() => startEdit(p)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                 <Pencil size={14}/>
               </button>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, Star, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listTestimonialsAdmin, createTestimonial, updateTestimonial, deleteTestimonial } from '../../api/testimonials';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
@@ -40,6 +41,7 @@ interface TestimonialFormProps {
 }
 
 function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<TestimonialFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -62,7 +64,7 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
       }
       onSaved();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -77,46 +79,47 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
       )}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ism *</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.testimonials.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
         </div>
         <LocalizedField
-          label="Lavozim / tavsif"
+          label={t('admin.testimonials.fRole')}
           required
           value={form.role}
           onChange={(next) => setForm((f) => ({ ...f, role: next }))}
-          placeholder="Frontend dasturchi, ... bitiruvchisi"
+          placeholder={t('admin.testimonials.rolePlaceholder')}
         />
       </div>
       <LocalizedField
-        label="Sharh matni"
+        label={t('admin.testimonials.fText')}
         required
         multiline
         value={form.text}
         onChange={(next) => setForm((f) => ({ ...f, text: next }))}
       />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-        <FileUpload kind="image" label="Rasm (ixtiyoriy)" value={form.avatarUrl}
+        <FileUpload kind="image" label={t('admin.testimonials.fPhoto')} value={form.avatarUrl}
           onChange={(url) => setForm((f: TestimonialFormState) => ({ ...f, avatarUrl: url }))} />
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Reyting (1-5)</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.testimonials.fRating')}</label>
           <input className="inp" type="number" min={1} max={5} value={form.rating} onChange={change('rating')} />
         </div>
       </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
-        <input type="checkbox" checked={form.published} onChange={change('published')} /> Saytda ko'rsatilsin (nashr qilingan)
+        <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.testimonials.publishedCheck')}
       </label>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
-          {status==='loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status==='loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminTestimonialsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [items, setItems]     = useState<Testimonial[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
   const [editing, setEditing] = useState<TestimonialFormState | null>(null);
@@ -133,75 +136,75 @@ export default function AdminTestimonialsPage(): React.ReactElement {
   });
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm("Sharhni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.testimonials.confirmDelete'))) return;
     try {
       await deleteTestimonial(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
-  const togglePublished = async (t: Testimonial): Promise<void> => {
+  const togglePublished = async (item: Testimonial): Promise<void> => {
     try {
-      await updateTestimonial(t.id, { published: !t.published });
+      await updateTestimonial(item.id, { published: !item.published });
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Sharhlar" sub="Bosh sahifadagi talaba sharhlarini boshqarish"
+      <AdminPageHeader title={t('admin.testimonials.title')} sub={t('admin.testimonials.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
-              <Plus size={15}/> Yangi sharh
+              <Plus size={15}/> {t('admin.testimonials.newBtn')}
             </button>
           ) : undefined
         } />
 
       {editing && <TestimonialForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-          {items.map((t) => (
-            <div key={t.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
+          {items.map((item) => (
+            <div key={item.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
               <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontWeight:800, color:'#0ea5e9' }}>
-                {t.name.charAt(0).toUpperCase()}
+                {item.name.charAt(0).toUpperCase()}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
-                <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{t.name}</p>
-                <p style={{ fontSize:12, color:'#94a3b8' }}>{t.role.uz}</p>
+                <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{item.name}</p>
+                <p style={{ fontSize:12, color:'#94a3b8' }}>{item.role.uz}</p>
               </div>
               <div style={{ display:'flex', gap:2, flexShrink:0 }}>
                 {Array.from({ length: 5 }).map((_, idx) => (
-                  <Star key={idx} size={13} fill={idx < t.rating ? '#f59e0b' : 'none'} style={{ color:'#f59e0b' }} />
+                  <Star key={idx} size={13} fill={idx < item.rating ? '#f59e0b' : 'none'} style={{ color:'#f59e0b' }} />
                 ))}
               </div>
-              {!t.published && (
+              {!item.published && (
                 <span className="tag" style={{ background:'#f8fafc', borderColor:'#e2e8f0', color:'#64748b', display:'flex', alignItems:'center', gap:4 }}>
-                  <EyeOff size={11}/> Nashr qilinmagan
+                  <EyeOff size={11}/> {t('admin.tags.notPublished')}
                 </span>
               )}
-              <button onClick={() => togglePublished(t)} className="btn-outline" style={{ fontSize:12, padding:'8px 12px' }}>
-                {t.published ? 'Yashirish' : "Nashr qilish"}
+              <button onClick={() => togglePublished(item)} className="btn-outline" style={{ fontSize:12, padding:'8px 12px' }}>
+                {item.published ? t('admin.testimonials.hide') : t('admin.testimonials.publish')}
               </button>
-              <button onClick={() => startEdit(t)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
+              <button onClick={() => startEdit(item)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                 <Pencil size={14}/>
               </button>
-              <button onClick={() => remove(t.id)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #fecaca', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#dc2626' }}>
+              <button onClick={() => remove(item.id)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #fecaca', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#dc2626' }}>
                 <Trash2 size={14}/>
               </button>
             </div>
           ))}
           {items.length === 0 && (
             <div className="card" style={{ padding:36, textAlign:'center' }}>
-              <p style={{ color:'#64748b', fontSize:14 }}>Sharhlar topilmadi.</p>
+              <p style={{ color:'#64748b', fontSize:14 }}>{t('admin.testimonials.empty')}</p>
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listBlogPostsAdmin, createBlogPost, updateBlogPost, deleteBlogPost } from '../../api/blog';
 import { resolveIcon } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
@@ -7,12 +8,13 @@ import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 const ICON_KEYS: string[] = ['BookOpen', 'Shield', 'Map', 'Monitor', 'Server', 'Database', 'Cloud'];
-const PRESETS: { name: string; color: string; bg: string; border: string }[] = [
-  { name: "Ko'k",      color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
-  { name: 'Binafsha',  color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
-  { name: 'Yashil',    color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
-  { name: 'Amber',     color:'#d97706', bg:'#fffbeb', border:'#fde68a' },
-  { name: 'Pushti',    color:'#db2777', bg:'#fdf2f8', border:'#fbcfe8' },
+// nameKey — rang nomi til bo'yicha t() bilan chiqadi; color/bg/border DB'ga yoziladi
+const PRESETS: { nameKey: string; color: string; bg: string; border: string }[] = [
+  { nameKey: 'admin.colors.blue',   color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
+  { nameKey: 'admin.colors.purple', color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
+  { nameKey: 'admin.colors.green',  color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
+  { nameKey: 'admin.colors.amber',  color:'#d97706', bg:'#fffbeb', border:'#fde68a' },
+  { nameKey: 'admin.colors.pink',   color:'#db2777', bg:'#fdf2f8', border:'#fbcfe8' },
 ];
 
 interface BlogFormState {
@@ -59,6 +61,7 @@ interface BlogFormProps {
 }
 
 function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<BlogFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -92,7 +95,7 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
       }
       onSaved();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -105,51 +108,52 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <LocalizedField label="Sarlavha" required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
-      <LocalizedField label="Qisqacha mazmun" required multiline rows={2} value={form.excerpt} onChange={(next) => setForm((f) => ({ ...f, excerpt: next }))} />
-      <LocalizedField label="Matn" required multiline rows={6} value={form.content} onChange={(next) => setForm((f) => ({ ...f, content: next }))} />
+      <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
+      <LocalizedField label={t('admin.blog.fExcerpt')} required multiline rows={2} value={form.excerpt} onChange={(next) => setForm((f) => ({ ...f, excerpt: next }))} />
+      <LocalizedField label={t('admin.blog.fContent')} required multiline rows={6} value={form.content} onChange={(next) => setForm((f) => ({ ...f, content: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Kategoriya *</label>
-          <input className="inp" value={form.category} onChange={change('category')} required placeholder="Tutorial" />
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.categoryReq')}</label>
+          <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.blog.categoryPlaceholder')} />
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ikonka</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.iconLabel')}</label>
           <select className="inp" value={form.iconKey} onChange={change('iconKey')}>
             {ICON_KEYS.map((k) => <option key={k} value={k}>{k}</option>)}
           </select>
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Rang</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.colorLabel')}</label>
           <select className="inp" value={form.preset} onChange={(e) => setForm((f) => ({ ...f, preset: Number(e.target.value) }))}>
-            {PRESETS.map((p, i) => <option key={p.name} value={i}>{p.name}</option>)}
+            {PRESETS.map((p, i) => <option key={p.nameKey} value={i}>{t(p.nameKey)}</option>)}
           </select>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>O'qish vaqti (daqiqa)</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.blog.fReadTime')}</label>
           <input className="inp" type="number" min="1" value={form.readMinutes} onChange={change('readMinutes')} />
         </div>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Teglar (vergul bilan)</label>
-          <input className="inp" value={form.tags} onChange={change('tags')} placeholder="React, JavaScript" />
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.blog.fTags')}</label>
+          <input className="inp" value={form.tags} onChange={change('tags')} placeholder={t('admin.blog.tagsPlaceholder')} />
         </div>
       </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
-        <input type="checkbox" checked={form.published} onChange={change('published')} /> Chop etilgan (saytda ko'rinadi)
+        <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.blog.published')}
       </label>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
-          {status==='loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status==='loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminBlogPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [posts, setPosts]     = useState<BlogPost[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
   const [editing, setEditing] = useState<BlogFormState | null>(null);
@@ -171,30 +175,30 @@ export default function AdminBlogPage(): React.ReactElement {
   };
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm("Maqolani o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.blog.confirmDelete'))) return;
     try {
       await deleteBlogPost(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Blog" sub="Maqolalarni yaratish va chop etish"
+      <AdminPageHeader title={t('admin.blog.title')} sub={t('admin.blog.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
-              <Plus size={15}/> Yangi maqola
+              <Plus size={15}/> {t('admin.blog.newBtn')}
             </button>
           ) : undefined
         } />
 
       {editing && <BlogForm initial={editing} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -207,10 +211,10 @@ export default function AdminBlogPage(): React.ReactElement {
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{p.title.uz}</p>
-                  <p style={{ fontSize:12, color:'#94a3b8' }}>{p.category} · {p.views} ko'rish</p>
+                  <p style={{ fontSize:12, color:'#94a3b8' }}>{p.category} · {t('admin.blog.viewsCount', { n: p.views })}</p>
                 </div>
                 <span className="tag" style={{ background: p.published ? '#f0fdf4' : '#f8fafc', borderColor: p.published ? '#bbf7d0' : '#e2e8f0', color: p.published ? '#16a34a' : '#94a3b8' }}>
-                  {p.published ? 'Chop etilgan' : 'Qoralama'}
+                  {p.published ? t('admin.tags.published') : t('admin.tags.draft')}
                 </span>
                 <button onClick={() => startEdit(p)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                   <Pencil size={14}/>

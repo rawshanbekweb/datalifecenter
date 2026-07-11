@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertCircle, UserCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listMentorsAdmin, createMentor, updateMentor, deleteMentor } from '../../api/mentors';
 import { listUsers, AdminUser } from '../../api/users';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
@@ -51,6 +52,7 @@ interface MentorFormProps {
 }
 
 function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): React.ReactElement {
+  const { t } = useTranslation();
   const [form, setForm]     = useState<MentorFormState>(initial);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError]   = useState<string>('');
@@ -73,7 +75,7 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
       }
       onSaved();
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      setError(err.message || t('common.error'));
       setStatus('error');
     }
   };
@@ -88,13 +90,13 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
       )}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>Ism Familiya *</label>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.mentors.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
         </div>
-        <LocalizedField label="Soha" required value={form.specialty} onChange={(next) => setForm((f) => ({ ...f, specialty: next }))} placeholder="Frontend & React" />
+        <LocalizedField label={t('admin.mentors.fSpecialty')} required value={form.specialty} onChange={(next) => setForm((f) => ({ ...f, specialty: next }))} placeholder={t('admin.mentors.specialtyPlaceholder')} />
       </div>
-      <LocalizedField label="Bio" required multiline value={form.bio} onChange={(next) => setForm((f) => ({ ...f, bio: next }))} />
-      <FileUpload kind="image" label="Mentor rasmi" value={form.photoUrl}
+      <LocalizedField label={t('admin.mentors.fBio')} required multiline value={form.bio} onChange={(next) => setForm((f) => ({ ...f, bio: next }))} />
+      <FileUpload kind="image" label={t('admin.mentors.fPhoto')} value={form.photoUrl}
         onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
@@ -112,31 +114,32 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
       </div>
       <div>
         <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>
-          Platformadagi hisobi (mentor kabinetiga kirish uchun)
+          {t('admin.mentors.fAccount')}
         </label>
         <select className="inp" value={form.userId}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm((f) => ({ ...f, userId: e.target.value }))}>
-          <option value="">Bog'lanmagan</option>
+          <option value="">{t('admin.mentors.accountNone')}</option>
           {users.map((u) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
         </select>
         <p style={{ fontSize:11, color:'#94a3b8', marginTop:4 }}>
-          Foydalanuvchiga avval "Foydalanuvchilar" bo'limida MENTOR roli berilishi tavsiya etiladi.
+          {t('admin.mentors.accountHint')}
         </p>
       </div>
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
-        <input type="checkbox" checked={form.featured} onChange={change('featured')} /> Tavsiya etilgan (birinchi ko'rsatiladi)
+        <input type="checkbox" checked={form.featured} onChange={change('featured')} /> {t('admin.form.featuredCheck')}
       </label>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
-          {status==='loading' ? 'Saqlanmoqda...' : 'Saqlash'}
+          {status==='loading' ? t('common.saving') : t('common.save')}
         </button>
-        <button type="button" onClick={onCancel} className="btn-outline">Bekor qilish</button>
+        <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
     </form>
   );
 }
 
 export default function AdminMentorsPage(): React.ReactElement {
+  const { t } = useTranslation();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [users, setUsers]     = useState<AdminUser[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
@@ -158,30 +161,30 @@ export default function AdminMentorsPage(): React.ReactElement {
   });
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm("Mentorni o'chirishni tasdiqlaysizmi?")) return;
+    if (!window.confirm(t('admin.mentors.confirmDelete'))) return;
     try {
       await deleteMentor(id);
       load();
     } catch (err: any) {
-      alert(err.message || 'Xatolik yuz berdi');
+      alert(err.message || t('common.error'));
     }
   };
 
   return (
     <div>
-      <AdminPageHeader title="Mentorlar" sub="O'qituvchilar jamoasini boshqarish"
+      <AdminPageHeader title={t('admin.mentors.title')} sub={t('admin.mentors.sub')}
         actions={
           !editing ? (
             <button onClick={() => setEditing({ ...emptyForm })} className="btn-primary" style={{ fontSize:13 }}>
-              <Plus size={15}/> Yangi mentor
+              <Plus size={15}/> {t('admin.mentors.newBtn')}
             </button>
           ) : undefined
         } />
 
       {editing && <MentorForm initial={editing} users={users} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
@@ -192,14 +195,14 @@ export default function AdminMentorsPage(): React.ReactElement {
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{m.name}</p>
-                <p style={{ fontSize:12, color:'#94a3b8' }}>{m.specialty.uz} · {m.courses?.length || 0} kurs</p>
+                <p style={{ fontSize:12, color:'#94a3b8' }}>{m.specialty.uz} · {t('admin.mentors.courseCount', { n: m.courses?.length || 0 })}</p>
               </div>
               {m.userId && (
                 <span className="tag" style={{ display:'flex', alignItems:'center', gap:5, background:'#f0fdf4', borderColor:'#bbf7d0', color:'#16a34a' }}>
-                  <UserCheck size={11}/> Hisob bog'langan
+                  <UserCheck size={11}/> {t('admin.tags.accountLinked')}
                 </span>
               )}
-              {m.featured && <span className="tag" style={{ background:'#faf5ff', borderColor:'#e9d5ff', color:'#9333ea' }}>Tavsiya</span>}
+              {m.featured && <span className="tag" style={{ background:'#faf5ff', borderColor:'#e9d5ff', color:'#9333ea' }}>{t('admin.tags.featured')}</span>}
               <button onClick={() => startEdit(m)} style={{ width:32, height:32, borderRadius:8, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#475569' }}>
                 <Pencil size={14}/>
               </button>
