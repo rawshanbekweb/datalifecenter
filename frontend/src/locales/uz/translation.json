@@ -512,7 +512,8 @@
       "roomOpens": "Xona dars boshlanishidan 10 daqiqa oldin ochiladi.",
       "externalInfo": "Bu dars tashqi platformada ({{host}}) o'tkaziladi.",
       "ended": "Bu jonli dars yakunlangan.",
-      "cancelled": "Bu jonli dars bekor qilingan."
+      "cancelled": "Bu jonli dars bekor qilingan.",
+      "mentorTip": "Ekraningizni ulashish uchun pastdagi Jitsi panelidan ekran belgisini bosing."
     }
   },
   "mentor": {

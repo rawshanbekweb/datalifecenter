@@ -512,7 +512,8 @@
       "roomOpens": "Bólme sabaq baslanıwınan 10 minut aldın ashıladı.",
       "externalInfo": "Bul sabaq sırtqı platformada ({{host}}) ótkeriledi.",
       "ended": "Bul janlı sabaq tamamlanǵan.",
-      "cancelled": "Bul janlı sabaq biykar etilgen."
+      "cancelled": "Bul janlı sabaq biykar etilgen.",
+      "mentorTip": "Ekranıńızdı bólisiw ushın tómendegi Jitsi panelinen ekran belgisin basıń."
     }
   },
   "mentor": {

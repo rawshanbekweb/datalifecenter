@@ -19,13 +19,20 @@ function isEmbeddableJitsi(url: string): boolean {
   }
 }
 
-// Jitsi URL'iga foydalanuvchi ismi va "kutish sahifasi"ni o'chirishni qo'shadi —
-// talaba sahifaga kirgach darhol xonaga qo'shiladi
+// Jitsi panelida ko'rinadigan tugmalar — `desktop` ekran ulashish (mentor
+// noutbuk ekranini translyatsiya qilishi) uchun ochiq turishi shart
+const JITSI_TOOLBAR = ['microphone', 'camera', 'desktop', 'tileview', 'raisehand', 'fullscreen', 'chat', 'settings', 'hangup'];
+
+// Jitsi URL'iga foydalanuvchi ismi, "kutish sahifasi"ni o'chirish, "ilovada
+// ochish" bezovtasini o'chirish va to'g'ri toolbar sozlamasini qo'shadi —
+// talaba/mentor sahifaga kirgach darhol xonaga qo'shiladi
 function jitsiEmbedUrl(url: string, displayName: string): string {
   const base = url.split('#')[0];
   const config = [
-    `userInfo.displayName="${encodeURIComponent(displayName)}"`,
+    `userInfo.displayName=${encodeURIComponent(JSON.stringify(displayName))}`,
     'config.prejoinConfig.enabled=false',
+    'config.disableDeepLinking=true',
+    `config.toolbarButtons=${encodeURIComponent(JSON.stringify(JITSI_TOOLBAR))}`,
   ].join('&');
   return `${base}#${config}`;
 }
@@ -123,14 +130,22 @@ export default function LiveSessionPage(): React.ReactElement {
             <p style={{ fontSize: 12.5, color: '#94a3b8', marginTop: 8 }}>{t('student.live.roomOpens')}</p>
           </div>
         ) : canJoin && embeddable ? (
-          <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #334155', background: '#000' }}>
-            <iframe
-              title={session.title}
-              src={jitsiEmbedUrl(session.meetingUrl, user?.name || t('student.live.participant'))}
-              allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
-              style={{ width: '100%', height: 'calc(100vh - 220px)', minHeight: 480, border: 'none', display: 'block' }}
-            />
-          </div>
+          <>
+            {(user?.role === 'MENTOR' || user?.role === 'ADMIN') && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 14px', marginBottom: 10, borderRadius: 10, background: 'rgba(14,165,233,0.12)', border: '1px solid #0e7490' }}>
+                <Video size={14} style={{ color: '#7dd3fc', flexShrink: 0 }} />
+                <p style={{ fontSize: 12.5, color: '#bae6fd' }}>{t('student.live.mentorTip')}</p>
+              </div>
+            )}
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #334155', background: '#000' }}>
+              <iframe
+                title={session.title}
+                src={jitsiEmbedUrl(session.meetingUrl, user?.name || t('student.live.participant'))}
+                allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+                style={{ width: '100%', height: 'calc(100vh - 175px)', minHeight: 520, border: 'none', display: 'block' }}
+              />
+            </div>
+          </>
         ) : (
           <div className="card" style={{ padding: 32, textAlign: 'center' }}>
             {canJoin ? (

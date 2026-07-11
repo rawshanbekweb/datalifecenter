@@ -512,7 +512,8 @@
       "roomOpens": "The room opens 10 minutes before the lesson starts.",
       "externalInfo": "This lesson is held on an external platform ({{host}}).",
       "ended": "This live lesson has ended.",
-      "cancelled": "This live lesson was cancelled."
+      "cancelled": "This live lesson was cancelled.",
+      "mentorTip": "To share your screen, click the screen-share icon in the Jitsi toolbar below."
     }
   },
   "mentor": {
