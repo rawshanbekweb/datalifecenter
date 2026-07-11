@@ -657,7 +657,8 @@
     "common": {
       "all": "Barlıǵı",
       "prev": "Aldıńǵı",
-      "next": "Keyingi"
+      "next": "Keyingi",
+      "search": "Izlew"
     },
     "enrollStatus": {
       "PENDING": "Kútilmekte",
@@ -746,6 +747,74 @@
     "receipt": {
       "title": "Tólem cheki",
       "loadFailed": "Chekti júklep bolmadı."
+    },
+    "rejectPrompt": "Tólemdi biykar etiw sebebin kiritiń (studentke kórsetiledi):",
+    "reasonLabel": "Sebebi: {{reason}}",
+    "payStatus": {
+      "FREE": "Biypul",
+      "UNPAID": "Tólenbegen",
+      "PENDING": "Tólem kútilmekte",
+      "PAID": "Tólengen",
+      "REJECTED": "Biykar etildi",
+      "REFUNDED": "Qaytarılǵan"
+    },
+    "subStatus": {
+      "PENDING": "Kútilmekte",
+      "ACTIVE": "Aktiv",
+      "EXPIRED": "Múddeti pitken",
+      "CANCELLED": "Biykar etilgen",
+      "REJECTED": "Biykar etilgen"
+    },
+    "roles": {
+      "STUDENT": "Student",
+      "MENTOR": "Mentor",
+      "ADMIN": "Admin"
+    },
+    "enrollments": {
+      "title": "Jazılıwlar",
+      "sub": "Kursqa jazılıwlar hám tólemlerdi basqarıw",
+      "searchPlaceholder": "Student yamasa kurs...",
+      "empty": "Jazılıwlar tabılmadı.",
+      "viewReceipt": "Chekti kóriw",
+      "approvePayment": "Tólemdi tastıyıqlaw",
+      "reject": "Biykar etiw",
+      "complete": "Juwmaqlaw",
+      "cancel": "Biykar etiw",
+      "restore": "Tiklew"
+    },
+    "subscriptions": {
+      "title": "Jazılıwlar (obuna)",
+      "sub": "Aylıq obuna tólemleri hám bahasın basqarıw",
+      "searchPlaceholder": "Student...",
+      "empty": "Obunalar tabılmadı.",
+      "planPrice": "Aylıq obuna bahası",
+      "expiresLabel": "Múddeti: {{date}}",
+      "viewReceipt": "Chekti kóriw",
+      "approvePayment": "Tólemdi tastıyıqlaw",
+      "reject": "Biykar etiw"
+    },
+    "users": {
+      "title": "Paydalanıwshılar",
+      "subTotal": "Jámi: {{n}} paydalanıwshı",
+      "searchPlaceholder": "At yamasa email...",
+      "empty": "Paydalanıwshılar tabılmadı.",
+      "resetCreated": "{{name}} ushın jańa parol jaratıldı",
+      "resetHint": "Bul paroldi paydalanıwshıǵa ({{email}}) jetkeriń — ol tek házir kórinedi.",
+      "copy": "Kóshiriw",
+      "closeTitle": "Jabıw",
+      "blocked": "Bloklanǵan",
+      "self": " (siz)",
+      "courseCount": "{{n}} kurs",
+      "filterStudents": "Studentler",
+      "filterMentors": "Mentorlar",
+      "filterAdmins": "Adminler",
+      "confirmBlock": "{{name}} bloklansınba? Ol sistemaǵa kire almaydı.",
+      "confirmDelete": "{{name}} ({{email}}) tolıq óshirilsinbe? Onıń barlıq jazılıwları da óshedi. Bul ámeldi qaytarıp bolmaydı.",
+      "confirmReset": "{{name}} ushın jańa waqtınsha parol jaratılsınba? Eski paroli islewden qaladı.",
+      "resetTitle": "Paroldi tiklew",
+      "blockTitle": "Bloklaw",
+      "unblockTitle": "Bloktan shıǵarıw",
+      "deleteTitle": "Óshiriw"
     }
   }
 }

@@ -657,7 +657,8 @@
     "common": {
       "all": "All",
       "prev": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "search": "Search"
     },
     "enrollStatus": {
       "PENDING": "Pending",
@@ -746,6 +747,74 @@
     "receipt": {
       "title": "Payment receipt",
       "loadFailed": "Failed to load the receipt."
+    },
+    "rejectPrompt": "Enter the reason for rejecting the payment (shown to the student):",
+    "reasonLabel": "Reason: {{reason}}",
+    "payStatus": {
+      "FREE": "Free",
+      "UNPAID": "Unpaid",
+      "PENDING": "Payment pending",
+      "PAID": "Paid",
+      "REJECTED": "Rejected",
+      "REFUNDED": "Refunded"
+    },
+    "subStatus": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled",
+      "REJECTED": "Rejected"
+    },
+    "roles": {
+      "STUDENT": "Student",
+      "MENTOR": "Mentor",
+      "ADMIN": "Admin"
+    },
+    "enrollments": {
+      "title": "Enrollments",
+      "sub": "Manage course enrollments and payments",
+      "searchPlaceholder": "Student or course...",
+      "empty": "No enrollments found.",
+      "viewReceipt": "View receipt",
+      "approvePayment": "Approve payment",
+      "reject": "Reject",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "restore": "Restore"
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "sub": "Manage monthly subscription payments and price",
+      "searchPlaceholder": "Student...",
+      "empty": "No subscriptions found.",
+      "planPrice": "Monthly subscription price",
+      "expiresLabel": "Expires: {{date}}",
+      "viewReceipt": "View receipt",
+      "approvePayment": "Approve payment",
+      "reject": "Reject"
+    },
+    "users": {
+      "title": "Users",
+      "subTotal": "Total: {{n}} users",
+      "searchPlaceholder": "Name or email...",
+      "empty": "No users found.",
+      "resetCreated": "A new password has been created for {{name}}",
+      "resetHint": "Give this password to the user ({{email}}) — it is only shown now.",
+      "copy": "Copy",
+      "closeTitle": "Close",
+      "blocked": "Blocked",
+      "self": " (you)",
+      "courseCount": "{{n}} courses",
+      "filterStudents": "Students",
+      "filterMentors": "Mentors",
+      "filterAdmins": "Admins",
+      "confirmBlock": "Block {{name}}? They will not be able to sign in.",
+      "confirmDelete": "Permanently delete {{name}} ({{email}})? All their enrollments will also be deleted. This action cannot be undone.",
+      "confirmReset": "Create a new temporary password for {{name}}? Their old password will stop working.",
+      "resetTitle": "Reset password",
+      "blockTitle": "Block",
+      "unblockTitle": "Unblock",
+      "deleteTitle": "Delete"
     }
   }
 }

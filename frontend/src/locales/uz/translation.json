@@ -657,7 +657,8 @@
     "common": {
       "all": "Barchasi",
       "prev": "Oldingi",
-      "next": "Keyingi"
+      "next": "Keyingi",
+      "search": "Qidirish"
     },
     "enrollStatus": {
       "PENDING": "Kutilmoqda",
@@ -746,6 +747,74 @@
     "receipt": {
       "title": "To'lov cheki",
       "loadFailed": "Chekni yuklab bo'lmadi."
+    },
+    "rejectPrompt": "To'lovni rad etish sababini kiriting (talabaga ko'rsatiladi):",
+    "reasonLabel": "Sabab: {{reason}}",
+    "payStatus": {
+      "FREE": "Bepul",
+      "UNPAID": "To'lanmagan",
+      "PENDING": "To'lov kutilmoqda",
+      "PAID": "To'langan",
+      "REJECTED": "Rad etildi",
+      "REFUNDED": "Qaytarilgan"
+    },
+    "subStatus": {
+      "PENDING": "Kutilmoqda",
+      "ACTIVE": "Faol",
+      "EXPIRED": "Muddati tugagan",
+      "CANCELLED": "Bekor qilingan",
+      "REJECTED": "Rad etilgan"
+    },
+    "roles": {
+      "STUDENT": "Talaba",
+      "MENTOR": "Mentor",
+      "ADMIN": "Admin"
+    },
+    "enrollments": {
+      "title": "Yozilishlar",
+      "sub": "Kursga yozilishlar va to'lovlarni boshqarish",
+      "searchPlaceholder": "Talaba yoki kurs...",
+      "empty": "Yozilishlar topilmadi.",
+      "viewReceipt": "Chekni ko'rish",
+      "approvePayment": "To'lovni tasdiqlash",
+      "reject": "Rad etish",
+      "complete": "Yakunlash",
+      "cancel": "Bekor qilish",
+      "restore": "Tiklash"
+    },
+    "subscriptions": {
+      "title": "Obunalar",
+      "sub": "Oylik obuna to'lovlari va narxni boshqarish",
+      "searchPlaceholder": "Talaba...",
+      "empty": "Obunalar topilmadi.",
+      "planPrice": "Oylik obuna narxi",
+      "expiresLabel": "Muddati: {{date}}",
+      "viewReceipt": "Chekni ko'rish",
+      "approvePayment": "To'lovni tasdiqlash",
+      "reject": "Rad etish"
+    },
+    "users": {
+      "title": "Foydalanuvchilar",
+      "subTotal": "Jami: {{n}} ta foydalanuvchi",
+      "searchPlaceholder": "Ism yoki email...",
+      "empty": "Foydalanuvchilar topilmadi.",
+      "resetCreated": "{{name}} uchun yangi parol yaratildi",
+      "resetHint": "Bu parolni foydalanuvchiga ({{email}}) yetkazing — u faqat hozir ko'rinadi.",
+      "copy": "Nusxalash",
+      "closeTitle": "Yopish",
+      "blocked": "Bloklangan",
+      "self": " (siz)",
+      "courseCount": "{{n}} ta kurs",
+      "filterStudents": "Talabalar",
+      "filterMentors": "Mentorlar",
+      "filterAdmins": "Adminlar",
+      "confirmBlock": "{{name}} bloklansinmi? U tizimga kira olmaydi.",
+      "confirmDelete": "{{name}} ({{email}}) butunlay o'chirilsinmi? Uning barcha yozilishlari ham o'chadi. Bu amalni qaytarib bo'lmaydi.",
+      "confirmReset": "{{name}} uchun yangi vaqtinchalik parol yaratilsinmi? Eski paroli ishlamay qoladi.",
+      "resetTitle": "Parolni tiklash",
+      "blockTitle": "Bloklash",
+      "unblockTitle": "Blokdan chiqarish",
+      "deleteTitle": "O'chirish"
     }
   }
 }

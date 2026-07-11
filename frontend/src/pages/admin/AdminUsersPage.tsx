@@ -1,23 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Search, Ban, LockOpen, KeyRound, Trash2, Copy, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { listUsers, updateUserRole, setUserBlocked, deleteUser, resetUserPassword, AdminUser } from '../../api/users';
+import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useAuth } from '../../hooks/useAuth';
 
-const ROLE_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  STUDENT: { label: 'Talaba', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
-  MENTOR:  { label: 'Mentor', color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
-  ADMIN:   { label: 'Admin',  color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
+const ROLE_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
+  STUDENT: { labelKey: 'admin.roles.STUDENT', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
+  MENTOR:  { labelKey: 'admin.roles.MENTOR',  color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
+  ADMIN:   { labelKey: 'admin.roles.ADMIN',   color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
 };
 
-const ROLE_FILTERS: { value: string; label: string }[] = [
-  { value: '',        label: 'Barchasi' },
-  { value: 'STUDENT', label: 'Talabalar' },
-  { value: 'MENTOR',  label: 'Mentorlar' },
-  { value: 'ADMIN',   label: 'Adminlar' },
+const ROLE_FILTERS: { value: string; labelKey: string }[] = [
+  { value: '',        labelKey: 'admin.common.all' },
+  { value: 'STUDENT', labelKey: 'admin.users.filterStudents' },
+  { value: 'MENTOR',  labelKey: 'admin.users.filterMentors' },
+  { value: 'ADMIN',   labelKey: 'admin.users.filterAdmins' },
 ];
 
 export default function AdminUsersPage(): React.ReactElement {
+  const { t } = useTranslation();
   const { user: me } = useAuth();
   const [items, setItems]   = useState<AdminUser[]>([]);
   const [total, setTotal]   = useState<number>(0);
@@ -43,7 +46,7 @@ export default function AdminUsersPage(): React.ReactElement {
     try {
       await action();
     } catch (err: unknown) {
-      alert((err as Error).message || 'Xatolik yuz berdi');
+      alert((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }
@@ -56,7 +59,7 @@ export default function AdminUsersPage(): React.ReactElement {
     });
 
   const toggleBlock = (u: AdminUser): Promise<void> | void => {
-    if (!u.isBlocked && !window.confirm(`${u.name} bloklansinmi? U tizimga kira olmaydi.`)) return;
+    if (!u.isBlocked && !window.confirm(t('admin.users.confirmBlock', { name: u.name }))) return;
     return runAction(u.id, async () => {
       const updated = await setUserBlocked(u.id, !u.isBlocked);
       setItems((prev) => prev.map((x) => (x.id === u.id ? updated : x)));
@@ -64,7 +67,7 @@ export default function AdminUsersPage(): React.ReactElement {
   };
 
   const removeUser = (u: AdminUser): Promise<void> | void => {
-    if (!window.confirm(`${u.name} (${u.email}) butunlay o'chirilsinmi? Uning barcha yozilishlari ham o'chadi. Bu amalni qaytarib bo'lmaydi.`)) return;
+    if (!window.confirm(t('admin.users.confirmDelete', { name: u.name, email: u.email }))) return;
     return runAction(u.id, async () => {
       await deleteUser(u.id);
       setItems((prev) => prev.filter((x) => x.id !== u.id));
@@ -73,7 +76,7 @@ export default function AdminUsersPage(): React.ReactElement {
   };
 
   const resetPassword = (u: AdminUser): Promise<void> | void => {
-    if (!window.confirm(`${u.name} uchun yangi vaqtinchalik parol yaratilsinmi? Eski paroli ishlamay qoladi.`)) return;
+    if (!window.confirm(t('admin.users.confirmReset', { name: u.name }))) return;
     return runAction(u.id, async () => {
       const { tempPassword } = await resetUserPassword(u.id);
       setResetInfo({ name: u.name, email: u.email, password: tempPassword });
@@ -82,21 +85,21 @@ export default function AdminUsersPage(): React.ReactElement {
 
   return (
     <div>
-      <AdminPageHeader title="Foydalanuvchilar" sub={`Jami: ${total} ta foydalanuvchi`} />
+      <AdminPageHeader title={t('admin.users.title')} sub={t('admin.users.subTotal', { n: total })} />
 
       {resetInfo && (
         <div className="card" style={{ padding:16, marginBottom:18, background:'#f0fdf4', border:'1.5px solid #bbf7d0', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
           <div style={{ flex:'1 1 260px' }}>
-            <p style={{ fontSize:13, fontWeight:800, color:'#166534' }}>{resetInfo.name} uchun yangi parol yaratildi</p>
-            <p style={{ fontSize:12, color:'#15803d' }}>Bu parolni foydalanuvchiga ({resetInfo.email}) yetkazing — u faqat hozir ko'rinadi.</p>
+            <p style={{ fontSize:13, fontWeight:800, color:'#166534' }}>{t('admin.users.resetCreated', { name: resetInfo.name })}</p>
+            <p style={{ fontSize:12, color:'#15803d' }}>{t('admin.users.resetHint', { email: resetInfo.email })}</p>
           </div>
           <code style={{ fontFamily:'JetBrains Mono,monospace', fontSize:15, fontWeight:700, color:'#0f172a', background:'#fff', border:'1.5px solid #bbf7d0', borderRadius:8, padding:'8px 14px' }}>
             {resetInfo.password}
           </code>
           <button onClick={() => navigator.clipboard.writeText(resetInfo.password)} className="btn-outline" style={{ fontSize:12, padding:'8px 12px' }}>
-            <Copy size={13} /> Nusxalash
+            <Copy size={13} /> {t('admin.users.copy')}
           </button>
-          <button onClick={() => setResetInfo(null)} title="Yopish"
+          <button onClick={() => setResetInfo(null)} title={t('admin.users.closeTitle')}
             style={{ background:'transparent', border:'none', cursor:'pointer', color:'#64748b', display:'flex' }}>
             <X size={16} />
           </button>
@@ -113,7 +116,7 @@ export default function AdminUsersPage(): React.ReactElement {
                 background: filter === f.value ? '#f0f9ff' : '#fff',
                 color: filter === f.value ? '#0ea5e9' : '#64748b',
               }}>
-              {f.label}
+              {t(f.labelKey)}
             </button>
           ))}
         </div>
@@ -122,18 +125,18 @@ export default function AdminUsersPage(): React.ReactElement {
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
             <input className="inp" value={search} onChange={(e) => setSearch(e.target.value)}
-              placeholder="Ism yoki email..." style={{ paddingLeft:34, width:220 }} />
+              placeholder={t('admin.users.searchPlaceholder')} style={{ paddingLeft:34, width:220 }} />
           </div>
-          <button type="submit" className="btn-outline" style={{ fontSize:13 }}>Qidirish</button>
+          <button type="submit" className="btn-outline" style={{ fontSize:13 }}>{t('admin.common.search')}</button>
         </form>
       </div>
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</p>}
-      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>Ma'lumotlarni yuklab bo'lmadi.</p>}
+      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && items.length === 0 && (
         <div className="card" style={{ padding:36, textAlign:'center' }}>
-          <p style={{ color:'#64748b', fontSize:14 }}>Foydalanuvchilar topilmadi.</p>
+          <p style={{ color:'#64748b', fontSize:14 }}>{t('admin.users.empty')}</p>
         </div>
       )}
 
@@ -150,33 +153,33 @@ export default function AdminUsersPage(): React.ReactElement {
                 </div>
                 <div style={{ flex:'1 1 200px', minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>
-                    {u.name}{isSelf ? ' (siz)' : ''}
-                    {u.isBlocked && <span className="tag" style={{ marginLeft:8, background:'#fef2f2', borderColor:'#fecaca', color:'#dc2626', fontWeight:700, fontSize:10.5 }}>Bloklangan</span>}
+                    {u.name}{isSelf ? t('admin.users.self') : ''}
+                    {u.isBlocked && <span className="tag" style={{ marginLeft:8, background:'#fef2f2', borderColor:'#fecaca', color:'#dc2626', fontWeight:700, fontSize:10.5 }}>{t('admin.users.blocked')}</span>}
                   </p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>{u.email}{u.phone ? ` · ${u.phone}` : ''}</p>
                 </div>
-                <p style={{ fontSize:12, color:'#64748b', flexShrink:0 }}>{u._count.enrollments} ta kurs</p>
-                <p style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{new Date(u.createdAt).toLocaleDateString('uz-UZ')}</p>
-                <span className="tag" style={{ background:r.bg, borderColor:r.border, color:r.color, fontWeight:700, flexShrink:0 }}>{r.label}</span>
+                <p style={{ fontSize:12, color:'#64748b', flexShrink:0 }}>{t('admin.users.courseCount', { n: u._count.enrollments })}</p>
+                <p style={{ fontSize:11.5, color:'#94a3b8', flexShrink:0 }}>{formatDate(u.createdAt)}</p>
+                <span className="tag" style={{ background:r.bg, borderColor:r.border, color:r.color, fontWeight:700, flexShrink:0 }}>{t(r.labelKey)}</span>
                 <select className="inp" value={u.role} disabled={busy || !!isSelf}
                   onChange={(e) => changeRole(u.id, e.target.value)}
                   style={{ width:130, fontSize:12.5, padding:'8px 10px', flexShrink:0, opacity: busy ? 0.6 : 1 }}>
-                  <option value="STUDENT">Talaba</option>
-                  <option value="MENTOR">Mentor</option>
-                  <option value="ADMIN">Admin</option>
+                  <option value="STUDENT">{t('admin.roles.STUDENT')}</option>
+                  <option value="MENTOR">{t('admin.roles.MENTOR')}</option>
+                  <option value="ADMIN">{t('admin.roles.ADMIN')}</option>
                 </select>
                 <div style={{ display:'flex', gap:6, flexShrink:0 }}>
-                  <button onClick={() => resetPassword(u)} disabled={busy} title="Parolni tiklash"
+                  <button onClick={() => resetPassword(u)} disabled={busy} title={t('admin.users.resetTitle')}
                     style={{ display:'flex', alignItems:'center', justifyContent:'center', width:34, height:34, borderRadius:9, background:'#fffbeb', border:'1.5px solid #fde68a', color:'#d97706', cursor:'pointer', opacity: busy ? 0.5 : 1 }}>
                     <KeyRound size={14} />
                   </button>
-                  <button onClick={() => toggleBlock(u)} disabled={busy || !!isSelf} title={u.isBlocked ? 'Blokdan chiqarish' : 'Bloklash'}
+                  <button onClick={() => toggleBlock(u)} disabled={busy || !!isSelf} title={u.isBlocked ? t('admin.users.unblockTitle') : t('admin.users.blockTitle')}
                     style={{ display:'flex', alignItems:'center', justifyContent:'center', width:34, height:34, borderRadius:9,
                       background: u.isBlocked ? '#f0fdf4' : '#fef2f2', border: u.isBlocked ? '1.5px solid #bbf7d0' : '1.5px solid #fecaca',
                       color: u.isBlocked ? '#16a34a' : '#dc2626', cursor:'pointer', opacity: busy || isSelf ? 0.5 : 1 }}>
                     {u.isBlocked ? <LockOpen size={14} /> : <Ban size={14} />}
                   </button>
-                  <button onClick={() => removeUser(u)} disabled={busy || !!isSelf} title="O'chirish"
+                  <button onClick={() => removeUser(u)} disabled={busy || !!isSelf} title={t('admin.users.deleteTitle')}
                     style={{ display:'flex', alignItems:'center', justifyContent:'center', width:34, height:34, borderRadius:9, background:'#fef2f2', border:'1.5px solid #fecaca', color:'#dc2626', cursor:'pointer', opacity: busy || isSelf ? 0.5 : 1 }}>
                     <Trash2 size={14} />
                   </button>

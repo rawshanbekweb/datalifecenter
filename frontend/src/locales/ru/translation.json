@@ -657,7 +657,8 @@
     "common": {
       "all": "Все",
       "prev": "Назад",
-      "next": "Вперёд"
+      "next": "Вперёд",
+      "search": "Поиск"
     },
     "enrollStatus": {
       "PENDING": "Ожидает",
@@ -746,6 +747,74 @@
     "receipt": {
       "title": "Чек об оплате",
       "loadFailed": "Не удалось загрузить чек."
+    },
+    "rejectPrompt": "Укажите причину отклонения платежа (будет показана студенту):",
+    "reasonLabel": "Причина: {{reason}}",
+    "payStatus": {
+      "FREE": "Бесплатно",
+      "UNPAID": "Не оплачено",
+      "PENDING": "Ожидает оплаты",
+      "PAID": "Оплачено",
+      "REJECTED": "Отклонено",
+      "REFUNDED": "Возвращено"
+    },
+    "subStatus": {
+      "PENDING": "Ожидает",
+      "ACTIVE": "Активна",
+      "EXPIRED": "Истекла",
+      "CANCELLED": "Отменена",
+      "REJECTED": "Отклонена"
+    },
+    "roles": {
+      "STUDENT": "Студент",
+      "MENTOR": "Ментор",
+      "ADMIN": "Админ"
+    },
+    "enrollments": {
+      "title": "Записи",
+      "sub": "Управление записями на курсы и платежами",
+      "searchPlaceholder": "Студент или курс...",
+      "empty": "Записи не найдены.",
+      "viewReceipt": "Посмотреть чек",
+      "approvePayment": "Подтвердить оплату",
+      "reject": "Отклонить",
+      "complete": "Завершить",
+      "cancel": "Отменить",
+      "restore": "Восстановить"
+    },
+    "subscriptions": {
+      "title": "Подписки",
+      "sub": "Управление платежами и ценой месячной подписки",
+      "searchPlaceholder": "Студент...",
+      "empty": "Подписки не найдены.",
+      "planPrice": "Цена месячной подписки",
+      "expiresLabel": "Срок: {{date}}",
+      "viewReceipt": "Посмотреть чек",
+      "approvePayment": "Подтвердить оплату",
+      "reject": "Отклонить"
+    },
+    "users": {
+      "title": "Пользователи",
+      "subTotal": "Всего: {{n}} пользователей",
+      "searchPlaceholder": "Имя или email...",
+      "empty": "Пользователи не найдены.",
+      "resetCreated": "Для {{name}} создан новый пароль",
+      "resetHint": "Передайте этот пароль пользователю ({{email}}) — он виден только сейчас.",
+      "copy": "Копировать",
+      "closeTitle": "Закрыть",
+      "blocked": "Заблокирован",
+      "self": " (вы)",
+      "courseCount": "{{n}} курсов",
+      "filterStudents": "Студенты",
+      "filterMentors": "Менторы",
+      "filterAdmins": "Админы",
+      "confirmBlock": "Заблокировать {{name}}? Он не сможет войти в систему.",
+      "confirmDelete": "Полностью удалить {{name}} ({{email}})? Все его записи также будут удалены. Это действие необратимо.",
+      "confirmReset": "Создать новый временный пароль для {{name}}? Старый пароль перестанет работать.",
+      "resetTitle": "Сбросить пароль",
+      "blockTitle": "Заблокировать",
+      "unblockTitle": "Разблокировать",
+      "deleteTitle": "Удалить"
     }
   }
 }
