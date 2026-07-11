@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckCircle2, Hourglass, AlertTriangle, Wallet, Sparkles } from 'lucide-react';
 import { createSubscription, getMySubscription, submitSubscriptionReceipt, Subscription } from '../api/subscriptions';
 import { getPaymentConfig, createCheckout, PaymentConfig } from '../api/payments';
@@ -104,7 +104,7 @@ export default function SubscriptionPage(): React.ReactElement {
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && isActive && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card"
+        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card"
           style={{ padding: 24, background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <CheckCircle2 size={20} style={{ color: '#16a34a' }} />
@@ -115,7 +115,7 @@ export default function SubscriptionPage(): React.ReactElement {
               ? t('student.subscription.accessOpenUntil', { date: formatDate(subscription.expiresAt) })
               : t('student.subscription.accessOpen')}
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       {status === 'ready' && isPending && subscription && (

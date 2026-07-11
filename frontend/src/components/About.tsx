@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 import { resolveIcon } from '../utils/iconMap';
@@ -75,18 +75,18 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
 
         {/* Header */}
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:64 }}>
           <span className="pill">{t('home.about.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.about.titleStart')} <span className="accent">{t('home.about.titleAccent')}</span></h2>
           <p className="sub">{t('home.about.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         {/* Two columns */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:56, alignItems:'center', marginBottom:64 }} className="about-grid">
 
           {/* Left */}
-          <motion.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
+          <m.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="divider" />
             <h3 style={{ fontSize:28, fontWeight:800, color:'#0f172a', lineHeight:1.35, marginBottom:16 }}>
               {t('home.about.headingStart')} <span className="accent">{t('home.about.headingAccent')}</span>
@@ -104,10 +104,10 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Right — Skills card */}
-          <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
+          <m.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="card" style={{ padding:28, boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
                 <img src="/assets/logotype.png" alt="DATA LIFE" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
@@ -124,7 +124,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                     <span style={{ fontSize:12, color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>{s.pct}%</span>
                   </div>
                   <div className="progress-track">
-                    <motion.div className="progress-fill"
+                    <m.div className="progress-fill"
                       initial={{ width:0 }} whileInView={{ width:`${s.pct}%` }} viewport={{ once:true }}
                       transition={{ duration:1.1, delay:0.2 + i*0.12, ease:'easeOut' }} />
                   </div>
@@ -140,7 +140,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                 ))}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Stats row */}
@@ -148,7 +148,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
           {STATS.map((s: RawStatItem, i: number) => {
             const Icon = resolveIcon(s.icon);
             return (
-              <motion.div key={s.label} initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }}
+              <m.div key={s.label} initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true }} transition={{ duration:0.55, delay:i*0.1 }}
                 className="card" style={{ padding:'28px 20px', textAlign:'center', boxShadow:'0 4px 20px rgba(0,0,0,0.06)' }}>
                 <div style={{ width:48, height:48, borderRadius:14, margin:'0 auto 14px', display:'flex', alignItems:'center', justifyContent:'center', background:withAlpha(s.color,'12'), border:`1.5px solid ${withAlpha(s.color,'30')}` }}>
@@ -156,7 +156,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                 </div>
                 <div style={{ fontSize:36, fontWeight:900, color:'#0f172a', lineHeight:1 }}>{s.value}</div>
                 <p style={{ color:'#64748b', fontWeight:600, marginTop:6, fontSize:14 }}>{s.label}</p>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

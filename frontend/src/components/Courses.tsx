@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -25,12 +25,12 @@ export default function Courses(): React.ReactElement {
   return (
     <section id="courses" className="section-light" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
           <span className="pill">{t('home.courses.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.courses.titleStart')}<span className="accent">{t('home.courses.titleAccent')}</span></h2>
           <p className="sub">{t('home.courses.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         {status === 'error' && (
           <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.courses.loadError')}</p>

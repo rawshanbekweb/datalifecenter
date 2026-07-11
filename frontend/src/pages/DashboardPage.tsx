@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
@@ -149,7 +149,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
   };
 
   return (
-    <motion.div whileHover={{ x: 4 }} className="card"
+    <m.div whileHover={{ x: 4 }} className="card"
       style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14, background: enrollment.course.bg, border: `1.5px solid ${enrollment.course.border}` }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
       <Link to={`/courses/${enrollment.course.slug}`} style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0, textDecoration: 'none' }}>
@@ -306,7 +306,7 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
         </div>
       </div>
     )}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -342,7 +342,7 @@ export default function DashboardPage(): React.ReactElement {
 
   return (
     <div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 240 }}>
               <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
@@ -356,7 +356,7 @@ export default function DashboardPage(): React.ReactElement {
               </button>
             </Link>
           </div>
-        </motion.div>
+        </m.div>
 
         <UpcomingSessionsPanel />
 

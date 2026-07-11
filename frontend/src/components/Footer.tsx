@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { GitBranch, MessageCircle, Briefcase, Camera, Play, Send, ArrowRight } from 'lucide-react';
 
@@ -88,12 +88,12 @@ export default function Footer(): React.ReactElement {
             {SOCIALS.length > 0 && (
               <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
                 {SOCIALS.map(({ icon:Icon, label, href }: SocialItem) => (
-                  <motion.a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} whileHover={{ y:-3 }}
+                  <m.a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} whileHover={{ y:-3 }}
                     style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.12)', cursor:'pointer', textDecoration:'none', color:'rgba(255,255,255,0.45)', transition:'all 0.2s' }}
                     onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='#0ea5e9'; e.currentTarget.style.color='#fff';}}
                     onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.07)'; e.currentTarget.style.color='rgba(255,255,255,0.45)';}}>
                     <Icon size={13}/>
-                  </motion.a>
+                  </m.a>
                 ))}
               </div>
             )}

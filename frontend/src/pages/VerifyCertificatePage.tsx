@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { BadgeCheck, AlertCircle, Loader, Award } from 'lucide-react';
 import { verifyCertificate, CertificateInfo } from '../api/enrollments';
@@ -43,7 +43,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
 
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 24px 60px' }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 460 }}>
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 460 }}>
         <div className="card" style={{ padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <div className="icon-box"><BadgeCheck size={18} style={{ color: '#0ea5e9' }} /></div>
@@ -70,7 +70,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
           )}
 
           {status === 'found' && cert && (
-            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+            <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
               style={{ padding: '18px 20px', borderRadius: 12, background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
               <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 800, color: '#166534', marginBottom: 12 }}>
                 <Award size={16} /> {t('pages.certificate.valid')}
@@ -81,10 +81,10 @@ export default function VerifyCertificatePage(): React.ReactElement {
                 <p><b>{t('pages.certificate.course')}:</b> {cert.courseTitle} ({t('pages.certificate.program', { n: cert.durationMonths })})</p>
                 {cert.completedAt && <p><b>{t('pages.certificate.completedAt')}:</b> {formatDate(cert.completedAt)}</p>}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </div>
-      </motion.div>
+      </m.div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap } from 'lucide-react';
@@ -25,8 +25,8 @@ const NAV: NavItem[] = [
   { labelKey: 'nav.contact', to: '/contact' },
 ];
 
-const MotionNavLink = motion.create(NavLink);
-const MotionLink = motion.create(Link);
+const MotionNavLink = m.create(NavLink);
+const MotionLink = m.create(Link);
 
 export default function Navbar(): React.ReactElement {
   const { t } = useTranslation();
@@ -57,7 +57,7 @@ export default function Navbar(): React.ReactElement {
 
   return (
     <>
-      <motion.nav
+      <m.nav
         initial={{ y: -70, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -126,12 +126,12 @@ export default function Navbar(): React.ReactElement {
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-      </motion.nav>
+      </m.nav>
 
       {/* Mobile menu */}
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+          <m.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             style={{ position: 'fixed', top: 70, left: 12, right: 12, zIndex: 99, background: '#fff', borderRadius: 20, padding: '16px 20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
             {NAV.map((n: NavItem, i: number) => (
               <MotionNavLink key={n.labelKey} to={n.to} end={n.end} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
@@ -181,7 +181,7 @@ export default function Navbar(): React.ReactElement {
                 </MotionLink>
               </>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

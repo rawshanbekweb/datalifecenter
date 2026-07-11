@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Clock, Eye, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug } from '../api/blog';
@@ -63,7 +63,7 @@ export default function BlogDetailPage(): React.ReactElement {
           <ArrowLeft size={14}/> {t('pages.blogDetail.back')}
         </Link>
 
-        <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}>
+        <m.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}>
           <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:20 }}>
             <div style={{ width:52, height:52, borderRadius:15, display:'flex', alignItems:'center', justifyContent:'center', background:post!.bg, border:`1.5px solid ${post!.border}`, flexShrink:0 }}>
               <Icon size={24} style={{ color:post!.color }} />
@@ -90,7 +90,7 @@ export default function BlogDetailPage(): React.ReactElement {
               <span key={tag} style={{ fontSize:11, padding:'4px 10px', borderRadius:12, background:'#f8fafc', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'JetBrains Mono,monospace' }}>#{tag}</span>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

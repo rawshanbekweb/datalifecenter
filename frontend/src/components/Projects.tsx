@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, GitBranch } from 'lucide-react';
 import { listProjects } from '../api/projects';
@@ -32,7 +32,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
   const { t } = useTranslation();
   const host = hostnameOf(p.liveUrl);
   return (
-    <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
+    <m.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, delay: (i % 3) * 0.1 }} className="card"
       style={{ overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}>
 
@@ -130,7 +130,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -157,12 +157,12 @@ export default function Projects(): React.ReactElement | null {
   return (
     <section id="projects" className="section-light" style={{ padding: '104px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+        <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: 48 }}>
           <span className="pill" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>{t('home.projects.pill')}</span>
           <h2 className="h-section" style={{ marginBottom: 10 }}>{t('home.projects.titleStart')}<span className="accent">{t('home.projects.titleAccent')}</span></h2>
           <p className="sub">{t('home.projects.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         {status === 'loading' && <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
         {status === 'error' && <p style={{ textAlign: 'center', color: '#dc2626', fontSize: 14 }}>{t('home.projects.loadError')}</p>}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Clock, Star, Users, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
 import { getCourseBySlug } from '../api/courses';
@@ -150,7 +150,7 @@ export default function CourseDetailPage(): React.ReactElement {
           <ArrowLeft size={14}/> {t('pages.courseDetail.back')}
         </Link>
 
-        <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
+        <m.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
           className="card" style={{ padding:32, marginBottom:24, background:course.bg, border:`1.5px solid ${course.border}` }}>
           <div style={{ display:'flex', alignItems:'flex-start', gap:20, flexWrap:'wrap' }}>
             <div style={{ width:56, height:56, borderRadius:15, display:'flex', alignItems:'center', justifyContent:'center', background:'#fff', border:`1.5px solid ${course.border}`, flexShrink:0 }}>
@@ -176,7 +176,7 @@ export default function CourseDetailPage(): React.ReactElement {
               {course.isFree ? t('common.free') : `${formatNumber(Number(course.price))} ${course.currency}`}
             </span>
           </div>
-        </motion.div>
+        </m.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:24 }} className="detail-grid">
           <div>

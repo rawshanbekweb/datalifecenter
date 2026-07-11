@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckCircle, AlertCircle, User, KeyRound, MailWarning } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { updateProfile, changePassword, resendVerification } from '../api/auth';
@@ -90,12 +90,12 @@ export default function ProfilePage(): React.ReactElement {
   return (
     <div>
       <div style={{ maxWidth:640 }}>
-        <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:24 }}>
+        <m.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:24 }}>
           <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:4 }}>
             {t('student.profile.titleStart')} <span className="accent">{t('student.profile.titleAccent')}</span>
           </h1>
           <p style={{ fontSize:13.5, color:'#64748b' }}>{t('student.profile.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         {user && user.emailVerified === false && (
           <div className="card" style={{ padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'flex-start', gap:12,

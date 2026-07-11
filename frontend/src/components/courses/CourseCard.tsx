@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight, Star } from 'lucide-react';
@@ -39,7 +39,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
   const Icon = resolveIcon(course.iconKey);
 
   return (
-    <motion.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
+    <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
       transition={{ duration:0.5, delay:(index%3)*0.1 }} className="card"
       style={{ padding:24, display:'flex', flexDirection:'column', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', background:course.bg, border:`1.5px solid ${course.border}` }}>
 
@@ -64,7 +64,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
       </div>
 
       {open && course.modules && course.modules.length > 0 && (
-        <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }}
+        <m.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }}
           style={{ background:'#fff', border:`1px solid ${course.border}`, borderRadius:12, padding:'12px 14px', marginBottom:12 }}>
           <p style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>{t('cards.course.modules')}</p>
           {course.modules.map((m: CourseModule, mi: number) => (
@@ -72,7 +72,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
               <span style={{ color:course.color, fontFamily:'JetBrains Mono,monospace', fontSize:11, marginRight:6 }}>0{mi+1}</span>{m.title}
             </p>
           ))}
-        </motion.div>
+        </m.div>
       )}
 
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, borderTop:`1px solid ${course.border}` }}>
@@ -93,6 +93,6 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
           </Link>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

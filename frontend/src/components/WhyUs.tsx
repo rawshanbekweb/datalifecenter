@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { resolveIcon } from '../utils/iconMap';
 
@@ -31,20 +31,20 @@ export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement
   return (
     <section id="why-us" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:56 }}>
           <span className="pill" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#d97706' }}>{t('home.whyUs.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>
             {t('home.whyUs.titleStart')} <span className="accent">DATA LIFE?</span>
           </h2>
           <p className="sub">{t('home.whyUs.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="why-grid">
           {FEATS.map((f: FeatureItem, i: number) => {
             const Icon = resolveIcon(f.icon);
             return (
-              <motion.div key={f.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
+              <m.div key={f.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(i%3)*0.1 }}
                 className="card" style={{ padding:'28px 24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden' }}>
 
@@ -60,13 +60,13 @@ export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement
                   <h3 style={{ fontSize:15, fontWeight:800, color:'#0f172a', margin:'8px 0 8px' }}>{f.title}</h3>
                   <p style={{ fontSize:13, color:'#64748b', lineHeight:1.75 }}>{f.desc}</p>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
 
         {/* CTA */}
-        <motion.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay:0.3 }}>
+        <m.div initial={{ opacity:0, y:24 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ delay:0.3 }}>
           <div style={{ marginTop:56, borderRadius:24, padding:'52px 40px', textAlign:'center',
             background:'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', position:'relative', overflow:'hidden' }}>
             {/* Subtle top accent */}
@@ -84,7 +84,7 @@ export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement
               </a>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
       <style>{`@media(max-width:1024px){.why-grid{grid-template-columns:1fr 1fr!important}} @media(max-width:600px){.why-grid{grid-template-columns:1fr!important}}`}</style>
     </section>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Code2, Cpu, Globe, CheckCircle } from 'lucide-react';
 
@@ -105,8 +105,8 @@ function Terminal(): React.ReactElement {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         {shown.map((l: TerminalLine, i: number) => (
-          <motion.p key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-            style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 12, color: l.c, lineHeight: 1.6 }}>{l.t}</motion.p>
+          <m.p key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+            style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 12, color: l.c, lineHeight: 1.6 }}>{l.t}</m.p>
         ))}
         {idx < LINES.length && <span style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 12, color: '#0ea5e9', animation: 'blink 1s infinite' }}>█</span>}
       </div>
@@ -139,37 +139,37 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
 
           {/* LEFT */}
           <div>
-            <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}>
+            <m.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}>
               <span className="pill">
                 <span style={{ width:6, height:6, borderRadius:'50%', background:'#0ea5e9', display:'inline-block', animation:'blink 1.5s infinite' }} />
                 Next-Gen IT Education Center
               </span>
-            </motion.div>
+            </m.div>
 
-            <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.12, duration:0.6 }}
+            <m.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.12, duration:0.6 }}
               style={{ fontFamily:'Outfit,sans-serif', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:12,
                 fontSize:'clamp(44px,7vw,76px)', color:'#0f172a' }}>
               DATA <br /><span style={{ color:'#0ea5e9' }}>LIFE</span>
-            </motion.h1>
+            </m.h1>
 
-            <motion.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
+            <m.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.22 }}
               style={{ fontSize:'clamp(16px,2vw,22px)', fontWeight:600, color:'#334155', marginBottom:10 }}>
               {t('home.hero.tagline')}
-            </motion.p>
+            </m.p>
 
-            <motion.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
+            <m.p initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3 }}
               style={{ color:'#64748b', fontSize:15, lineHeight:1.85, marginBottom:36, maxWidth:460 }}>
               {t('home.hero.description')}
-            </motion.p>
+            </m.p>
 
-            <motion.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
+            <m.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
               style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:44 }}>
               <a href="#contact"><button className="btn-primary">{t('home.hero.ctaPrimary')} <ArrowRight size={15} /></button></a>
               <a href="#contact"><button className="btn-outline">{t('home.hero.ctaSecondary')}</button></a>
-            </motion.div>
+            </m.div>
 
             {/* Trust badges */}
-            <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.52 }}
+            <m.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.52 }}
               style={{ display:'flex', gap:28, paddingTop:28, borderTop:'1px solid #f1f5f9', flexWrap:'wrap' }}>
               {stats.map((s: StatItem) => (
                 <div key={s.label} style={{ textAlign:'center' }}>
@@ -177,17 +177,17 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
                   <div style={{ fontSize:11, color:'#94a3b8', marginTop:2 }}>{s.label}</div>
                 </div>
               ))}
-            </motion.div>
+            </m.div>
           </div>
 
           {/* RIGHT */}
-          <motion.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}
+          <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}
             style={{ display:'flex', flexDirection:'column', gap:14 }}>
             <Terminal />
             {BADGES.map((b: BadgeItem) => {
               const Icon = b.icon;
               return (
-                <motion.div key={b.label} whileHover={{ x:4, scale:1.02 }}
+                <m.div key={b.label} whileHover={{ x:4, scale:1.02 }}
                   style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 18px', borderRadius:14, background:b.bg, border:`1.5px solid ${b.border}`, cursor:'default' }}>
                   <div style={{ width:38, height:38, borderRadius:10, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
                     <Icon size={18} style={{ color: b.ic }} />
@@ -197,10 +197,10 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
                     <p style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{b.value}</p>
                   </div>
                   <CheckCircle size={16} style={{ color:'#16a34a', marginLeft:'auto' }} />
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
         </div>
       </div>
       <style>{`

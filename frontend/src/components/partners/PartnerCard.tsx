@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Building2 } from 'lucide-react';
 
 export interface PartnerCardData {
@@ -18,7 +18,7 @@ interface PartnerCardProps {
 
 export default function PartnerCard({ partner, index = 0 }: PartnerCardProps): React.ReactElement {
   const content = (
-    <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
+    <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
       transition={{ duration:0.4, delay:(index%4)*0.08 }} whileHover={{ y:-4 }} className="card"
       style={{ padding:24, display:'flex', flexDirection:'column', alignItems:'center', gap:12, textAlign:'center' }}>
       {partner.logoUrl ? (
@@ -35,7 +35,7 @@ export default function PartnerCard({ partner, index = 0 }: PartnerCardProps): R
       </div>
       <p style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{partner.name}</p>
       <span className="tag" style={{ background:'#f8fafc', borderColor:'#e2e8f0', color:'#64748b' }}>{partner.category}</span>
-    </motion.div>
+    </m.div>
   );
 
   return partner.websiteUrl

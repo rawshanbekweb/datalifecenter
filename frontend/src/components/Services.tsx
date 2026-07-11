@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { resolveIcon } from '../utils/iconMap';
@@ -32,18 +32,18 @@ export default function Services({ settings }: ServicesProps = {}): React.ReactE
   return (
     <section id="services" className="section-gray" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
           <span className="pill" style={{ background:'#fdf2f8', borderColor:'#fbcfe8', color:'#db2777' }}>{t('home.services.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.services.titleStart')}<span className="accent">{t('home.services.titleAccent')}</span></h2>
           <p className="sub">{t('home.services.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="svc-grid">
           {SVCS.map((s: ServiceItem, i: number) => {
             const Icon = resolveIcon(s.icon);
             return (
-              <motion.div key={s.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
+              <m.div key={s.title} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
                 viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(i%3)*0.1 }}
                 className="card" style={{ padding:'28px 24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', cursor:'pointer', position:'relative', overflow:'hidden' }}>
 
@@ -70,7 +70,7 @@ export default function Services({ settings }: ServicesProps = {}): React.ReactE
                 <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:s.color, cursor:'pointer' }}>
                   {t('common.more')} <ArrowRight size={14} />
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

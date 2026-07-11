@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { LockKeyhole, AlertCircle, CheckCircle2, Loader } from 'lucide-react';
 import { resetPassword } from '../api/auth';
@@ -35,7 +35,7 @@ export default function ResetPasswordPage(): React.ReactElement {
 
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 24px 60px' }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 420 }}>
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 420 }}>
         <div className="card" style={{ padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <div className="icon-box"><LockKeyhole size={18} style={{ color: '#0ea5e9' }} /></div>
@@ -53,21 +53,21 @@ export default function ResetPasswordPage(): React.ReactElement {
               </p>
             </div>
           ) : status === 'done' ? (
-            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+            <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
               style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '14px 16px', borderRadius: 12, background: '#f0fdf4', border: '1.5px solid #bbf7d0' }}>
               <CheckCircle2 size={17} style={{ color: '#16a34a', flexShrink: 0, marginTop: 1 }} />
               <p style={{ fontSize: 13, color: '#166534' }}>
                 {t('auth.reset.done')}
               </p>
-            </motion.div>
+            </m.div>
           ) : (
             <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {status === 'error' && (
-                <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+                <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
                   style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, background: '#fef2f2', border: '1.5px solid #fecaca' }}>
                   <AlertCircle size={16} style={{ color: '#dc2626', flexShrink: 0 }} />
                   <p style={{ fontSize: 13, color: '#dc2626' }}>{errorMsg}</p>
-                </motion.div>
+                </m.div>
               )}
               <div>
                 <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('auth.reset.newPassword')}</label>
@@ -88,7 +88,7 @@ export default function ResetPasswordPage(): React.ReactElement {
             <Link to="/login" style={{ color: '#0ea5e9', fontWeight: 700, textDecoration: 'none' }}>{t('auth.reset.backToLogin')}</Link>
           </p>
         </div>
-      </motion.div>
+      </m.div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );

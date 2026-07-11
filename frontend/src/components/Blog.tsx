@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -25,12 +25,12 @@ export default function Blog(): React.ReactElement {
   return (
     <section id="blog" className="section-light" style={{ padding:'104px 0' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
-        <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
+        <m.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
           style={{ textAlign:'center', marginBottom:52 }}>
           <span className="pill" style={{ background:'#f0f9ff', borderColor:'#bae6fd', color:'#0284c7' }}>{t('home.blog.pill')}</span>
           <h2 className="h-section" style={{ marginBottom:10 }}>{t('home.blog.titleStart')} <span className="accent">{t('home.blog.titleAccent')}</span></h2>
           <p className="sub">{t('home.blog.subtitle')}</p>
-        </motion.div>
+        </m.div>
 
         {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.blog.loadError')}</p>}

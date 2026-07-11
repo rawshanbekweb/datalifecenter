@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight } from 'lucide-react';
@@ -42,7 +42,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
   const Icon = resolveIcon(post.iconKey);
   return (
     <Link to={`/blog/${post.slug}`} style={{ textDecoration:'none' }}>
-      <motion.article initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
+      <m.article initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
         viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(index%3)*0.1 }}
         className="card" style={{ overflow:'hidden', cursor:'pointer', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', display:'flex', flexDirection:'column', background:post.bg, border:`1.5px solid ${post.border}`, height:'100%' }}>
 
@@ -74,7 +74,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
             {t('cards.blog.continue')} <ArrowRight size={13}/>
           </div>
         </div>
-      </motion.article>
+      </m.article>
     </Link>
   );
 }

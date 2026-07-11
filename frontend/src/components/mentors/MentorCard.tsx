@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { GitBranch, Briefcase, Send } from 'lucide-react';
 
 interface MentorCourse {
@@ -56,7 +56,7 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
   if (mentor.telegramUrl) socials.push({ icon: Send, href: mentor.telegramUrl });
 
   return (
-    <motion.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
+    <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
       transition={{ duration:0.5, delay:(index%3)*0.1 }} className="card"
       style={{ padding:24, textAlign:'center', background:theme.bg, border:`1.5px solid ${theme.border}` }}>
 
@@ -93,6 +93,6 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
           ))}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
