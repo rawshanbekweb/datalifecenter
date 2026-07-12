@@ -31,6 +31,7 @@ const StudentLayout = lazy(() => import('./layouts/StudentLayout'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const StudentSessionsPage = lazy(() => import('./pages/student/StudentSessionsPage'))
+const StudentAssignmentsPage = lazy(() => import('./pages/student/StudentAssignmentsPage'))
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'))
 const StudentCertificatesPage = lazy(() => import('./pages/student/StudentCertificatesPage'))
 
@@ -42,6 +43,7 @@ const MentorCoursesPage = lazy(() => import('./pages/mentor/MentorCoursesPage'))
 const MentorCurriculumPage = lazy(() => import('./pages/mentor/MentorCurriculumPage'))
 const MentorProfilePage = lazy(() => import('./pages/mentor/MentorProfilePage'))
 const MentorQuestionsPage = lazy(() => import('./pages/mentor/MentorQuestionsPage'))
+const MentorAssignmentsPage = lazy(() => import('./pages/mentor/MentorAssignmentsPage'))
 const MentorRequestsPage = lazy(() => import('./pages/mentor/MentorRequestsPage'))
 
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
@@ -113,6 +115,7 @@ export function createAppRouter(basename: string) {
     children: [
       { index: true, element: s(<DashboardPage />) },
       { path: 'sessions', element: s(<StudentSessionsPage />) },
+      { path: 'assignments', element: s(<StudentAssignmentsPage />) },
       { path: 'subscription', element: s(<SubscriptionPage />) },
       { path: 'certificates', element: s(<StudentCertificatesPage />) },
       { path: 'profile', element: s(<ProfilePage />) },
@@ -129,6 +132,7 @@ export function createAppRouter(basename: string) {
       { path: 'students', element: s(<MentorStudentsPage />) },
       { path: 'sessions', element: s(<MentorSessionsPage />) },
       { path: 'questions', element: s(<MentorQuestionsPage />) },
+      { path: 'assignments', element: s(<MentorAssignmentsPage />) },
       { path: 'requests', element: s(<MentorRequestsPage />) },
       { path: 'profile', element: s(<MentorProfilePage />) },
     ],

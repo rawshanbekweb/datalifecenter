@@ -90,7 +90,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
       await sendContactMessage(form);
       setStatus('success');
     } catch (err: any) {
-      setErrorMsg(err.message || "Xabarni yuborib bo'lmadi");
+      setErrorMsg(err.message || t('common.error'));
       setStatus('error');
     }
   };

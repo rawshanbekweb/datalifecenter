@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet,
+  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet, ClipboardList,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -18,6 +18,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { labelKey: 'cabinet.nav.dashboard',     to: '/student',              icon: LayoutDashboard, end: true },
   { labelKey: 'cabinet.nav.sessions',      to: '/student/sessions',     icon: Video },
+  { labelKey: 'cabinet.nav.assignments',   to: '/student/assignments',  icon: ClipboardList },
   { labelKey: 'cabinet.nav.subscription',  to: '/student/subscription', icon: Wallet },
   { labelKey: 'cabinet.nav.certificates',  to: '/student/certificates', icon: Award },
   { labelKey: 'cabinet.nav.profile',       to: '/student/profile',      icon: UserRound },

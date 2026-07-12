@@ -121,7 +121,8 @@
       "title": "Stay up to date with IT news",
       "subtitle": "Weekly IT news, course discounts and articles",
       "placeholder": "Your email",
-      "button": "Subscribe"
+      "button": "Subscribe",
+      "done": "Thank you! Your subscription request has been received."
     },
     "legal": {
       "privacy": "Privacy",
@@ -350,6 +351,7 @@
     "nav": {
       "dashboard": "Overview",
       "sessions": "Live lessons",
+      "assignments": "Assignments",
       "subscription": "Subscription",
       "certificates": "Certificates",
       "profile": "Profile"
@@ -494,6 +496,27 @@
       "subtitle": "Scheduled online lessons for the courses you are enrolled in",
       "empty": "No live lessons are scheduled yet. Enroll in a course and lessons announced by your mentors will appear here."
     },
+    "assignments": {
+      "titleStart": "My",
+      "titleAccent": "assignments",
+      "subtitle": "Tasks from your mentors and their results",
+      "empty": "No assignments yet. When a mentor gives you a task, it will appear here.",
+      "due": "Due: {{date}}",
+      "statusNone": "Not submitted",
+      "statusSubmitted": "Under review",
+      "statusAccepted": "Accepted",
+      "statusReturned": "Needs resubmission",
+      "material": "Assignment material",
+      "yourAnswer": "Your answer",
+      "answerPlaceholder": "Write your answer: what you did and how you solved it...",
+      "linkPlaceholder": "Link to your work (GitHub, Google Docs...) — optional",
+      "attach": "Attach a screenshot",
+      "attached": "Attached file",
+      "removeFile": "Remove",
+      "submit": "Submit",
+      "resubmit": "Resubmit",
+      "feedback": "Mentor feedback"
+    },
     "certificates": {
       "titleStart": "My ",
       "titleAccent": "certificates",
@@ -525,6 +548,7 @@
       "students": "Students",
       "sessions": "Live lessons",
       "questions": "Q&A",
+      "assignments": "Assignments",
       "requests": "Contact admin",
       "profile": "Profile"
     },
@@ -578,6 +602,38 @@
       "placeholder": "Write your answer...",
       "answerBtn": "Answer",
       "sendError": "Failed to send the answer"
+    },
+    "assignments": {
+      "title": "Assignments",
+      "pageSub": "Give tasks to your students and review their answers",
+      "newAssignment": "New assignment",
+      "needCourseWarn": "No course is assigned to you yet, so you cannot create assignments. An administrator must select you as the mentor when editing a course.",
+      "selectCourse": "Select a course...",
+      "titlePlaceholder": "Assignment title",
+      "descPlaceholder": "Assignment brief: what to do, requirements, grading criteria...",
+      "linkPlaceholder": "Material link (optional)",
+      "dueLabel": "Due:",
+      "audienceLabel": "Audience — if none are selected, it goes to all enrolled students",
+      "create": "Give assignment",
+      "empty": "You haven't given any assignments yet. Use \"New assignment\" to give your students a task.",
+      "forNStudents": "For {{n}} students",
+      "openToAll": "All students",
+      "waitingCount": "{{n}} answers awaiting review",
+      "submissionsCount": "{{n}} answers",
+      "noSubmissions": "No answers yet",
+      "confirmDelete": "Delete assignment \"{{title}}\"? All answers will also be deleted.",
+      "deleteTitle": "Delete",
+      "statusSubmitted": "Awaiting review",
+      "statusAccepted": "Accepted",
+      "statusReturned": "Returned",
+      "gradePlaceholder": "Grade (0-100)",
+      "feedbackPlaceholder": "Feedback (visible to the student)...",
+      "accept": "Accept",
+      "return": "Return",
+      "yourFeedback": "Your feedback",
+      "openLink": "Open work link",
+      "openFile": "Open attached file",
+      "due": "Due: {{date}}"
     },
     "requests": {
       "title": "Contact admin",

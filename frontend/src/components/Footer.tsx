@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { GitBranch, MessageCircle, Briefcase, Camera, Play, Send, ArrowRight } from 'lucide-react';
+import { GitBranch, MessageCircle, Briefcase, Camera, Play, Send, ArrowRight, CheckCircle } from 'lucide-react';
+import { sendContactMessage } from '../api/contact';
 
 interface SocialItem {
   icon: React.ElementType;
@@ -47,6 +48,23 @@ const SOCIALS: SocialItem[] = [
 
 export default function Footer(): React.ReactElement {
   const { t } = useTranslation();
+  // Newsletter obunasi — alohida backend yo'q, shuning uchun mavjud "aloqa xabari"
+  // kanalidan foydalanamiz: obuna so'rovi admin "Xabarlar" bo'limiga tushadi (haqiqiy,
+  // soxta "muvaffaqiyat" emas). Newsletter jadvali qo'shilsa shu yerni almashtirish kifoya.
+  const [email, setEmail] = useState<string>('');
+  const [subState, setSubState] = useState<'idle' | 'sending' | 'done'>('idle');
+  const subscribe = async (): Promise<void> => {
+    const v = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) || subState === 'sending') return;
+    setSubState('sending');
+    try {
+      await sendContactMessage({ name: 'Newsletter', email: v, subject: 'newsletter', message: t('footer.newsletter.subtitle') });
+      setSubState('done');
+      setEmail('');
+    } catch {
+      setSubState('idle');
+    }
+  };
   const legalItems: Array<{ key: string; label: string }> = [
     { key: 'privacy', label: t('footer.legal.privacy') },
     { key: 'terms', label: t('footer.legal.terms') },
@@ -66,13 +84,19 @@ export default function Footer(): React.ReactElement {
             <h3 style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:4 }}>{t('footer.newsletter.title')}</h3>
             <p style={{ fontSize:13, color:'rgba(255,255,255,0.45)' }}>{t('footer.newsletter.subtitle')}</p>
           </div>
-          <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-            <input type="email" placeholder={t('footer.newsletter.placeholder')}
-              style={{ width:230, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:50, padding:'11px 18px', fontSize:13, color:'#fff', outline:'none', fontFamily:'Outfit,sans-serif' }} />
-            <button className="btn-primary" style={{ padding:'11px 22px', whiteSpace:'nowrap' }}>
-              {t('footer.newsletter.button')} <ArrowRight size={14}/>
-            </button>
-          </div>
+          {subState === 'done' ? (
+            <div style={{ display:'flex', alignItems:'center', gap:8, color:'#4ade80', fontSize:13, fontWeight:600 }}>
+              <CheckCircle size={16}/> {t('footer.newsletter.done')}
+            </div>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); void subscribe(); }} style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('footer.newsletter.placeholder')}
+                style={{ width:230, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:50, padding:'11px 18px', fontSize:13, color:'#fff', outline:'none', fontFamily:'Outfit,sans-serif' }} />
+              <button type="submit" disabled={subState === 'sending'} className="btn-primary" style={{ padding:'11px 22px', whiteSpace:'nowrap', opacity: subState === 'sending' ? 0.7 : 1 }}>
+                {subState === 'sending' ? t('common.sending') : <>{t('footer.newsletter.button')} <ArrowRight size={14}/></>}
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Grid */}

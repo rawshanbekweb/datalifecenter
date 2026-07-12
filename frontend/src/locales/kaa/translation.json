@@ -121,7 +121,8 @@
       "title": "IT jańalıqlarınan xabardar bolıń",
       "subtitle": "Háptelik IT jańalıqları, kurs shegirmeleri hám maqalalar",
       "placeholder": "Email mánzilińiz",
-      "button": "Jazılıw"
+      "button": "Jazılıw",
+      "done": "Rahmet! Obuna sorawıńız qabıl etildi."
     },
     "legal": {
       "privacy": "Qupıyalıq",
@@ -350,6 +351,7 @@
     "nav": {
       "dashboard": "Basqarıw paneli",
       "sessions": "Janlı sabaqlar",
+      "assignments": "Tapsırmalar",
       "subscription": "Jazılım",
       "certificates": "Sertifikatlar",
       "profile": "Profil"
@@ -494,6 +496,27 @@
       "subtitle": "Siz jazılǵan kurslar boyınsha rejelestirilgen onlayn sabaqlar",
       "empty": "Házirshe rejelestirilgen janlı sabaqlar joq. Kursqa jazılsańız, mentorlarıńız daǵaza etken sabaqlar usı jerde kórinedi."
     },
+    "assignments": {
+      "titleStart": "Meniń",
+      "titleAccent": "tapsırmalarım",
+      "subtitle": "Mentorlarıńız bergen wazıypalar hám olardıń nátiyjeleri",
+      "empty": "Házirshe tapsırmalar joq. Mentor wazıypa bergende usı jerde kórinedi.",
+      "due": "Múddet: {{date}}",
+      "statusNone": "Tapsırılmaǵan",
+      "statusSubmitted": "Tekserilip atır",
+      "statusAccepted": "Qabıl etildi",
+      "statusReturned": "Qayta tapsırıw kerek",
+      "material": "Tapsırma materialı",
+      "yourAnswer": "Sizdiń juwabıńız",
+      "answerPlaceholder": "Juwabıńızdı jazıń: ne isledińiz, qalay sheshtińiz...",
+      "linkPlaceholder": "Jumıs siltemesi (GitHub, Google Docs...) — ıqtıyarlı",
+      "attach": "Skrinshot qosıw",
+      "attached": "Qosılǵan fayl",
+      "removeFile": "Alıp taslaw",
+      "submit": "Jiberiw",
+      "resubmit": "Qayta jiberiw",
+      "feedback": "Mentor pikiri"
+    },
     "certificates": {
       "titleStart": "Sertifikat",
       "titleAccent": "lar",
@@ -525,6 +548,7 @@
       "students": "Studentler",
       "sessions": "Janlı sabaqlar",
       "questions": "Soraw-juwap",
+      "assignments": "Tapsırmalar",
       "requests": "Admin menen baylanıs",
       "profile": "Profil"
     },
@@ -578,6 +602,38 @@
       "placeholder": "Juwabıńızdı jazıń...",
       "answerBtn": "Juwap beriw",
       "sendError": "Juwaptı jiberip bolmadı"
+    },
+    "assignments": {
+      "title": "Tapsırmalar",
+      "pageSub": "Oqıwshılarǵa wazıypa beriń hám juwapların tekseriń",
+      "newAssignment": "Jańa tapsırma",
+      "needCourseWarn": "Sizge ele kurs bekitilmegen, sol sebepli tapsırma berip bolmaydı. Administrator kurs redaktorında sizdi mentor retinde tańlawı kerek.",
+      "selectCourse": "Kurstı tańlań...",
+      "titlePlaceholder": "Tapsırma atı",
+      "descPlaceholder": "Tapsırma shárti: ne islew kerek, talaplar, bahalaw ólshemleri...",
+      "linkPlaceholder": "Material siltemesi (ıqtıyarlı)",
+      "dueLabel": "Múddet:",
+      "audienceLabel": "Kimge — belgilenbese kursqa jazılǵan barlıq oqıwshılarǵa baradı",
+      "create": "Tapsırma beriw",
+      "empty": "Ele tapsırma bermediniz. \"Jańa tapsırma\" túymesi arqalı oqıwshılarıńızǵa wazıypa beriń.",
+      "forNStudents": "{{n}} oqıwshı ushın",
+      "openToAll": "Barlıq oqıwshılarǵa",
+      "waitingCount": "{{n}} juwap kútip tur",
+      "submissionsCount": "{{n}} juwap",
+      "noSubmissions": "Ele juwap kelmegen",
+      "confirmDelete": "\"{{title}}\" tapsırması óshirilsin be? Barlıq juwaplar da óshedi.",
+      "deleteTitle": "Óshiriw",
+      "statusSubmitted": "Tekseriw kútilmekte",
+      "statusAccepted": "Qabıl etilgen",
+      "statusReturned": "Qaytarılǵan",
+      "gradePlaceholder": "Baha (0-100)",
+      "feedbackPlaceholder": "Pikir (oqıwshıǵa kórinedi)...",
+      "accept": "Qabıl etiw",
+      "return": "Qaytarıw",
+      "yourFeedback": "Pikirińiz",
+      "openLink": "Jumıs siltemesin ashıw",
+      "openFile": "Qosılǵan fayldı ashıw",
+      "due": "Múddet: {{date}}"
     },
     "requests": {
       "title": "Admin menen baylanıs",

@@ -72,6 +72,7 @@ model User {
   subscriptions Subscription[]
   lessonProgress LessonProgress[]
   lessonQuestions LessonQuestion[]
+  assignmentSubmissions AssignmentSubmission[]
   courseReviews CourseReview[]
   notifications Notification[]
   passwordResetTokens PasswordResetToken[]
@@ -123,6 +124,7 @@ model Mentor {
   courses       Course[]
   blogPosts     BlogPost[]
   liveSessions  LiveSession[]
+  assignments   Assignment[]
   requests      MentorRequest[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -154,6 +156,7 @@ model Course {
   modules        Module[]
   enrollments    Enrollment[]
   liveSessions   LiveSession[]
+  assignments    Assignment[]
   announcements  Announcement[]
   reviews        CourseReview[]
   createdAt      DateTime     @default(now())
@@ -247,6 +250,58 @@ enum MentorRequestStatus {
   CLOSED
 }
 
+enum SubmissionStatus {
+  SUBMITTED
+  ACCEPTED
+  RETURNED
+}
+
+// Mentor ↔ o'quvchi: kurs bo'yicha topshiriq (vazifa berish va tekshirish).
+// Savol-javob (LessonQuestion) kabi to'g'ridan-to'g'ri muloqot kanali —
+// shu sabab matnlar ko'p tilli Json emas, oddiy String.
+model Assignment {
+  id          String   @id @default(cuid())
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorId    String
+  title       String
+  description String
+  // Qo'shimcha material havolasi (Google Docs, GitHub va h.k.)
+  linkUrl     String?
+  dueAt       DateTime?
+  // Bo'sh massiv = kursga yozilgan barcha faol o'quvchiga (LiveSession patterni)
+  targetStudentIds String[] @default([])
+  submissions AssignmentSubmission[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([courseId, createdAt])
+  @@index([mentorId])
+}
+
+// O'quvchining topshiriq javobi. RETURNED bo'lsa qayta topshirish mumkin,
+// ACCEPTED — yakuniy (o'zgartirib bo'lmaydi).
+model AssignmentSubmission {
+  id           String           @id @default(cuid())
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignmentId String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  content      String
+  linkUrl      String?
+  fileUrl      String?
+  status       SubmissionStatus @default(SUBMITTED)
+  grade        Int?
+  feedback     String?
+  reviewedAt   DateTime?
+  submittedAt  DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([assignmentId, userId])
+  @@index([userId])
+}
+
 // Mentor ↔ admin aloqasi: mentorning rasmiy so'rovlari
 model MentorRequest {
   id        String              @id @default(cuid())
@@ -275,6 +330,9 @@ enum NotificationType {
   ANNOUNCEMENT
   PAYMENT_REJECTED
   SUBSCRIPTION_ACTIVATED
+  NEW_ASSIGNMENT
+  ASSIGNMENT_SUBMITTED
+  ASSIGNMENT_REVIEWED
 }
 
 // Kabinet ichidagi bildirishnomalar — har bir yozuv bitta foydalanuvchiga tegishli

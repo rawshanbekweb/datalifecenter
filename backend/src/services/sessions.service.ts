@@ -3,6 +3,7 @@ import { prisma } from '../config/prisma';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep, toJsonInput, toUzText } from '../utils/localizedField';
+import { audienceRecipientIds, filterEnrolledStudentIds } from '../utils/courseAudience';
 import { notify } from './notifications.service';
 
 const sessionInclude = {
@@ -22,16 +23,6 @@ function isEffectivelyEnded(s: { status: string; startsAt: Date; durationMin: nu
 
 function presentStatus<T extends { status: string; startsAt: Date; durationMin: number }>(session: T): T {
   return isEffectivelyEnded(session) ? ({ ...session, status: 'ENDED' } as T) : session;
-}
-
-// Sessiya auditoriyasi: tanlangan bo'lsa faqat o'sha talabalar, aks holda kursning barcha faol talabalari
-async function sessionRecipientIds(courseId: string, targetStudentIds: string[]): Promise<string[]> {
-  if (targetStudentIds.length > 0) return targetStudentIds;
-  const enrollments = await prisma.enrollment.findMany({
-    where: { courseId, status: 'ACTIVE' },
-    select: { userId: true },
-  });
-  return enrollments.map((e) => e.userId);
 }
 
 interface Actor {
@@ -57,18 +48,6 @@ interface UpdateSessionInput {
   durationMin?: number;
   status?: 'SCHEDULED' | 'LIVE' | 'ENDED' | 'CANCELLED';
   targetStudentIds?: string[];
-}
-
-// Mentor yuborgan userId'lar orasidan faqat shu kursga haqiqatan ham
-// faol (ACTIVE/COMPLETED) yozilganlarini qoldiradi — boshqa kurs yoki
-// mavjud bo'lmagan foydalanuvchi id'si sessiyaga yozilib qolmasin.
-async function filterEnrolledStudentIds(courseId: string, userIds: string[]): Promise<string[]> {
-  if (userIds.length === 0) return [];
-  const enrollments = await prisma.enrollment.findMany({
-    where: { courseId, userId: { in: userIds }, status: { in: ['ACTIVE', 'COMPLETED'] } },
-    select: { userId: true },
-  });
-  return enrollments.map((e) => e.userId);
 }
 
 // MENTOR roli uchun user hisobiga bog'langan mentor profilini topadi
@@ -110,7 +89,7 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
     include: sessionInclude,
   });
 
-  const recipientIds = await sessionRecipientIds(input.courseId, targetStudentIds);
+  const recipientIds = await audienceRecipientIds(input.courseId, targetStudentIds);
   await notify(recipientIds, {
     type: 'SESSION_SCHEDULED',
     title: `Yangi jonli dars: ${toUzText(session.title)}`,
@@ -217,7 +196,7 @@ export async function updateSession(id: string, input: UpdateSessionInput, actor
   // Efir boshlandi/bekor qilindi — auditoriyaga xabar (tip alohida emas:
   // NotificationType enum'iga yangi qiymat migratsiya talab qiladi, frontend tipga qaramaydi)
   if (input.status && input.status !== session.status) {
-    const recipientIds = await sessionRecipientIds(updated.courseId, updated.targetStudentIds);
+    const recipientIds = await audienceRecipientIds(updated.courseId, updated.targetStudentIds);
     if (input.status === 'LIVE') {
       await notify(recipientIds, {
         type: 'SESSION_SCHEDULED',

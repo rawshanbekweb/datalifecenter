@@ -121,7 +121,8 @@
       "title": "IT yangiliklardan xabardor bo'ling",
       "subtitle": "Haftalik IT yangiliklar, kurs chegirmalari va maqolalar",
       "placeholder": "Email manzilingiz",
-      "button": "Obuna bo'lish"
+      "button": "Obuna bo'lish",
+      "done": "Rahmat! Obuna so'rovingiz qabul qilindi."
     },
     "legal": {
       "privacy": "Maxfiylik",
@@ -350,6 +351,7 @@
     "nav": {
       "dashboard": "Boshqaruv paneli",
       "sessions": "Jonli darslar",
+      "assignments": "Topshiriqlar",
       "subscription": "Obuna",
       "certificates": "Sertifikatlar",
       "profile": "Profil"
@@ -494,6 +496,27 @@
       "subtitle": "Siz yozilgan kurslar bo'yicha rejalashtirilgan onlayn darslar",
       "empty": "Hozircha rejalashtirilgan jonli darslar yo'q. Kursga yozilsangiz, mentorlaringiz e'lon qilgan darslar shu yerda ko'rinadi."
     },
+    "assignments": {
+      "titleStart": "Mening",
+      "titleAccent": "topshiriqlarim",
+      "subtitle": "Mentorlaringiz bergan vazifalar va ularning natijalari",
+      "empty": "Hozircha topshiriqlar yo'q. Mentor vazifa berganida shu yerda ko'rinadi.",
+      "due": "Muddat: {{date}}",
+      "statusNone": "Topshirilmagan",
+      "statusSubmitted": "Tekshirilmoqda",
+      "statusAccepted": "Qabul qilindi",
+      "statusReturned": "Qayta topshirish kerak",
+      "material": "Topshiriq materiali",
+      "yourAnswer": "Sizning javobingiz",
+      "answerPlaceholder": "Javobingizni yozing: nima qildingiz, qanday yechdingiz...",
+      "linkPlaceholder": "Ish havolasi (GitHub, Google Docs...) — ixtiyoriy",
+      "attach": "Skrinshot biriktirish",
+      "attached": "Biriktirilgan fayl",
+      "removeFile": "Olib tashlash",
+      "submit": "Yuborish",
+      "resubmit": "Qayta yuborish",
+      "feedback": "Mentor izohi"
+    },
     "certificates": {
       "titleStart": "Sertifikat",
       "titleAccent": "lar",
@@ -525,6 +548,7 @@
       "students": "Talabalar",
       "sessions": "Jonli darslar",
       "questions": "Savol-javob",
+      "assignments": "Topshiriqlar",
       "requests": "Admin bilan aloqa",
       "profile": "Profil"
     },
@@ -578,6 +602,38 @@
       "placeholder": "Javobingizni yozing...",
       "answerBtn": "Javob berish",
       "sendError": "Javobni yuborib bo'lmadi"
+    },
+    "assignments": {
+      "title": "Topshiriqlar",
+      "pageSub": "O'quvchilarga vazifa bering va javoblarini tekshiring",
+      "newAssignment": "Yangi topshiriq",
+      "needCourseWarn": "Sizga hali kurs biriktirilmagan, shu sababli topshiriq berib bo'lmaydi. Administrator kurs tahririda sizni mentor sifatida tanlashi kerak.",
+      "selectCourse": "Kursni tanlang...",
+      "titlePlaceholder": "Topshiriq sarlavhasi",
+      "descPlaceholder": "Topshiriq sharti: nima qilish kerak, talablar, baholash mezonlari...",
+      "linkPlaceholder": "Material havolasi (ixtiyoriy)",
+      "dueLabel": "Muddat:",
+      "audienceLabel": "Kimga — belgilanmasa kursga yozilgan barcha o'quvchilarga boradi",
+      "create": "Topshiriq berish",
+      "empty": "Hali topshiriq bermagansiz. \"Yangi topshiriq\" tugmasi orqali o'quvchilaringizga vazifa bering.",
+      "forNStudents": "{{n}} ta o'quvchi uchun",
+      "openToAll": "Barcha o'quvchilarga",
+      "waitingCount": "{{n}} ta javob kutmoqda",
+      "submissionsCount": "{{n}} ta javob",
+      "noSubmissions": "Hali javob kelmagan",
+      "confirmDelete": "\"{{title}}\" topshirig'i o'chirilsinmi? Barcha javoblar ham o'chadi.",
+      "deleteTitle": "O'chirish",
+      "statusSubmitted": "Tekshirish kutilmoqda",
+      "statusAccepted": "Qabul qilingan",
+      "statusReturned": "Qaytarilgan",
+      "gradePlaceholder": "Baho (0-100)",
+      "feedbackPlaceholder": "Izoh (o'quvchiga ko'rinadi)...",
+      "accept": "Qabul qilish",
+      "return": "Qaytarish",
+      "yourFeedback": "Izohingiz",
+      "openLink": "Ish havolasini ochish",
+      "openFile": "Biriktirilgan faylni ochish",
+      "due": "Muddat: {{date}}"
     },
     "requests": {
       "title": "Admin bilan aloqa",

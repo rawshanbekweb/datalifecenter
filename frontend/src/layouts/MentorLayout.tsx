@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, BookOpen, Users, Video, MessageCircleQuestion, Inbox, UserRound, LogOut, Globe, Menu, X,
+  LayoutDashboard, BookOpen, Users, Video, MessageCircleQuestion, Inbox, UserRound, LogOut, Globe, Menu, X, ClipboardList,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -21,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'mentor.nav.students',  to: '/mentor/students', icon: Users },
   { labelKey: 'mentor.nav.sessions',  to: '/mentor/sessions', icon: Video },
   { labelKey: 'mentor.nav.questions', to: '/mentor/questions', icon: MessageCircleQuestion },
+  { labelKey: 'mentor.nav.assignments', to: '/mentor/assignments', icon: ClipboardList },
   { labelKey: 'mentor.nav.requests',  to: '/mentor/requests', icon: Inbox },
   { labelKey: 'mentor.nav.profile',   to: '/mentor/profile',  icon: UserRound },
 ];

@@ -9,6 +9,8 @@ export { app, prisma };
 // Barcha jadvallarni FK tartibida tozalaydi — har bir test to'plami toza bazadan boshlanadi
 export async function resetDb(): Promise<void> {
   await prisma.$transaction([
+    prisma.assignmentSubmission.deleteMany(),
+    prisma.assignment.deleteMany(),
     prisma.lessonProgress.deleteMany(),
     prisma.lessonQuestion.deleteMany(),
     prisma.notification.deleteMany(),
