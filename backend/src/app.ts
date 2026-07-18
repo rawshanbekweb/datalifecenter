@@ -1,5 +1,6 @@
 import path from 'path';
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -23,6 +24,12 @@ app.set('trust proxy', 1);
 
 // crossOriginResourcePolicy: /uploads rasmlari boshqa origin'dagi (Vercel) frontend'da ko'rinishi uchun
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+// JSON javoblarni gzip bilan siqish — katta ro'yxatlar (kurslar, foydalanuvchilar)
+// sekin tarmoqda bir necha barobar tez yetib boradi. SSE oqimi siqilmaydi:
+// compression bufferlab yuboradi va real-vaqt bildirishnomalar kechikib qoladi.
+app.use(compression({
+  filter: (req, res) => req.path !== '/api/notifications/stream' && compression.filter(req, res),
+}));
 app.use(cors(corsOptions));
 app.use(express.json());
 // Click webhook'lari application/x-www-form-urlencoded yuboradi (Payme JSON ishlatadi, express.json() yetarli)
