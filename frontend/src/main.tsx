@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { LazyMotion } from 'framer-motion'
 import { createAppRouter } from './router'
+import { FeedbackProvider } from './components/common/Feedback'
 import { AuthProvider } from './context/AuthContext'
 import { LocaleProvider } from './context/LocaleContext'
 import { detectLocale } from './i18n/locale'
@@ -38,7 +39,9 @@ function mount(): void {
       <LazyMotion features={loadMotionFeatures}>
         <LocaleProvider locale={locale} basename={basename}>
           <AuthProvider>
-            <RouterProvider router={router} />
+            <FeedbackProvider>
+              <RouterProvider router={router} />
+            </FeedbackProvider>
           </AuthProvider>
         </LocaleProvider>
       </LazyMotion>

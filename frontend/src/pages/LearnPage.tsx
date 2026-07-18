@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getCourseLearn } from '../api/courses';
 import { completeLesson, uncompleteLesson } from '../api/progress';
 import ComingSoon from '../components/common/ComingSoon';
+import { useToast } from '../components/common/Feedback';
 import LessonVideo from '../components/common/LessonVideo';
 import LessonQA from '../components/questions/LessonQA';
 
@@ -44,6 +45,7 @@ const TYPE_ICONS: Record<LearnLesson['contentType'], React.ComponentType<{ size?
 
 export default function LearnPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const { slug } = useParams<{ slug: string }>();
   const [course, setCourse]           = useState<LearnCourse | null>(null);
   const [status, setStatus]           = useState<'loading' | 'ready' | 'forbidden' | 'not-found' | 'error'>('loading');
@@ -138,7 +140,7 @@ export default function LearnPage(): React.ReactElement {
       );
       setCourseCompleted(summary.courseCompleted);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setMarking(false);
     }

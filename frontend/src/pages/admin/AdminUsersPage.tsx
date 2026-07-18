@@ -5,6 +5,7 @@ import { listUsers, updateUserRole, setUserBlocked, deleteUser, resetUserPasswor
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 
 const ROLE_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
   STUDENT: { labelKey: 'admin.roles.STUDENT', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
@@ -21,6 +22,8 @@ const ROLE_FILTERS: { value: string; labelKey: string }[] = [
 
 export default function AdminUsersPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const { user: me } = useAuth();
   const [items, setItems]   = useState<AdminUser[]>([]);
   const [total, setTotal]   = useState<number>(0);
@@ -46,7 +49,7 @@ export default function AdminUsersPage(): React.ReactElement {
     try {
       await action();
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }
@@ -58,16 +61,16 @@ export default function AdminUsersPage(): React.ReactElement {
       setItems((prev) => prev.map((u) => (u.id === id ? updated : u)));
     });
 
-  const toggleBlock = (u: AdminUser): Promise<void> | void => {
-    if (!u.isBlocked && !window.confirm(t('admin.users.confirmBlock', { name: u.name }))) return;
+  const toggleBlock = async (u: AdminUser): Promise<void> => {
+    if (!u.isBlocked && !(await confirm(t('admin.users.confirmBlock', { name: u.name }), { danger: true, confirmLabel: t('common.confirm') }))) return;
     return runAction(u.id, async () => {
       const updated = await setUserBlocked(u.id, !u.isBlocked);
       setItems((prev) => prev.map((x) => (x.id === u.id ? updated : x)));
     });
   };
 
-  const removeUser = (u: AdminUser): Promise<void> | void => {
-    if (!window.confirm(t('admin.users.confirmDelete', { name: u.name, email: u.email }))) return;
+  const removeUser = async (u: AdminUser): Promise<void> => {
+    if (!(await confirm(t('admin.users.confirmDelete', { name: u.name, email: u.email }), { danger: true }))) return;
     return runAction(u.id, async () => {
       await deleteUser(u.id);
       setItems((prev) => prev.filter((x) => x.id !== u.id));
@@ -75,8 +78,8 @@ export default function AdminUsersPage(): React.ReactElement {
     });
   };
 
-  const resetPassword = (u: AdminUser): Promise<void> | void => {
-    if (!window.confirm(t('admin.users.confirmReset', { name: u.name }))) return;
+  const resetPassword = async (u: AdminUser): Promise<void> => {
+    if (!(await confirm(t('admin.users.confirmReset', { name: u.name })))) return;
     return runAction(u.id, async () => {
       const { tempPassword } = await resetUserPassword(u.id);
       setResetInfo({ name: u.name, email: u.email, password: tempPassword });

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { getSiteSettings } from '../api/siteSettings';
 import { PAYMENT_INFO } from '../config/payment';
 import { formatDate, formatNumber } from '../utils/format';
+import { useToast } from '../components/common/Feedback';
 import FileUpload from '../components/common/FileUpload';
 
 const DEFAULT_PRICE = 99000;
@@ -15,6 +16,7 @@ const DEFAULT_CURRENCY = 'UZS';
 
 export default function SubscriptionPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [status, setStatus]             = useState<'loading' | 'ready' | 'error'>('loading');
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ click: false, payme: false });
@@ -62,7 +64,7 @@ export default function SubscriptionPage(): React.ReactElement {
       const created = await createSubscription();
       setSubscription(created);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setStarting(false);
     }

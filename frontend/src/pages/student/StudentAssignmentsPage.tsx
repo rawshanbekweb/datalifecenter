@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AssignmentSubmission, MyAssignment, getMyAssignments, submitAssignment } from '../../api/assignments';
 import { uploadFile } from '../../api/uploads';
 import { formatDateTime } from '../../utils/format';
+import { useToast } from '../../components/common/Feedback';
 
 type StatusKey = 'NONE' | 'SUBMITTED' | 'ACCEPTED' | 'RETURNED';
 
@@ -24,6 +25,7 @@ interface DraftState {
 // Bitta topshiriqning javob yuborish formasi — yuborilmagan yoki qaytarilgan holatda ochiladi
 function SubmitForm({ assignment, onSubmitted }: { assignment: MyAssignment; onSubmitted: (s: AssignmentSubmission) => void }): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const prev = assignment.mySubmission;
   const [draft, setDraft] = useState<DraftState>({
     content: prev?.content ?? '',
@@ -40,7 +42,7 @@ function SubmitForm({ assignment, onSubmitted }: { assignment: MyAssignment; onS
       const result = await uploadFile(file, 'image', setUploadPct);
       setDraft((d) => ({ ...d, fileUrl: result.url }));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setUploadPct(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -59,7 +61,7 @@ function SubmitForm({ assignment, onSubmitted }: { assignment: MyAssignment; onS
       });
       onSubmitted(submission);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setSending(false);
     }

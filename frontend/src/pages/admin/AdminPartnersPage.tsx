@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, AlertCircle, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listPartners, createPartner, updatePartner, deletePartner } from '../../api/partners';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import FileUpload from '../../components/common/FileUpload';
 
 interface PartnerFormState {
@@ -102,6 +103,8 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
 
 export default function AdminPartnersPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
   const [editing, setEditing]   = useState<PartnerFormState | null>(null);
@@ -118,12 +121,12 @@ export default function AdminPartnersPage(): React.ReactElement {
   });
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm(t('admin.partners.confirmDelete'))) return;
+    if (!(await confirm(t('admin.partners.confirmDelete'), { danger: true }))) return;
     try {
       await deletePartner(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

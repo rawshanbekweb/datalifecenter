@@ -5,6 +5,7 @@ import { listSubscriptionsAdmin, updateSubscriptionAdmin } from '../../api/subsc
 import { getSiteSettings, updateSiteSettingSection } from '../../api/siteSettings';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 
 interface AdminSubscription {
@@ -38,6 +39,7 @@ const STATUS_FILTERS: { value: string; labelKey: string }[] = [
 
 function PlanPriceCard(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const [price, setPrice] = useState<string>('');
   const [currency, setCurrency] = useState<string>('UZS');
   const [status, setStatus] = useState<'loading' | 'ready' | 'saving'>('loading');
@@ -58,7 +60,7 @@ function PlanPriceCard(): React.ReactElement {
     try {
       await updateSiteSettingSection('subscription_plan', { price: Number(price), currency });
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setStatus('ready');
     }
@@ -83,6 +85,8 @@ function PlanPriceCard(): React.ReactElement {
 
 export default function AdminSubscriptionsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const promptText = usePrompt();
   const [items, setItems]   = useState<AdminSubscription[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter] = useState<string>('');
@@ -106,14 +110,14 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
       const updated = await updateSubscriptionAdmin(id, data);
       setItems((prev) => prev.map((s) => (s.id === id ? updated : s)));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }
   };
 
-  const reject = (id: string): void => {
-    const reason = window.prompt(t('admin.rejectPrompt'));
+  const reject = async (id: string): Promise<void> => {
+    const reason = await promptText(t('admin.rejectPrompt'), { multiline: true });
     if (!reason || !reason.trim()) return;
     act(id, { status: 'REJECTED', rejectionReason: reason.trim() });
   };

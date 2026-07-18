@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, AlertCircle, LayoutGrid, EyeOff } from 'lucide-re
 import { useTranslation } from 'react-i18next';
 import { listProjectsAdmin, createProject, updateProject, deleteProject } from '../../api/projects';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
@@ -149,6 +150,8 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
 
 export default function AdminProjectsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [projects, setProjects] = useState<Project[]>([]);
   const [status, setStatus]     = useState<Status>('loading');
   const [editing, setEditing]   = useState<ProjectFormState | null>(null);
@@ -167,12 +170,12 @@ export default function AdminProjectsPage(): React.ReactElement {
   });
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm(t('admin.projects.confirmDelete'))) return;
+    if (!(await confirm(t('admin.projects.confirmDelete'), { danger: true }))) return;
     try {
       await deleteProject(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

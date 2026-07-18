@@ -11,6 +11,7 @@ import {
 } from '../../api/sessions';
 import { useTranslation } from 'react-i18next';
 import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
+import { useToast, useConfirm } from '../common/Feedback';
 import LocalizedField from '../admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
@@ -46,6 +47,8 @@ function randomJitsiUrl(): string {
 
 export default function MentorSessionsPanel({ courses, students }: { courses: CourseOption[]; students: StudentOption[] }): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [sessions, setSessions] = useState<ManagedLiveSession[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
   const [formOpen, setFormOpen] = useState<boolean>(false);
@@ -78,7 +81,7 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
       setForm(EMPTY_FORM);
       setFormOpen(false);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setSaving(false);
     }
@@ -90,20 +93,20 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
       const updated = await updateSession(id, { status: newStatus });
       setSessions((prev) => prev.map((s) => (s.id === id ? updated : s)));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }
   };
 
   const remove = async (s: ManagedLiveSession): Promise<void> => {
-    if (!window.confirm(t('mentor.sessionsPanel.confirmDelete', { title: s.title.uz }))) return;
+    if (!(await confirm(t('mentor.sessionsPanel.confirmDelete', { title: s.title.uz }), { danger: true }))) return;
     setBusyId(s.id);
     try {
       await deleteSession(s.id);
       setSessions((prev) => prev.filter((x) => x.id !== s.id));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }

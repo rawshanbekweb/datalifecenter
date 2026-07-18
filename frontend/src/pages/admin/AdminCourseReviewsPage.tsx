@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listReviewsAdmin, updateReviewAdmin, deleteReviewAdmin } from '../../api/reviews';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 
 interface Review {
   id: string;
@@ -19,6 +20,8 @@ type Status = 'loading' | 'ready' | 'error';
 
 export default function AdminCourseReviewsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [items, setItems]   = useState<Review[]>([]);
   const [status, setStatus] = useState<Status>('loading');
 
@@ -36,17 +39,17 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
       await updateReviewAdmin(r.id, { published: !r.published });
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm(t('admin.reviews.confirmDelete'))) return;
+    if (!(await confirm(t('admin.reviews.confirmDelete'), { danger: true }))) return;
     try {
       await deleteReviewAdmin(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

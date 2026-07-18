@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { createModule, updateModule, deleteModule, createLesson, updateLesson, deleteLesson } from '../../api/courses';
 import AdminPageHeader from '../admin/AdminPageHeader';
 import FileUpload from '../common/FileUpload';
+import { useToast, useConfirm } from '../common/Feedback';
 import LocalizedField from '../admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
@@ -144,6 +145,8 @@ interface CurriculumEditorProps {
 // Kurs dasturi tahrirlagichi — admin va mentor kabinetlarida birgalikda ishlatiladi
 export default function CurriculumEditor({ courseId, backTo, backLabel, loadCourse }: CurriculumEditorProps): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [course, setCourse] = useState<CourseWithCurriculum | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
@@ -173,29 +176,29 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
       setModuleForm(null);
       load();
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setModuleSaving(false);
     }
   };
 
   const removeModule = async (moduleId: string): Promise<void> => {
-    if (!window.confirm(t('admin.curriculum.confirmDeleteModule'))) return;
+    if (!(await confirm(t('admin.curriculum.confirmDeleteModule'), { danger: true }))) return;
     try {
       await deleteModule(moduleId);
       load();
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     }
   };
 
   const removeLesson = async (lessonId: string): Promise<void> => {
-    if (!window.confirm(t('admin.curriculum.confirmDeleteLesson'))) return;
+    if (!(await confirm(t('admin.curriculum.confirmDeleteLesson'), { danger: true }))) return;
     try {
       await deleteLesson(lessonId);
       load();
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     }
   };
 

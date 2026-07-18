@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MentorRequest, getAllMentorRequests, updateMentorRequest } from '../../api/questions';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast } from '../../components/common/Feedback';
 
 const STATUS_META: Record<MentorRequest['status'], { labelKey: string; color: string; bg: string; border: string }> = {
   OPEN:     { labelKey: 'admin.reqStatus.OPEN',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
@@ -14,6 +15,7 @@ const STATUS_META: Record<MentorRequest['status'], { labelKey: string; color: st
 // Admin: mentorlardan kelgan so'rovlar — javob berish va yopish
 export default function AdminMentorRequestsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const [requests, setRequests] = useState<MentorRequest[]>([]);
   const [status, setStatus]     = useState<'loading' | 'ready' | 'error'>('loading');
   const [drafts, setDrafts]     = useState<Record<string, string>>({});
@@ -38,7 +40,7 @@ export default function AdminMentorRequestsPage(): React.ReactElement {
       apply(await updateMentorRequest(id, { reply: draft }));
       setDrafts((prev) => ({ ...prev, [id]: '' }));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId(null);
     }
@@ -50,7 +52,7 @@ export default function AdminMentorRequestsPage(): React.ReactElement {
     try {
       apply(await updateMentorRequest(id, { status: 'CLOSED' }));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId(null);
     }

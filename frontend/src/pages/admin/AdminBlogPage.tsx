@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listBlogPostsAdmin, createBlogPost, updateBlogPost, deleteBlogPost } from '../../api/blog';
 import { resolveIcon } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
@@ -154,6 +155,8 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
 
 export default function AdminBlogPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [posts, setPosts]     = useState<BlogPost[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
   const [editing, setEditing] = useState<BlogFormState | null>(null);
@@ -175,12 +178,12 @@ export default function AdminBlogPage(): React.ReactElement {
   };
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm(t('admin.blog.confirmDelete'))) return;
+    if (!(await confirm(t('admin.blog.confirmDelete'), { danger: true }))) return;
     try {
       await deleteBlogPost(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

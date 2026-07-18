@@ -5,6 +5,7 @@ import { listAnnouncements, createAnnouncement, deleteAnnouncement, type Announc
 import { listCoursesAdmin } from '../../api/courses';
 import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
@@ -32,6 +33,8 @@ type Status = 'loading' | 'ready' | 'error';
 
 export default function AdminAnnouncementsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [items, setItems]     = useState<Announcement[]>([]);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
@@ -68,12 +71,12 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm(t('admin.announcements.confirmDelete'))) return;
+    if (!(await confirm(t('admin.announcements.confirmDelete'), { danger: true }))) return;
     try {
       await deleteAnnouncement(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

@@ -7,6 +7,7 @@ import { listMentors } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
 import { formatNumber } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
@@ -186,6 +187,8 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
 
 export default function AdminCoursesPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [courses, setCourses] = useState<Course[]>([]);
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [status, setStatus]   = useState<'loading' | 'ready' | 'error'>('loading');
@@ -211,12 +214,12 @@ export default function AdminCoursesPage(): React.ReactElement {
   };
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm(t('admin.courses.confirmDelete'))) return;
+    if (!(await confirm(t('admin.courses.confirmDelete'), { danger: true }))) return;
     try {
       await deleteCourse(id);
       load();
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     }
   };
 

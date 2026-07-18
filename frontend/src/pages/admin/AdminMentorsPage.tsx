@@ -6,6 +6,7 @@ import { listUsers, AdminUser } from '../../api/users';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 interface MentorFormState {
@@ -140,6 +141,8 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
 
 export default function AdminMentorsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [users, setUsers]     = useState<AdminUser[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
@@ -161,12 +164,12 @@ export default function AdminMentorsPage(): React.ReactElement {
   });
 
   const remove = async (id: string | number): Promise<void> => {
-    if (!window.confirm(t('admin.mentors.confirmDelete'))) return;
+    if (!(await confirm(t('admin.mentors.confirmDelete'), { danger: true }))) return;
     try {
       await deleteMentor(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

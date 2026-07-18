@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, AlertCircle, Star, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listTestimonialsAdmin, createTestimonial, updateTestimonial, deleteTestimonial } from '../../api/testimonials';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
@@ -120,6 +121,8 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
 
 export default function AdminTestimonialsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [items, setItems]     = useState<Testimonial[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
   const [editing, setEditing] = useState<TestimonialFormState | null>(null);
@@ -136,12 +139,12 @@ export default function AdminTestimonialsPage(): React.ReactElement {
   });
 
   const remove = async (id: string): Promise<void> => {
-    if (!window.confirm(t('admin.testimonials.confirmDelete'))) return;
+    if (!(await confirm(t('admin.testimonials.confirmDelete'), { danger: true }))) return;
     try {
       await deleteTestimonial(id);
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 
@@ -150,7 +153,7 @@ export default function AdminTestimonialsPage(): React.ReactElement {
       await updateTestimonial(item.id, { published: !item.published });
       load();
     } catch (err: any) {
-      alert(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     }
   };
 

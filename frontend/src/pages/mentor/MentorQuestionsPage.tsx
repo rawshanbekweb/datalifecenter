@@ -5,10 +5,12 @@ import { LessonQuestion, answerQuestion, getMentorQuestions } from '../../api/qu
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
+import { useToast } from '../../components/common/Feedback';
 
 // Mentor kurslaridagi o'quvchi savollari — javob berish shu yerdan
 export default function MentorQuestionsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const [questions, setQuestions] = useState<LessonQuestion[]>([]);
   const [status, setStatus]       = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg]   = useState<string>('');
@@ -36,7 +38,7 @@ export default function MentorQuestionsPage(): React.ReactElement {
       setQuestions((prev) => prev.map((q) => q.id === id ? { ...q, answer: updated.answer, answeredAt: updated.answeredAt } : q));
       setDrafts((prev) => ({ ...prev, [id]: '' }));
     } catch (err: unknown) {
-      alert((err as Error).message || t('mentor.questions.sendError'));
+      toast.error((err as Error).message || t('mentor.questions.sendError'));
     } finally {
       setSendingId(null);
     }

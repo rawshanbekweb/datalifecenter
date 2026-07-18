@@ -13,6 +13,7 @@ import { getMentorDashboard, getMentorStudents } from '../../api/mentors';
 import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
+import { useToast, useConfirm } from '../../components/common/Feedback';
 
 interface CourseOption { id: string; title: string }
 interface StudentOption { id: string; name: string; email: string; courseId: string }
@@ -37,6 +38,7 @@ const SUB_STATUS_META = {
 // Bitta javobni tekshirish bloki — baho + izoh + qabul/qaytarish
 function SubmissionRow({ submission, onReviewed }: { submission: AssignmentSubmission; onReviewed: (s: AssignmentSubmission) => void }): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
   const [grade, setGrade] = useState<string>(submission.grade != null ? String(submission.grade) : '');
   const [feedback, setFeedback] = useState<string>(submission.feedback ?? '');
   const [busy, setBusy] = useState<boolean>(false);
@@ -52,7 +54,7 @@ function SubmissionRow({ submission, onReviewed }: { submission: AssignmentSubmi
       });
       onReviewed(updated);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusy(false);
     }
@@ -116,6 +118,8 @@ function SubmissionRow({ submission, onReviewed }: { submission: AssignmentSubmi
 // Mentor: topshiriq berish va o'quvchi javoblarini tekshirish
 export default function MentorAssignmentsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [students, setStudents] = useState<StudentOption[]>([]);
   const [assignments, setAssignments] = useState<ManagedAssignment[]>([]);
@@ -161,20 +165,20 @@ export default function MentorAssignmentsPage(): React.ReactElement {
       setForm(EMPTY_FORM);
       setFormOpen(false);
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setSaving(false);
     }
   };
 
   const remove = async (a: ManagedAssignment): Promise<void> => {
-    if (!window.confirm(t('mentor.assignments.confirmDelete', { title: a.title }))) return;
+    if (!(await confirm(t('mentor.assignments.confirmDelete', { title: a.title }), { danger: true }))) return;
     setBusyId(a.id);
     try {
       await deleteAssignment(a.id);
       setAssignments((prev) => prev.filter((x) => x.id !== a.id));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }

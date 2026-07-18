@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listEnrollmentsAdmin, updateEnrollmentAdmin } from '../../api/enrollments';
 import { formatDate, formatNumber } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 
 interface AdminEnrollment {
@@ -44,6 +45,8 @@ const STATUS_FILTERS: { value: string; labelKey: string }[] = [
 
 export default function AdminEnrollmentsPage(): React.ReactElement {
   const { t } = useTranslation();
+  const toast = useToast();
+  const promptText = usePrompt();
   const [items, setItems]           = useState<AdminEnrollment[]>([]);
   const [status, setStatus]         = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter]         = useState<string>('');
@@ -67,14 +70,14 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
       const updated = await updateEnrollmentAdmin(id, data);
       setItems((prev) => prev.map((e) => (e.id === id ? updated : e)));
     } catch (err: unknown) {
-      alert((err as Error).message || t('common.error'));
+      toast.error((err as Error).message || t('common.error'));
     } finally {
       setBusyId('');
     }
   };
 
-  const reject = (id: string): void => {
-    const reason = window.prompt(t('admin.rejectPrompt'));
+  const reject = async (id: string): Promise<void> => {
+    const reason = await promptText(t('admin.rejectPrompt'), { multiline: true });
     if (!reason || !reason.trim()) return;
     act(id, { paymentStatus: 'REJECTED', rejectionReason: reason.trim() });
   };
