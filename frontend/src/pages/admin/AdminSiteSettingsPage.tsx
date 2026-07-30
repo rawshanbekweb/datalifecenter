@@ -9,7 +9,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { useConfirm, useToast } from '../../components/common/Feedback';
 import { useLocale } from '../../hooks/useLocale';
-import { ENABLED_LOCALES } from '../../i18n/config';
+import { DEFAULT_LOCALE, ENABLED_LOCALES, SUPPORTED_LOCALES } from '../../i18n/config';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 
 type SectionKey = 'hero' | 'about' | 'services' | 'why_us' | 'contact';
@@ -70,6 +70,43 @@ function move<T>(list: T[], from: number, to: number): T[] {
 /** Tarjimasi bo'sh (uz maydoni to'ldirilmagan) matnlar soni. */
 function countEmptyBase(values: (LocalizedString | undefined)[]): number {
   return values.filter((v) => !(v?.uz ?? '').trim()).length;
+}
+
+// Kalitlari faqat til kodlaridan iborat obyekt — LocalizedString shu bilan
+// aniqlanadi. Bu shakllarda hech qaysi boshqa maydon 'uz'/'ru'/'kaa'/'en'
+// deb nomlanmagani uchun chalkashlik bo'lmaydi.
+function isLocalizedString(value: object): boolean {
+  const keys = Object.keys(value);
+  return keys.length > 0 && keys.every((k) => (SUPPORTED_LOCALES as readonly string[]).includes(k));
+}
+
+/**
+ * Ko'p tilli maydonlardan bo'sh tarjimalarni olib tashlaydi:
+ * `{uz:'Kurslar', ru:'', en:'Courses'}` → `{uz:'Kurslar', en:'Courses'}`.
+ * Maqsad — bazada "tarjima bor, lekin bo'sh" degan yolg'on yozuv qolmasligi.
+ * `uz` har doim saqlanadi: LocalizedString shakli uni talab qiladi va ochiq
+ * API tarjima yo'q bo'lganda o'sha maydonga qaytadi.
+ * Faqat serverga yuboriladigan nusxaga qo'llanadi — forma holati tegilmaydi,
+ * chunki UI uchun `{ru:''}` va `ru` kalitining yo'qligi bir xil ma'noni beradi.
+ */
+function stripEmptyLocales<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((item) => stripEmptyLocales(item)) as unknown as T;
+  if (value === null || typeof value !== 'object') return value;
+
+  if (isLocalizedString(value)) {
+    const src = value as Record<string, string | undefined>;
+    const out: Record<string, string> = { [DEFAULT_LOCALE]: src[DEFAULT_LOCALE] ?? '' };
+    for (const loc of SUPPORTED_LOCALES) {
+      if (loc === DEFAULT_LOCALE) continue;
+      const text = src[loc];
+      if (text?.trim()) out[loc] = text;
+    }
+    return out as unknown as T;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([k, v]) => [k, stripEmptyLocales(v)]),
+  ) as T;
 }
 
 // ── Umumiy kichik bloklar ────────────────────────────────────────────────────
@@ -456,9 +493,12 @@ function ContactForm({ data, onChange }: { data: ContactData; onChange: (d: Cont
               <LocalizedField label={t('admin.siteSettings.day')} value={h.day} onChange={(next) => updateHour(i, { day: next })} />
             </div>
             <Field label={t('admin.siteSettings.time')}>
-              <input className="inp" value={h.time} disabled={h.closed} placeholder="09:00 — 18:00"
+              {/* "Yopiq" bo'lsa ham tahrirlanadigan qoladi — backend `time`ni
+                  bo'sh qoldirishga ruxsat bermaydi (min(1)), disable qilinsa
+                  yangi yopiq kunni saqlab bo'lmasdi. */}
+              <input className="inp" value={h.time} placeholder="09:00 — 18:00"
                 onChange={(e) => updateHour(i, { time: e.target.value })}
-                style={{ opacity: h.closed ? 0.5 : 1 }} />
+                style={{ opacity: h.closed ? 0.6 : 1 }} />
             </Field>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#334155', paddingBottom: 11, cursor: 'pointer', flexShrink: 0 }}>
               <input type="checkbox" checked={h.closed} onChange={(e) => updateHour(i, { closed: e.target.checked })} />
@@ -554,7 +594,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
     const failed: SectionKey[] = [];
     for (const key of dirty) {
       try {
-        await updateSiteSettingSection(key, sections[key]);
+        await updateSiteSettingSection(key, stripEmptyLocales(sections[key]));
       } catch (err: unknown) {
         failed.push(key);
         toast.error(`${t(`admin.siteSettings.tabs.${key}`)}: ${err instanceof Error ? err.message : t('common.error')}`);
