@@ -12,7 +12,7 @@ export default function Loader(): React.ReactElement {
         <m.div style={{ height:'100%', background:'#0ea5e9', borderRadius:3 }}
           initial={{ width:0 }} animate={{ width:'100%' }} transition={{ duration:1.4, ease:'easeOut' }}/>
       </div>
-      <p style={{ fontSize:11, fontFamily:'JetBrains Mono,monospace', color:'#94a3b8', letterSpacing:'0.12em' }}>
+      <p style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'#94a3b8', letterSpacing:'0.12em' }}>
         INITIALIZING DATA LIFE...
       </p>
     </m.div>

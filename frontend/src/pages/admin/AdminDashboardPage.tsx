@@ -68,7 +68,7 @@ export default function AdminDashboardPage(): React.ReactElement {
                 </div>
                 <ArrowRight size={15} style={{ color:card.color }} />
               </div>
-              <p style={{ fontFamily:'Outfit,sans-serif', fontSize:28, fontWeight:800, color:'#0f172a', lineHeight:1 }}>{card.value}</p>
+              <p style={{ fontFamily:'var(--font-sans)', fontSize:28, fontWeight:800, color:'#0f172a', lineHeight:1 }}>{card.value}</p>
               <p style={{ fontSize:13, fontWeight:700, color:'#334155', margin:'6px 0 2px' }}>{card.label}</p>
               <p style={{ fontSize:11.5, color:'#64748b' }}>{card.sub}</p>
             </Link>

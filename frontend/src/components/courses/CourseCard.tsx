@@ -69,7 +69,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
           <p style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>{t('cards.course.modules')}</p>
           {course.modules.map((m: CourseModule, mi: number) => (
             <p key={m.id} style={{ fontSize:12, color:'#334155', marginBottom:4 }}>
-              <span style={{ color:course.color, fontFamily:'JetBrains Mono,monospace', fontSize:11, marginRight:6 }}>0{mi+1}</span>{m.title}
+              <span style={{ color:course.color, fontFamily:'var(--font-mono)', fontSize:11, marginRight:6 }}>0{mi+1}</span>{m.title}
             </p>
           ))}
         </m.div>

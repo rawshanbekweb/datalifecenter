@@ -799,7 +799,9 @@
       "audMentors": "Mentorlarǵa"
     },
     "localizedField": {
-      "untranslated": "Awdarılmaǵan — saytta ózbekshe kórinedi."
+      "untranslated": "Awdarılmaǵan — saytta ózbekshe kórinedi.",
+      "empty": "awdarma joq",
+      "copyFromBase": "Ózbekshesinen kóshiriw"
     },
     "receipt": {
       "title": "Tólem cheki",
@@ -991,7 +993,6 @@
     "siteSettings": {
       "title": "Sayt sazlawları",
       "sub": "Bas bettegi statistika, kartalar hám baylanıs maǵlıwmatların basqarıw",
-      "saved": "Saqlandı",
       "tabs": {
         "hero": "Bas bet statistikası",
         "about": "Biz haqqımızda",
@@ -1032,7 +1033,19 @@
       "day": "Kún",
       "time": "Waqıt",
       "closed": "Jabıq",
-      "addDay": "Kún qosıw"
+      "addDay": "Kún qosıw",
+      "preview": "Saytta kóriw",
+      "localeHint": "Hár bir tekst maydanında til tabları bar (UZ / RU / KAA / EN). Sarı noqat — sol tilde awdarma joq, saytta onıń ornına ózbekshe tekst kórinedi.",
+      "unsaved": "Saqlanbaǵan ózgerisler",
+      "dirtyCount": "Saqlanbaǵan bólimler: {{n}}",
+      "allSaved": "Barlıq ózgerisler saqlandı",
+      "savedCount": "Saqlandı — ózgergen bólimler: {{n}}",
+      "reset": "Ózgerislerdi qaytarıw",
+      "resetConfirm": "Barlıq saqlanbaǵan ózgerisler biykar etiledi hám aqırǵı saqlanǵan halat qaytarıladı. Dawam etesiz be?",
+      "missingWarn": "{{n}} tekstiniń ózbekshe (tiykarǵı) variantı bos — saytta ol jerler bos kórinedi. Sonda da saqlansın ba?",
+      "moveUp": "Joqarıǵa jıljıtıw",
+      "moveDown": "Tómenge jıljıtıw",
+      "emptyList": "Házirshe element joq — tómendegi tuyme arqalı qosıń."
     },
     "curriculum": {
       "loadFailed": "Kurstı júklep bolmadı.",

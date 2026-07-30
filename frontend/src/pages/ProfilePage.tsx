@@ -91,7 +91,7 @@ export default function ProfilePage(): React.ReactElement {
     <div>
       <div style={{ maxWidth:640 }}>
         <m.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} style={{ marginBottom:24 }}>
-          <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:4 }}>
+          <h1 style={{ fontFamily:'var(--font-sans)', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:4 }}>
             {t('student.profile.titleStart')} <span className="accent">{t('student.profile.titleAccent')}</span>
           </h1>
           <p style={{ fontSize:13.5, color:'#64748b' }}>{t('student.profile.subtitle')}</p>

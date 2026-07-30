@@ -76,7 +76,7 @@ export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement
             <div style={{ display:'flex', justifyContent:'center', gap:12, flexWrap:'wrap' }}>
               <a href="#contact"><button className="btn-primary">{t('home.whyUs.ctaButton')}</button></a>
               <a href="#courses" style={{ textDecoration:'none' }}>
-                <button style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'12px 28px', borderRadius:50, background:'rgba(255,255,255,0.1)', color:'#fff', border:'1.5px solid rgba(255,255,255,0.2)', fontWeight:700, fontSize:15, cursor:'pointer', transition:'all 0.25s', fontFamily:'Outfit,sans-serif' }}
+                <button style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'12px 28px', borderRadius:50, background:'rgba(255,255,255,0.1)', color:'#fff', border:'1.5px solid rgba(255,255,255,0.2)', fontWeight:700, fontSize:15, cursor:'pointer', transition:'all 0.25s', fontFamily:'var(--font-sans)' }}
                   onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.18)'}}
                   onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) =>{e.currentTarget.style.background='rgba(255,255,255,0.1)'}}>
                   {t('home.whyUs.ctaCourses')}

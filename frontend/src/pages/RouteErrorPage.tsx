@@ -10,7 +10,7 @@ export default function RouteErrorPage(): React.ReactElement {
     <section style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'80px 24px' }}>
       <div style={{ textAlign:'center', maxWidth:520 }}>
         <div style={{ fontSize:36, marginBottom:16 }}>⚠️</div>
-        <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(28px,4vw,38px)', fontWeight:800, color:'#0f172a', marginBottom:10 }}>
+        <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(28px,4vw,38px)', fontWeight:800, color:'#0f172a', marginBottom:10 }}>
           Kutilmagan xatolik yuz berdi
         </h1>
         <p style={{ color:'#64748b', fontSize:15, lineHeight:1.75, marginBottom:12 }}>

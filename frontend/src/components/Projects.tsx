@@ -43,7 +43,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
             <span key={c} style={{ width: 8, height: 8, borderRadius: '50%', background: c, display: 'inline-block', flexShrink: 0 }} />
           ))}
           {host && (
-            <span style={{ marginLeft: 8, fontSize: 10.5, color: '#94a3b8', fontFamily: 'JetBrains Mono,monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ marginLeft: 8, fontSize: 10.5, color: '#94a3b8', fontFamily:'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {host}
             </span>
           )}
@@ -92,7 +92,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
                 )
               )}
               {isLive && (
-                <span style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 20, background: 'rgba(22,163,74,0.92)', color: '#fff', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', fontFamily: 'JetBrains Mono,monospace', pointerEvents: 'none' }}>
+                <span style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 9px', borderRadius: 20, background: 'rgba(22,163,74,0.92)', color: '#fff', fontSize: 9.5, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', fontFamily:'var(--font-mono)', pointerEvents: 'none' }}>
                   <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff', display: 'inline-block' }} /> Live
                 </span>
               )}
@@ -108,7 +108,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
         <p style={{ fontSize: 12.5, color: '#64748b', lineHeight: 1.7, marginBottom: 14, flex: 1 }}>{p.description}</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: p.repoUrl || p.liveUrl ? 14 : 0 }}>
           {p.techStack.map((t: string) => (
-            <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 12, background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0', fontFamily: 'JetBrains Mono,monospace' }}>{t}</span>
+            <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 12, background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0', fontFamily:'var(--font-mono)' }}>{t}</span>
           ))}
         </div>
         {(p.liveUrl || p.repoUrl) && (

@@ -345,7 +345,7 @@ export default function DashboardPage(): React.ReactElement {
         <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 240 }}>
-              <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+              <h1 style={{ fontFamily:'var(--font-sans)', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
                 {t('student.dashboard.welcome')} <span className="accent">{user?.name?.split(' ')[0]}</span>
               </h1>
               <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.dashboard.subtitle')}</p>
@@ -382,7 +382,7 @@ export default function DashboardPage(): React.ReactElement {
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: `1.5px solid ${card.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
                       <Icon size={16} style={{ color: card.color }} />
                     </div>
-                    <p style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{card.value}</p>
+                    <p style={{ fontFamily:'var(--font-sans)', fontSize: 24, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{card.value}</p>
                     <p style={{ fontSize: 12.5, fontWeight: 700, color: '#475569', marginTop: 5 }}>{card.label}</p>
                   </div>
                 );

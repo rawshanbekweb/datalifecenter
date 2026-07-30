@@ -75,7 +75,7 @@ export default function Navbar(): React.ReactElement {
           {/* Logo */}
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', boxShadow: '0 4px 12px rgba(14,165,233,0.3)' }} />
-            <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: 0.5, fontFamily: 'Outfit,sans-serif' }}>
+            <span style={{ fontWeight: 800, fontSize: 19, color: '#0f172a', letterSpacing: 0.5, fontFamily:'var(--font-sans)' }}>
               DATA <span style={{ color: '#0ea5e9' }}>LIFE</span>
             </span>
           </Link>

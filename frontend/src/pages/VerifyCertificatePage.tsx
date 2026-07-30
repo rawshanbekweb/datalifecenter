@@ -55,7 +55,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
 
           <form onSubmit={submit} style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
             <input className="inp" value={no} onChange={(e) => { setNo(e.target.value); setStatus('idle'); }}
-              placeholder="DL-XXXXXXXX" required style={{ flex: 1, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase' }} />
+              placeholder="DL-XXXXXXXX" required style={{ flex: 1, fontFamily:'var(--font-mono)', textTransform: 'uppercase' }} />
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, flexShrink: 0 }}>
               {status === 'loading' ? <Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> : t('pages.certificate.check')}

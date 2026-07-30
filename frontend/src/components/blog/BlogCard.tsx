@@ -52,7 +52,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
             <Icon size={22} style={{ color:post.color }} />
           </div>
           <div style={{ position:'absolute', top:10, left:12 }}>
-            <span style={{ fontSize:10, padding:'3px 10px', borderRadius:20, background:post.bg, color:post.color, border:`1px solid ${post.border}`, fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>{post.category}</span>
+            <span style={{ fontSize:10, padding:'3px 10px', borderRadius:20, background:post.bg, color:post.color, border:`1px solid ${post.border}`, fontFamily:'var(--font-mono)', fontWeight:700 }}>{post.category}</span>
           </div>
           <div style={{ position:'absolute', top:12, right:12, fontSize:11, color:'#94a3b8' }}>{t('cards.blog.views', { n: formatViews(post.views) })}</div>
         </div>
@@ -67,7 +67,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
             overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{post.excerpt}</p>
 
           <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:12 }}>
-            {post.tags.map((tag: string) => <span key={tag} style={{ fontSize:10, padding:'2px 8px', borderRadius:12, background:'#fff', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'JetBrains Mono,monospace' }}>#{tag}</span>)}
+            {post.tags.map((tag: string) => <span key={tag} style={{ fontSize:10, padding:'2px 8px', borderRadius:12, background:'#fff', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'var(--font-mono)' }}>#{tag}</span>)}
           </div>
 
           <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:post.color }}>

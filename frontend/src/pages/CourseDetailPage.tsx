@@ -157,7 +157,7 @@ export default function CourseDetailPage(): React.ReactElement {
               <Icon size={26} style={{ color:course.color }} />
             </div>
             <div style={{ flex:1, minWidth:240 }}>
-              <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(24px,3vw,32px)', fontWeight:800, color:'#0f172a', marginBottom:4 }}>{course.title}</h1>
+              <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(24px,3vw,32px)', fontWeight:800, color:'#0f172a', marginBottom:4 }}>{course.title}</h1>
               <p style={{ fontSize:14, color:course.color, fontWeight:700, marginBottom:12 }}>{course.subtitle}</p>
               <p style={{ color:'#64748b', fontSize:14, lineHeight:1.8 }}>{course.description}</p>
             </div>
@@ -184,7 +184,7 @@ export default function CourseDetailPage(): React.ReactElement {
             {course.modules.map((mod, mi) => (
               <div key={mod.id} className="card" style={{ padding:'18px 20px', marginBottom:12 }}>
                 <p style={{ fontSize:13, fontWeight:700, color:'#0f172a', marginBottom:10 }}>
-                  <span style={{ color:course.color, fontFamily:'JetBrains Mono,monospace', marginRight:8 }}>0{mi+1}</span>{mod.title}
+                  <span style={{ color:course.color, fontFamily:'var(--font-mono)', marginRight:8 }}>0{mi+1}</span>{mod.title}
                 </p>
                 {mod.lessons.map((lesson) => (
                   <div key={lesson.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', fontSize:13, color:'#64748b' }}>

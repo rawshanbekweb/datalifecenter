@@ -68,10 +68,10 @@ export default function BlogDetailPage(): React.ReactElement {
             <div style={{ width:52, height:52, borderRadius:15, display:'flex', alignItems:'center', justifyContent:'center', background:post!.bg, border:`1.5px solid ${post!.border}`, flexShrink:0 }}>
               <Icon size={24} style={{ color:post!.color }} />
             </div>
-            <span style={{ fontSize:11, padding:'4px 12px', borderRadius:20, background:post!.bg, color:post!.color, border:`1px solid ${post!.border}`, fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>{post!.category}</span>
+            <span style={{ fontSize:11, padding:'4px 12px', borderRadius:20, background:post!.bg, color:post!.color, border:`1px solid ${post!.border}`, fontFamily:'var(--font-mono)', fontWeight:700 }}>{post!.category}</span>
           </div>
 
-          <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(26px,4vw,38px)', fontWeight:800, color:'#0f172a', lineHeight:1.25, marginBottom:16 }}>{post!.title}</h1>
+          <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(26px,4vw,38px)', fontWeight:800, color:'#0f172a', lineHeight:1.25, marginBottom:16 }}>{post!.title}</h1>
 
           <div style={{ display:'flex', gap:20, flexWrap:'wrap', fontSize:13, color:'#94a3b8', marginBottom:28, paddingBottom:24, borderBottom:'1px solid #f1f5f9' }}>
             <span style={{ display:'flex', alignItems:'center', gap:5 }}><Clock size={13}/> {t('pages.blogDetail.readMinutes', { n: post!.readMinutes })}</span>
@@ -87,7 +87,7 @@ export default function BlogDetailPage(): React.ReactElement {
 
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:28, paddingTop:24, borderTop:'1px solid #f1f5f9' }}>
             {post!.tags.map((tag: string) => (
-              <span key={tag} style={{ fontSize:11, padding:'4px 10px', borderRadius:12, background:'#f8fafc', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'JetBrains Mono,monospace' }}>#{tag}</span>
+              <span key={tag} style={{ fontSize:11, padding:'4px 10px', borderRadius:12, background:'#f8fafc', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'var(--font-mono)' }}>#{tag}</span>
             ))}
           </div>
         </m.div>

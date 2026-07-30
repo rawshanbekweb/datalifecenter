@@ -248,7 +248,7 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
               <GripVertical size={15} style={{ color:'#cbd5e1', flexShrink:0 }} />
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>
-                  <span style={{ color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace', marginRight:8 }}>{String(mi + 1).padStart(2, '0')}</span>
+                  <span style={{ color:'#0ea5e9', fontFamily:'var(--font-mono)', marginRight:8 }}>{String(mi + 1).padStart(2, '0')}</span>
                   {mod.title.uz}
                 </p>
                 {mod.description?.uz && <p style={{ fontSize:12, color:'#94a3b8' }}>{mod.description.uz}</p>}

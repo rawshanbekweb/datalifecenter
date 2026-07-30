@@ -101,14 +101,14 @@ function Terminal(): React.ReactElement {
     <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 16, padding: '18px 20px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
         {(['#f87171','#fbbf24','#34d399'] as string[]).map((c: string) => <span key={c} style={{ width:10, height:10, borderRadius:'50%', background:c, display:'inline-block' }} />)}
-        <span style={{ marginLeft: 10, fontSize: 11, color: '#94a3b8', fontFamily: 'JetBrains Mono,monospace' }}>datalife — terminal</span>
+        <span style={{ marginLeft: 10, fontSize: 11, color: '#94a3b8', fontFamily:'var(--font-mono)' }}>datalife — terminal</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         {shown.map((l: TerminalLine, i: number) => (
           <m.p key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-            style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 12, color: l.c, lineHeight: 1.6 }}>{l.t}</m.p>
+            style={{ fontFamily:'var(--font-mono)', fontSize: 12, color: l.c, lineHeight: 1.6 }}>{l.t}</m.p>
         ))}
-        {idx < LINES.length && <span style={{ fontFamily: 'JetBrains Mono,monospace', fontSize: 12, color: '#0ea5e9', animation: 'blink 1s infinite' }}>█</span>}
+        {idx < LINES.length && <span style={{ fontFamily:'var(--font-mono)', fontSize: 12, color: '#0ea5e9', animation: 'blink 1s infinite' }}>█</span>}
       </div>
     </div>
   );
@@ -147,7 +147,7 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
             </m.div>
 
             <m.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.12, duration:0.6 }}
-              style={{ fontFamily:'Outfit,sans-serif', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:12,
+              style={{ fontFamily:'var(--font-sans)', fontWeight:900, lineHeight:1.05, letterSpacing:'-0.03em', marginBottom:12,
                 fontSize:'clamp(44px,7vw,76px)', color:'#0f172a' }}>
               DATA <br /><span style={{ color:'#0ea5e9' }}>LIFE</span>
             </m.h1>

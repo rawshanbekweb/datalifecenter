@@ -207,7 +207,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
               {hours.map((h: HoursItem) => (
                 <div key={h.day} style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
                   <span style={{ fontSize:13, color:'#64748b' }}>{h.day}</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:h.closed?'#cbd5e1':'#0ea5e9', fontFamily:'JetBrains Mono,monospace' }}>{h.time}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:h.closed?'#cbd5e1':'#0ea5e9', fontFamily:'var(--font-mono)' }}>{h.time}</span>
                 </div>
               ))}
             </div>

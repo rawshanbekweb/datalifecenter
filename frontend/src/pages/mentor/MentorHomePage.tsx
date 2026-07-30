@@ -88,7 +88,7 @@ export default function MentorHomePage(): React.ReactElement {
                   <div style={{ width:36, height:36, borderRadius:10, background:'#fff', border:`1.5px solid ${card.border}`, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
                     <Icon size={16} style={{ color:card.color }} />
                   </div>
-                  <p style={{ fontFamily:'Outfit,sans-serif', fontSize:26, fontWeight:800, color:'#0f172a', lineHeight:1 }}>{card.value}</p>
+                  <p style={{ fontFamily:'var(--font-sans)', fontSize:26, fontWeight:800, color:'#0f172a', lineHeight:1 }}>{card.value}</p>
                   <p style={{ fontSize:12.5, fontWeight:700, color:'#475569', marginTop:5 }}>{card.label}</p>
                 </div>
               );

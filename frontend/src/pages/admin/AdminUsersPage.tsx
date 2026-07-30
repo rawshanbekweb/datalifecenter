@@ -96,7 +96,7 @@ export default function AdminUsersPage(): React.ReactElement {
             <p style={{ fontSize:13, fontWeight:800, color:'#166534' }}>{t('admin.users.resetCreated', { name: resetInfo.name })}</p>
             <p style={{ fontSize:12, color:'#15803d' }}>{t('admin.users.resetHint', { email: resetInfo.email })}</p>
           </div>
-          <code style={{ fontFamily:'JetBrains Mono,monospace', fontSize:15, fontWeight:700, color:'#0f172a', background:'#fff', border:'1.5px solid #bbf7d0', borderRadius:8, padding:'8px 14px' }}>
+          <code style={{ fontFamily:'var(--font-mono)', fontSize:15, fontWeight:700, color:'#0f172a', background:'#fff', border:'1.5px solid #bbf7d0', borderRadius:8, padding:'8px 14px' }}>
             {resetInfo.password}
           </code>
           <button onClick={() => navigator.clipboard.writeText(resetInfo.password)} className="btn-outline" style={{ fontSize:12, padding:'8px 12px' }}>

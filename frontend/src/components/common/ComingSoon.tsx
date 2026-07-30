@@ -17,7 +17,7 @@ export default function ComingSoon({ title, sub }: ComingSoonProps): React.React
         <div className="icon-box" style={{ margin:'0 auto 20px' }}>
           <Construction size={20} style={{ color:'#0ea5e9' }} />
         </div>
-        <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(28px,4vw,38px)', fontWeight:800, color:'#0f172a', marginBottom:10 }}>
+        <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(28px,4vw,38px)', fontWeight:800, color:'#0f172a', marginBottom:10 }}>
           {title}
         </h1>
         <p style={{ color:'#64748b', fontSize:15, lineHeight:1.75, marginBottom:28 }}>{sub}</p>

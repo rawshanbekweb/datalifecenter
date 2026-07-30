@@ -108,7 +108,7 @@ export default function LearnPage(): React.ReactElement {
   if (status === 'forbidden') {
     return (
       <section style={{ padding:'200px 24px 120px', textAlign:'center' }}>
-        <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:10 }}>{t('student.learn.forbiddenTitle')}</h1>
+        <h1 style={{ fontFamily:'var(--font-sans)', fontSize:24, fontWeight:800, color:'#0f172a', marginBottom:10 }}>{t('student.learn.forbiddenTitle')}</h1>
         <p style={{ fontSize:14, color:'#64748b', marginBottom:24 }}>{errorMsg || t('student.learn.forbiddenSub')}</p>
         <Link to={`/courses/${slug}`}>
           <button className="btn-primary">{t('student.learn.toCourse')}</button>
@@ -153,7 +153,7 @@ export default function LearnPage(): React.ReactElement {
           <Link to="/student" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none' }}>
             <ArrowLeft size={14}/> {t('cabinet.cabinet')}
           </Link>
-          <h1 style={{ fontFamily:'Outfit,sans-serif', fontSize:'clamp(18px,2.4vw,24px)', fontWeight:800, color:'#0f172a', flex:1, minWidth:200 }}>
+          <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(18px,2.4vw,24px)', fontWeight:800, color:'#0f172a', flex:1, minWidth:200 }}>
             {course.title}
           </h1>
           {course.mentor && <span className="tag" style={{ borderColor:course.border, color:course.color, fontWeight:700 }}>{t('pages.courseDetail.mentor')}: {course.mentor.name}</span>}
@@ -193,7 +193,7 @@ export default function LearnPage(): React.ReactElement {
                       style={{ display:'flex', alignItems:'center', gap:8, width:'100%', padding:'10px 10px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
                       {open ? <ChevronDown size={14} style={{ color:'#94a3b8', flexShrink:0 }}/> : <ChevronRight size={14} style={{ color:'#94a3b8', flexShrink:0 }}/>}
                       <span style={{ fontSize:13, fontWeight:800, color:'#0f172a', flex:1 }}>
-                        <span style={{ color:course.color, fontFamily:'JetBrains Mono,monospace', marginRight:6 }}>{String(mi + 1).padStart(2, '0')}</span>
+                        <span style={{ color:course.color, fontFamily:'var(--font-mono)', marginRight:6 }}>{String(mi + 1).padStart(2, '0')}</span>
                         {mod.title}
                       </span>
                       <span style={{ fontSize:11, color:'#94a3b8', flexShrink:0 }}>{mod.lessons.length}</span>
@@ -227,7 +227,7 @@ export default function LearnPage(): React.ReactElement {
               {!activeLesson && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('student.learn.selectLesson')}</p>}
               {activeLesson && (
                 <div>
-                  <h2 style={{ fontFamily:'Outfit,sans-serif', fontSize:20, fontWeight:800, color:'#0f172a', marginBottom:6 }}>{activeLesson.title}</h2>
+                  <h2 style={{ fontFamily:'var(--font-sans)', fontSize:20, fontWeight:800, color:'#0f172a', marginBottom:6 }}>{activeLesson.title}</h2>
                   <p style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#94a3b8', marginBottom:18 }}>
                     <Clock size={12}/> {activeLesson.durationMinutes ? t('pages.blogDetail.readMinutes', { n: activeLesson.durationMinutes }) : t('student.learn.noDuration')}
                   </p>

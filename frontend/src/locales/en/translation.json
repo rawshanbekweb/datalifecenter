@@ -799,7 +799,9 @@
       "audMentors": "Mentors"
     },
     "localizedField": {
-      "untranslated": "Not translated — shown in Uzbek on the site."
+      "untranslated": "Not translated — shown in Uzbek on the site.",
+      "empty": "no translation",
+      "copyFromBase": "Copy from Uzbek"
     },
     "receipt": {
       "title": "Payment receipt",
@@ -991,7 +993,6 @@
     "siteSettings": {
       "title": "Site settings",
       "sub": "Manage the home page statistics, cards and contact details",
-      "saved": "Saved",
       "tabs": {
         "hero": "Home statistics",
         "about": "About us",
@@ -1032,7 +1033,19 @@
       "day": "Day",
       "time": "Time",
       "closed": "Closed",
-      "addDay": "Add day"
+      "addDay": "Add day",
+      "preview": "View on site",
+      "localeHint": "Every text field has language tabs (UZ / RU / KAA / EN). A yellow dot means that translation is missing and the Uzbek text will be shown on the site instead.",
+      "unsaved": "Unsaved changes",
+      "dirtyCount": "Unsaved sections: {{n}}",
+      "allSaved": "All changes saved",
+      "savedCount": "Saved — sections updated: {{n}}",
+      "reset": "Discard changes",
+      "resetConfirm": "All unsaved changes will be discarded and the last saved state restored. Continue?",
+      "missingWarn": "{{n}} texts have no Uzbek (base) value — those spots will appear empty on the site. Save anyway?",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "emptyList": "No items yet — add one with the button below."
     },
     "curriculum": {
       "loadFailed": "Failed to load the course.",

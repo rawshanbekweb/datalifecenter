@@ -91,7 +91,7 @@ export default function Footer(): React.ReactElement {
           ) : (
             <form onSubmit={(e) => { e.preventDefault(); void subscribe(); }} style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('footer.newsletter.placeholder')}
-                style={{ width:230, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:50, padding:'11px 18px', fontSize:13, color:'#fff', outline:'none', fontFamily:'Outfit,sans-serif' }} />
+                style={{ width:230, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:50, padding:'11px 18px', fontSize:13, color:'#fff', outline:'none', fontFamily:'var(--font-sans)' }} />
               <button type="submit" disabled={subState === 'sending'} className="btn-primary" style={{ padding:'11px 22px', whiteSpace:'nowrap', opacity: subState === 'sending' ? 0.7 : 1 }}>
                 {subState === 'sending' ? t('common.sending') : <>{t('footer.newsletter.button')} <ArrowRight size={14}/></>}
               </button>
@@ -153,7 +153,7 @@ export default function Footer(): React.ReactElement {
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
             <span style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e', display:'inline-block', animation:'pulse 2s infinite' }} />
-            <span style={{ fontSize:11, color:'rgba(255,255,255,0.25)', fontFamily:'JetBrains Mono,monospace' }}>{t('footer.systemsOperational')}</span>
+            <span style={{ fontSize:11, color:'rgba(255,255,255,0.25)', fontFamily:'var(--font-mono)' }}>{t('footer.systemsOperational')}</span>
           </div>
         </div>
       </div>

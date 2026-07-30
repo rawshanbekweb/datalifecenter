@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ENABLED_LOCALES, Locale } from '../../i18n/config';
+import { ENABLED_LOCALES, LOCALE_ENGLISH_LABELS, Locale, DEFAULT_LOCALE } from '../../i18n/config';
 import { LocalizedString } from '../../types/locale';
 
 interface LocalizedFieldProps {
@@ -27,8 +27,10 @@ export default function LocalizedField({
   rows = 3,
 }: LocalizedFieldProps): React.ReactElement {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<Locale>('uz');
+  const [tab, setTab] = useState<Locale>(DEFAULT_LOCALE);
   const current = value?.[tab] ?? '';
+  const base = value?.[DEFAULT_LOCALE] ?? '';
+  const showTabs = ENABLED_LOCALES.length > 1;
 
   const setTabValue = (v: string): void => {
     onChange({ ...value, [tab]: v });
@@ -36,40 +38,57 @@ export default function LocalizedField({
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-        <label style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
-          {label} {required && '*'}
-        </label>
-        {ENABLED_LOCALES.length > 1 && (
-          <div style={{ display: 'flex', gap: 4 }}>
-            {ENABLED_LOCALES.map((loc) => (
-              <button
-                key={loc}
-                type="button"
-                onClick={() => setTab(loc)}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  padding: '3px 8px',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  border: tab === loc ? '1.5px solid #0ea5e9' : '1px solid #e2e8f0',
-                  background: tab === loc ? '#f0f9ff' : '#fff',
-                  color: tab === loc ? '#0ea5e9' : '#64748b',
-                }}
-              >
-                {loc.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      {(label || showTabs) && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 5, minHeight: 20 }}>
+          <label style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>
+            {label}{label && required ? ' *' : ''}
+          </label>
+          {showTabs && (
+            <div style={{ display: 'flex', gap: 4 }}>
+              {ENABLED_LOCALES.map((loc) => {
+                const active = tab === loc;
+                // Bo'sh tarjimalar shu yerda darhol ko'rinadi — admin har bir
+                // tabni bosib chiqmasdan qaysi til qolganini biladi.
+                const missing = !(value?.[loc] ?? '').trim();
+                return (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => setTab(loc)}
+                    aria-pressed={active}
+                    title={`${LOCALE_ENGLISH_LABELS[loc]}${missing ? ` — ${t('admin.localizedField.empty')}` : ''}`}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                      padding: '3px 7px',
+                      borderRadius: 6,
+                      cursor: 'pointer',
+                      border: active ? '1.5px solid #0ea5e9' : '1px solid #e2e8f0',
+                      background: active ? '#f0f9ff' : '#fff',
+                      color: active ? '#0ea5e9' : '#64748b',
+                    }}
+                  >
+                    {loc.toUpperCase()}
+                    {missing && loc !== DEFAULT_LOCALE && (
+                      <span aria-hidden style={{ width: 5, height: 5, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
       {multiline ? (
         <textarea
           className="inp"
+          lang={tab === 'kaa' ? 'uz' : tab}
           value={current}
           onChange={(e) => setTabValue(e.target.value)}
-          required={required && tab === 'uz'}
+          required={required && tab === DEFAULT_LOCALE}
           rows={rows}
           style={{ resize: 'none' }}
           placeholder={placeholder}
@@ -77,16 +96,26 @@ export default function LocalizedField({
       ) : (
         <input
           className="inp"
+          lang={tab === 'kaa' ? 'uz' : tab}
           value={current}
           onChange={(e) => setTabValue(e.target.value)}
-          required={required && tab === 'uz'}
+          required={required && tab === DEFAULT_LOCALE}
           placeholder={placeholder}
         />
       )}
-      {tab !== 'uz' && !current && (
-        <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-          {t('admin.localizedField.untranslated')}
-        </p>
+      {tab !== DEFAULT_LOCALE && !current && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+          <p style={{ fontSize: 11, color: '#94a3b8' }}>{t('admin.localizedField.untranslated')}</p>
+          {base && (
+            <button
+              type="button"
+              onClick={() => setTabValue(base)}
+              style={{ fontSize: 11, fontWeight: 700, color: '#0ea5e9', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {t('admin.localizedField.copyFromBase')}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

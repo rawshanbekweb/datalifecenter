@@ -7,10 +7,21 @@ export const DEFAULT_LOCALE: Locale = 'uz';
 // massivni o'zgartirish orqali amalga oshadi.
 export const ENABLED_LOCALES: Locale[] = ['uz', 'ru', 'kaa', 'en'];
 
+// Har bir til o'z tilida (endonim) — til tanlagichda hech qachon tarjima
+// qilinmaydi, aks holda foydalanuvchi o'z tilini topa olmaydi.
 export const LOCALE_LABELS: Record<Locale, string> = {
   uz: "O'zbekcha",
   ru: 'Русский',
   kaa: 'Qaraqalpaqsha',
+  en: 'English',
+};
+
+// Faqat aria-label / title uchun — kirill yoki notanish yozuvdagi variantni
+// screen reader va tooltip'da tushunarli qiladi.
+export const LOCALE_ENGLISH_LABELS: Record<Locale, string> = {
+  uz: 'Uzbek',
+  ru: 'Russian',
+  kaa: 'Karakalpak',
   en: 'English',
 };
 

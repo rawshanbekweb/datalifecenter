@@ -124,7 +124,7 @@ export default function StudentAssignmentsPage(): React.ReactElement {
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+        <h1 style={{ fontFamily:'var(--font-sans)', fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
           {t('student.assignments.titleStart')} <span className="accent">{t('student.assignments.titleAccent')}</span>
         </h1>
         <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.assignments.subtitle')}</p>

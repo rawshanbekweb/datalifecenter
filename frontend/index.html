@@ -16,8 +16,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- API backend (Render) — TLS qo'l berishish sahifa yuklanishi bilan parallel boshlanadi -->
     <link rel="preconnect" href="https://datalife.onrender.com" crossorigin />
-    <!-- Faqat real ishlatiladigan shrift og'irliklari — har bir ortiqcha og'irlik alohida woff2 fayl -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!--
+      Variable (wght@a..b) so'rovi: har bir og'irlik uchun alohida woff2 o'rniga
+      subset boshiga bitta fayl tushadi.
+      Montserrat — Outfit'da kirill glifleri yo'qligi uchun qo'shilgan zaxira
+      shrift: brauzer har bir belgi uchun stackdan glif topa oladigan birinchi
+      shriftni tanlaydi, shuning uchun lotin matn baribir Outfit'da qoladi va
+      Montserrat'ning faqat kirill subset'i (ya'ni faqat ru sahifalarida) yuklanadi.
+    -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..900&family=Montserrat:wght@400..900&family=JetBrains+Mono:wght@400..600&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

@@ -113,7 +113,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                 <img src="/assets/logotype.png" alt="DATA LIFE" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
                 <div>
                   <p style={{ fontWeight:700, color:'#0f172a' }}>DATA LIFE</p>
-                  <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace' }}>IT Education Center</p>
+                  <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'var(--font-mono)' }}>IT Education Center</p>
                 </div>
               </div>
 
@@ -121,7 +121,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
                 <div key={s.label} style={{ marginBottom:16 }}>
                   <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
                     <span style={{ fontSize:13, color:'#334155', fontWeight:500 }}>{s.label}</span>
-                    <span style={{ fontSize:12, color:'#0ea5e9', fontFamily:'JetBrains Mono,monospace', fontWeight:700 }}>{s.pct}%</span>
+                    <span style={{ fontSize:12, color:'#0ea5e9', fontFamily:'var(--font-mono)', fontWeight:700 }}>{s.pct}%</span>
                   </div>
                   <div className="progress-track">
                     <m.div className="progress-fill"

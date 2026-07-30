@@ -1,14 +1,44 @@
 @import "tailwindcss";
 
+/* ── Shrift stacklari ──
+   Shrift oilasi hech qachon to'g'ridan-to'g'ri yozilmaydi — hamma joyda shu ikki
+   o'zgaruvchi ishlatiladi (inline style'larda ham: fontFamily:'var(--font-sans)').
+   `@theme` — Tailwind v4'ning o'z tokenlarini almashtirish yo'li: shu tufayli
+   `font-sans`/`font-mono` utilitalari ham aynan shu stackni beradi.
+
+   Muhim: 'Outfit'da kirill harflari yo'q (faqat latin/latin-ext). Stackda undan
+   keyin turgan Montserrat kirill glifleri uchun ishlaydi — brauzer fallback'ni
+   butun matn uchun emas, har bir belgi uchun alohida hisoblaydi, shuning uchun
+   aralash matnda ham lotin qismi Outfit'da qoladi. */
+@theme {
+  --font-sans: 'Outfit', 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', monospace;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
 body {
   background: #ffffff;
   color: #0f172a;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Forma elementlari brauzerning OS shriftini oladi va `font-family`ni meros
+   olmaydi — bu qatorsiz inline style'li tugmalar (masalan til tanlagich)
+   saytning qolgan qismidan boshqa shriftda ko'rinadi. */
+button, input, select, textarea, optgroup {
+  font-family: inherit;
+}
+
+/* Montserrat'ning kirill glifleri Outfit lotinidan biroz kengroq —
+   yirik sarlavhalarda optik muvozanat uchun harflar orasi ozgina siqiladi. */
+:lang(ru) .h-section,
+:lang(ru) h1 {
+  letter-spacing: -0.028em;
 }
 
 /* ── Scrollbar ── */
@@ -42,7 +72,7 @@ body {
   font-weight: 700; font-size: 15px; border: none; cursor: pointer;
   background: #0ea5e9; color: #ffffff;
   transition: all 0.25s ease;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 .btn-primary:hover {
   background: #0284c7;
@@ -57,7 +87,7 @@ body {
   background: transparent; color: #0ea5e9;
   border: 2px solid #0ea5e9;
   transition: all 0.25s ease;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 .btn-outline:hover {
   background: #f0f9ff;
@@ -70,7 +100,7 @@ body {
   font-weight: 700; font-size: 15px; border: none; cursor: pointer;
   background: #0f172a; color: #ffffff;
   transition: all 0.25s ease;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 .btn-dark:hover {
   background: #1e293b;
@@ -84,7 +114,7 @@ body {
   padding: 5px 14px; border-radius: 50px;
   font-size: 11px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   background: #f0f9ff;
   border: 1px solid #bae6fd;
   color: #0ea5e9;
@@ -122,7 +152,7 @@ body {
 .tag {
   display: inline-block;
   padding: 3px 10px; border-radius: 20px;
-  font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+  font-size: 11px; font-family: var(--font-mono); font-weight: 500;
   background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd;
 }
 
@@ -145,7 +175,7 @@ body {
   padding: 12px 16px;
   font-size: 14px; color: #0f172a;
   outline: none; transition: all 0.25s;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 .inp::placeholder { color: #94a3b8; }
 .inp:focus { border-color: #0ea5e9; background: #fff; box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }

@@ -799,7 +799,9 @@
       "audMentors": "Mentorlarga"
     },
     "localizedField": {
-      "untranslated": "Tarjima qilinmagan — saytda o'zbekcha ko'rinadi."
+      "untranslated": "Tarjima qilinmagan — saytda o'zbekcha ko'rinadi.",
+      "empty": "tarjima yo'q",
+      "copyFromBase": "O'zbekchadan nusxalash"
     },
     "receipt": {
       "title": "To'lov cheki",
@@ -991,7 +993,6 @@
     "siteSettings": {
       "title": "Sayt sozlamalari",
       "sub": "Bosh sahifadagi statistika, kartalar va aloqa ma'lumotlarini boshqarish",
-      "saved": "Saqlandi",
       "tabs": {
         "hero": "Bosh sahifa statistikasi",
         "about": "Biz haqimizda",
@@ -1032,7 +1033,19 @@
       "day": "Kun",
       "time": "Vaqt",
       "closed": "Yopiq",
-      "addDay": "Kun qo'shish"
+      "addDay": "Kun qo'shish",
+      "preview": "Saytda ko'rish",
+      "localeHint": "Har bir matn maydonida til tabi bor (UZ / RU / KAA / EN). Sariq nuqta — o'sha tilda tarjima yo'q, saytda uning o'rniga o'zbekcha matn ko'rinadi.",
+      "unsaved": "Saqlanmagan o'zgarishlar",
+      "dirtyCount": "Saqlanmagan bo'limlar: {{n}}",
+      "allSaved": "Barcha o'zgarishlar saqlangan",
+      "savedCount": "Saqlandi — o'zgargan bo'limlar: {{n}}",
+      "reset": "O'zgarishlarni qaytarish",
+      "resetConfirm": "Saqlanmagan barcha o'zgarishlar bekor qilinadi va oxirgi saqlangan holat tiklanadi. Davom etasizmi?",
+      "missingWarn": "{{n}} ta matnning o'zbekcha (asosiy) varianti bo'sh — saytda o'sha joylar bo'sh ko'rinadi. Shunday saqlansinmi?",
+      "moveUp": "Yuqoriga surish",
+      "moveDown": "Pastga surish",
+      "emptyList": "Hozircha element yo'q — quyidagi tugma orqali qo'shing."
     },
     "curriculum": {
       "loadFailed": "Kursni yuklab bo'lmadi.",

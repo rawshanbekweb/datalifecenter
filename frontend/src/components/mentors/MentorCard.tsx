@@ -69,7 +69,7 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
           }}
           style={{ width:72, height:72, borderRadius:'50%', objectFit:'cover', margin:'0 auto 16px', border:`2px solid ${theme.border}` }} />
       ) : null}
-      <div style={{ display: mentor.photoUrl ? 'none' : 'flex', width:72, height:72, borderRadius:'50%', margin:'0 auto 16px', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px solid ${theme.border}`, fontFamily:'Outfit,sans-serif', fontWeight:800, fontSize:22, color:theme.color }}>
+      <div style={{ display: mentor.photoUrl ? 'none' : 'flex', width:72, height:72, borderRadius:'50%', margin:'0 auto 16px', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px solid ${theme.border}`, fontFamily:'var(--font-sans)', fontWeight:800, fontSize:22, color:theme.color }}>
         {initials(mentor.name)}
       </div>
 

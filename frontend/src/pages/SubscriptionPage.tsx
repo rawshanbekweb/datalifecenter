@@ -99,7 +99,7 @@ export default function SubscriptionPage(): React.ReactElement {
 
   return (
     <div>
-      <h1 style={{ fontFamily: 'Outfit,sans-serif', fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>{t('student.subscription.title')}</h1>
+      <h1 style={{ fontFamily:'var(--font-sans)', fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>{t('student.subscription.title')}</h1>
       <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 24 }}>{t('student.subscription.subtitle')}</p>
 
       {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
