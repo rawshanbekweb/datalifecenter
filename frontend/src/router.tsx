@@ -77,8 +77,6 @@ function s(el: React.ReactElement): React.ReactElement {
   return <Suspense fallback={<PageFallback />}>{el}</Suspense>
 }
 
-// `basename` orqali /ru, /kaa, /en prefikslar avtomatik qo'shiladi/olib
-// tashlanadi — quyidagi route'lar hech qachon locale prefiksini bilishi shart emas.
 export function createAppRouter(basename: string) {
   return createBrowserRouter([
   {
