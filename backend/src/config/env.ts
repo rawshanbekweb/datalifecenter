@@ -6,6 +6,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   FRONTEND_URL: z.string().min(1, 'FRONTEND_URL kerak'),
+  // Qo'shimcha ruxsat etilgan origin'lar (CORS/CSRF) — vergul bilan ajratilgan ro'yxat
+  EXTRA_ALLOWED_ORIGINS: z.string().optional(),
   JWT_SECRET: z.string().min(1, 'JWT_SECRET kerak'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 

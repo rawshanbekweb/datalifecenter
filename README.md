@@ -72,6 +72,7 @@ frontend odatdagidek `npm run dev` bilan. Postgres hostga `5433` portda ochilgan
 | `PORT`                  | yo'q     | API porti (default 4000)                            |
 | `NODE_ENV`              | ha       | `development` / `production` / `test`               |
 | `FRONTEND_URL`          | ha       | CORS va emaildagi havolalar uchun frontend manzili  |
+| `EXTRA_ALLOWED_ORIGINS` | yo'q     | CORS/CSRF uchun qo'shimcha origin'lar (vergul bilan) |
 | `JWT_SECRET`            | ha       | Production'da kamida 32 belgi (server tekshiradi)   |
 | `JWT_EXPIRES_IN`        | yo'q     | Token muddati (default `7d`)                        |
 | `SMTP_HOST/PORT/USER/PASS/FROM` | yo'q | Email yuborish (sozlanmasa o'chiq)          |
@@ -114,7 +115,9 @@ Frontend: `VITE_API_URL` (masalan `http://localhost:4000/api`), ixtiyoriy `VITE_
 2. Environment: `VITE_API_URL=https://<backend-domeningiz>/api`.
 3. `vercel.json` allaqachon SPA rewrite bilan sozlangan.
 4. Agar domen o'zgarsa, backend'dagi `FRONTEND_URL`ni ham yangilang
-   (CORS va emaildagi havolalar uchun).
+   (emaildagi havolalar uchun) va CORS ro'yxatiga qo'shing: yangi domenni
+   `backend/src/config/cors.ts`dagi `STATIC_ORIGINS`ga yoki Render'dagi
+   `EXTRA_ALLOWED_ORIGINS` env'iga kiriting.
 
 ## Testlar
 
