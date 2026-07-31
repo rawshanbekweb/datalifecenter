@@ -6,6 +6,7 @@ import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast, useConfirm } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 const ROLE_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
   STUDENT: { labelKey: 'admin.roles.STUDENT', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
@@ -134,7 +135,7 @@ export default function AdminUsersPage(): React.ReactElement {
         </form>
       </div>
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && items.length === 0 && (

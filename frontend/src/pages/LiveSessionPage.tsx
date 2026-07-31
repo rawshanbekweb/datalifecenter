@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { LiveSession, getSession } from '../api/sessions';
 import { useAuth } from '../hooks/useAuth';
 import { SESSION_STATUS_META, formatSessionTime } from '../components/sessions/sessionMeta';
+import Loading from '../components/common/Loading';
 
 type Status = 'loading' | 'ready' | 'forbidden' | 'error';
 
@@ -74,7 +75,7 @@ export default function LiveSessionPage(): React.ReactElement {
   );
 
   if (status === 'loading') {
-    return <section style={{ padding: '200px 24px 80px', textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
   }
 
   if (status === 'forbidden' || status === 'error' || !session) {

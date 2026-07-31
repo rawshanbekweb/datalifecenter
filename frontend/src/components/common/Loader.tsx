@@ -118,9 +118,25 @@ export default function Loader(): React.ReactElement {
           animation: dl-splash-caret .8s steps(1) infinite;
         }
 
-        /* Animatsiyani o'chirgan foydalanuvchilarda qoplama umuman ko'rinmasin */
+        /* Animatsiyani o'chirganlarda (Windows'da "Animatsiya effektlari"
+           o'chiq bo'lsa ham shu rejim yoqiladi — bu juda keng tarqalgan)
+           splash BUTUNLAY YASHIRILMAYDI, faqat harakat olib tashlanadi:
+           logo pulsi, halqalar, harflarning chiqishi va zarrachalar o'rniga
+           tayyor holat ko'rsatiladi.
+
+           Yo'qolish uchun opacity animatsiyasi ATAYIN qoldirilgan — u
+           harakat emas, va usiz qoplama ekranda abadiy qolib ketardi.
+           Animatsiyasi o'chirilgan elementlarga yakuniy holat qo'lda
+           beriladi, aks holda ular "opacity: 0" da qotib qolardi. */
         @media (prefers-reduced-motion: reduce) {
-          .dl-splash { display: none; }
+          .dl-splash { animation: dl-splash-out .3s linear .7s forwards; }
+          .dl-splash__badge::before,
+          .dl-splash__badge::after { display: none; }
+          .dl-splash__logo { animation: none; }
+          .dl-splash__char { opacity: 1; animation: none; transform: none; }
+          .dl-splash__bar { width: 100%; animation: none; }
+          .dl-splash__dot { opacity: 1; animation: none; transform: none; }
+          .dl-splash__caret { animation: none; }
         }
       `}</style>
 

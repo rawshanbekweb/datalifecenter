@@ -14,6 +14,7 @@ import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
 import { useToast, useConfirm } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 interface CourseOption { id: string; title: string }
 interface StudentOption { id: string; name: string; email: string; courseId: string }
@@ -194,7 +195,7 @@ export default function MentorAssignmentsPage(): React.ReactElement {
     <div>
       <AdminPageHeader title={t('mentor.assignments.title')} sub={t('mentor.assignments.pageSub')} />
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 

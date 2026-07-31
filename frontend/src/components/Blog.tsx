@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { listBlogPosts } from '../api/blog';
 import BlogCard from './blog/BlogCard';
 import React from 'react';
+import Loading from './common/Loading';
 
 type BlogStatus = 'loading' | 'ready' | 'error';
 
@@ -32,7 +33,7 @@ export default function Blog(): React.ReactElement {
           <p className="sub">{t('home.blog.subtitle')}</p>
         </m.div>
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.blog.loadError')}</p>}
 
         {status === 'ready' && (

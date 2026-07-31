@@ -14,6 +14,7 @@ import { SESSION_STATUS_META, formatSessionTime } from './sessionMeta';
 import { useToast, useConfirm } from '../common/Feedback';
 import LocalizedField from '../admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../common/Loading';
 
 interface CourseOption {
   id: string;
@@ -196,7 +197,7 @@ export default function MentorSessionsPanel({ courses, students }: { courses: Co
         </form>
       )}
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('mentor.sessionsPanel.loadError')}</p>}
       {status === 'ready' && sessions.length === 0 && (
         <div className="card" style={{ padding: 24, textAlign: 'center' }}>

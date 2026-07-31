@@ -14,6 +14,7 @@ import { useConfirm, useToast } from '../../components/common/Feedback';
 import { useLocale } from '../../hooks/useLocale';
 import { DEFAULT_LOCALE, ENABLED_LOCALES, LOCALE_LABELS, Locale, SUPPORTED_LOCALES } from '../../i18n/config';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../../components/common/Loading';
 import {
   AboutData, AboutStatItem, ContactData, HeroData, HoursItem, SatisfactionItem, SectionKey,
   SECTION_KEYS, Sections, ServiceItem, ServicesData, SkillItem, StatItem, WhyUsData, WhyUsItem,
@@ -677,7 +678,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
         })}
       </div>
 
-      {!loaded && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {!loaded && <Loading />}
 
       {loaded && loadError && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, background: '#fef2f2', border: '1.5px solid #fecaca' }}>

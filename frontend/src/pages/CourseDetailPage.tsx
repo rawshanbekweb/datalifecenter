@@ -13,6 +13,7 @@ import { useEngagementItem } from '../hooks/useEngagementItem';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
 import CourseReviews from '../components/courses/CourseReviews';
+import Loading from '../components/common/Loading';
 
 interface Lesson {
   id: string | number;
@@ -116,7 +117,7 @@ export default function CourseDetailPage(): React.ReactElement {
   }, [user, slug]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
   }
   if (status === 'error') {
     return <ComingSoon title={t('common.error')} sub={t('pages.courseDetail.errorSub')} />;

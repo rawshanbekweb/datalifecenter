@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SectionHeader from '../components/common/SectionHeader';
 import MentorCard, { MentorCardData } from '../components/mentors/MentorCard';
 import { listMentors } from '../api/mentors';
+import Loading from '../components/common/Loading';
 
 type Mentor = MentorCardData;
 
@@ -26,7 +27,7 @@ export default function MentorsPage(): React.ReactElement {
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <SectionHeader pill={t('pages.mentors.pill')} title={t('pages.mentors.title')} accent={t('pages.mentors.accent')} sub={t('pages.mentors.sub')} />
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('pages.mentors.loadError')}</p>}
         {status === 'ready' && mentors.length === 0 && (
           <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.mentors.empty')}</p>

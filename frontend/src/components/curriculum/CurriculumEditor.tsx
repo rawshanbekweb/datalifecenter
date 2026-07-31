@@ -8,6 +8,7 @@ import FileUpload from '../common/FileUpload';
 import { useToast, useConfirm } from '../common/Feedback';
 import LocalizedField from '../admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../common/Loading';
 
 interface LessonItem {
   id: string;
@@ -202,7 +203,7 @@ export default function CurriculumEditor({ courseId, backTo, backLabel, loadCour
     }
   };
 
-  if (status === 'loading') return <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>;
+  if (status === 'loading') return <Loading />;
   if (status === 'error' || !course) return <p style={{ color:'#dc2626', fontSize:14 }}>{t('admin.curriculum.loadFailed')}</p>;
 
   return (

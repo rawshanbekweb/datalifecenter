@@ -10,6 +10,7 @@ import { formatDate } from '../utils/format';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import Loading from '../components/common/Loading';
 
 interface BlogPost {
   id: string;
@@ -59,7 +60,7 @@ export default function BlogDetailPage(): React.ReactElement {
   }, [post?.id]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
   }
   if (status === 'not-found') {
     return <ComingSoon title={t('pages.blogDetail.notFoundTitle')} sub={t('pages.blogDetail.notFoundSub')} />;

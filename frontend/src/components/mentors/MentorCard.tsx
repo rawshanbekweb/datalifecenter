@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { GitBranch, Briefcase, Send } from 'lucide-react';
 
@@ -50,6 +50,12 @@ function initials(name: string): string {
 
 export default function MentorCard({ mentor, index = 0 }: MentorCardProps): React.ReactElement {
   const theme = PALETTE[index % PALETTE.length];
+  // Rasm yuklanmasa bosh harflar ko'rsatiladi. Holat orqali — imperativ
+  // `style.display` React qayta render qilganda yo'qolib ketardi.
+  // Bepul Render rejasida /uploads fayllari har deploy'da o'chib ketadi,
+  // ya'ni bu holat amalda uchraydi.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const showPhoto = Boolean(mentor.photoUrl) && !photoFailed;
   const socials: SocialLink[] = [];
   if (mentor.githubUrl) socials.push({ icon: GitBranch, href: mentor.githubUrl });
   if (mentor.linkedinUrl) socials.push({ icon: Briefcase, href: mentor.linkedinUrl });
@@ -60,18 +66,15 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
       transition={{ duration:0.5, delay:(index%3)*0.1 }} className="card"
       style={{ padding:24, textAlign:'center', background:theme.bg, border:`1.5px solid ${theme.border}` }}>
 
-      {mentor.photoUrl ? (
-        <img src={mentor.photoUrl} alt={mentor.name}
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            const fallback = e.currentTarget.nextSibling as HTMLElement | null;
-            if (fallback) fallback.style.display = 'flex';
-          }}
+      {showPhoto ? (
+        <img src={mentor.photoUrl!} alt={mentor.name}
+          onError={() => setPhotoFailed(true)}
           style={{ width:72, height:72, borderRadius:'50%', objectFit:'cover', margin:'0 auto 16px', border:`2px solid ${theme.border}` }} />
-      ) : null}
-      <div style={{ display: mentor.photoUrl ? 'none' : 'flex', width:72, height:72, borderRadius:'50%', margin:'0 auto 16px', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px solid ${theme.border}`, fontFamily:'var(--font-sans)', fontWeight:800, fontSize:22, color:theme.color }}>
-        {initials(mentor.name)}
-      </div>
+      ) : (
+        <div style={{ display:'flex', width:72, height:72, borderRadius:'50%', margin:'0 auto 16px', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px solid ${theme.border}`, fontFamily:'var(--font-sans)', fontWeight:800, fontSize:22, color:theme.color }}>
+          {initials(mentor.name)}
+        </div>
+      )}
 
       <h3 style={{ fontSize:16, fontWeight:800, color:'#0f172a', marginBottom:3 }}>{mentor.name}</h3>
       <p style={{ fontSize:12, color:theme.color, fontWeight:700, marginBottom:12 }}>{mentor.specialty}</p>

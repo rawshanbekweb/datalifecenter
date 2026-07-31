@@ -4,6 +4,7 @@ import { Award, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { downloadCertificate, getMyEnrollments } from '../../api/enrollments';
 import { resolveIcon } from '../../utils/iconMap';
+import Loading from '../../components/common/Loading';
 
 interface CompletedEnrollment {
   id: string;
@@ -61,7 +62,7 @@ export default function StudentCertificatesPage(): React.ReactElement {
         <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.certificates.subtitle')}</p>
       </div>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
       {error && <p style={{ color: '#dc2626', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 

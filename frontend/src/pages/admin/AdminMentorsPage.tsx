@@ -8,6 +8,7 @@ import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../../components/common/Loading';
 
 interface MentorFormState {
   id?: string | number;
@@ -186,7 +187,7 @@ export default function AdminMentorsPage(): React.ReactElement {
 
       {editing && <MentorForm initial={editing} users={users} onCancel={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (

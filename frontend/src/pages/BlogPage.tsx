@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SectionHeader from '../components/common/SectionHeader';
 import BlogCard, { BlogPostCardData } from '../components/blog/BlogCard';
 import { listBlogPosts } from '../api/blog';
+import Loading from '../components/common/Loading';
 
 type BlogPost = BlogPostCardData;
 
@@ -43,7 +44,7 @@ export default function BlogPage(): React.ReactElement {
           </div>
         )}
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.blog.loadError')}</p>}
         {status === 'ready' && posts.length === 0 && (
           <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.blog.empty')}</p>

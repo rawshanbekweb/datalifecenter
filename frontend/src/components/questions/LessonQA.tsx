@@ -3,6 +3,7 @@ import { MessageCircleQuestion, Send, CornerDownRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LessonQuestion, askQuestion, getLessonQuestions } from '../../api/questions';
 import { formatDate } from '../../utils/format';
+import Loading from '../common/Loading';
 
 interface LessonQAProps {
   lessonId: string;
@@ -63,7 +64,7 @@ export default function LessonQA({ lessonId, accentColor }: LessonQAProps): Reac
       </form>
       {error && <p style={{ fontSize:12.5, color:'#dc2626', marginTop:-8, marginBottom:12 }}>{error}</p>}
 
-      {!loaded && <p style={{ fontSize:13, color:'#94a3b8' }}>{t('common.loading')}</p>}
+      {!loaded && <Loading />}
       {loaded && questions.length === 0 && (
         <p style={{ fontSize:13, color:'#94a3b8' }}>{t('qa.empty')}</p>
       )}

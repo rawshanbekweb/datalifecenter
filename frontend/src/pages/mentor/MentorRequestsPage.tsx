@@ -5,6 +5,7 @@ import { MentorRequest, createMentorRequest, getMyMentorRequests } from '../../a
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
+import Loading from '../../components/common/Loading';
 
 const STATUS_META: Record<MentorRequest['status'], { labelKey: string; color: string; bg: string; border: string }> = {
   OPEN:     { labelKey: 'mentor.requests.status.OPEN',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
@@ -64,7 +65,7 @@ export default function MentorRequestsPage(): React.ReactElement {
           ) : undefined
         } />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 

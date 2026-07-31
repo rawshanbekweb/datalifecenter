@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listContactMessages, updateContactMessageStatus } from '../../api/contact';
 import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import Loading from '../../components/common/Loading';
 
 type MessageStatus = 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
 
@@ -88,7 +89,7 @@ export default function AdminMessagesPage(): React.ReactElement {
     </div>
   );
 
-  if (status === 'loading') return <div>{header}<p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p></div>;
+  if (status === 'loading') return <div>{header}<Loading /></div>;
   if (status === 'error') return <div>{header}<p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p></div>;
   if (messages.length === 0) {
     return (

@@ -6,6 +6,7 @@ import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
 import { useToast } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 // Mentor kurslaridagi o'quvchi savollari — javob berish shu yerdan
 export default function MentorQuestionsPage(): React.ReactElement {
@@ -51,7 +52,7 @@ export default function MentorQuestionsPage(): React.ReactElement {
       <AdminPageHeader title={t('mentor.questions.title')}
         sub={unanswered > 0 ? t('mentor.questions.subWaiting', { n: unanswered }) : t('mentor.questions.subDefault')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 

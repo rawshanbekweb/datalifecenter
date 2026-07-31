@@ -7,6 +7,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import RouteErrorPage from './pages/RouteErrorPage'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import RoleHomeRedirect from './components/common/RoleHomeRedirect'
+import Loading from './components/common/Loading'
 import { lazyWithRetry } from './utils/lazyWithRetry'
 
 // Og'ir sahifalar (kabinetlar, learn, admin) faqat kerak bo'lganda yuklanadi —
@@ -65,10 +66,14 @@ const AdminTestimonialsPage = lazyWithRetry(() => import('./pages/admin/AdminTes
 const AdminCourseReviewsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseReviewsPage'))
 const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProjectsPage'))
 
+// Sahifadan sahifaga o'tishda eng ko'p ko'rinadigan holat — kirish splash'i
+// faqat bir marta chiqadi, foydalanuvchi esa kunning qolgan qismida aynan
+// shuni ko'radi. Ilgari bu yerda tarjima qilinmagan "Yuklanmoqda..." matni
+// qo'lda yozilgan edi (boshqa tilda ham o'zbekcha chiqardi).
 function PageFallback(): React.ReactElement {
   return (
-    <section style={{ padding: '200px 24px 80px', textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>
-      Yuklanmoqda...
+    <section style={{ padding: '200px 24px 80px' }}>
+      <Loading center bar />
     </section>
   )
 }

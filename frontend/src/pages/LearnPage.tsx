@@ -8,6 +8,7 @@ import ComingSoon from '../components/common/ComingSoon';
 import { useToast } from '../components/common/Feedback';
 import LessonVideo from '../components/common/LessonVideo';
 import LessonQA from '../components/questions/LessonQA';
+import Loading from '../components/common/Loading';
 
 interface LearnLesson {
   id: string;
@@ -103,7 +104,7 @@ export default function LearnPage(): React.ReactElement {
   }, [course, activeLessonId]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
   }
   if (status === 'forbidden') {
     return (

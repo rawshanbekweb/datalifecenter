@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { getMentorStudents } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
+import Loading from '../../components/common/Loading';
 
 interface StudentProgressRow {
   id: string;
@@ -35,7 +36,7 @@ export default function MentorStudentsPage(): React.ReactElement {
     <div>
       <AdminPageHeader title={t('mentor.students.title')} sub={t('mentor.students.sub')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
       {status === 'not-linked' && <MentorNotLinked message={errorMsg} />}
 

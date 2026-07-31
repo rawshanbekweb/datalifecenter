@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SectionHeader from '../components/common/SectionHeader';
 import PartnerCard, { PartnerCardData } from '../components/partners/PartnerCard';
 import { listPartners } from '../api/partners';
+import Loading from '../components/common/Loading';
 
 type Partner = PartnerCardData;
 
@@ -26,7 +27,7 @@ export default function PartnersPage(): React.ReactElement {
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
         <SectionHeader pill={t('pages.partners.pill')} title={t('pages.partners.title')} accent={t('pages.partners.accent')} sub={t('pages.partners.sub')} />
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('pages.partners.loadError')}</p>}
         {status === 'ready' && partners.length === 0 && (
           <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.partners.empty')}</p>

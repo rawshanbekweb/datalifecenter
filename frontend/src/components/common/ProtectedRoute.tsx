@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import Loading from './Loading';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps):
   const location = useLocation();
 
   if (loading) {
-    return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>Yuklanmoqda...</section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
   }
 
   if (!user) {

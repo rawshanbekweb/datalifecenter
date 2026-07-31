@@ -5,6 +5,7 @@ import { listReviewsAdmin, updateReviewAdmin, deleteReviewAdmin } from '../../ap
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useToast, useConfirm } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 interface Review {
   id: string;
@@ -57,7 +58,7 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
     <div>
       <AdminPageHeader title={t('admin.reviews.title')} sub={t('admin.reviews.sub')} />
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && items.length === 0 && (

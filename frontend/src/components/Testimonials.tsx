@@ -5,6 +5,7 @@ import { Star, Quote } from 'lucide-react';
 import { listTestimonials } from '../api/testimonials';
 import LikeButton from './common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import Loading from './common/Loading';
 
 interface Testimonial {
   id: string;
@@ -79,7 +80,7 @@ export default function Testimonials(): React.ReactElement | null {
           <p className="sub">{t('home.testimonials.subtitle')}</p>
         </m.div>
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
 
         {status === 'ready' && (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="testimonials-grid">

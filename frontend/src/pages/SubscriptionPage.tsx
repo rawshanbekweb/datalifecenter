@@ -10,6 +10,7 @@ import { PAYMENT_INFO } from '../config/payment';
 import { formatDate, formatNumber } from '../utils/format';
 import { useToast } from '../components/common/Feedback';
 import FileUpload from '../components/common/FileUpload';
+import Loading from '../components/common/Loading';
 
 const DEFAULT_PRICE = 99000;
 const DEFAULT_CURRENCY = 'UZS';
@@ -102,7 +103,7 @@ export default function SubscriptionPage(): React.ReactElement {
       <h1 style={{ fontFamily:'var(--font-sans)', fontSize: 22, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>{t('student.subscription.title')}</h1>
       <p style={{ fontSize: 13.5, color: '#64748b', marginBottom: 24 }}>{t('student.subscription.subtitle')}</p>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && isActive && (

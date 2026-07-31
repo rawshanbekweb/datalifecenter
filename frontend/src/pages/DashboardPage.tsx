@@ -12,6 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
 import FileUpload from '../components/common/FileUpload';
 import { PAYMENT_INFO } from '../config/payment';
+import Loading from '../components/common/Loading';
 
 interface CourseInfo {
   iconKey: string;
@@ -391,7 +392,7 @@ export default function DashboardPage(): React.ReactElement {
           );
         })()}
 
-        {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading />}
         {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailedBackend')}</p>}
 
         {status === 'ready' && enrollments.length === 0 && (

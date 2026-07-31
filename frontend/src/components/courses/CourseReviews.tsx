@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 import { listCourseReviews } from '../../api/reviews';
 import { formatDate } from '../../utils/format';
+import Loading from '../common/Loading';
 
 interface Review {
   id: string;
@@ -48,7 +49,7 @@ export default function CourseReviews({ slug, rating, reviewsCount, color = '#0e
         )}
       </div>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 13 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
 
       {status === 'ready' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

@@ -6,6 +6,7 @@ import { listProjects } from '../api/projects';
 import { registerView } from '../api/engagement';
 import LikeButton from './common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import Loading from './common/Loading';
 
 interface ProjectItem {
   id: string;
@@ -182,7 +183,7 @@ export default function Projects(): React.ReactElement | null {
           <p className="sub">{t('home.projects.subtitle')}</p>
         </m.div>
 
-        {status === 'loading' && <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign: 'center', color: '#dc2626', fontSize: 14 }}>{t('home.projects.loadError')}</p>}
 
         {status === 'ready' && (

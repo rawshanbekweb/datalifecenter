@@ -5,6 +5,7 @@ import { MentorRequest, getAllMentorRequests, updateMentorRequest } from '../../
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useToast } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 const STATUS_META: Record<MentorRequest['status'], { labelKey: string; color: string; bg: string; border: string }> = {
   OPEN:     { labelKey: 'admin.reqStatus.OPEN',     color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
@@ -65,7 +66,7 @@ export default function AdminMentorRequestsPage(): React.ReactElement {
       <AdminPageHeader title={t('admin.mentorRequests.title')}
         sub={open > 0 ? t('admin.mentorRequests.subWaiting', { n: open }) : t('admin.mentorRequests.subDefault')} />
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && requests.length === 0 && (

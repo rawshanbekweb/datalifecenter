@@ -7,6 +7,7 @@ import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
+import Loading from '../../components/common/Loading';
 
 interface AdminSubscription {
   id: string;
@@ -153,7 +154,7 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
         </form>
       </div>
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && items.length === 0 && (

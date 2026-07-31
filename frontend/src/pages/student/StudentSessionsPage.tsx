@@ -4,6 +4,7 @@ import { Video } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LiveSession, getMySessions } from '../../api/sessions';
 import { SESSION_STATUS_META, formatSessionTime } from '../../components/sessions/sessionMeta';
+import Loading from '../../components/common/Loading';
 
 // Talaba yozilgan kurslarning barcha jonli darslari
 export default function StudentSessionsPage(): React.ReactElement {
@@ -28,7 +29,7 @@ export default function StudentSessionsPage(): React.ReactElement {
         <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.sessions.subtitle')}</p>
       </div>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && sessions.length === 0 && (

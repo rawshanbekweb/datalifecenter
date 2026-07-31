@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getAdminStats, AdminStats } from '../../api/admin';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import Loading from '../../components/common/Loading';
 
 const ENROLLMENT_STATUS: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
   PENDING:   { labelKey: 'admin.enrollStatus.PENDING',   color: '#d97706', bg: '#fffbeb', border: '#fde68a' },
@@ -38,7 +39,7 @@ export default function AdminDashboardPage(): React.ReactElement {
   }, []);
 
   if (status === 'loading') {
-    return <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>;
+    return <Loading />;
   }
   if (status === 'error' || !stats) {
     return <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailedBackend')}</p>;

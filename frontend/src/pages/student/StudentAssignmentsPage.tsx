@@ -6,6 +6,7 @@ import { AssignmentSubmission, MyAssignment, getMyAssignments, submitAssignment 
 import { uploadFile } from '../../api/uploads';
 import { formatDateTime } from '../../utils/format';
 import { useToast } from '../../components/common/Feedback';
+import Loading from '../../components/common/Loading';
 
 type StatusKey = 'NONE' | 'SUBMITTED' | 'ACCEPTED' | 'RETURNED';
 
@@ -130,7 +131,7 @@ export default function StudentAssignmentsPage(): React.ReactElement {
         <p style={{ fontSize: 13.5, color: '#64748b' }}>{t('student.assignments.subtitle')}</p>
       </div>
 
-      {status === 'loading' && <p style={{ color: '#94a3b8', fontSize: 14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color: '#dc2626', fontSize: 14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && assignments.length === 0 && (

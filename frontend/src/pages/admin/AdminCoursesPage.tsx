@@ -10,6 +10,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../../components/common/Loading';
 
 const ICON_KEYS: string[] = ['Monitor', 'Server', 'Shield', 'Smartphone', 'Database', 'Cloud', 'BookOpen'];
 // daraja nomi umumiy `levels.*` (Stage 2) orqali t() bilan chiqadi
@@ -239,7 +240,7 @@ export default function AdminCoursesPage(): React.ReactElement {
           onSaved={() => { setEditing(null); load(); }} />
       )}
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (

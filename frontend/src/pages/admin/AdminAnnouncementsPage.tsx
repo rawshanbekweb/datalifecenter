@@ -8,6 +8,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
+import Loading from '../../components/common/Loading';
 
 interface CourseOption {
   id: string;
@@ -117,7 +118,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
         </button>
       </form>
 
-      {status === 'loading' && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+      {status === 'loading' && <Loading />}
       {status === 'error' && <p style={{ color:'#dc2626', fontSize:14 }}>{t('common.loadFailed')}</p>}
 
       {status === 'ready' && (

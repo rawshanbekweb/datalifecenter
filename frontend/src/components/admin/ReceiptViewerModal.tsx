@@ -3,6 +3,7 @@ import { X, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getReceiptImageUrl } from '../../api/enrollments';
 import { getSubscriptionReceiptImageUrl } from '../../api/subscriptions';
+import Loading from '../common/Loading';
 
 interface ReceiptViewerModalProps {
   id: string;
@@ -42,7 +43,7 @@ export default function ReceiptViewerModal({ id, kind = 'enrollment', onClose }:
           </button>
         </div>
 
-        {status === 'loading' && <p style={{ fontSize: 13, color: '#94a3b8', padding: '30px 0', textAlign: 'center' }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '30px 0' }}>
             <AlertTriangle size={22} style={{ color: '#dc2626' }} />

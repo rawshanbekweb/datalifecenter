@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import SectionHeader from '../components/common/SectionHeader';
 import CourseCard, { CourseCardData } from '../components/courses/CourseCard';
 import { listCourses } from '../api/courses';
+import Loading from '../components/common/Loading';
 
 type Status = 'loading' | 'ready' | 'error';
 
@@ -58,7 +59,7 @@ export default function CoursesPage(): React.ReactElement {
           </select>
         </div>
 
-        {status === 'loading' && <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>}
+        {status === 'loading' && <Loading center />}
         {status === 'error' && <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.courses.loadError')}</p>}
         {status === 'ready' && courses.length === 0 && (
           <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.courses.empty')}</p>

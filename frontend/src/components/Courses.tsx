@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { listCourses } from '../api/courses';
 import CourseCard from './courses/CourseCard';
 import React from 'react';
+import Loading from './common/Loading';
 
 type CourseStatus = 'loading' | 'ready' | 'error';
 
@@ -36,7 +37,7 @@ export default function Courses(): React.ReactElement {
           <p style={{ textAlign:'center', color:'#dc2626', fontSize:14 }}>{t('home.courses.loadError')}</p>
         )}
         {status === 'loading' && (
-          <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</p>
+          <Loading center />
         )}
 
         {status === 'ready' && (
