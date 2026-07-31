@@ -1,17 +1,18 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense } from 'react';
 import Hero from '../components/Hero';
 import { useSiteSettings } from '../hooks/useSiteSettings';
+import { lazyWithRetry } from '../utils/lazyWithRetry';
 
 // Hero'dan pastdagi seksiyalar alohida chunk'larda — kirish bundle'i faqat
 // birinchi ekranda ko'rinadigan kodni olib keladi, qolganlari parallel yuklanadi.
-const About = lazy(() => import('../components/About'));
-const Courses = lazy(() => import('../components/Courses'));
-const Services = lazy(() => import('../components/Services'));
-const Projects = lazy(() => import('../components/Projects'));
-const WhyUs = lazy(() => import('../components/WhyUs'));
-const Testimonials = lazy(() => import('../components/Testimonials'));
-const Blog = lazy(() => import('../components/Blog'));
-const Contact = lazy(() => import('../components/Contact'));
+const About = lazyWithRetry(() => import('../components/About'));
+const Courses = lazyWithRetry(() => import('../components/Courses'));
+const Services = lazyWithRetry(() => import('../components/Services'));
+const Projects = lazyWithRetry(() => import('../components/Projects'));
+const WhyUs = lazyWithRetry(() => import('../components/WhyUs'));
+const Testimonials = lazyWithRetry(() => import('../components/Testimonials'));
+const Blog = lazyWithRetry(() => import('../components/Blog'));
+const Contact = lazyWithRetry(() => import('../components/Contact'));
 
 // anchorId: seksiya chunk'i hali kelmagan qisqa oraliqda ham #contact kabi
 // havolalar ishlashi uchun placeholder o'sha id'ni ushlab turadi

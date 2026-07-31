@@ -1,20 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  AlertCircle, ArrowDown, ArrowUp, ExternalLink, Inbox, Plus, RotateCcw, Save, Trash2,
+  AlertCircle, ArrowDown, ArrowUp, ExternalLink, Eye, Inbox, Plus, RotateCcw, Save, Trash2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getSiteSettingsAdmin, updateSiteSettingSection } from '../../api/siteSettings';
 import { ICON_NAMES, resolveIcon } from '../../utils/iconMap';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import LocalizedField from '../../components/admin/LocalizedField';
+import SectionPreview from '../../components/admin/SectionPreview';
+import TemplatePicker from '../../components/admin/TemplatePicker';
+import { SectionTemplate, applyTemplate, pickLocale } from '../../components/admin/siteSettingTemplates';
 import { useConfirm, useToast } from '../../components/common/Feedback';
 import { useLocale } from '../../hooks/useLocale';
-import { DEFAULT_LOCALE, ENABLED_LOCALES, SUPPORTED_LOCALES } from '../../i18n/config';
+import { DEFAULT_LOCALE, ENABLED_LOCALES, LOCALE_LABELS, Locale, SUPPORTED_LOCALES } from '../../i18n/config';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
-
-type SectionKey = 'hero' | 'about' | 'services' | 'why_us' | 'contact';
-
-const SECTION_KEYS: SectionKey[] = ['hero', 'about', 'services', 'why_us', 'contact'];
+import {
+  AboutData, AboutStatItem, ContactData, HeroData, HoursItem, SatisfactionItem, SectionKey,
+  SECTION_KEYS, Sections, ServiceItem, ServicesData, SkillItem, StatItem, WhyUsData, WhyUsItem,
+} from '../../types/siteSettings';
 
 // Har bo'lim bosh sahifadagi qaysi blokka mos kelishini ko'rsatish uchun —
 // "Ko'rish" havolasi shu anchor'ga olib boradi.
@@ -25,28 +28,6 @@ const SECTION_ANCHOR: Record<SectionKey, string> = {
   why_us: '#why-us',
   contact: '#contact',
 };
-
-interface StatItem { label: LocalizedString; value: string }
-interface AboutStatItem { icon: string; label: LocalizedString; value: string; color: string }
-interface SkillItem { label: LocalizedString; pct: number }
-interface SatisfactionItem { value: string; label: LocalizedString }
-interface ServiceItem { icon: string; title: LocalizedString; color: string; desc: LocalizedString; feats: LocalizedString[] }
-interface WhyUsItem { icon: string; title: LocalizedString; color: string; stat: string; desc: LocalizedString }
-interface HoursItem { day: LocalizedString; time: string; closed: boolean }
-
-interface HeroData { stats: StatItem[] }
-interface AboutData { stats: AboutStatItem[]; features: LocalizedString[]; skills: SkillItem[]; satisfaction: SatisfactionItem[] }
-interface ServicesData { items: ServiceItem[] }
-interface WhyUsData { items: WhyUsItem[] }
-interface ContactData { phone: string; telegram: string; email: string; address: string; addressSub: LocalizedString; hours: HoursItem[] }
-
-interface Sections {
-  hero: HeroData;
-  about: AboutData;
-  services: ServicesData;
-  why_us: WhyUsData;
-  contact: ContactData;
-}
 
 const EMPTY_SECTIONS: Sections = {
   hero: { stats: [] },
@@ -154,7 +135,14 @@ function RowControls({ index, total, onMove, onRemove }: {
       <IconBtn title={t('admin.siteSettings.moveDown')} disabled={index === total - 1} onClick={() => onMove(index + 1)}>
         <ArrowDown size={13} />
       </IconBtn>
-      <IconBtn title={t('common.delete')} danger onClick={onRemove}>
+      {/* Oxirgi elementni o'chirishga yo'l qo'ymaymiz: backend har ro'yxatdan
+          kamida bitta element talab qiladi (bo'sh ro'yxat saytda zaxira
+          kontentni chiqarib yuboradi), aks holda o'chirish "ishlagandek"
+          ko'rinib, saqlashda xato bilan qaytardi. */}
+      <IconBtn
+        title={total <= 1 ? t('admin.siteSettings.minOneItem') : t('common.delete')}
+        danger disabled={total <= 1} onClick={onRemove}
+      >
         <Trash2 size={13} />
       </IconBtn>
     </div>
@@ -419,7 +407,7 @@ function ServicesForm({ data, onChange }: { data: ServicesData; onChange: (d: Se
         </div>
       ))}
       <AddButton label={t('admin.siteSettings.addService')}
-        onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Globe', title: emptyLocalizedString(), color: '#0ea5e9', desc: emptyLocalizedString(), feats: [] }] })} />
+        onClick={() => onChange({ ...data, items: [...data.items, { icon: 'Globe', title: emptyLocalizedString(), color: '#0ea5e9', desc: emptyLocalizedString(), feats: [emptyLocalizedString()] }] })} />
     </div>
   );
 }
@@ -535,9 +523,12 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
   const { t } = useTranslation();
   const toast = useToast();
   const confirm = useConfirm();
-  const { basename } = useLocale();
+  const { basename, locale: i18nLocale } = useLocale();
 
   const [tab, setTab] = useState<SectionKey>('hero');
+  // Ko'rinish qaysi tilda chizilsin — formadagi til tab'idan mustaqil, chunki
+  // admin ko'pincha ruscha matnni yozayotib o'zbekcha maketni ko'rib turadi
+  const [previewLocale, setPreviewLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [sections, setSections] = useState<Sections>(EMPTY_SECTIONS);
@@ -585,10 +576,16 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
   const save = async (): Promise<void> => {
     if (dirty.length === 0) return;
 
-    // Bo'sh asosiy (uz) matn saytda bo'sh joy bo'lib ko'rinadi — bu odatda
-    // unutilgan maydon, shuning uchun saqlashdan oldin tasdiq so'raladi.
+    // Bo'sh asosiy (uz) matnni backend qabul qilmaydi (localizedString: uz min 1).
+    // Ilgari bu yerda "shunday saqlansinmi?" deb tasdiq so'ralardi — tasdiqlangan
+    // saqlash esa har doim 400 bilan qaytardi. Shuning uchun to'g'ridan-to'g'ri
+    // to'xtatamiz va qaysi bo'limda nechta maydon qolganini aytamiz.
     const missing = dirty.reduce((sum, k) => sum + missingByTab[k], 0);
-    if (missing > 0 && !(await confirm(t('admin.siteSettings.missingWarn', { n: missing })))) return;
+    if (missing > 0) {
+      const where = dirty.filter((k) => missingByTab[k] > 0).map((k) => t(`admin.siteSettings.tabs.${k}`)).join(', ');
+      toast.error(t('admin.siteSettings.missingBlock', { n: missing, where }));
+      return;
+    }
 
     setSaving(true);
     const failed: SectionKey[] = [];
@@ -611,6 +608,23 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
     });
     setSaving(false);
     if (failed.length === 0) toast.success(t('admin.siteSettings.savedCount', { n: dirty.length }));
+  };
+
+  /**
+   * Tayyor shablonni joriy bo'limga qo'llaydi. Bu mavjud kontentni
+   * almashtiradi (kontaktda — faqat ish jadvalini), shuning uchun tasdiq
+   * so'raladi. Natija darhol SAQLANMAYDI: forma "o'zgargan" holatga o'tadi,
+   * admin ko'rinishda tekshirib, keyin o'zi saqlaydi.
+   */
+  const onApplyTemplate = async (template: SectionTemplate): Promise<void> => {
+    const name = pickLocale(template.name, i18nLocale);
+    if (!(await confirm(t('admin.siteSettings.templateConfirm', { name }), {
+      danger: true,
+      confirmLabel: t('admin.siteSettings.templateApply'),
+    }))) return;
+
+    setSections((prev) => ({ ...prev, [tab]: applyTemplate(prev[tab], template) }));
+    toast.success(t('admin.siteSettings.templateApplied', { name }));
   };
 
   const reset = async (): Promise<void> => {
@@ -674,12 +688,72 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
 
       {loaded && !loadError && (
         <>
-          <div className="card" style={{ padding: 24 }}>
-            {tab === 'hero' && <HeroForm data={sections.hero} onChange={(d) => setSections((p) => ({ ...p, hero: d }))} />}
-            {tab === 'about' && <AboutForm data={sections.about} onChange={(d) => setSections((p) => ({ ...p, about: d }))} />}
-            {tab === 'services' && <ServicesForm data={sections.services} onChange={(d) => setSections((p) => ({ ...p, services: d }))} />}
-            {tab === 'why_us' && <WhyUsForm data={sections.why_us} onChange={(d) => setSections((p) => ({ ...p, why_us: d }))} />}
-            {tab === 'contact' && <ContactForm data={sections.contact} onChange={(d) => setSections((p) => ({ ...p, contact: d }))} />}
+          {/* Keng ekranda forma va jonli ko'rinish yonma-yon; tor ekranda
+              ko'rinish forma TAGIGA tushadi — mobil admin uchun forma ustuvor. */}
+          <style>{`
+            .dl-settings-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+            @media (min-width: 1180px) {
+              .dl-settings-grid { grid-template-columns: minmax(0, 1fr) 400px; }
+              /* Ko'rinish uzun formani kuzatib borishi uchun yopishib turadi */
+              .dl-settings-preview { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
+            }
+          `}</style>
+
+          <div className="dl-settings-grid">
+            <div style={{ minWidth: 0 }}>
+              <TemplatePicker section={tab} locale={i18nLocale} onApply={onApplyTemplate} />
+
+              <div className="card" style={{ padding: 24 }}>
+                {tab === 'hero' && <HeroForm data={sections.hero} onChange={(d) => setSections((p) => ({ ...p, hero: d }))} />}
+                {tab === 'about' && <AboutForm data={sections.about} onChange={(d) => setSections((p) => ({ ...p, about: d }))} />}
+                {tab === 'services' && <ServicesForm data={sections.services} onChange={(d) => setSections((p) => ({ ...p, services: d }))} />}
+                {tab === 'why_us' && <WhyUsForm data={sections.why_us} onChange={(d) => setSections((p) => ({ ...p, why_us: d }))} />}
+                {tab === 'contact' && <ContactForm data={sections.contact} onChange={(d) => setSections((p) => ({ ...p, contact: d }))} />}
+              </div>
+            </div>
+
+            <div className="dl-settings-preview">
+              <div className="card" style={{ padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+                  <Eye size={15} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                  <p style={{ flex: 1, minWidth: 100, fontSize: 12.5, fontWeight: 700, color: '#0f172a' }}>
+                    {t('admin.siteSettings.previewTitle')}
+                  </p>
+                  {ENABLED_LOCALES.length > 1 && (
+                    <div style={{ display: 'flex', gap: 3 }}>
+                      {ENABLED_LOCALES.map((loc) => {
+                        const active = previewLocale === loc;
+                        return (
+                          <button
+                            key={loc} type="button" onClick={() => setPreviewLocale(loc)}
+                            title={LOCALE_LABELS[loc]} aria-label={LOCALE_LABELS[loc]} aria-pressed={active}
+                            style={{
+                              padding: '3px 7px', borderRadius: 7, cursor: 'pointer',
+                              fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase',
+                              fontFamily: 'var(--font-mono)',
+                              border: `1px solid ${active ? '#0ea5e9' : '#e2e8f0'}`,
+                              background: active ? '#f0f9ff' : '#fff',
+                              color: active ? '#0ea5e9' : '#94a3b8',
+                            }}
+                          >
+                            {loc}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Saytdagi fon — kartochkalar oq bo'lgani uchun kontrast beradi */}
+                <div style={{ background: '#f8fafc', borderRadius: 12, padding: 12 }}>
+                  <SectionPreview section={tab} data={sections[tab]} locale={previewLocale} />
+                </div>
+
+                <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 10, lineHeight: 1.5 }}>
+                  {t('admin.siteSettings.previewNote')}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Formalar uzun — saqlash paneli doim ko'rinib turadi */}

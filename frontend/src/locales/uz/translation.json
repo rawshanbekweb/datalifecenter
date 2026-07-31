@@ -1,6 +1,7 @@
 {
   "common": {
     "loading": "Yuklanmoqda...",
+    "serverWaking": "Server uyg'onmoqda, biroz kuting...",
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
     "sending": "Yuborilmoqda...",
@@ -1035,6 +1036,14 @@
       "closed": "Yopiq",
       "addDay": "Kun qo'shish",
       "preview": "Saytda ko'rish",
+      "previewTitle": "Jonli ko'rinish",
+      "previewNote": "Bu bo'lim saytda shunga yaqin ko'rinadi. Sarlavha va fon kabi umumiy bezaklar bu yerda ko'rsatilmaydi.",
+      "previewEmpty": "matn kiritilmagan",
+      "templatesTitle": "Tayyor shablonlar",
+      "templatesHint": "{{n}} ta namuna — bo'limni tayyor tuzilma va matnlar bilan to'ldiradi",
+      "templateApply": "Qo'llash",
+      "templateConfirm": "\"{{name}}\" shabloni qo'llanadi va bu bo'limdagi hozirgi kontent almashtiriladi. Natija darhol saqlanmaydi — avval ko'rib chiqasiz. Davom etasizmi?",
+      "templateApplied": "\"{{name}}\" shabloni qo'llandi — tekshirib, saqlashni unutmang",
       "localeHint": "Har bir matn maydonida til tabi bor (UZ / RU / KAA / EN). Sariq nuqta — o'sha tilda tarjima yo'q, saytda uning o'rniga o'zbekcha matn ko'rinadi.",
       "unsaved": "Saqlanmagan o'zgarishlar",
       "dirtyCount": "Saqlanmagan bo'limlar: {{n}}",
@@ -1042,7 +1051,8 @@
       "savedCount": "Saqlandi — o'zgargan bo'limlar: {{n}}",
       "reset": "O'zgarishlarni qaytarish",
       "resetConfirm": "Saqlanmagan barcha o'zgarishlar bekor qilinadi va oxirgi saqlangan holat tiklanadi. Davom etasizmi?",
-      "missingWarn": "{{n}} ta matnning o'zbekcha (asosiy) varianti bo'sh — saytda o'sha joylar bo'sh ko'rinadi. Shunday saqlansinmi?",
+      "missingBlock": "Saqlab bo'lmadi: {{n}} ta matnning o'zbekcha (asosiy) varianti bo'sh ({{where}}). Server bo'sh maydonni qabul qilmaydi — ularni to'ldiring.",
+      "minOneItem": "Ro'yxatda kamida bitta element qolishi kerak",
       "moveUp": "Yuqoriga surish",
       "moveDown": "Pastga surish",
       "emptyList": "Hozircha element yo'q — quyidagi tugma orqali qo'shing."
@@ -1073,5 +1083,9 @@
         "ASSIGNMENT": "Vazifa"
       }
     }
+  },
+  "engagement": {
+    "like": "Yoqtirish",
+    "unlike": "Yoqtirishni olib tashlash"
   }
 }

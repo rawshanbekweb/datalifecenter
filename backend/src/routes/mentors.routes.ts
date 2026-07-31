@@ -14,12 +14,13 @@ import {
 } from '../controllers/mentors.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
+import { publicCache } from '../middleware/publicCache';
 import { validateBody } from '../middleware/validateRequest';
 import { createMentorSchema, updateMentorMeSchema, updateMentorSchema } from '../validators/mentors.validator';
 
 const router = Router();
 
-router.get('/', listMentorsHandler);
+router.get('/', publicCache(120), listMentorsHandler);
 router.get('/me', authenticate, authorize('MENTOR', 'ADMIN'), getMentorMeHandler);
 router.patch('/me', authenticate, authorize('MENTOR', 'ADMIN'), validateBody(updateMentorMeSchema), updateMentorMeHandler);
 router.get('/me/dashboard', authenticate, authorize('MENTOR', 'ADMIN'), mentorDashboardHandler);

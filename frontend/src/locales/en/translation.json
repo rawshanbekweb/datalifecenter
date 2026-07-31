@@ -1,6 +1,7 @@
 {
   "common": {
     "loading": "Loading...",
+    "serverWaking": "The server is waking up, please wait...",
     "save": "Save",
     "saving": "Saving...",
     "sending": "Sending...",
@@ -1035,6 +1036,14 @@
       "closed": "Closed",
       "addDay": "Add day",
       "preview": "View on site",
+      "previewTitle": "Live preview",
+      "previewNote": "This is roughly how the section looks on the site. Shared decoration such as the heading and background is not shown here.",
+      "previewEmpty": "no text entered",
+      "templatesTitle": "Ready-made templates",
+      "templatesHint": "{{n}} samples — fill the section with a ready structure and text",
+      "templateApply": "Apply",
+      "templateConfirm": "The \"{{name}}\" template will be applied and the current content of this section will be replaced. Nothing is saved immediately — you review it first. Continue?",
+      "templateApplied": "\"{{name}}\" template applied — review it and remember to save",
       "localeHint": "Every text field has language tabs (UZ / RU / KAA / EN). A yellow dot means that translation is missing and the Uzbek text will be shown on the site instead.",
       "unsaved": "Unsaved changes",
       "dirtyCount": "Unsaved sections: {{n}}",
@@ -1042,7 +1051,8 @@
       "savedCount": "Saved — sections updated: {{n}}",
       "reset": "Discard changes",
       "resetConfirm": "All unsaved changes will be discarded and the last saved state restored. Continue?",
-      "missingWarn": "{{n}} texts have no Uzbek (base) value — those spots will appear empty on the site. Save anyway?",
+      "missingBlock": "Cannot save: {{n}} texts have no Uzbek (base) value ({{where}}). The server rejects empty fields — please fill them in.",
+      "minOneItem": "At least one item must remain in the list",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "emptyList": "No items yet — add one with the button below."
@@ -1073,5 +1083,9 @@
         "ASSIGNMENT": "Assignment"
       }
     }
+  },
+  "engagement": {
+    "like": "Like",
+    "unlike": "Remove like"
   }
 }

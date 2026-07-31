@@ -12,6 +12,7 @@ import { IMAGES_DIR, VIDEOS_DIR } from './config/uploads';
 import routes from './routes';
 import { csrfProtect } from './middleware/csrfProtect';
 import { resolveLocale } from './middleware/locale';
+import { clearPublicCache } from './middleware/publicCache';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 import { verifyLocalVideoToken } from './utils/videoAccess';
@@ -31,9 +32,12 @@ app.use(compression({
   filter: (req, res) => req.path !== '/api/notifications/stream' && compression.filter(req, res),
 }));
 app.use(cors(corsOptions));
-app.use(express.json());
+// Aniq hajm chegarasi: hech bir endpoint 100 KB'dan katta JSON kutmaydi
+// (fayllar multer orqali alohida yuklanadi), shuning uchun undan kattasi
+// faqat xotirani bekorga band qilishga urinish bo'ladi.
+app.use(express.json({ limit: '100kb' }));
 // Click webhook'lari application/x-www-form-urlencoded yuboradi (Payme JSON ishlatadi, express.json() yetarli)
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 
 // Yuklangan rasmlar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz, ochiq qoladi
@@ -55,19 +59,86 @@ app.get('/uploads/videos/:filename', (req, res) => {
   });
 });
 
-// Umumiy API limiti — bitta IP'dan 15 daqiqada 1000 so'rov (auth route'larida qattiqroq limitlar bor)
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 1000,
+const tooManyRequests = {
+  success: false,
+  error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' },
+};
+
+const isRead = (req: express.Request): boolean => req.method === 'GET' || req.method === 'HEAD';
+
+// SSE oqimi uzoq yashaydi va uzilganda backoff bilan qayta ulanadi — har ulanish
+// limitga sanalsa umumiy NAT ortidagi IP butun API'dan bloklanib qolardi
+const alwaysSkip = (req: express.Request): boolean =>
+  env.NODE_ENV === 'test' || req.path === '/notifications/stream';
+
+/**
+ * O'QISH limiti — ATAYIN keng.
+ *
+ * Rate limit IP bo'yicha hisoblaydi, lekin bitta Wi-Fi (tadbir zali, ofis,
+ * universitet) yoki mobil operatorning CGNAT'i ortidagi YUZLAB mehmon
+ * serverga BITTA IP bo'lib ko'rinadi. Bosh sahifa ~7 ta GET qiladi, ya'ni
+ * tor limitda 150 nafar mehmondan keyin butun zal saytdan bloklanardi —
+ * ochilish marosimida bu eng ehtimolli nosozlik ssenariysi edi.
+ *
+ * Keng limit xavfsiz, chunki bu javoblar publicCache tufayli xotiradan
+ * beriladi: DB'ga tegmaydi va deyarli CPU sarflamaydi.
+ *
+ * 3000/daqiqa raqami yuklama testidan olingan: 200 mehmon bosh sahifani bir
+ * vaqtda ochsa ~1400 so'rov ketadi, ya'ni 1000 limitida taxminan har uchinchi
+ * so'rov bloklanardi. Hozirgi qiymat ~400 nafar bir vaqtdagi mehmonni
+ * ko'taradi va shunga qaramay jiddiy skreyper/toshbo'ron urinishini
+ * to'xtatadi. Kamaytirish kerak bo'lsa — shu yagona raqamni o'zgartiring.
+ */
+const readLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 3000,
   standardHeaders: true,
   legacyHeaders: false,
-  // SSE oqimi uzoq yashaydi va uzilganda backoff bilan qayta ulanadi — har ulanish
-  // limitga sanalsa umumiy NAT ortidagi IP butun API'dan bloklanib qolardi
-  skip: (req) => env.NODE_ENV === 'test' || req.path === '/notifications/stream',
-  message: { success: false, error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  skip: (req) => alwaysSkip(req) || !isRead(req),
+  message: tooManyRequests,
 });
 
-app.use('/api', apiLimiter, csrfProtect, resolveLocale, routes);
+/**
+ * YOZISH limiti — qattiqroq, chunki har bir POST/PATCH/DELETE DB yozuvi
+ * demak va aynan shular suiiste'molga ochiq (sharh spami, soxta ro'yxatdan
+ * o'tish to'lqini). Auth va kontakt route'larida bundan ham tor, maqsadli
+ * limitlar bor — bu umumiy zaxira to'siq.
+ */
+const writeLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => alwaysSkip(req) || isRead(req),
+  message: tooManyRequests,
+});
+
+/**
+ * Muvaffaqiyatli har qanday o'zgartirishdan keyin ochiq keshni tozalaymiz:
+ * admin kursni yoki sayt sozlamasini tahrirlaganda o'zgarish TTL tugashini
+ * kutmasdan darhol saytda ko'rinadi. Kesh butunlay tozalanadi — bu arzon
+ * (keyingi so'rov uni qayta to'ldiradi) va qaysi yozuv qaysi endpoint'ga
+ * ta'sir qilishini kuzatishdan ko'ra ancha ishonchli.
+ *
+ * `finish` hodisasiga route'lardan OLDIN obuna bo'lish shart — javob
+ * yuborilgach ro'yxatdan o'tkazishga urinish kech bo'lardi.
+ *
+ * ISTISNO: handler `res.locals.skipCacheInvalidation` qo'ysa kesh
+ * tozalanmaydi. Bu yoqtirish/ko'rish hisoblagichlari uchun — ular juda
+ * tez-tez yoziladi va har bosishda butun keshni tozalash yuklamaga
+ * chidamlilikni yo'qqa chiqarardi.
+ */
+const invalidateCacheOnWrite: express.RequestHandler = (req, res, next) => {
+  if (!isRead(req)) {
+    res.on('finish', () => {
+      if (res.locals.skipCacheInvalidation) return;
+      if (res.statusCode >= 200 && res.statusCode < 400) clearPublicCache();
+    });
+  }
+  next();
+};
+
+app.use('/api', readLimiter, writeLimiter, csrfProtect, resolveLocale, invalidateCacheOnWrite, routes);
 
 app.use(notFoundHandler);
 // Sentry'ga xatolar bizning errorHandler'dan OLDIN yoziladi (DSN sozlangan bo'lsa)

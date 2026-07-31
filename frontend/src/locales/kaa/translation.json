@@ -1,6 +1,7 @@
 {
   "common": {
     "loading": "Júklenip atır...",
+    "serverWaking": "Server oyanıp atır, azǵana kútiń...",
     "save": "Saqlaw",
     "saving": "Saqlanıp atır...",
     "sending": "Jiberilip atır...",
@@ -1035,6 +1036,14 @@
       "closed": "Jabıq",
       "addDay": "Kún qosıw",
       "preview": "Saytta kóriw",
+      "previewTitle": "Janlı kóriniw",
+      "previewNote": "Bul bólim saytta usıǵan jaqın kórinedi. Baslıq hám fon sıyaqlı ulıwma bezekler bul jerde kórsetilmeydi.",
+      "previewEmpty": "tekst kirgizilmegen",
+      "templatesTitle": "Tayar shablonlar",
+      "templatesHint": "{{n}} úlgi — bólimdi tayar dúzilis hám tekstler menen toltıradı",
+      "templateApply": "Qollaw",
+      "templateConfirm": "\"{{name}}\" shablonı qollanadı hám bul bólimdegi házirgi kontent almastırıladı. Nátiyje derhal saqlanbaydı — aldın kórip shıǵasız. Dawam etesiz be?",
+      "templateApplied": "\"{{name}}\" shablonı qollanıldı — tekserip, saqlawdı umıtpań",
       "localeHint": "Hár bir tekst maydanında til tabları bar (UZ / RU / KAA / EN). Sarı noqat — sol tilde awdarma joq, saytta onıń ornına ózbekshe tekst kórinedi.",
       "unsaved": "Saqlanbaǵan ózgerisler",
       "dirtyCount": "Saqlanbaǵan bólimler: {{n}}",
@@ -1042,7 +1051,8 @@
       "savedCount": "Saqlandı — ózgergen bólimler: {{n}}",
       "reset": "Ózgerislerdi qaytarıw",
       "resetConfirm": "Barlıq saqlanbaǵan ózgerisler biykar etiledi hám aqırǵı saqlanǵan halat qaytarıladı. Dawam etesiz be?",
-      "missingWarn": "{{n}} tekstiniń ózbekshe (tiykarǵı) variantı bos — saytta ol jerler bos kórinedi. Sonda da saqlansın ba?",
+      "missingBlock": "Saqlanbadı: {{n}} tekstiniń ózbekshe (tiykarǵı) variantı bos ({{where}}). Server bos maydandı qabıl etpeydi — olardı toltırıń.",
+      "minOneItem": "Dizimde keminde bir element qalıwı kerek",
       "moveUp": "Joqarıǵa jıljıtıw",
       "moveDown": "Tómenge jıljıtıw",
       "emptyList": "Házirshe element joq — tómendegi tuyme arqalı qosıń."
@@ -1073,5 +1083,9 @@
         "ASSIGNMENT": "Tapsırma"
       }
     }
+  },
+  "engagement": {
+    "like": "Unatıw",
+    "unlike": "Unatıwdı alıp taslaw"
   }
 }

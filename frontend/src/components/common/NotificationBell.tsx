@@ -39,8 +39,19 @@ export default function NotificationBell(): React.ReactElement | null {
     if (!user) return;
     load();
     const unsubscribe = subscribeNotifications(load);
-    const t = setInterval(load, POLL_MS);
-    return () => { unsubscribe(); clearInterval(t); };
+    // Zaxira polling faqat tab ko'rinib turganda ishlaydi — fon tabda ochiq
+    // qolgan sayt kun bo'yi bekorga so'rov yuborib, uxlab qolishi kerak bo'lgan
+    // bepul serverga ham keraksiz yuk berardi. Tab qaytganda darhol bir marta
+    // yangilanadi, ya'ni foydalanuvchi eskirgan ro'yxatni ko'rmaydi.
+    const tick = (): void => { if (document.visibilityState === 'visible') load(); };
+    const timer = setInterval(tick, POLL_MS);
+    const onVisible = (): void => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      unsubscribe();
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 

@@ -14,3 +14,7 @@ function normalizeApiUrl(raw: string | undefined): string {
 }
 
 export const API_URL: string = normalizeApiUrl(import.meta.env.VITE_API_URL);
+
+// Saytning ommaviy manzili — canonical/og:url/sitemap uchun ABSOLYUT bo'lishi
+// shart (ijtimoiy tarmoq va qidiruv robotlari nisbiy yo'lni tushunmaydi).
+export const SITE_URL: string = (import.meta.env.VITE_SITE_URL || 'https://datalife.uz').replace(/\/+$/, '');

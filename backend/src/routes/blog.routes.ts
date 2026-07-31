@@ -10,6 +10,7 @@ import {
 } from '../controllers/blog.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
+import { publicCache } from '../middleware/publicCache';
 import { validateBody, validateQuery } from '../middleware/validateRequest';
 import { createBlogPostSchema, listBlogQuerySchema, updateBlogPostSchema } from '../validators/blog.validator';
 
@@ -21,7 +22,9 @@ router.post('/', authenticate, authorize('ADMIN'), validateBody(createBlogPostSc
 router.put('/:id', authenticate, authorize('ADMIN'), validateBody(updateBlogPostSchema), updateBlogPostHandler);
 router.delete('/:id', authenticate, authorize('ADMIN'), deleteBlogPostHandler);
 
-router.get('/', validateQuery(listBlogQuerySchema), listBlogPostsHandler);
+// Faqat ro'yxat keshlanadi — bitta post sahifasi ko'rishlar sonini oshiradi
+// (bv_<id> cookie'si bilan), keshlansa hisob umuman ishlamay qolardi.
+router.get('/', publicCache(60), validateQuery(listBlogQuerySchema), listBlogPostsHandler);
 router.get('/:slug', getBlogPostHandler);
 
 export default router;

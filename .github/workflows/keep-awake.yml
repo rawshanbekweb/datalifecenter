@@ -1,0 +1,32 @@
+# Render'ning bepul rejasi 15 daqiqa harakatsizlikdan keyin servisni uxlatadi va
+# keyingi mehmon ~30-60 soniya kutadi. Har 10 daqiqada /api/health'ga so'rov
+# yuborib servisni uyg'oq ushlab turamiz.
+#
+# ESLATMA: GitHub'ning cron rejalashtiruvchisi kafolatli emas — band paytlarda
+# 5-15 daqiqa kechikishi mumkin va repo 60 kun harakatsiz qolsa workflow
+# avtomatik o'chadi. Ishonchliroq variant — UptimeRobot yoki cron-job.org
+# (ikkalasi ham bepul, 5 daqiqalik interval): shu URL'ni monitoring sifatida
+# qo'shsangiz, uptime hisoboti ham bonus bo'ladi.
+name: Keep backend awake
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          for attempt in 1 2 3; do
+            # Uxlab qolgan servis uyg'onishi uchun uzun timeout kerak
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 \
+              https://datalife.onrender.com/api/health || echo 000)
+            echo "Attempt $attempt: HTTP $code"
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 15
+          done
+          echo "Backend javob bermadi"
+          exit 1

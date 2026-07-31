@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { getSiteSettingsAdminHandler, getSiteSettingsHandler, updateSiteSettingSectionHandler } from '../controllers/siteSettings.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
+import { publicCache } from '../middleware/publicCache';
 
 const router = Router();
 
-router.get('/', getSiteSettingsHandler);
+router.get('/', publicCache(60), getSiteSettingsHandler);
 router.get('/admin', authenticate, authorize('ADMIN'), getSiteSettingsAdminHandler);
 router.patch('/:section', authenticate, authorize('ADMIN'), updateSiteSettingSectionHandler);
 
