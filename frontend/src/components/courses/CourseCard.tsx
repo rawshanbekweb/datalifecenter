@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight, Star } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
+import LikeButton from '../common/LikeButton';
+import { useEngagementItem } from '../../hooks/useEngagementItem';
 
 interface CourseModule {
   id: string | number;
@@ -37,6 +39,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
   const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
+  const engagement = useEngagementItem('course', String(course.id));
 
   return (
     <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
@@ -80,7 +83,8 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
           <Clock size={13} />{t('cards.course.months', { n: course.durationMonths })}
           {course.studentsCount > 0 && <span style={{ marginLeft:8 }}>{t('cards.course.studentsShort', { n: course.studentsCount })}</span>}
         </div>
-        <div style={{ display:'flex', gap:7 }}>
+        <div style={{ display:'flex', gap:7, alignItems:'center' }}>
+          <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} color={course.color} />
           {course.modules && course.modules.length > 0 && (
             <button onClick={() => setOpen(!open)} style={{ fontSize:11, padding:'5px 12px', borderRadius:20, cursor:'pointer', background:'#fff', color:course.color, border:`1px solid ${course.border}`, fontWeight:600, transition:'all 0.2s' }}>
               {open ? t('common.close') : t('cards.course.more')}

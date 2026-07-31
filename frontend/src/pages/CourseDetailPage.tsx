@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Clock, Star, Users, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
+import { Clock, Star, Users, Eye, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
 import { getCourseBySlug } from '../api/courses';
 import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
+import { registerView } from '../api/engagement';
 import { resolveIcon } from '../utils/iconMap';
 import { formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
+import { useEngagementItem } from '../hooks/useEngagementItem';
 import ComingSoon from '../components/common/ComingSoon';
+import LikeButton from '../components/common/LikeButton';
 import CourseReviews from '../components/courses/CourseReviews';
 
 interface Lesson {
@@ -77,6 +80,8 @@ export default function CourseDetailPage(): React.ReactElement {
   const [enrollment, setEnrollment]     = useState<Enrollment | null>(null);
   const [payStatus, setPayStatus]       = useState<PayStatus>('idle');
 
+  const engagement = useEngagementItem('course', course ? String(course.id) : undefined);
+
   useEffect(() => {
     let cancelled = false;
     setStatus('loading');
@@ -85,6 +90,13 @@ export default function CourseDetailPage(): React.ReactElement {
       .catch((err) => { if (!cancelled) setStatus(err.status === 404 ? 'not-found' : 'error'); });
     return () => { cancelled = true; };
   }, [slug]);
+
+  // Ko'rishni alohida so'rov bilan qayd etamiz — dublikat server tomonda
+  // qurilma bo'yicha to'siladi, xatosi sahifaga ta'sir qilmaydi
+  useEffect(() => {
+    if (!course?.id) return;
+    void registerView('course', String(course.id)).catch(() => undefined);
+  }, [course?.id]);
 
   // Foydalanuvchi bu kursga yozilganmi — sahifa ochilganda aniqlaymiz
   useEffect(() => {
@@ -171,7 +183,11 @@ export default function CourseDetailPage(): React.ReactElement {
             {course.studentsCount > 0 && (
               <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {t('pages.courseDetail.students', { n: course.studentsCount })}</span>
             )}
+            {(engagement.views ?? 0) > 0 && (
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Eye size={14}/> {engagement.views}</span>
+            )}
             <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{t(`levels.${course.level}`)}</span>
+            <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} size="md" color={course.color} />
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
               {course.isFree ? t('common.free') : `${formatNumber(Number(course.price))} ${course.currency}`}
             </span>

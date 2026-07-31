@@ -7,6 +7,7 @@ import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/locali
 import { slugify } from '../utils/slugify';
 import { signVideoUrl } from './storage.service';
 import { hasActiveSubscription } from './subscriptions.service';
+import { purgeEngagement } from './engagement.service';
 
 interface ListCoursesFilters {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -247,4 +248,6 @@ export async function deleteCourse(id: string) {
     }
     throw err;
   }
+  // ContentLike/ContentView polimorf — foreign key yo'q, qo'lda tozalanadi
+  await purgeEngagement('COURSE', id);
 }

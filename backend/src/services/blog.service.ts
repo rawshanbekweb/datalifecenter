@@ -4,6 +4,7 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
 import { slugify } from '../utils/slugify';
+import { purgeEngagement } from './engagement.service';
 
 interface ListBlogFilters {
   category?: string;
@@ -39,14 +40,6 @@ export async function getBlogPostBySlug(slug: string, locale: SupportedLocale) {
     throw ApiError.notFound('Maqola topilmadi');
   }
   return resolveLocaleDeep(post, locale);
-}
-
-// Bitta brauzer/qurilma bir kun ichida sahifani necha marta yangilasa ham
-// faqat bitta ko'rish sifatida hisoblanishi uchun kontrollerdan cookie
-// tekshiruvidan o'tgandan keyingina chaqiriladi.
-export async function incrementBlogViews(id: string): Promise<number> {
-  const updated = await prisma.blogPost.update({ where: { id }, data: { views: { increment: 1 } } });
-  return updated.views;
 }
 
 export async function listBlogPostsAdmin() {
@@ -109,4 +102,6 @@ export async function deleteBlogPost(id: string) {
     throw ApiError.notFound('Maqola topilmadi');
   }
   await prisma.blogPost.delete({ where: { id } });
+  // ContentLike/ContentView polimorf — foreign key yo'q, qo'lda tozalanadi
+  await purgeEngagement('BLOG_POST', id);
 }

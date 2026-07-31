@@ -3,6 +3,8 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Star, Quote } from 'lucide-react';
 import { listTestimonials } from '../api/testimonials';
+import LikeButton from './common/LikeButton';
+import { useEngagementItem } from '../hooks/useEngagementItem';
 
 interface Testimonial {
   id: string;
@@ -14,6 +16,42 @@ interface Testimonial {
 }
 
 type TestimonialsStatus = 'loading' | 'ready' | 'error';
+
+/**
+ * Alohida komponent — `useEngagementItem` hook'i ro'yxat ichidagi
+ * `.map()` callback'ida chaqirilmasligi kerak (React hook qoidalari).
+ */
+function TestimonialCard({ item, index }: { item: Testimonial; index: number }): React.ReactElement {
+  const engagement = useEngagementItem('testimonial', item.id);
+
+  return (
+    <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
+      viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(index%3)*0.1 }}
+      className="card" style={{ padding:'26px 24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', position:'relative', display:'flex', flexDirection:'column' }}>
+      <Quote size={28} style={{ color:'#bae6fd', marginBottom:10 }} />
+      <div style={{ display:'flex', gap:2, marginBottom:12 }}>
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <Star key={idx} size={14} fill={idx < item.rating ? '#f59e0b' : 'none'} style={{ color:'#f59e0b' }} />
+        ))}
+      </div>
+      <p style={{ fontSize:13.5, color:'#475569', lineHeight:1.8, marginBottom:20, flex:1 }}>{item.text}</p>
+      <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+        {item.avatarUrl ? (
+          <img src={item.avatarUrl} alt={item.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', flexShrink:0 }} />
+        ) : (
+          <div style={{ width:40, height:40, borderRadius:'50%', background:'#f0f9ff', border:'1.5px solid #bae6fd', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontWeight:800, color:'#0ea5e9', fontSize:15 }}>
+            {item.name.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <div style={{ minWidth:0, flex:1 }}>
+          <p style={{ fontSize:13.5, fontWeight:800, color:'#0f172a' }}>{item.name}</p>
+          <p style={{ fontSize:11.5, color:'#94a3b8' }}>{item.role}</p>
+        </div>
+        <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} />
+      </div>
+    </m.div>
+  );
+}
 
 export default function Testimonials(): React.ReactElement | null {
   const { t } = useTranslation();
@@ -45,31 +83,8 @@ export default function Testimonials(): React.ReactElement | null {
 
         {status === 'ready' && (
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="testimonials-grid">
-            {items.map((t: Testimonial, i: number) => (
-              <m.div key={t.id} initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true, margin:'-30px' }} transition={{ duration:0.5, delay:(i%3)*0.1 }}
-                className="card" style={{ padding:'26px 24px', boxShadow:'0 2px 16px rgba(0,0,0,0.06)', position:'relative' }}>
-                <Quote size={28} style={{ color:'#bae6fd', marginBottom:10 }} />
-                <div style={{ display:'flex', gap:2, marginBottom:12 }}>
-                  {Array.from({ length: 5 }).map((_, idx) => (
-                    <Star key={idx} size={14} fill={idx < t.rating ? '#f59e0b' : 'none'} style={{ color:'#f59e0b' }} />
-                  ))}
-                </div>
-                <p style={{ fontSize:13.5, color:'#475569', lineHeight:1.8, marginBottom:20 }}>{t.text}</p>
-                <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                  {t.avatarUrl ? (
-                    <img src={t.avatarUrl} alt={t.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', flexShrink:0 }} />
-                  ) : (
-                    <div style={{ width:40, height:40, borderRadius:'50%', background:'#f0f9ff', border:'1.5px solid #bae6fd', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontWeight:800, color:'#0ea5e9', fontSize:15 }}>
-                      {t.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div>
-                    <p style={{ fontSize:13.5, fontWeight:800, color:'#0f172a' }}>{t.name}</p>
-                    <p style={{ fontSize:11.5, color:'#94a3b8' }}>{t.role}</p>
-                  </div>
-                </div>
-              </m.div>
+            {items.map((item: Testimonial, i: number) => (
+              <TestimonialCard key={item.id} item={item} index={i} />
             ))}
           </div>
         )}

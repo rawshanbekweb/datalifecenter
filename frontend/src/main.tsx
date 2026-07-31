@@ -5,7 +5,9 @@ import { RouterProvider } from 'react-router-dom'
 import { LazyMotion } from 'framer-motion'
 import { createAppRouter } from './router'
 import { FeedbackProvider } from './components/common/Feedback'
+import ServerWakeBanner from './components/common/ServerWakeBanner'
 import { AuthProvider } from './context/AuthContext'
+import EngagementProvider from './context/EngagementProvider'
 import { LocaleProvider } from './context/LocaleContext'
 import { detectLocale } from './i18n/locale'
 import { initI18n } from './i18n/i18n'
@@ -40,7 +42,12 @@ function mount(): void {
         <LocaleProvider locale={locale} basename={basename}>
           <AuthProvider>
             <FeedbackProvider>
-              <RouterProvider router={router} />
+              {/* Yoqtirish/ko'rish hisoblagichlari — barcha sahifalarda
+                  ko'rinadigani uchun router'dan tashqarida turadi */}
+              <EngagementProvider>
+                <RouterProvider router={router} />
+              </EngagementProvider>
+              <ServerWakeBanner />
             </FeedbackProvider>
           </AuthProvider>
         </LocaleProvider>

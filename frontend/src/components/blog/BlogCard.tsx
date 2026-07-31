@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Clock, ArrowRight } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
 import { formatDate as formatLocalizedDate } from '../../utils/format';
+import { useEngagementItem } from '../../hooks/useEngagementItem';
+import LikeButton from '../common/LikeButton';
 
 export interface BlogPostCardData {
   id: string | number;
@@ -40,6 +42,10 @@ function formatDate(dateStr: string): string {
 export default function BlogCard({ post, index = 0 }: BlogCardProps): React.ReactElement {
   const { t } = useTranslation();
   const Icon = resolveIcon(post.iconKey);
+  const engagement = useEngagementItem('blog', String(post.id));
+  // Jonli qiymat kelmaguncha maqola bilan birga kelgan son ko'rsatiladi —
+  // shu tufayli kartada hech qachon bo'sh joy yoki nol chaqnashi bo'lmaydi
+  const views = engagement.views ?? post.views;
   return (
     <Link to={`/blog/${post.slug}`} style={{ textDecoration:'none' }}>
       <m.article initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
@@ -54,7 +60,7 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
           <div style={{ position:'absolute', top:10, left:12 }}>
             <span style={{ fontSize:10, padding:'3px 10px', borderRadius:20, background:post.bg, color:post.color, border:`1px solid ${post.border}`, fontFamily:'var(--font-mono)', fontWeight:700 }}>{post.category}</span>
           </div>
-          <div style={{ position:'absolute', top:12, right:12, fontSize:11, color:'#94a3b8' }}>{t('cards.blog.views', { n: formatViews(post.views) })}</div>
+          <div style={{ position:'absolute', top:12, right:12, fontSize:11, color:'#94a3b8' }}>{t('cards.blog.views', { n: formatViews(views) })}</div>
         </div>
 
         <div style={{ padding:'16px 18px', display:'flex', flexDirection:'column', flexGrow:1 }}>
@@ -70,8 +76,11 @@ export default function BlogCard({ post, index = 0 }: BlogCardProps): React.Reac
             {post.tags.map((tag: string) => <span key={tag} style={{ fontSize:10, padding:'2px 8px', borderRadius:12, background:'#fff', color:'#64748b', border:'1px solid #e2e8f0', fontFamily:'var(--font-mono)' }}>#{tag}</span>)}
           </div>
 
-          <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:post.color }}>
-            {t('cards.blog.continue')} <ArrowRight size={13}/>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+            <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:post.color }}>
+              {t('cards.blog.continue')} <ArrowRight size={13}/>
+            </span>
+            <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} />
           </div>
         </div>
       </m.article>

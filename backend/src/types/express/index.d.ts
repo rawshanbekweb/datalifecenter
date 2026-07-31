@@ -7,6 +7,8 @@ declare global {
       user?: JwtPayload;
       validatedQuery?: Record<string, unknown>;
       locale: SupportedLocale;
+      // Anonim qurilma identifikatori (X-Device-Id) — yoqtirish/ko'rish uchun
+      deviceId?: string;
     }
   }
 }

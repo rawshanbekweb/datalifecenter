@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
+import { purgeEngagement } from './engagement.service';
 
 export async function listProjects(locale: SupportedLocale) {
   const projects = await prisma.project.findMany({
@@ -48,4 +49,6 @@ export async function deleteProject(id: string) {
     throw ApiError.notFound('Loyiha topilmadi');
   }
   await prisma.project.delete({ where: { id } });
+  // ContentLike/ContentView polimorf — foreign key yo'q, qo'lda tozalanadi
+  await purgeEngagement('PROJECT', id);
 }

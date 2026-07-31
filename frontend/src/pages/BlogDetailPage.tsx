@@ -4,11 +4,15 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Clock, Eye, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug } from '../api/blog';
+import { registerView } from '../api/engagement';
 import { resolveIcon } from '../utils/iconMap';
 import { formatDate } from '../utils/format';
 import ComingSoon from '../components/common/ComingSoon';
+import LikeButton from '../components/common/LikeButton';
+import { useEngagementItem } from '../hooks/useEngagementItem';
 
 interface BlogPost {
+  id: string;
   iconKey: string;
   bg: string;
   border: string;
@@ -35,6 +39,8 @@ export default function BlogDetailPage(): React.ReactElement {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [status, setStatus] = useState<Status>('loading');
 
+  const engagement = useEngagementItem('blog', post?.id);
+
   useEffect(() => {
     let cancelled = false;
     setStatus('loading');
@@ -43,6 +49,14 @@ export default function BlogDetailPage(): React.ReactElement {
       .catch((err: ApiError) => { if (!cancelled) setStatus(err.status === 404 ? 'not-found' : 'error'); });
     return () => { cancelled = true; };
   }, [slug]);
+
+  // Ko'rish maqola ochilgach alohida so'rov bilan qayd etiladi (GET'ning
+  // o'zi hisoblamaydi — shu tufayli maqola javobi keshlanadi). Dublikat
+  // server tomonda qurilma bo'yicha to'siladi, xatosi jim yutiladi.
+  useEffect(() => {
+    if (!post?.id) return;
+    void registerView('blog', post.id).catch(() => undefined);
+  }, [post?.id]);
 
   if (status === 'loading') {
     return <section style={{ padding:'200px 24px 80px', textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('common.loading')}</section>;
@@ -75,8 +89,11 @@ export default function BlogDetailPage(): React.ReactElement {
 
           <div style={{ display:'flex', gap:20, flexWrap:'wrap', fontSize:13, color:'#94a3b8', marginBottom:28, paddingBottom:24, borderBottom:'1px solid #f1f5f9' }}>
             <span style={{ display:'flex', alignItems:'center', gap:5 }}><Clock size={13}/> {t('pages.blogDetail.readMinutes', { n: post!.readMinutes })}</span>
-            <span style={{ display:'flex', alignItems:'center', gap:5 }}><Eye size={13}/> {t('pages.blogDetail.views', { n: post!.views })}</span>
+            <span style={{ display:'flex', alignItems:'center', gap:5 }}><Eye size={13}/> {t('pages.blogDetail.views', { n: engagement.views ?? post!.views })}</span>
             <span>{formatDate(post!.publishedAt, { day:'numeric', month:'long', year:'numeric' })}</span>
+            <span style={{ marginLeft:'auto' }}>
+              <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} size="md" />
+            </span>
           </div>
 
           <div style={{ fontSize:15, color:'#334155', lineHeight:1.9 }}>

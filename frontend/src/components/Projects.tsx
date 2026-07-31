@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, GitBranch } from 'lucide-react';
+import { ExternalLink, Eye, GitBranch } from 'lucide-react';
 import { listProjects } from '../api/projects';
+import { registerView } from '../api/engagement';
+import LikeButton from './common/LikeButton';
+import { useEngagementItem } from '../hooks/useEngagementItem';
 
 interface ProjectItem {
   id: string;
@@ -31,6 +34,14 @@ function hostnameOf(url?: string | null): string {
 function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
   const { t } = useTranslation();
   const host = hostnameOf(p.liveUrl);
+  const engagement = useEngagementItem('project', p.id);
+
+  // Loyihaning alohida sahifasi yo'q — shuning uchun "ko'rish" deb loyiha
+  // saytiga o'tish hisoblanadi. Bu "kartani ko'rdi"dan ko'ra ancha ma'noli
+  // ko'rsatkich: qancha odam ishni haqiqatan ochib ko'rgan.
+  const handleVisit = (): void => {
+    void registerView('project', p.id).catch(() => undefined);
+  };
   return (
     <m.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, delay: (i % 3) * 0.1 }} className="card"
@@ -56,7 +67,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
           // (aks holda ikkita <a> ichma-ich bo'lib, HTML buzilardi).
           const Wrapper = isLive ? 'div' : (p.liveUrl ? 'a' : 'div');
           const wrapperProps = !isLive && p.liveUrl
-            ? { href: p.liveUrl, target: '_blank', rel: 'noopener noreferrer' }
+            ? { href: p.liveUrl, target: '_blank', rel: 'noopener noreferrer', onClick: handleVisit }
             : {};
 
           return (
@@ -72,7 +83,7 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
               )}
               {p.liveUrl && (
                 isLive ? (
-                  <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="proj-shot-overlay" style={{
+                  <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" onClick={handleVisit} className="proj-shot-overlay" style={{
                     position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: 'rgba(15,23,42,0.45)', opacity: 0, transition: 'opacity 0.25s', textDecoration: 'none',
                   }}>
@@ -103,32 +114,39 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
 
       {/* Kontent */}
       <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <span className="tag" style={{ alignSelf: 'flex-start', marginBottom: 10 }}>{p.category}</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10 }}>
+          <span className="tag">{p.category}</span>
+          {(engagement.views ?? 0) > 0 && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#94a3b8', fontFamily: 'var(--font-mono)' }}>
+              <Eye size={12} /> {engagement.views}
+            </span>
+          )}
+        </div>
         <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>{p.title}</h3>
         <p style={{ fontSize: 12.5, color: '#64748b', lineHeight: 1.7, marginBottom: 14, flex: 1 }}>{p.description}</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: p.repoUrl || p.liveUrl ? 14 : 0 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
           {p.techStack.map((t: string) => (
             <span key={t} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 12, background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0', fontFamily:'var(--font-mono)' }}>{t}</span>
           ))}
         </div>
-        {(p.liveUrl || p.repoUrl) && (
-          <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: '1px solid #f1f5f9' }}>
-            {p.liveUrl && (
-              <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', flex: 1 }}>
-                <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 12, padding: '8px 12px' }}>
-                  {t('home.projects.view')} <ExternalLink size={12} />
-                </button>
-              </a>
-            )}
-            {p.repoUrl && (
-              <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                <button className="btn-outline" style={{ fontSize: 12, padding: '8px 12px' }}>
-                  <GitBranch size={12} />
-                </button>
-              </a>
-            )}
-          </div>
-        )}
+        {/* Yoqtirish tugmasi doim ko'rinadi — havolasiz loyihalarda ham */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', paddingTop: 12, borderTop: '1px solid #f1f5f9' }}>
+          <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} />
+          {p.liveUrl && (
+            <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" onClick={handleVisit} style={{ textDecoration: 'none', flex: 1 }}>
+              <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: 12, padding: '8px 12px' }}>
+                {t('home.projects.view')} <ExternalLink size={12} />
+              </button>
+            </a>
+          )}
+          {p.repoUrl && (
+            <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <button className="btn-outline" style={{ fontSize: 12, padding: '8px 12px' }}>
+                <GitBranch size={12} />
+              </button>
+            </a>
+          )}
+        </div>
       </div>
     </m.div>
   );

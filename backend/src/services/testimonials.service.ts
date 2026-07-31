@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep } from '../utils/localizedField';
+import { purgeEngagement } from './engagement.service';
 
 export async function listTestimonials(locale: SupportedLocale) {
   const testimonials = await prisma.testimonial.findMany({
@@ -45,4 +46,6 @@ export async function deleteTestimonial(id: string) {
     throw ApiError.notFound('Sharh topilmadi');
   }
   await prisma.testimonial.delete({ where: { id } });
+  // ContentLike polimorf — foreign key yo'q, qo'lda tozalanadi
+  await purgeEngagement('TESTIMONIAL', id);
 }

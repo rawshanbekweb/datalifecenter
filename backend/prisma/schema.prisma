@@ -149,6 +149,8 @@ model Course {
   rating         Float        @default(0)
   reviewsCount   Int          @default(0)
   studentsCount  Int          @default(0)
+  views          Int          @default(0)
+  likesCount     Int          @default(0)
   tags           String[]
   published      Boolean      @default(false)
   mentor         Mentor?      @relation(fields: [mentorId], references: [id])
@@ -408,6 +410,8 @@ model Project {
   order         Int      @default(0)
   featured      Boolean  @default(false)
   published     Boolean  @default(true)
+  views         Int      @default(0)
+  likesCount    Int      @default(0)
   createdAt     DateTime @default(now())
 }
 
@@ -516,7 +520,60 @@ model Testimonial {
   rating    Int      @default(5)
   published Boolean  @default(true)
   order     Int      @default(0)
+  likesCount Int     @default(0)
   createdAt DateTime @default(now())
+}
+
+// Yoqtirish/ko'rish hisoblagichlari qo'llanadigan kontent turlari.
+// Polimorf yondashuv ATAYIN tanlangan: har bir tur uchun alohida Like jadvali
+// (BlogPostLike, ProjectLike...) bir xil kodni to'rt marta takrorlashni talab
+// qilardi. Buning evaziga foreign key yo'q — kontent o'chirilganda unga
+// tegishli yozuvlar `engagement.service.ts` dagi `purgeEngagement()` orqali
+// qo'lda tozalanadi.
+// ESLATMA: `ContentType` nomi allaqachon band (Lesson uchun VIDEO/TEXT/...),
+// shu sabab bu yerda `EngagementTarget` ishlatiladi.
+enum EngagementTarget {
+  BLOG_POST
+  PROJECT
+  COURSE
+  TESTIMONIAL
+}
+
+// Bitta qurilmaning bitta kontentga qo'ygan yoqtirishi.
+// `deviceId` — httpOnly cookie'dagi tasodifiy identifikator (login talab
+// qilinmaydi): mehmon ham yoqtira olishi kerak. Cookie tozalansa qayta
+// yoqtirish mumkin — bu ongli murosa, qat'iy noyoblik uchun login shart bo'lardi.
+model ContentLike {
+  id          String           @id @default(cuid())
+  contentType EngagementTarget
+  contentId   String
+  deviceId    String
+  createdAt   DateTime         @default(now())
+
+  // Bir qurilma bir kontentni faqat bir marta yoqtira oladi — takroriy
+  // bosish yozuvni o'chiradi (toggle)
+  @@unique([contentType, contentId, deviceId])
+  // Kontent bo'yicha sanash va o'chirish uchun
+  @@index([contentType, contentId])
+}
+
+// Ko'rishlar dublikatini to'sish uchun.
+//
+// Ilgari bu blogda `bv_<id>` cookie'si bilan qilinardi — lekin frontend va
+// backend turli domenlarda (vercel.app / datalife.uz ↔ onrender.com) va
+// Safari krossdomen cookie'ni bloklaydi: o'sha brauzerlarda har yangilashda
+// ko'rishlar soni oshib ketardi. Endi hisob `deviceId` (localStorage'dagi
+// identifikator, `X-Device-Id` header orqali) bo'yicha bazada tekshiriladi.
+model ContentView {
+  id          String           @id @default(cuid())
+  contentType EngagementTarget
+  contentId   String
+  deviceId    String
+  // Oxirgi hisoblangan vaqt — 24 soatdan keyin ko'rish qayta sanaladi
+  viewedAt    DateTime         @default(now())
+
+  @@unique([contentType, contentId, deviceId])
+  @@index([contentType, contentId])
 }
 
 model ContactMessage {
@@ -543,7 +600,10 @@ model BlogPost {
   bg           String
   border       String
   readMinutes  Int       @default(5)
+  // Hisoblagichlar ATAYIN denormallashtirilgan (ContentLike'dan COUNT emas):
+  // ro'yxat endpointlari yuklama ostida har element uchun sanashga chidamaydi
   views        Int       @default(0)
+  likesCount   Int       @default(0)
   tags         String[]
   published    Boolean   @default(false)
   mentor       Mentor?   @relation(fields: [mentorId], references: [id])
