@@ -104,7 +104,7 @@ export default function LearnPage(): React.ReactElement {
   }, [course, activeLessonId]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;
   }
   if (status === 'forbidden') {
     return (

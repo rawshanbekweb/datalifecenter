@@ -117,7 +117,7 @@ export default function CourseDetailPage(): React.ReactElement {
   }, [user, slug]);
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;
   }
   if (status === 'error') {
     return <ComingSoon title={t('common.error')} sub={t('pages.courseDetail.errorSub')} />;

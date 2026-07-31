@@ -75,7 +75,7 @@ export default function LiveSessionPage(): React.ReactElement {
   );
 
   if (status === 'loading') {
-    return <section style={{ padding:'200px 24px 80px' }}><Loading center bar /></section>;
+    return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;
   }
 
   if (status === 'forbidden' || status === 'error' || !session) {

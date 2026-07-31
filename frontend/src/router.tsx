@@ -73,7 +73,7 @@ const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProject
 function PageFallback(): React.ReactElement {
   return (
     <section style={{ padding: '200px 24px 80px' }}>
-      <Loading center bar />
+      <Loading page />
     </section>
   )
 }
