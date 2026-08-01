@@ -52,13 +52,24 @@ jobs:
         env:
           PROBLEMS: ${{ steps.monitor.outputs.problems }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        # Xabar Node orqali JSON bilan yuboriladi: qobiq orqali (curl
+        # --data-urlencode) yuborilganda matn qobiqning kodlashiga bog'liq
+        # bo'lib qoladi va o'zbekcha belgilar "strings must be encoded in
+        # UTF-8" xatosini berishi mumkin — bu lokal sinovda aynan shunday bo'ldi.
         run: |
-          TEXT="DATA LIFE — saytda muammo aniqlandi
-          ${PROBLEMS:-Tafsilotlar log'da}
-
-          Batafsil: ${RUN_URL}"
-          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${TEXT}" \
-            --data-urlencode "disable_web_page_preview=true" \
-            -o /dev/null -w 'Telegram: HTTP %{http_code}\n'
+          node -e "
+            const text = 'DATA LIFE — saytda muammo aniqlandi\n\n'
+              + (process.env.PROBLEMS || 'Tafsilotlar log da')
+              + '\n\nBatafsil: ' + process.env.RUN_URL;
+            fetch('https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json; charset=utf-8' },
+              body: JSON.stringify({
+                chat_id: process.env.TELEGRAM_CHAT_ID,
+                text,
+                disable_web_page_preview: true,
+              }),
+            })
+              .then((r) => r.json())
+              .then((j) => console.log(j.ok ? 'Telegram: yuborildi' : 'Telegram XATO: ' + JSON.stringify(j)));
+          "
