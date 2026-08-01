@@ -18,10 +18,19 @@ const envSchema = z.object({
   BREVO_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
 
-  // Cloudinary (ixtiyoriy) — sozlansa fayllar bulutga yuklanadi (ephemeral hostingda shart)
+  // --- Fayl xotirasi (ephemeral hostingda ikkalasidan biri MAJBURIY) ---
+  // Cloudinary (ixtiyoriy). DIQQAT: Cloudinary ba'zi mamlakatlarda, jumladan
+  // O'zbekistonda, ro'yxatdan o'tishni bloklaydi — bunday holda Supabase ishlatiladi.
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
+
+  // Supabase Storage (ixtiyoriy) — Cloudinary'ga muqobil.
+  // SUPABASE_SERVICE_ROLE_KEY faqat serverda ishlatiladi (frontendga CHIQMASLIGI shart).
+  SUPABASE_URL: z.string().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_BUCKET_IMAGES: z.string().default('datalife-images'),
+  SUPABASE_BUCKET_VIDEOS: z.string().default('datalife-videos'),
 
   // Sentry (ixtiyoriy) — production'da xatolarni kuzatish
   SENTRY_DSN: z.string().optional(),

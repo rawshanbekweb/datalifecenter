@@ -2,7 +2,7 @@
 import './config/sentry';
 import { env } from './config/env';
 import app from './app';
-import { cloudinaryEnabled } from './services/storage.service';
+import { cloudStorageEnabled, storageProvider } from './services/storage.service';
 
 app.listen(env.PORT, () => {
   console.log(`DATA LIFE API http://localhost:${env.PORT}`);
@@ -12,12 +12,15 @@ app.listen(env.PORT, () => {
   // rasm saqlanadi, URL bazaga yoziladi, lekin keyingi deploydan so'ng
   // o'sha URL 404 qaytaradi va sayt bo'ylab singan rasmlar paydo bo'ladi.
   // Bu jimgina yo'qotish bo'lgani uchun ishga tushishda baland ogohlantiramiz.
-  if (!cloudinaryEnabled && env.NODE_ENV === 'production') {
+  if (cloudStorageEnabled) {
+    console.log(`Fayl xotirasi: ${storageProvider}`);
+  } else if (env.NODE_ENV === 'production') {
     console.warn(
-      '\n[OGOHLANTIRISH] CLOUDINARY_* sozlanmagan — yuklangan rasm va videolar ' +
+      '\n[OGOHLANTIRISH] Bulut xotira sozlanmagan — yuklangan rasm va videolar ' +
       'lokal diskda saqlanadi va KEYINGI DEPLOYDA YO\'QOLADI.\n' +
-      'Render/Railway kabi hostingda CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY ' +
-      'va CLOUDINARY_API_SECRET kiritilishi shart.\n'
+      'Render/Railway kabi hostingda quyidagilardan biri kiritilishi shart:\n' +
+      '  SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY   (Cloudinary ochilmaydigan mamlakatlar uchun)\n' +
+      '  CLOUDINARY_CLOUD_NAME + CLOUDINARY_API_KEY + CLOUDINARY_API_SECRET\n'
     );
   }
 });

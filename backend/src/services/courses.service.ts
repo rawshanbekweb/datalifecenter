@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/localizedField';
 import { slugify } from '../utils/slugify';
-import { signVideoUrl } from './storage.service';
+import { signVideoUrls } from './storage.service';
 import { hasActiveSubscription } from './subscriptions.service';
 import { purgeEngagement } from './engagement.service';
 
@@ -65,6 +65,12 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  // Faqat bepul ko'rish uchun ochiq darslar imzolanadi; qolganlariga null beriladi,
+  // shuning uchun imzolash ro'yxatiga ham kirmaydi.
+  const signed = await signVideoUrlMap(course.modules, (lesson) =>
+    lesson.isFreePreview ? lesson.videoUrl : null
+  );
+
   return resolveLocaleDeep(
     {
       ...course,
@@ -72,13 +78,27 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
         ...mod,
         lessons: mod.lessons.map((lesson) => ({
           ...lesson,
-          videoUrl: lesson.isFreePreview ? signVideoUrl(lesson.videoUrl) : null,
+          videoUrl: signed.get(lesson.id) ?? null,
           content: lesson.isFreePreview ? lesson.content : null,
         })),
       })),
     },
     locale
   );
+}
+
+/**
+ * Kursdagi barcha dars videolarini BITTA to'plamda imzolaydi va lesson.id → havola
+ * jadvalini qaytaradi. Supabase imzolash tarmoq so'rovi bo'lgani uchun darslar
+ * bittalab imzolanmasligi kerak (30 darsli kursda 30 so'rov bo'lardi).
+ */
+async function signVideoUrlMap<L extends { id: string; videoUrl: string | null }>(
+  modules: { lessons: L[] }[],
+  pick: (lesson: L) => string | null
+): Promise<Map<string, string | null>> {
+  const lessons = modules.flatMap((mod) => mod.lessons);
+  const signed = await signVideoUrls(lessons.map(pick));
+  return new Map(lessons.map((lesson, i) => [lesson.id, signed[i]]));
 }
 
 export async function listCoursesAdmin() {
@@ -159,12 +179,14 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     select: { lessonId: true },
   });
 
+  const signed = await signVideoUrlMap(course.modules, (lesson) => lesson.videoUrl);
+
   const signedCourse = resolveLocaleDeep(
     {
       ...course,
       modules: course.modules.map((mod) => ({
         ...mod,
-        lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signVideoUrl(lesson.videoUrl) })),
+        lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signed.get(lesson.id) ?? null })),
       })),
     },
     locale

@@ -4,7 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 import { verifyFileSignature } from '../utils/fileSignature';
-import { cloudinaryEnabled, uploadToCloudinary } from '../services/storage.service';
+import { cloudStorageEnabled, storageProvider, uploadToCloud } from '../services/storage.service';
 
 function publicUrl(req: Request, folder: 'images' | 'videos', filename: string): string {
   return `${req.protocol}://${req.get('host')}/uploads/${folder}/${filename}`;
@@ -24,15 +24,15 @@ function makeUploadHandler(folder: 'images' | 'videos') {
       throw ApiError.badRequest("Fayl mazmuni e'lon qilingan turiga mos emas", 'FILE_SIGNATURE_MISMATCH');
     }
 
-    // Cloudinary sozlangan bo'lsa fayl bulutga ko'chadi (ephemeral hostingda majburiy),
-    // lokal nusxa o'chiriladi. Sozlanmagan bo'lsa avvalgidek /uploads'dan beriladi.
+    // Bulut xotira sozlangan bo'lsa fayl u yerga ko'chadi (ephemeral hostingda
+    // majburiy), lokal nusxa o'chiriladi. Sozlanmagan bo'lsa avvalgidek /uploads'dan beriladi.
     let url = publicUrl(req, folder, file.filename);
-    if (cloudinaryEnabled) {
+    if (cloudStorageEnabled) {
       try {
-        const uploaded = await uploadToCloudinary(file.path, folder);
+        const uploaded = await uploadToCloud(file.path, folder, file.mimetype);
         url = uploaded.url;
       } catch (err) {
-        console.error('Cloudinary yuklash xatosi:', err);
+        console.error('Bulut xotiraga yuklash xatosi:', err);
         await fs.unlink(file.path).catch(() => {});
         throw ApiError.badRequest("Faylni bulut xotirasiga yuklab bo'lmadi. Qayta urinib ko'ring.", 'CLOUD_UPLOAD_FAILED');
       }
@@ -60,5 +60,5 @@ export const uploadVideoHandler = makeUploadHandler('videos');
  * ko'rganda sezadi. Shuning uchun panel yuklashdan OLDIN ogohlantirsin.
  */
 export const uploadConfigHandler = asyncHandler(async (_req: Request, res: Response) => {
-  sendSuccess(res, { cloudStorage: cloudinaryEnabled });
+  sendSuccess(res, { cloudStorage: cloudStorageEnabled, provider: storageProvider });
 });

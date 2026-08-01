@@ -4,15 +4,29 @@ import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { env } from '../config/env';
 import { IMAGES_DIR, VIDEOS_DIR } from '../config/uploads';
 import { signLocalVideoUrl } from '../utils/videoAccess';
+import * as supabase from './storage/supabase';
 
 const VIDEO_URL_TTL_SECONDS = 6 * 3600;
 
 // Render/Railway kabi ephemeral hostingda lokal disk deploy'da tozalanadi —
-// CLOUDINARY_* sozlansa fayllar bulutga ko'chadi va URL'lar doimiy bo'ladi.
+// bulut xotira sozlansa fayllar u yerga ko'chadi va URL'lar doimiy bo'ladi.
 // Sozlanmasa avvalgidek lokal diskda qoladi (development uchun qulay).
+//
+// Ikki provayder qo'llab-quvvatlanadi. Cloudinary ba'zi mamlakatlarda (jumladan
+// O'zbekistonda) ro'yxatdan o'tishni bloklaydi — o'sha holat uchun Supabase
+// Storage bor. Ikkalasi sozlangan bo'lsa Cloudinary ustun turadi, chunki
+// avvaldan ishlab turgan o'rnatmalar xatti-harakatini o'zgartirmaslik kerak.
 export const cloudinaryEnabled = Boolean(
   env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SECRET
 );
+
+export const storageProvider: 'cloudinary' | 'supabase' | 'local' = cloudinaryEnabled
+  ? 'cloudinary'
+  : supabase.supabaseEnabled
+    ? 'supabase'
+    : 'local';
+
+export const cloudStorageEnabled = storageProvider !== 'local';
 
 if (cloudinaryEnabled) {
   cloudinary.config({
@@ -23,12 +37,19 @@ if (cloudinaryEnabled) {
   });
 }
 
-// Lokal faylni Cloudinary'ga yuklab, doimiy URL qaytaradi.
-// Video uchun upload_large — 100 MB dan katta fayllar bo'laklab yuboriladi.
-export async function uploadToCloudinary(
+// Lokal faylni bulut xotiraga yuklab, doimiy URL qaytaradi.
+// Cloudinary uchun video — upload_large (100 MB dan katta fayllar bo'laklab yuboriladi).
+export async function uploadToCloud(
   filePath: string,
-  kind: 'images' | 'videos'
-): Promise<{ url: string; bytes: number }> {
+  kind: 'images' | 'videos',
+  contentType = 'application/octet-stream'
+): Promise<{ url: string }> {
+  if (storageProvider === 'supabase') {
+    const body = await fs.readFile(filePath);
+    const url = await supabase.upload(body, kind, path.basename(filePath), contentType);
+    return { url };
+  }
+
   const options = {
     folder: `datalife/${kind}`,
     resource_type: (kind === 'videos' ? 'video' : 'image') as 'video' | 'image',
@@ -47,7 +68,7 @@ export async function uploadToCloudinary(
         })
       : await cloudinary.uploader.upload(filePath, options);
 
-  return { url: result.secure_url, bytes: result.bytes };
+  return { url: result.secure_url };
 }
 
 // Cloudinary URL'idan public_id ni ajratadi:
@@ -68,35 +89,71 @@ function parseCloudinaryUrl(
   };
 }
 
-// Dars videosining saqlangan (doimiy) URL'ini vaqtinchalik, imzoli havolaga aylantiradi —
-// enrollment tekshiruvidan o'tgan foydalanuvchiga har safar YANGI havola beriladi, shuning
-// uchun oshkor bo'lgan eski havola muddat (TTL) tugagach ishlamay qoladi.
-// Cloudinary — "authenticated" turidagi asset uchun imzoli delivery URL generatsiya qilinadi
-// (tarmoq so'rovisiz, faqat lokal hisoblash). Lokal disk — HMAC token qo'shiladi.
-// YouTube/Vimeo va boshqa tashqi havolalar o'zgarishsiz qaytadi (biz tomondan himoya mumkin emas).
-export function signVideoUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
+/**
+ * Dars videolarining saqlangan (doimiy) URL'larini vaqtinchalik, imzoli havolaga
+ * aylantiradi — enrollment tekshiruvidan o'tgan foydalanuvchiga har safar YANGI
+ * havola beriladi, shuning uchun oshkor bo'lgan eski havola muddat tugagach
+ * ishlamay qoladi.
+ *
+ *   Cloudinary — "authenticated" asset uchun imzoli delivery URL (lokal hisoblash).
+ *   Supabase   — yopiq bucketdagi fayllar uchun imzoli havola (HTTP so'rov).
+ *   Lokal disk — HMAC token qo'shiladi.
+ *   YouTube/Vimeo va boshqa tashqi havolalar o'zgarishsiz qaytadi.
+ *
+ * ATAYIN TO'PLAMLI (massiv qabul qiladi): Supabase imzolash tarmoq so'rovi talab
+ * qiladi, kursda esa o'nlab dars bo'lishi mumkin — bittalab imzolansa sahifa
+ * ochilishi shuncha marta sekinlashardi. Tartib saqlanadi: natija massivi
+ * kirish massivi bilan bir xil indekslarda keladi.
+ */
+export async function signVideoUrls(urls: (string | null | undefined)[]): Promise<(string | null)[]> {
+  const result: (string | null)[] = urls.map((url) => {
+    if (!url) return null;
 
-  const cloud = parseCloudinaryUrl(url);
-  if (cloud) {
-    return cloudinary.url(cloud.publicId, {
-      resource_type: cloud.resourceType,
-      type: 'authenticated',
-      sign_url: true,
-      secure: true,
-      expires_at: Math.floor(Date.now() / 1000) + VIDEO_URL_TTL_SECONDS,
-    });
+    const cloud = parseCloudinaryUrl(url);
+    if (cloud) {
+      return cloudinary.url(cloud.publicId, {
+        resource_type: cloud.resourceType,
+        type: 'authenticated',
+        sign_url: true,
+        secure: true,
+        expires_at: Math.floor(Date.now() / 1000) + VIDEO_URL_TTL_SECONDS,
+      });
+    }
+
+    if (url.includes('/uploads/videos/')) {
+      return signLocalVideoUrl(url, VIDEO_URL_TTL_SECONDS);
+    }
+
+    return url;
+  });
+
+  // Supabase — bitta so'rovda hammasini imzolaymiz
+  const pending = new Map<number, supabase.SupabaseObject>();
+  urls.forEach((url, i) => {
+    const object = url ? supabase.parseUrl(url) : null;
+    if (object) pending.set(i, object);
+  });
+
+  if (pending.size > 0) {
+    const signed = await supabase.signUrls([...pending.values()], VIDEO_URL_TTL_SECONDS);
+    for (const [i, object] of pending) {
+      // Imzolab bo'lmasa null — xom (ochilmaydigan) havolani mijozga bermaymiz
+      result[i] = signed.get(`${object.bucket}/${object.path}`) ?? null;
+    }
   }
 
-  if (url.includes('/uploads/videos/')) {
-    return signLocalVideoUrl(url, VIDEO_URL_TTL_SECONDS);
-  }
-
-  return url;
+  return result;
 }
 
-// Cloudinary'dagi (yoki boshqa ochiq manba) rasmni server orqali o'tkazadi — asl URL
-// clientga hech qachon chiqmaydi, faqat bizning autentifikatsiyalangan endpoint ko'rinadi.
+/** Bitta havola uchun qulaylik o'ramchisi — ko'p havola bo'lsa signVideoUrls() ishlatilsin. */
+export async function signVideoUrl(url: string | null | undefined): Promise<string | null> {
+  const [signed] = await signVideoUrls([url]);
+  return signed;
+}
+
+// Cloudinary/Supabase'dagi (yoki boshqa ochiq manba) rasmni server orqali o'tkazadi —
+// asl URL clientga hech qachon chiqmaydi, faqat bizning autentifikatsiyalangan
+// endpoint ko'rinadi.
 export async function fetchRemoteImage(url: string): Promise<{ buffer: Buffer; contentType: string }> {
   const res = await fetch(url);
   if (!res.ok) {
@@ -118,6 +175,14 @@ export async function deleteUploadByUrl(url: string | null | undefined): Promise
           resource_type: cloud.resourceType,
           type: cloud.deliveryType,
         });
+      }
+      return;
+    }
+
+    const object = supabase.parseUrl(url);
+    if (object) {
+      if (supabase.supabaseEnabled) {
+        await supabase.remove(object);
       }
       return;
     }

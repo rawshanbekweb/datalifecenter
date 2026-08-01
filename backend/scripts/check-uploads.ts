@@ -60,7 +60,7 @@ type Item = Entry & {
 };
 
 function classify(url: string): Storage {
-  if (/res\.cloudinary\.com/.test(url)) return 'cloud';
+  if (/res\.cloudinary\.com/.test(url) || /\.supabase\.co\/storage\/v1\//.test(url)) return 'cloud';
   if (url.includes('/uploads/')) return 'local';
   if (url.startsWith('/')) return 'static';
   return 'external';
@@ -222,13 +222,16 @@ function shorten(url: string, max = 72): string {
 
 async function main(): Promise<void> {
   const dbHost = /@([^/:]+)/.exec(process.env.DATABASE_URL ?? '')?.[1] ?? 'noma\'lum';
-  const cloudOn = Boolean(
+  const cloudinaryOn = Boolean(
     process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET
   );
+  const supabaseOn = Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const cloudOn = cloudinaryOn || supabaseOn;
+  const cloudName = cloudinaryOn ? 'cloudinary' : supabaseOn ? 'supabase' : null;
 
   console.log('\nDATA LIFE — yuklangan fayllar auditi');
   console.log(`Baza:          ${dbHost}`);
-  console.log(`Bulut xotira:  ${cloudOn ? 'BOR (shu jarayon env\'ida)' : "YO'Q (shu jarayon env'ida)"}`);
+  console.log(`Bulut xotira:  ${cloudName ? `${cloudName} (shu jarayon env'ida)` : "YO'Q (shu jarayon env'ida)"}`);
   console.log(`API_URL:       ${API_URL ?? '(berilmagan)'}`);
   console.log(`FRONTEND_URL:  ${FRONTEND_URL ?? '(berilmagan)'}`);
 
@@ -311,8 +314,9 @@ async function main(): Promise<void> {
   }
 
   if (counts.local > 0 && !cloudOn) {
-    console.log('\n\nKEYINGI QADAM: CLOUDINARY_* env\'lari to\'ldirilsin (README → "Fayl xotirasi"),');
-    console.log('keyin yuqoridagi fayllar bir marta qayta yuklansin — undan keyin ular doimiy bo\'ladi.');
+    console.log("\n\nKEYINGI QADAM: bulut xotira sozlansin (README → \"Fayl xotirasi\" —");
+    console.log("SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY), keyin yuqoridagi fayllar bir");
+    console.log("marta qayta yuklansin — undan keyin ular doimiy bo'ladi.");
   }
 
   console.log('');

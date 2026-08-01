@@ -77,34 +77,67 @@ frontend odatdagidek `npm run dev` bilan. Postgres hostga `5433` portda ochilgan
 | `JWT_EXPIRES_IN`        | yo'q     | Token muddati (default `7d`)                        |
 | `BREVO_API_KEY`         | yo'q     | Email yuborish (Brevo HTTP API; sozlanmasa o'chiq)  |
 | `EMAIL_FROM`            | yo'q     | Yuboruvchi: `Nomi <email>` (Brevo'da tasdiqlangan)  |
-| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | yo'q* | Fayllarni bulutda saqlash. *Render/Railway'da majburiy |
+| `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | yo'q* | Fayl xotirasi (Supabase Storage). *Render/Railway'da shu yoki Cloudinary majburiy |
+| `SUPABASE_BUCKET_IMAGES/VIDEOS` | yo'q | Bucket nomlari (default `datalife-images`/`datalife-videos`) |
+| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | yo'q* | Muqobil fayl xotirasi. **Cloudinary O'zbekistondan bloklangan** |
 | `SENTRY_DSN`            | yo'q     | Xatolarni Sentry'ga yuborish (sentry.io)            |
 | `CLICK_*` / `PAYME_*`   | yo'q     | To'lov shlyuzlari (sozlanmasa tugmalar ko'rinmaydi) |
 
 Frontend: `VITE_API_URL` (masalan `http://localhost:4000/api`), ixtiyoriy `VITE_SENTRY_DSN`.
 
-## Fayl xotirasi (Cloudinary)
+## Fayl xotirasi
 
 Render/Railway'ning diski **ephemeral**: har deploy'da va instans qayta
-ishga tushganda tozalanadi. Cloudinary sozlanmagan bo'lsa yuklash
+ishga tushganda tozalanadi. Bulut xotira sozlanmagan bo'lsa yuklash
 "ishlaganday" ko'rinadi (rasm chiqadi, URL bazaga yoziladi), lekin keyingi
 deploy'dan so'ng o'sha URL 404 qaytaradi. Shuning uchun production'da bu
 sozlama **majburiy**.
 
-**Sozlash (bir marta):**
+Ikkita provayder qo'llab-quvvatlanadi — **Supabase Storage** (tavsiya etiladi)
+va **Cloudinary**. Ikkalasi sozlangan bo'lsa Cloudinary ustun turadi.
+
+> **Cloudinary O'zbekistondan ishlamaydi**: ro'yxatdan o'tish sahifasi
+> "Unfortunately our services currently are not available in your country"
+> qaytaradi. Shu sabab asosiy yo'l — Supabase.
+
+### Supabase Storage (tavsiya)
+
+1. [supabase.com](https://supabase.com) da bepul hisob va yangi **Project**
+   oching (eng yaqin region — `eu-central` / Frankfurt).
+2. Project Settings → **API** bo'limidan ikkita qiymatni oling:
+   - **Project URL** (`https://xxxx.supabase.co`) → `SUPABASE_URL`
+   - **service_role** kaliti → `SUPABASE_SERVICE_ROLE_KEY`
+3. Render → Web Service → **Environment** → shu ikkita o'zgaruvchini qo'shing
+   → **Save** (Render avtomatik qayta deploy qiladi).
+4. Bucketlarni qo'lda yaratish **shart emas** — birinchi yuklashda server
+   o'zi yaratadi: `datalife-images` (ochiq) va `datalife-videos` (yopiq).
+
+> **Diqqat:** `service_role` kaliti loyihaning barcha ma'lumotlariga to'liq
+> huquq beradi. U faqat backend env'ida turishi kerak — frontendga,
+> `VITE_*` o'zgaruvchilarga yoki repozitoriyga hech qachon tushmasin.
+
+Videolar yopiq bucketda saqlanadi: xom havola ochilmaydi, har so'rovda
+6 soatlik imzoli havola generatsiya qilinadi (Cloudinary'dagi `authenticated`
+bilan bir xil model). Rasmlar ochiq bucketda — ular saytda baribir ko'rinadi.
+
+### Cloudinary (muqobil)
 
 1. [cloudinary.com](https://cloudinary.com) da bepul hisob oching.
-2. Dashboard → **Product Environment Credentials** dan uchta qiymatni oling:
-   `Cloud name`, `API Key`, `API Secret`.
-3. Render → tegishli Web Service → **Environment** → uchta o'zgaruvchi qo'shing:
-   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` →
-   **Save** (Render avtomatik qayta deploy qiladi).
-4. Tekshirish: Render **Logs**da `[OGOHLANTIRISH] CLOUDINARY_* sozlanmagan`
-   xabari endi chiqmasligi kerak. Admin panelda rasm yuklash maydonidagi
-   "fayl keyingi deployda yo'qoladi" ogohlantirishi ham yo'qoladi
-   (holat `GET /api/uploads/config` dan keladi).
+2. Dashboard → **Product Environment Credentials**: `Cloud name`, `API Key`,
+   `API Secret`.
+3. Render'da `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
+   `CLOUDINARY_API_SECRET` o'zgaruvchilarini kiriting.
 
-**Yo'qolgan fayllarni topish.** Sozlashdan oldin yuklangan fayllar qaytmaydi —
+### Tekshirish
+
+Render **Logs**da `Fayl xotirasi: supabase` (yoki `cloudinary`) qatori
+ko'rinishi kerak; `[OGOHLANTIRISH] Bulut xotira sozlanmagan` esa chiqmasligi.
+Admin panelda rasm yuklash maydonidagi "fayl keyingi deployda yo'qoladi"
+ogohlantirishi ham yo'qoladi (holat `GET /api/uploads/config` dan keladi).
+
+### Yo'qolgan fayllarni topish
+
+Sozlashdan oldin yuklangan fayllar qaytmaydi —
 ularning bazadagi havolasi qoladi, fayli esa yo'q. Nimani qayta yuklash
 kerakligini shu audit ko'rsatadi (faqat o'qiydi, hech narsa o'zgartirmaydi):
 
@@ -117,9 +150,9 @@ Natijada har bir buzuq havola **kim/qaysi bo'lim** ekani va **qayerdan
 tuzatilishi** (masalan `/admin/mentors`) bilan ro'yxatlanadi. `SKIP_HTTP=true`
 bilan tarmoqsiz, faqat tasnif ko'rsatiladi.
 
-> Cloudinary yoqilgunga qadar yuklangan **videolar** ham lokal diskda — ular
-> `type: authenticated` bilan qayta yuklanishi kerak (imzoli havola shundan
-> ishlaydi).
+> Bulut xotira yoqilgunga qadar yuklangan **videolar** ham lokal diskda — ular
+> qayta yuklanishi kerak, shundagina yopiq bucketga (yoki Cloudinary'da
+> `type: authenticated`) tushadi va imzoli havola ishlaydi.
 
 ## Xavfsizlik xususiyatlari
 
@@ -141,12 +174,13 @@ bilan tarmoqsiz, faqat tasnif ko'rsatiladi.
    - Build Command: `npm install && npm run build && npx prisma migrate deploy`
    - Start Command: `npm start`
 3. Environment o'zgaruvchilarini kiriting: `DATABASE_URL`, `NODE_ENV=production`,
-   `FRONTEND_URL`, `JWT_SECRET` (32+ belgi), `CLOUDINARY_*` (majburiy! —
-   "Fayl xotirasi" bo'limiga qarang), `BREVO_API_KEY`+`EMAIL_FROM` (email kerak bo'lsa).
+   `FRONTEND_URL`, `JWT_SECRET` (32+ belgi), `SUPABASE_URL`+`SUPABASE_SERVICE_ROLE_KEY`
+   (majburiy! — "Fayl xotirasi" bo'limiga qarang), `BREVO_API_KEY`+`EMAIL_FROM`
+   (email kerak bo'lsa).
 4. Birinchi deploy'dan keyin kontent kerak bo'lsa, Render Shell'da:
    `SEED_FORCE=true ADMIN_PASSWORD=<kuchli parol> npm run seed`
 
-> **Diqqat:** Cloudinary sozlanmasa, yuklangan rasm/videolar Render'ning
+> **Diqqat:** bulut xotira sozlanmasa, yuklangan rasm/videolar Render'ning
 > ephemeral diskida saqlanadi va **har deploy'da yo'qoladi**.
 
 ### Frontend — Vercel
