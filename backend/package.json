@@ -13,6 +13,7 @@
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
     "translate:content": "tsx scripts/translate-content.ts",
+    "check:uploads": "tsx scripts/check-uploads.ts",
     "test": "vitest run"
   },
   "engines": {

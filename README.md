@@ -75,11 +75,51 @@ frontend odatdagidek `npm run dev` bilan. Postgres hostga `5433` portda ochilgan
 | `EXTRA_ALLOWED_ORIGINS` | yo'q     | CORS/CSRF uchun qo'shimcha origin'lar (vergul bilan) |
 | `JWT_SECRET`            | ha       | Production'da kamida 32 belgi (server tekshiradi)   |
 | `JWT_EXPIRES_IN`        | yo'q     | Token muddati (default `7d`)                        |
-| `SMTP_HOST/PORT/USER/PASS/FROM` | yo'q | Email yuborish (sozlanmasa o'chiq)          |
+| `BREVO_API_KEY`         | yo'q     | Email yuborish (Brevo HTTP API; sozlanmasa o'chiq)  |
+| `EMAIL_FROM`            | yo'q     | Yuboruvchi: `Nomi <email>` (Brevo'da tasdiqlangan)  |
 | `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | yo'q* | Fayllarni bulutda saqlash. *Render/Railway'da majburiy |
 | `SENTRY_DSN`            | yo'q     | Xatolarni Sentry'ga yuborish (sentry.io)            |
+| `CLICK_*` / `PAYME_*`   | yo'q     | To'lov shlyuzlari (sozlanmasa tugmalar ko'rinmaydi) |
 
 Frontend: `VITE_API_URL` (masalan `http://localhost:4000/api`), ixtiyoriy `VITE_SENTRY_DSN`.
+
+## Fayl xotirasi (Cloudinary)
+
+Render/Railway'ning diski **ephemeral**: har deploy'da va instans qayta
+ishga tushganda tozalanadi. Cloudinary sozlanmagan bo'lsa yuklash
+"ishlaganday" ko'rinadi (rasm chiqadi, URL bazaga yoziladi), lekin keyingi
+deploy'dan so'ng o'sha URL 404 qaytaradi. Shuning uchun production'da bu
+sozlama **majburiy**.
+
+**Sozlash (bir marta):**
+
+1. [cloudinary.com](https://cloudinary.com) da bepul hisob oching.
+2. Dashboard → **Product Environment Credentials** dan uchta qiymatni oling:
+   `Cloud name`, `API Key`, `API Secret`.
+3. Render → tegishli Web Service → **Environment** → uchta o'zgaruvchi qo'shing:
+   `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` →
+   **Save** (Render avtomatik qayta deploy qiladi).
+4. Tekshirish: Render **Logs**da `[OGOHLANTIRISH] CLOUDINARY_* sozlanmagan`
+   xabari endi chiqmasligi kerak. Admin panelda rasm yuklash maydonidagi
+   "fayl keyingi deployda yo'qoladi" ogohlantirishi ham yo'qoladi
+   (holat `GET /api/uploads/config` dan keladi).
+
+**Yo'qolgan fayllarni topish.** Sozlashdan oldin yuklangan fayllar qaytmaydi —
+ularning bazadagi havolasi qoladi, fayli esa yo'q. Nimani qayta yuklash
+kerakligini shu audit ko'rsatadi (faqat o'qiydi, hech narsa o'zgartirmaydi):
+
+```bash
+cd backend
+DATABASE_URL="<prod url>" API_URL="https://<backend>" FRONTEND_URL="https://<sayt>" npm run check:uploads
+```
+
+Natijada har bir buzuq havola **kim/qaysi bo'lim** ekani va **qayerdan
+tuzatilishi** (masalan `/admin/mentors`) bilan ro'yxatlanadi. `SKIP_HTTP=true`
+bilan tarmoqsiz, faqat tasnif ko'rsatiladi.
+
+> Cloudinary yoqilgunga qadar yuklangan **videolar** ham lokal diskda — ular
+> `type: authenticated` bilan qayta yuklanishi kerak (imzoli havola shundan
+> ishlaydi).
 
 ## Xavfsizlik xususiyatlari
 
@@ -101,8 +141,8 @@ Frontend: `VITE_API_URL` (masalan `http://localhost:4000/api`), ixtiyoriy `VITE_
    - Build Command: `npm install && npm run build && npx prisma migrate deploy`
    - Start Command: `npm start`
 3. Environment o'zgaruvchilarini kiriting: `DATABASE_URL`, `NODE_ENV=production`,
-   `FRONTEND_URL`, `JWT_SECRET` (32+ belgi), `CLOUDINARY_*` (majburiy!),
-   `SMTP_*` (email kerak bo'lsa).
+   `FRONTEND_URL`, `JWT_SECRET` (32+ belgi), `CLOUDINARY_*` (majburiy! —
+   "Fayl xotirasi" bo'limiga qarang), `BREVO_API_KEY`+`EMAIL_FROM` (email kerak bo'lsa).
 4. Birinchi deploy'dan keyin kontent kerak bo'lsa, Render Shell'da:
    `SEED_FORCE=true ADMIN_PASSWORD=<kuchli parol> npm run seed`
 
