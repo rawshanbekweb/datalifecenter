@@ -378,7 +378,11 @@
     "button": "Upload",
     "error": "Upload failed",
     "imagePlaceholder": "https://... or upload an image",
-    "videoPlaceholder": "https://... or upload a video"
+    "videoPlaceholder": "https://... or upload a video",
+    "networkError": "Could not reach the server. Check your internet connection.",
+    "timeout": "The upload timed out. Please try again.",
+    "serverWaking": "The server is waking up, retrying...",
+    "ephemeralWarning": "Cloud storage is not configured: the file stays on a temporary disk and will be lost on the next deploy. An administrator needs to set the CLOUDINARY_* variables."
   },
   "sessions": {
     "panelTitle": "Live lessons",

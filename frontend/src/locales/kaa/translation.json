@@ -378,7 +378,11 @@
     "button": "Júklew",
     "error": "Júklewde qátelik júz berdi",
     "imagePlaceholder": "https://... yamasa súwret júkleń",
-    "videoPlaceholder": "https://... yamasa video júkleń"
+    "videoPlaceholder": "https://... yamasa video júkleń",
+    "networkError": "Serverge baylanısıp bolmadı. Internet baylanısın tekseriń.",
+    "timeout": "Júklew waqtı tamamlandı. Qayta urınıp kóriń.",
+    "serverWaking": "Server oyanıp atır, qayta urınılmaqta...",
+    "ephemeralWarning": "Bult saqlaw sazlanbaǵan: júklengen fayl waqtınsha diskte qaladı hám keyingi deployda joǵaladı. Administrator CLOUDINARY_* sazlawların kiritiwi kerek."
   },
   "sessions": {
     "panelTitle": "Janlı sabaqlar",

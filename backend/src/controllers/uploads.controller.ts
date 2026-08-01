@@ -50,3 +50,15 @@ function makeUploadHandler(folder: 'images' | 'videos') {
 
 export const uploadImageHandler = makeUploadHandler('images');
 export const uploadVideoHandler = makeUploadHandler('videos');
+
+/**
+ * Yuklash sozlamalari holati.
+ *
+ * Bulut xotira o'chiq bo'lsa yuklash muvaffaqiyatli tugaydi, lekin fayl
+ * ephemeral diskda qoladi va keyingi deployda yo'qoladi. Bu jimgina
+ * yo'qotish: admin buni faqat oylar keyin, sayt bo'ylab singan rasmlarni
+ * ko'rganda sezadi. Shuning uchun panel yuklashdan OLDIN ogohlantirsin.
+ */
+export const uploadConfigHandler = asyncHandler(async (_req: Request, res: Response) => {
+  sendSuccess(res, { cloudStorage: cloudinaryEnabled });
+});

@@ -1,7 +1,25 @@
-import { useRef, useState } from 'react';
-import { Upload, CheckCircle2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Upload, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { uploadFile } from '../../api/uploads';
+import { getUploadConfig, uploadFile } from '../../api/uploads';
+
+/**
+ * Bulut xotira holati bir marta so'raladi va butun panel bo'ylab
+ * bo'lishiladi — har bir yuklash maydoni alohida so'rov yubormasin
+ * (bitta formada 3-4 ta maydon bo'lishi mumkin).
+ */
+let cloudStoragePromise: Promise<boolean> | null = null;
+
+function checkCloudStorage(): Promise<boolean> {
+  if (!cloudStoragePromise) {
+    cloudStoragePromise = getUploadConfig()
+      .then((cfg) => cfg.cloudStorage)
+      // Holatni bilib bo'lmadi — ogohlantirishni ko'rsatmaymiz (noto'g'ri
+      // signal bermaslik uchun), yuklashning o'zi baribir ishlaydi
+      .catch(() => true);
+  }
+  return cloudStoragePromise;
+}
 
 interface FileUploadProps {
   value: string;
@@ -25,6 +43,16 @@ export default function FileUpload({ value, onChange, kind, label, required, pla
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError]       = useState<string>('');
   const [done, setDone]         = useState<boolean>(false);
+  const [ephemeral, setEphemeral] = useState<boolean>(false);
+
+  // Bulut xotira o'chiq bo'lsa yuklash "ishlaydi", lekin fayl keyingi
+  // deployda yo'qoladi va sayt bo'ylab singan rasmlar qoladi — admin
+  // buni yuklashdan OLDIN bilishi kerak
+  useEffect(() => {
+    let cancelled = false;
+    void checkCloudStorage().then((enabled) => { if (!cancelled) setEphemeral(!enabled); });
+    return () => { cancelled = true; };
+  }, []);
 
   const pick = async (file: File | undefined): Promise<void> => {
     if (!file) return;
@@ -72,6 +100,12 @@ export default function FileUpload({ value, onChange, kind, label, required, pla
         </div>
       )}
       {error && <p style={{ fontSize:12, color:'#dc2626', marginTop:5 }}>{error}</p>}
+      {ephemeral && (
+        <div style={{ display:'flex', alignItems:'flex-start', gap:7, marginTop:6, padding:'7px 10px', borderRadius:9, background:'#fffbeb', border:'1px solid #fde68a' }}>
+          <AlertTriangle size={13} style={{ color:'#d97706', flexShrink:0, marginTop:1 }} />
+          <p style={{ fontSize:11.5, color:'#92400e', lineHeight:1.6 }}>{t('upload.ephemeralWarning')}</p>
+        </div>
+      )}
     </div>
   );
 }

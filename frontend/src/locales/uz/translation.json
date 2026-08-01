@@ -378,7 +378,11 @@
     "button": "Yuklash",
     "error": "Yuklashda xatolik yuz berdi",
     "imagePlaceholder": "https://... yoki rasm yuklang",
-    "videoPlaceholder": "https://... yoki video yuklang"
+    "videoPlaceholder": "https://... yoki video yuklang",
+    "networkError": "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.",
+    "timeout": "Yuklash vaqti tugadi. Qayta urinib ko’ring.",
+    "serverWaking": "Server uyg'onmoqda, qayta urinilmoqda...",
+    "ephemeralWarning": "Bulut xotira sozlanmagan: yuklangan fayl vaqtinchalik diskda qoladi va keyingi deployda yo'qoladi. Administrator CLOUDINARY_* sozlamalarini kiritishi kerak."
   },
   "sessions": {
     "panelTitle": "Jonli darslar",
