@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { DEFAULT_LOCALE, ENABLED_LOCALES, LOCALE_BCP47 } from '../../i18n/config';
 import { useLocale } from '../../hooks/useLocale';
@@ -34,6 +35,14 @@ export default function Seo({ title, description, image, type = 'website', noInd
   const { pathname, search } = useLocation();
   const { locale, basename } = useLocale();
 
+  // index.html'dagi zaxira teglarni olib tashlaymiz. React <title>ni almashtiradi,
+  // lekin <meta>ni FAQAT QO'SHADI — natijada sahifaga xos tavsif bilan umumiy
+  // zaxira yonma-yon qolib, qidiruv tizimi birinchisini (zaxirani) olardi.
+  // JS ishlamaydigan robot esa baribir zaxira teglarni ko'radi — ular HTML'da qoladi.
+  useEffect(() => {
+    document.querySelectorAll('head [data-default]').forEach((el) => el.remove());
+  }, []);
+
   const fullTitle = title ? `${title} — ${BRAND}` : `${BRAND} — IT Education Center & Technology Company`;
   const canonical = `${SITE_URL}${basename}${pathname === '/' ? '' : pathname}`;
   const imageUrl = absolute(image || DEFAULT_IMAGE);
@@ -46,12 +55,17 @@ export default function Seo({ title, description, image, type = 'website', noInd
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Har til uchun muqobil manzil — Google qaysi tildagi versiyani kimga
-          ko'rsatishni shundan biladi. x-default asosiy (o'zbekcha) versiya. */}
+          ko'rsatishni shundan biladi. x-default asosiy (o'zbekcha) versiya.
+          DIQQAT: bu yerda LOCALE_BCP47 ISHLATILMAYDI — unda kaa uchun 'uz-UZ'
+          turadi (Intl'da qoraqalpoqcha yo'qligi uchun ataylab), va o'sha qiymat
+          hreflang'ga tushsa ikki xil manzil bitta til deb e'lon qilinib,
+          Google ularni ziddiyatli deb rad etardi. Til kodining o'zi (uz, ru,
+          kaa, en) to'g'ri va yaroqli hreflang qiymati. */}
       {!noIndex && ENABLED_LOCALES.map((loc) => (
         <link
           key={loc}
           rel="alternate"
-          hrefLang={LOCALE_BCP47[loc]}
+          hrefLang={loc}
           href={`${SITE_URL}${loc === DEFAULT_LOCALE ? '' : `/${loc}`}${pathname === '/' ? '' : pathname}`}
         />
       ))}

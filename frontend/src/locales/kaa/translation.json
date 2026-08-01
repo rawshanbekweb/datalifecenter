@@ -1180,5 +1180,47 @@
       "ENROLLED": "Jazıldıńız",
       "REJECTED": "Biykarlandı"
     }
+  },
+  "seo": {
+    "home": {
+      "description": "Zamanagóy IT bilim orayı: baǵdarlamalaw, kiberqáwipsizlik, jasalma intellekt hám bult texnologiyaları boyınsha kurslar. Ámeliy joybarlar hám mentor járdemi."
+    },
+    "about": {
+      "title": "Kompaniya haqqında",
+      "description": "DATA LIFE haqqında: maqsetimiz, jámáátimiz hám bilim beriw jolımız."
+    },
+    "courses": {
+      "title": "Kurslar",
+      "description": "Barlıq kurslar katalogı — baǵdar, dáreje hám baha boyınsha saylań. Onlayn hám oflayn formatlar bar."
+    },
+    "mentors": {
+      "title": "Mentorlar",
+      "description": "Kurslardı alıp baratuǵın ámeliyatshı qánigeler menen tanısıń."
+    },
+    "partners": {
+      "title": "Sherikler",
+      "description": "DATA LIFE sherikleri hám olar menen alıp barılıp atırǵan jumıslar."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Texnologiya, baǵdarlamalaw hám IT kareya boyınsha maqalalar."
+    },
+    "contact": {
+      "title": "Baylanıs",
+      "description": "Sorawıńız barma? Mánzil, telefon hám xabar jiberiw forması."
+    },
+    "verifyCertificate": {
+      "title": "Sertifikattı tekseriw",
+      "description": "DATA LIFE sertifikatınıń haqıyqıylıǵın nomeri boyınsha tekseriń."
+    },
+    "login": {
+      "title": "Kiriw"
+    },
+    "register": {
+      "title": "Dizimnen ótiw"
+    },
+    "notFound": {
+      "title": "Bet tabılmadı"
+    }
   }
 }

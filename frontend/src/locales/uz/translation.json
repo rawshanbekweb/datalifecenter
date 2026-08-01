@@ -1180,5 +1180,47 @@
       "ENROLLED": "Yozildingiz",
       "REJECTED": "Rad etildi"
     }
+  },
+  "seo": {
+    "home": {
+      "description": "Zamonaviy IT ta'lim markazi: dasturlash, kiberxavfsizlik, sun'iy intellekt va bulut texnologiyalari bo'yicha kurslar. Amaliy loyihalar va mentor qo'llab-quvvatlashi."
+    },
+    "about": {
+      "title": "Kompaniya haqida",
+      "description": "DATA LIFE haqida: maqsadimiz, jamoamiz va ta'lim yondashuvimiz."
+    },
+    "courses": {
+      "title": "Kurslar",
+      "description": "Barcha kurslar katalogi — yo'nalish, daraja va narx bo'yicha tanlang. Onlayn va oflayn formatlar mavjud."
+    },
+    "mentors": {
+      "title": "Mentorlar",
+      "description": "Kurslarni olib boradigan amaliyotchi mutaxassislar bilan tanishing."
+    },
+    "partners": {
+      "title": "Hamkorlar",
+      "description": "DATA LIFE hamkorlari va ular bilan olib borilayotgan ishlar."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Texnologiya, dasturlash va IT karera bo’yicha maqolalar."
+    },
+    "contact": {
+      "title": "Aloqa",
+      "description": "Savolingiz bormi? Manzil, telefon va xabar yuborish formasi."
+    },
+    "verifyCertificate": {
+      "title": "Sertifikatni tekshirish",
+      "description": "DATA LIFE sertifikatining haqiqiyligini raqami bo'yicha tekshiring."
+    },
+    "login": {
+      "title": "Kirish"
+    },
+    "register": {
+      "title": "Ro'yxatdan o'tish"
+    },
+    "notFound": {
+      "title": "Sahifa topilmadi"
+    }
   }
 }

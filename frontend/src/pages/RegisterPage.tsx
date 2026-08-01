@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { UserPlus, AlertCircle, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
+import Seo from '../components/common/Seo';
 
 interface RegisterForm {
   name: string;
@@ -38,6 +39,7 @@ export default function RegisterPage(): React.ReactElement {
 
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 24px 60px' }}>
+      <Seo title={t('seo.register.title')} noIndex />
       <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 420 }}>
         <div className="card" style={{ padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>

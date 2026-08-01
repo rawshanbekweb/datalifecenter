@@ -4,6 +4,7 @@ import SectionHeader from '../components/common/SectionHeader';
 import BlogCard, { BlogPostCardData } from '../components/blog/BlogCard';
 import { listBlogPosts } from '../api/blog';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
 
 type BlogPost = BlogPostCardData;
 
@@ -29,6 +30,7 @@ export default function BlogPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
+        <Seo title={t('seo.blog.title')} description={t('seo.blog.description')} />
         <SectionHeader pill={t('pages.blog.pill')} title={t('pages.blog.title')} accent={t('pages.blog.accent')} sub={t('pages.blog.sub')} />
 
         {categories.length > 1 && (

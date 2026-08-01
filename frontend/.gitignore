@@ -23,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Har qurishda qayta yasaladi (scripts/generate-sitemap.mjs) — repoda saqlanmaydi
+public/sitemap.xml

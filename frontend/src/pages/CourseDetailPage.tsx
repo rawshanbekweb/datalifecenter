@@ -16,6 +16,9 @@ import CourseReviews from '../components/courses/CourseReviews';
 import CourseFormatBadge from '../components/courses/CourseFormatBadge';
 import CourseRequestModal from '../components/courses/CourseRequestModal';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
+import JsonLd from '../components/common/JsonLd';
+import { SITE_URL } from '../api/config';
 
 interface Lesson {
   id: string | number;
@@ -170,6 +173,26 @@ export default function CourseDetailPage(): React.ReactElement {
 
   return (
     <section style={{ padding:'160px 0 104px' }}>
+      <Seo title={course.title} description={course.subtitle || course.description} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'Course',
+          name: course.title,
+          description: course.subtitle || course.description,
+          provider: { '@type': 'Organization', name: 'DATA LIFE', url: SITE_URL },
+          ...(course.mentor?.name ? { instructor: { '@type': 'Person', name: course.mentor.name } } : {}),
+          ...(Number(course.rating) > 0 && course.reviewsCount
+            ? {
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: Number(course.rating),
+                  reviewCount: course.reviewsCount,
+                },
+              }
+            : {}),
+        }}
+      />
       <div style={{ maxWidth:1000, margin:'0 auto', padding:'0 24px' }}>
         <Link to="/courses" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none', marginBottom:24 }}>
           <ArrowLeft size={14}/> {t('pages.courseDetail.back')}

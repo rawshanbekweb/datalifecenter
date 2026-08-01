@@ -25,10 +25,11 @@ import projectsRoutes from './projects.routes';
 import paymentsRoutes from './payments.routes';
 import subscriptionsRoutes from './subscriptions.routes';
 import { verifyCertificateHandler } from '../controllers/enrollments.controller';
+import { healthHandler } from '../controllers/health.controller';
 
 const router = Router();
 
-router.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
+router.get('/health', healthHandler);
 // Ochiq sertifikat tekshiruvi — ish beruvchilar uchun, login talab qilinmaydi
 router.get('/certificates/:no/verify', verifyCertificateHandler);
 router.use('/auth', authRoutes);

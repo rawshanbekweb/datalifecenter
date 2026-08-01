@@ -5,6 +5,7 @@ import SectionHeader from '../components/common/SectionHeader';
 import CourseCard, { CourseCardData } from '../components/courses/CourseCard';
 import { listCourses } from '../api/courses';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
 
 type Status = 'loading' | 'ready' | 'error';
 
@@ -44,6 +45,7 @@ export default function CoursesPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
+        <Seo title={t('seo.courses.title')} description={t('seo.courses.description')} />
         <SectionHeader pill={t('pages.courses.pill')} title={t('pages.courses.title')} accent={t('pages.courses.accent')} sub={t('pages.courses.sub')} />
 
         <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:32, justifyContent:'center' }}>

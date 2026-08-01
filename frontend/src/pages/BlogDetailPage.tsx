@@ -11,6 +11,9 @@ import LikeButton from '../components/common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
 import { useContentView } from '../hooks/useContentView';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
+import JsonLd from '../components/common/JsonLd';
+import { SITE_URL } from '../api/config';
 
 interface BlogPost {
   id: string;
@@ -20,6 +23,7 @@ interface BlogPost {
   color: string;
   category: string;
   title: string;
+  excerpt?: string;
   readMinutes: number;
   views: number;
   publishedAt: string;
@@ -69,6 +73,19 @@ export default function BlogDetailPage(): React.ReactElement {
 
   return (
     <section style={{ padding:'160px 0 104px' }}>
+      <Seo title={post!.title} description={post!.excerpt} type="article" />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post!.title,
+          ...(post!.excerpt ? { description: post!.excerpt } : {}),
+          datePublished: post!.publishedAt,
+          articleSection: post!.category,
+          ...(post!.tags?.length ? { keywords: post!.tags.join(', ') } : {}),
+          publisher: { '@type': 'Organization', name: 'DATA LIFE', url: SITE_URL },
+        }}
+      />
       <div style={{ maxWidth:760, margin:'0 auto', padding:'0 24px' }}>
         <Link to="/blog" style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, color:'#64748b', textDecoration:'none', marginBottom:24 }}>
           <ArrowLeft size={14}/> {t('pages.blogDetail.back')}

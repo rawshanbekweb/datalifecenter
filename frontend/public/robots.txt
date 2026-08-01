@@ -1,0 +1,36 @@
+# DATA LIFE — qidiruv robotlari uchun qoidalar
+
+User-agent: *
+Allow: /
+
+# Kabinetlar va autentifikatsiya sahifalari indekslanmasin: ular login talab
+# qiladi, qidiruvda foydasi yo'q, parol tiklash havolalari esa umuman
+# ommaviy bo'lmasligi kerak.
+Disallow: /admin
+Disallow: /student
+Disallow: /mentor
+Disallow: /learn
+Disallow: /live
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /dashboard
+Disallow: /profile
+
+# Til prefikslari uchun ham xuddi shunday (masalan /ru/admin)
+Disallow: /*/admin
+Disallow: /*/student
+Disallow: /*/mentor
+Disallow: /*/learn
+Disallow: /*/live
+Disallow: /*/login
+Disallow: /*/register
+Disallow: /*/forgot-password
+Disallow: /*/reset-password
+Disallow: /*/verify-email
+Disallow: /*/dashboard
+Disallow: /*/profile
+
+Sitemap: https://datalife.uz/sitemap.xml

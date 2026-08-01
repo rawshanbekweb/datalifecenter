@@ -1,17 +1,36 @@
 <!doctype html>
-<html lang="en">
+<!-- Asosiy til o'zbekcha; boshqa tillar /ru, /kaa, /en prefiksi bilan ochiladi
+     va React ilovasi <html lang> ni ish paytida almashtiradi. -->
+<html lang="uz">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/assets/favicon.jpg" />
     <link rel="apple-touch-icon" href="/assets/logotype.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DATA LIFE — IT Education Center & Technology Company</title>
-    <meta name="description" content="DATA LIFE — O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash, raqamli mahsulotlar va kelajak mutaxassislarini tayyorlash." />
-    <meta name="keywords" content="IT center, programming, web development, cyber security, IT education, Uzbekistan" />
-    <meta property="og:title" content="DATA LIFE — IT Education Center" />
-    <meta property="og:description" content="Zamonaviy IT ta'lim markazi — kelajakni bugundan yarating" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/assets/logotype.png" />
+    <meta name="theme-color" content="#0a0a0f" />
+    <title data-default>DATA LIFE — IT Education Center & Technology Company</title>
+    <!--
+      Quyidagi teglar — ZAXIRA qiymatlar: JS ishga tushmaguncha va JS
+      ishlatmaydigan robotlar uchun shular ko'rinadi.
+      data-default belgisi MAJBURIY: React <meta>ni faqat qo'shadi, eskisini
+      almashtirmaydi — <Seo> komponenti aynan shu belgiga qarab zaxiralarni
+      olib tashlaydi, aks holda sahifada ikkita tavsif qolib, qidiruv tizimi
+      umumiy zaxirani tanlardi.
+      og:image ATAYIN to'liq manzil bilan — Telegram/Facebook nisbiy yo'lni
+      ocholmaydi va rasmsiz preview chiqaradi.
+    -->
+    <meta name="description" data-default content="DATA LIFE — O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash, raqamli mahsulotlar va kelajak mutaxassislarini tayyorlash." />
+    <meta property="og:site_name" data-default content="DATA LIFE" />
+    <meta property="og:title" data-default content="DATA LIFE — IT Education Center" />
+    <meta property="og:description" data-default content="Zamonaviy IT ta'lim markazi — kelajakni bugundan yarating" />
+    <meta property="og:type" data-default content="website" />
+    <meta property="og:url" data-default content="https://datalife.uz/" />
+    <meta property="og:image" data-default content="https://datalife.uz/assets/logotype.png" />
+    <meta property="og:locale" data-default content="uz_UZ" />
+    <meta name="twitter:card" data-default content="summary_large_image" />
+    <meta name="twitter:title" data-default content="DATA LIFE — IT Education Center" />
+    <meta name="twitter:description" data-default content="Zamonaviy IT ta'lim markazi — kelajakni bugundan yarating" />
+    <meta name="twitter:image" data-default content="https://datalife.uz/assets/logotype.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- API backend (Render) — TLS qo'l berishish sahifa yuklanishi bilan parallel boshlanadi -->

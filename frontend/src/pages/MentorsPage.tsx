@@ -4,6 +4,7 @@ import SectionHeader from '../components/common/SectionHeader';
 import MentorCard, { MentorCardData } from '../components/mentors/MentorCard';
 import { listMentors } from '../api/mentors';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
 
 type Mentor = MentorCardData;
 
@@ -25,6 +26,7 @@ export default function MentorsPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
+        <Seo title={t('seo.mentors.title')} description={t('seo.mentors.description')} />
         <SectionHeader pill={t('pages.mentors.pill')} title={t('pages.mentors.title')} accent={t('pages.mentors.accent')} sub={t('pages.mentors.sub')} />
 
         {status === 'loading' && <Loading center />}

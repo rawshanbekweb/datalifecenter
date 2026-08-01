@@ -1180,5 +1180,47 @@
       "ENROLLED": "Enrolled",
       "REJECTED": "Rejected"
     }
+  },
+  "seo": {
+    "home": {
+      "description": "Modern IT education center: courses in programming, cybersecurity, artificial intelligence and cloud technologies. Hands-on projects with mentor support."
+    },
+    "about": {
+      "title": "About us",
+      "description": "About DATA LIFE: our mission, team and approach to teaching."
+    },
+    "courses": {
+      "title": "Courses",
+      "description": "Full course catalogue — filter by track, level and price. Online and in-person formats available."
+    },
+    "mentors": {
+      "title": "Mentors",
+      "description": "Meet the working professionals who teach our courses."
+    },
+    "partners": {
+      "title": "Partners",
+      "description": "DATA LIFE partners and the work we do together."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Articles on technology, programming and careers in IT."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Have a question? Address, phone and a message form."
+    },
+    "verifyCertificate": {
+      "title": "Verify a certificate",
+      "description": "Check whether a DATA LIFE certificate is genuine using its number."
+    },
+    "login": {
+      "title": "Sign in"
+    },
+    "register": {
+      "title": "Sign up"
+    },
+    "notFound": {
+      "title": "Page not found"
+    }
   }
 }

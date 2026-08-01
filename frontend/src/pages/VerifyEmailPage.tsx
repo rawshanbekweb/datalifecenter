@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { MailCheck, AlertCircle, CheckCircle2, Loader } from 'lucide-react';
 import { verifyEmail } from '../api/auth';
+import Seo from '../components/common/Seo';
 
 export default function VerifyEmailPage(): React.ReactElement {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function VerifyEmailPage(): React.ReactElement {
 
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 24px 60px' }}>
+      <Seo noIndex />
       <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 420 }}>
         <div className="card" style={{ padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>

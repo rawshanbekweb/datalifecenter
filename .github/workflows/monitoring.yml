@@ -1,0 +1,64 @@
+# Saytning haqiqiy holatini kuzatadi: API, baza, fayl xotirasi, ochiq
+# endpointlar va saytda ko'rinadigan rasmlar.
+#
+# NEGA keep-awake.yml YETARLI EMAS: u faqat "servis javob beryaptimi" deb
+# so'raydi. Fayllar yo'qolgani, bazadagi ro'yxat bo'shab qolgani yoki hamkor
+# logotipi begona CDN'dan bloklangani — bularning hech biri /api/health'da
+# ko'rinmaydi va oylar davomida sezilmasligi mumkin (aynan shunday bo'lgan).
+#
+# OGOHLANTIRISH: workflow yiqilsa GitHub repo egasiga email yuboradi. Telegram
+# xabari uchun repo Settings → Secrets and variables → Actions'da ikkita secret
+# qo'shilishi kerak: TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID. Ular bo'lmasa
+# qadam jimgina o'tkazib yuboriladi (workflow baribir yiqiladi va email keladi).
+name: Monitoring
+
+on:
+  schedule:
+    # Har 30 daqiqada. GitHub cron'i kafolatlangan emas — band paytda kechikadi,
+    # bu monitoring uchun muammo emas (nosozlik bir necha daqiqa kechroq bilinadi).
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+# Bir vaqtda bitta tekshiruv — kechikkan cron'lar bir-birining ustiga chiqmasin
+concurrency:
+  group: monitoring
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # Secretlar aynan shu yerda (job darajasida) e'lon qilinadi: qadamning o'z
+    # `env` bloki uning `if:` shartida ko'rinmaydi, job darajasidagisi esa ko'rinadi.
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Sog'liq tekshiruvi
+        id: monitor
+        run: node scripts/monitor.mjs
+        env:
+          API_URL: https://datalife.onrender.com
+          SITE_URL: https://datalife.uz
+
+      - name: Telegram'ga ogohlantirish
+        # Faqat tekshiruv yiqilganda va token sozlangan bo'lsa
+        if: failure() && env.TELEGRAM_BOT_TOKEN != ''
+        env:
+          PROBLEMS: ${{ steps.monitor.outputs.problems }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TEXT="DATA LIFE — saytda muammo aniqlandi
+          ${PROBLEMS:-Tafsilotlar log'da}
+
+          Batafsil: ${RUN_URL}"
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${TEXT}" \
+            --data-urlencode "disable_web_page_preview=true" \
+            -o /dev/null -w 'Telegram: HTTP %{http_code}\n'

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { BadgeCheck, AlertCircle, Loader, Award } from 'lucide-react';
 import { verifyCertificate, CertificateInfo } from '../api/enrollments';
 import { formatDate } from '../utils/format';
+import Seo from '../components/common/Seo';
 
 // Ochiq sahifa: ish beruvchi sertifikat raqamini kiritib haqiqiyligini tekshiradi.
 // PDF pastidagi havola shu sahifaga olib keladi.
@@ -43,6 +44,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
 
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '140px 24px 60px' }}>
+      <Seo title={t('seo.verifyCertificate.title')} description={t('seo.verifyCertificate.description')} />
       <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ width: '100%', maxWidth: 460 }}>
         <div className="card" style={{ padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>

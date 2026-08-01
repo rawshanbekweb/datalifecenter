@@ -4,6 +4,7 @@ import SectionHeader from '../components/common/SectionHeader';
 import PartnerCard, { PartnerCardData } from '../components/partners/PartnerCard';
 import { listPartners } from '../api/partners';
 import Loading from '../components/common/Loading';
+import Seo from '../components/common/Seo';
 
 type Partner = PartnerCardData;
 
@@ -25,6 +26,7 @@ export default function PartnersPage(): React.ReactElement {
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
       <div style={{ maxWidth:1280, margin:'0 auto', padding:'0 24px' }}>
+        <Seo title={t('seo.partners.title')} description={t('seo.partners.description')} />
         <SectionHeader pill={t('pages.partners.pill')} title={t('pages.partners.title')} accent={t('pages.partners.accent')} sub={t('pages.partners.sub')} />
 
         {status === 'loading' && <Loading center />}

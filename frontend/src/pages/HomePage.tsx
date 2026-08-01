@@ -1,7 +1,11 @@
 import React, { Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import Hero from '../components/Hero';
 import { useSiteSettings } from '../hooks/useSiteSettings';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
+import Seo from '../components/common/Seo';
+import JsonLd from '../components/common/JsonLd';
+import { SITE_URL } from '../api/config';
 
 // Hero'dan pastdagi seksiyalar alohida chunk'larda — kirish bundle'i faqat
 // birinchi ekranda ko'rinadigan kodni olib keladi, qolganlari parallel yuklanadi.
@@ -26,9 +30,22 @@ function s(el: React.ReactElement, anchorId?: string): React.ReactElement {
 
 export default function HomePage(): React.ReactElement {
   const settings = useSiteSettings();
+  const { t } = useTranslation();
 
   return (
     <>
+      {/* Bosh sahifada sarlavha berilmaydi — brendning to'liq nomi qoladi */}
+      <Seo description={t('seo.home.description')} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'EducationalOrganization',
+          name: 'DATA LIFE',
+          url: SITE_URL,
+          logo: `${SITE_URL}/assets/logotype.png`,
+          description: t('seo.home.description'),
+        }}
+      />
       <Hero settings={settings.hero} />
       {s(<About settings={settings.about} />, 'about')}
       {s(<Courses />, 'courses')}
