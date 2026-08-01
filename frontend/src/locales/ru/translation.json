@@ -1145,12 +1145,15 @@
     "administrationHint": "Ответит дежурный администратор",
     "toAdminChannel": "Обращение в администрацию",
     "unknownUser": "Пользователь",
-    "defaultGreeting": "Здравствуйте!",
     "roles": {
       "STUDENT": "Студент",
       "MENTOR": "Ментор",
       "ADMIN": "Администратор"
-    }
+    },
+    "loadOlder": "Ранние сообщения",
+    "firstMessageLabel": "Первое сообщение",
+    "startAndSend": "Отправить",
+    "noSearchResults": "Никого не найдено."
   },
   "courseRequest": {
     "title": "Узнать о курсе",

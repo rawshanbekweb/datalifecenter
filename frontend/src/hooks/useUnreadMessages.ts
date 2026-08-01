@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getUnreadMessagesCount } from '../api/messages';
+import { getUnreadMessagesCount, MESSAGES_READ_EVENT } from '../api/messages';
 import { subscribeNotifications } from '../api/notifications';
 import { useAuth } from './useAuth';
 
@@ -34,12 +34,15 @@ export function useUnreadMessages(): number {
     const timer = setInterval(() => { if (document.visibilityState === 'visible') load(); }, POLL_MS);
     const onVisible = (): void => { if (document.visibilityState === 'visible') load(); };
     document.addEventListener('visibilitychange', onVisible);
+    // Xabarlar oynasida suhbat o'qilgach belgi darhol tushsin
+    window.addEventListener(MESSAGES_READ_EVENT, load);
 
     return () => {
       cancelled = true;
       unsubscribe();
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener(MESSAGES_READ_EVENT, load);
     };
     // Faqat user.id ga bog'lanadi: profil tahriri (yangi obyekt referensi)
     // SSE ulanishini keraksiz uzib-ulab yubormasligi uchun

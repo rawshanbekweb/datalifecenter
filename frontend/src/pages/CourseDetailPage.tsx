@@ -56,6 +56,7 @@ interface CourseDetail {
   isFree: boolean;
   durationMonths: number;
   studentsCount: number;
+  views?: number;
   format?: 'ONLINE' | 'OFFLINE' | 'HYBRID';
   /** Offline mashg'ulot manzili */
   location?: string | null;
@@ -134,6 +135,8 @@ export default function CourseDetailPage(): React.ReactElement {
   const totalLessons = course.modules.reduce((sum: number, m: CourseModule) => sum + m.lessons.length, 0);
   // Faqat offline o'tiladigan kursga sayt orqali yozilib bo'lmaydi;
   // gibrid kursda online yozilish ham, offline uchun murojaat ham mumkin
+  // Stats so'rovi kelguncha kurs javobidagi qiymat ko'rsatiladi
+  const courseViews = engagement.views ?? course.views ?? 0;
   const isOfflineOnly = course.format === 'OFFLINE';
   const isHybrid = course.format === 'HYBRID';
   const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
@@ -193,8 +196,8 @@ export default function CourseDetailPage(): React.ReactElement {
             {course.studentsCount > 0 && (
               <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Users size={14}/> {t('pages.courseDetail.students', { n: course.studentsCount })}</span>
             )}
-            {(engagement.views ?? 0) > 0 && (
-              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Eye size={14}/> {engagement.views}</span>
+            {courseViews > 0 && (
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Eye size={14}/> {courseViews}</span>
             )}
             <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{t(`levels.${course.level}`)}</span>
             <CourseFormatBadge format={course.format} size="md" />

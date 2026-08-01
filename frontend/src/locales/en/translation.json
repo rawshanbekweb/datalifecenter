@@ -1145,12 +1145,15 @@
     "administrationHint": "The administrator on duty will reply",
     "toAdminChannel": "Request to the administration",
     "unknownUser": "User",
-    "defaultGreeting": "Hello!",
     "roles": {
       "STUDENT": "Student",
       "MENTOR": "Mentor",
       "ADMIN": "Administrator"
-    }
+    },
+    "loadOlder": "Older messages",
+    "firstMessageLabel": "First message",
+    "startAndSend": "Send",
+    "noSearchResults": "Nobody found."
   },
   "courseRequest": {
     "title": "Ask about this course",

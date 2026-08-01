@@ -103,6 +103,57 @@ describe('Kim kimga yoza oladi', () => {
 
     expect(res.body.data.kind).toBe('ADMIN');
   });
+
+  it('admin hamkasbiga yozsa oddiy shaxsiy yozishma ochiladi', async () => {
+    const second = await createUser('admin2@msg.uz', 'ADMIN', 'Ikkinchi Admin');
+    const res = await adminAgent
+      .post('/api/messages/conversations')
+      .send({ recipientId: second.id, body: 'Hamkasbga xabar' })
+      .expect(201);
+
+    // Administratsiya kanaliga emas — admin o'ziga tegishli kanalga yoza olmaydi
+    expect(res.body.data.kind).toBe('DIRECT');
+    expect(res.body.data.otherUser.id).toBe(second.id);
+  });
+});
+
+describe('Bildirishnomalar', () => {
+  it('bitta suhbat qo‘ng‘iroqni to‘ldirmaydi — bitta o‘qilmagan yozuv qoladi', async () => {
+    const mentorUser = await prisma.user.findUniqueOrThrow({ where: { email: 'mentor@msg.uz' } });
+    await prisma.notification.deleteMany({ where: { userId: mentorUser.id } });
+
+    for (const text of ['Birinchi', 'Ikkinchi', 'Uchinchi']) {
+      await enrolledAgent
+        .post('/api/messages/conversations')
+        .send({ recipientId: mentorUserId, body: text })
+        .expect(201);
+    }
+
+    const notifications = await prisma.notification.findMany({
+      where: { userId: mentorUser.id, type: 'NEW_MESSAGE' },
+    });
+    expect(notifications).toHaveLength(1);
+    // Matn oxirgi xabarga yangilanadi
+    expect(notifications[0]?.body).toContain('Uchinchi');
+  });
+
+  it("o'qilgandan keyin yangi xabar yangi bildirishnoma yaratadi", async () => {
+    const mentorUser = await prisma.user.findUniqueOrThrow({ where: { email: 'mentor@msg.uz' } });
+    await prisma.notification.updateMany({
+      where: { userId: mentorUser.id, readAt: null },
+      data: { readAt: new Date() },
+    });
+
+    await enrolledAgent
+      .post('/api/messages/conversations')
+      .send({ recipientId: mentorUserId, body: "O'qilgandan keyingi xabar" })
+      .expect(201);
+
+    const unread = await prisma.notification.count({
+      where: { userId: mentorUser.id, type: 'NEW_MESSAGE', readAt: null },
+    });
+    expect(unread).toBe(1);
+  });
 });
 
 describe("O'qilmagan xabarlar", () => {

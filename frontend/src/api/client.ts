@@ -95,7 +95,7 @@ export async function apiFetch<T = unknown>(
             ...(options.headers as Record<string, string>),
           },
         });
-      } catch (err) {
+      } catch {
         cancel();
         // Chaqiruvchining o'zi bekor qilgan bo'lsa qayta urinmaymiz
         if (options.signal?.aborted) throw new ApiClientError(i18n.t('errors.network'), 0, 'ABORTED');

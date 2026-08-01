@@ -1145,12 +1145,15 @@
     "administrationHint": "Sorawıńızǵa gezekshi administrator juwap beredi",
     "toAdminChannel": "Administraciyaǵa múrájat",
     "unknownUser": "Paydalanıwshı",
-    "defaultGreeting": "Assalawma áleykum!",
     "roles": {
       "STUDENT": "Student",
       "MENTOR": "Mentor",
       "ADMIN": "Administrator"
-    }
+    },
+    "loadOlder": "Eski xabarlar",
+    "firstMessageLabel": "Birinshi xabar",
+    "startAndSend": "Jiberiw",
+    "noSearchResults": "Hesh kim tabılmadı."
   },
   "courseRequest": {
     "title": "Kurs haqqında maǵlıwmat alıw",

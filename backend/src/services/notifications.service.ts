@@ -29,6 +29,47 @@ export async function notify(userIds: string | string[], input: NotifyInput): Pr
   }
 }
 
+/**
+ * Bir xil havolaga o'qilmagan bildirishnoma bo'lsa YANGISINI yaratmaydi —
+ * mavjudini yangilaydi (matn va vaqt).
+ *
+ * Yozishma uchun: har bir xabar alohida bildirishnoma yozsa, 20 xabarlik
+ * suhbat qo'ng'iroqdagi 30 ta yozuvning hammasini bitta odam bilan to'ldirib
+ * qo'yardi va qolgan barcha bildirishnomalar ko'rinmay ketardi. Endi bitta
+ * suhbat — bitta o'qilmagan yozuv, oxirgi xabar matni bilan.
+ *
+ * SSE hodisasi HAR DOIM yuboriladi: yangi yozuv yozilmagan bo'lsa ham ochiq
+ * yozishma oynasi va o'qilmaganlar hisobi yangilanishi kerak.
+ */
+export async function notifyMerged(userIds: string | string[], input: NotifyInput): Promise<void> {
+  const ids = (Array.isArray(userIds) ? userIds : [userIds]).filter(Boolean);
+  if (!ids.length) return;
+  try {
+    const existing = await prisma.notification.findMany({
+      where: { userId: { in: ids }, type: input.type, link: input.link, readAt: null },
+      select: { id: true, userId: true },
+    });
+    const merged = new Set(existing.map((n) => n.userId));
+    const fresh = ids.filter((id) => !merged.has(id));
+
+    await prisma.$transaction([
+      ...(existing.length
+        ? [prisma.notification.updateMany({
+          where: { id: { in: existing.map((n) => n.id) } },
+          // createdAt yangilanadi — yozuv ro'yxatning tepasiga qaytadi
+          data: { title: input.title, body: input.body ?? null, createdAt: new Date() },
+        })]
+        : []),
+      ...(fresh.length
+        ? [prisma.notification.createMany({ data: fresh.map((userId) => ({ userId, ...input })) })]
+        : []),
+    ]);
+    pushNotifyEvent(ids);
+  } catch (err) {
+    console.error('Bildirishnoma yozilmadi:', err);
+  }
+}
+
 export async function notifyAdmins(input: NotifyInput): Promise<void> {
   try {
     const admins = await prisma.user.findMany({

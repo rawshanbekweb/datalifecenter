@@ -29,6 +29,7 @@ export interface CourseCardData {
   durationMonths: number;
   studentsCount: number;
   format?: CourseFormat;
+  views?: number;
   [key: string]: unknown;
 }
 
@@ -42,6 +43,9 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
   const engagement = useEngagementItem('course', String(course.id));
+  // Paketli stats so'rovi kelguncha ro'yxat bilan kelgan qiymat ko'rsatiladi —
+  // aks holda raqam avval yo'q bo'lib, keyin "sakrab" paydo bo'lardi
+  const views = engagement.views ?? course.views ?? 0;
 
   return (
     <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
@@ -87,9 +91,9 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
         <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#94a3b8' }}>
           <Clock size={13} />{t('cards.course.months', { n: course.durationMonths })}
           {course.studentsCount > 0 && <span style={{ marginLeft:8 }}>{t('cards.course.studentsShort', { n: course.studentsCount })}</span>}
-          {(engagement.views ?? 0) > 0 && (
+          {views > 0 && (
             <span style={{ marginLeft:8, display:'inline-flex', alignItems:'center', gap:4 }}>
-              <Eye size={12} />{engagement.views}
+              <Eye size={12} />{views}
             </span>
           )}
         </div>

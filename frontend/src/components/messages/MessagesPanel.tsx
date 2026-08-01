@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, MessageSquarePlus, Search, Send, Shield, X } from 'lucide-react';
+import { ArrowLeft, ChevronUp, MessageSquarePlus, Search, Send, Shield, X } from 'lucide-react';
 import {
   ChatMessage,
   ContactCard,
@@ -65,10 +65,16 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
   const [pickerOpen, setPickerOpen] = useState<boolean>(false);
   const [contacts, setContacts] = useState<ContactCard[]>([]);
   const [contactSearch, setContactSearch] = useState<string>('');
+  const [loadingOlder, setLoadingOlder] = useState<boolean>(false);
+  // Fon yangilanishidagi tarmoq xatosi butun oynani "xato" holatiga
+  // o'tkazmasligi kerak — faqat birinchi yuklash muhim
+  const loadedOnce = useRef<boolean>(false);
+  const searchTimer = useRef<number | null>(null);
 
   // Bildirishnomadagi havola aynan kerakli suhbatni ochadi (?c=<id>)
   const activeId = searchParams.get('c');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const draftRef = useRef<HTMLTextAreaElement>(null);
 
   const setActiveId = useCallback((id: string | null): void => {
     setSearchParams(id ? { c: id } : {}, { replace: true });
@@ -76,8 +82,8 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
 
   const loadConversations = useCallback((): void => {
     listConversations()
-      .then((list) => { setConversations(list); setStatus('ready'); })
-      .catch(() => setStatus('error'));
+      .then((list) => { setConversations(list); setStatus('ready'); loadedOnce.current = true; })
+      .catch(() => { if (!loadedOnce.current) setStatus('error'); });
   }, []);
 
   const loadThread = useCallback((id: string, showSpinner: boolean): void => {
@@ -99,6 +105,9 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
 
   useEffect(() => {
     if (!activeId) { setThread(null); return; }
+    // Eski yozishmani darhol tozalaymiz — aks holda yangi suhbat
+    // yuklanguncha ekranda BOSHQA odamning xabarlari turib qolardi
+    setThread(null);
     loadThread(activeId, true);
   }, [activeId, loadThread]);
 
@@ -121,10 +130,20 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
     return subscribeNotifications(refresh);
   }, [loadConversations, loadThread]);
 
-  // Yangi xabar kelganda oxiriga tushamiz
+  // Yangi xabar kelganda oxiriga tushamiz.
+  //
+  // Bog'lanish ATAYIN oxirgi xabar id'siga: xabarlar SONI eski yozishmalar
+  // yuklanganda ham o'zgaradi va o'shanda pastga sakrash foydalanuvchi
+  // endigina ochgan eski xabarlarni ko'zdan yo'qotardi.
+  const lastMessageId = thread?.messages[thread.messages.length - 1]?.id;
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: 'end' });
-  }, [thread?.messages.length, thread?.id]);
+  }, [lastMessageId, thread?.id]);
+
+  // Komponent yopilganda kutayotgan qidiruv so'rovi osilib qolmasin
+  useEffect(() => () => {
+    if (searchTimer.current !== null) window.clearTimeout(searchTimer.current);
+  }, []);
 
   const openPicker = (): void => {
     setPickerOpen(true);
@@ -133,8 +152,30 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
 
   const searchContacts = (value: string): void => {
     setContactSearch(value);
-    // Admin ro'yxati uzun bo'lishi mumkin — qidiruv serverda bajariladi
-    listMessageContacts(value || undefined).then(setContacts).catch(() => {});
+    // Qidiruv serverda bajariladi (admin ro'yxati uzun bo'lishi mumkin),
+    // shuning uchun har bosilgan harf uchun so'rov yubormaymiz
+    if (searchTimer.current !== null) window.clearTimeout(searchTimer.current);
+    searchTimer.current = window.setTimeout(() => {
+      searchTimer.current = null;
+      listMessageContacts(value.trim() || undefined).then(setContacts).catch(() => {});
+    }, 300);
+  };
+
+  // Eski xabarlar: yozishma uzun bo'lsa boshidan 40 tasi yuklanadi,
+  // qolganini foydalanuvchi so'raganda olib kelamiz
+  const loadOlder = async (): Promise<void> => {
+    if (!thread || loadingOlder || thread.messages.length === 0) return;
+    setLoadingOlder(true);
+    try {
+      const older = await getConversation(thread.id, thread.messages[0].createdAt);
+      setThread((prev) => (prev && prev.id === older.id
+        ? { ...prev, messages: [...older.messages, ...prev.messages], hasMore: older.hasMore }
+        : prev));
+    } catch {
+      // yuklanmadi — mavjud xabarlar joyida qoladi
+    } finally {
+      setLoadingOlder(false);
+    }
   };
 
   const send = async (): Promise<void> => {
@@ -144,6 +185,7 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
     try {
       const message = await sendMessage(thread.id, body);
       setDraft('');
+      if (draftRef.current) draftRef.current.style.height = 'auto';
       setThread((prev) => (prev ? { ...prev, messages: [...prev.messages, message] } : prev));
       loadConversations();
     } catch (err: unknown) {
@@ -154,14 +196,14 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
   };
 
   // Yangi suhbat: aniq odamga yoki administratsiyaga
-  const startWith = async (target: { recipientId?: string; toAdmin?: boolean }): Promise<void> => {
-    const body = draft.trim() || t('messages.defaultGreeting');
+  const startWith = async (target: { recipientId?: string; toAdmin?: boolean }, body: string): Promise<void> => {
+    if (!body.trim()) return;
     setSending(true);
     try {
-      const created = await startConversation({ ...target, body });
-      setDraft('');
+      const created = await startConversation({ ...target, body: body.trim() });
       setPickerOpen(false);
-      setThread(created);
+      // Yozishmani activeId effekti yuklaydi — bu yerda qo'shimcha
+      // setThread qilinsa u darhol qayta so'ralib, ekran bir "sakrardi"
       setActiveId(created.id);
       loadConversations();
     } catch (err: unknown) {
@@ -252,7 +294,9 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
     <div className="msg-thread" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
       {!thread && (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', lineHeight: 1.8 }}>{t('messages.pickConversation')}</p>
+          {threadLoading
+            ? <Loading />
+            : <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', lineHeight: 1.8 }}>{t('messages.pickConversation')}</p>}
         </div>
       )}
 
@@ -272,6 +316,12 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 10, background: '#f8fafc' }}>
             {threadLoading && <Loading />}
+            {!threadLoading && thread.hasMore && (
+              <button onClick={() => void loadOlder()} disabled={loadingOlder}
+                style={{ alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: accent, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: '5px 14px', cursor: 'pointer', opacity: loadingOlder ? 0.6 : 1 }}>
+                <ChevronUp size={13} /> {loadingOlder ? t('common.loading') : t('messages.loadOlder')}
+              </button>
+            )}
             {!threadLoading && thread.messages.length === 0 && (
               <p style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center' }}>{t('messages.emptyThread')}</p>
             )}
@@ -283,9 +333,15 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
 
           <div style={{ display: 'flex', gap: 8, padding: '12px 14px', borderTop: '1px solid #f1f5f9', background: '#fff' }}>
             <textarea
+              ref={draftRef}
               className="inp"
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                // Uzun xabar 40px'lik qutiga tiqilib qolmasin — maydon o'sadi
+                e.target.style.height = 'auto';
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+              }}
               onKeyDown={(e) => {
                 // Enter — yuborish, Shift+Enter — yangi qator (chatning odatiy xulqi)
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -320,8 +376,9 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
           search={contactSearch}
           onSearch={searchContacts}
           onClose={() => setPickerOpen(false)}
-          onPick={(id) => void startWith({ recipientId: id })}
-          onPickAdmin={user?.role === 'ADMIN' ? undefined : () => void startWith({ toAdmin: true })}
+          onStart={(target, body) => void startWith(target, body)}
+          // Admin administratsiyaning o'zi — bu yo'nalish unga ko'rsatilmaydi
+          allowAdminChannel={user?.role !== 'ADMIN'}
           accent={accent}
           busy={sending}
         />
@@ -385,15 +442,41 @@ interface PickerProps {
   search: string;
   onSearch: (value: string) => void;
   onClose: () => void;
-  onPick: (id: string) => void;
-  /** Adminning o'zi uchun berilmaydi — u administratsiyaga yoza olmaydi */
-  onPickAdmin?: () => void;
+  onStart: (target: { recipientId?: string; toAdmin?: boolean }, body: string) => void;
+  /** Adminning ozi administratsiyaga yoza olmaydi — unga bu yonalish korsatilmaydi */
+  allowAdminChannel: boolean;
   accent: string;
   busy: boolean;
 }
 
-function ContactPicker({ contacts, search, onSearch, onClose, onPick, onPickAdmin, accent, busy }: PickerProps): React.ReactElement {
+/**
+ * Yangi yozishma: avval kimga, keyin nima yozilishi.
+ *
+ * Birinchi xabar ATAYIN shu yerda soraladi. Ilgari kontakt bosilishi bilan
+ * standart salomlashuv avtomatik yuborilardi — foydalanuvchi ozi yozmagan
+ * xabar uning nomidan ketardi, suhbatdosh esa mazmunsiz salom olardi.
+ * Endi suhbat faqat haqiqiy xabar bilan boshlanadi.
+ */
+function ContactPicker({ contacts, search, onSearch, onClose, onStart, allowAdminChannel, accent, busy }: PickerProps): React.ReactElement {
   const { t } = useTranslation();
+  const [target, setTarget] = useState<{ recipientId?: string; toAdmin?: boolean; name: string } | null>(null);
+  const [body, setBody] = useState<string>('');
+
+  // Escape — modalni yopish (yoki tanlovga qaytish) odatiy kutilma
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key !== 'Escape') return;
+      if (target) setTarget(null);
+      else onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [target, onClose]);
+
+  const submit = (): void => {
+    if (!target || !body.trim()) return;
+    onStart({ recipientId: target.recipientId, toAdmin: target.toAdmin }, body);
+  };
 
   return (
     <div onClick={onClose}
@@ -401,55 +484,83 @@ function ContactPicker({ contacts, search, onSearch, onClose, onPick, onPickAdmi
       <div onClick={(e) => e.stopPropagation()} className="card"
         style={{ width: '100%', maxWidth: 420, maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid #f1f5f9' }}>
-          <p style={{ flex: 1, fontSize: 14, fontWeight: 800, color: '#0f172a' }}>{t('messages.newConversation')}</p>
-          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {target && (
+            <button onClick={() => setTarget(null)}
+              style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <ArrowLeft size={15} />
+            </button>
+          )}
+          <p style={{ flex: 1, fontSize: 14, fontWeight: 800, color: '#0f172a', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {target ? target.name : t('messages.newConversation')}
+          </p>
+          <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <X size={15} />
           </button>
         </div>
 
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Search size={15} style={{ color: '#94a3b8', flexShrink: 0 }} />
-          <input className="inp" value={search} onChange={(e) => onSearch(e.target.value)}
-            placeholder={t('messages.searchContacts')} style={{ flex: 1 }} />
-        </div>
-
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          {onPickAdmin && (
-            <button onClick={onPickAdmin} disabled={busy}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', borderBottom: '1px solid #f8fafc', background: '#fff', cursor: 'pointer' }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#0f172a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Shield size={15} />
-              </div>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{t('messages.administration')}</p>
-                <p style={{ fontSize: 11.5, color: '#94a3b8' }}>{t('messages.administrationHint')}</p>
-              </div>
+        {target ? (
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <label style={{ fontSize: 12, color: '#475569', fontWeight: 600 }}>{t('messages.firstMessageLabel')}</label>
+            <textarea className="inp" value={body} autoFocus rows={4}
+              onChange={(e) => setBody(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+              }}
+              placeholder={t('messages.placeholder')} style={{ resize: 'vertical' }} />
+            <button onClick={submit} disabled={busy || !body.trim()} className="btn-primary"
+              style={{ width: '100%', justifyContent: 'center', opacity: busy || !body.trim() ? 0.6 : 1 }}>
+              <Send size={14} /> {busy ? t('common.sending') : t('messages.startAndSend')}
             </button>
-          )}
+          </div>
+        ) : (
+          <>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid #f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Search size={15} style={{ color: '#94a3b8', flexShrink: 0 }} />
+              <input className="inp" value={search} onChange={(e) => onSearch(e.target.value)}
+                placeholder={t('messages.searchContacts')} style={{ flex: 1 }} />
+            </div>
 
-          {contacts.length === 0 && (
-            <p style={{ padding: '18px 16px', fontSize: 12.5, color: '#94a3b8', lineHeight: 1.7 }}>{t('messages.noContacts')}</p>
-          )}
-
-          {contacts.map((contact) => (
-            <button key={contact.id} onClick={() => onPick(contact.id)} disabled={busy}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '11px 16px', border: 'none', borderBottom: '1px solid #f8fafc', background: '#fff', cursor: 'pointer' }}>
-              {contact.avatarUrl ? (
-                <img src={contact.avatarUrl} alt={contact.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              ) : (
-                <div style={{ width: 34, height: 34, borderRadius: '50%', background: accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
-                  {initialsOf(contact.name)}
-                </div>
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              {allowAdminChannel && (
+                <button onClick={() => setTarget({ toAdmin: true, name: t('messages.administration') })}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', borderBottom: '1px solid #f8fafc', background: '#fff', cursor: 'pointer' }}>
+                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#0f172a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Shield size={15} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{t('messages.administration')}</p>
+                    <p style={{ fontSize: 11.5, color: '#94a3b8' }}>{t('messages.administrationHint')}</p>
+                  </div>
+                </button>
               )}
-              <div style={{ minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{contact.name}</p>
-                <p style={{ fontSize: 11.5, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {contact.context || t(`messages.roles.${contact.role}`)}
+
+              {contacts.length === 0 && (
+                <p style={{ padding: '18px 16px', fontSize: 12.5, color: '#94a3b8', lineHeight: 1.7 }}>
+                  {search.trim() ? t('messages.noSearchResults') : t('messages.noContacts')}
                 </p>
-              </div>
-            </button>
-          ))}
-        </div>
+              )}
+
+              {contacts.map((contact) => (
+                <button key={contact.id} onClick={() => setTarget({ recipientId: contact.id, name: contact.name })}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '11px 16px', border: 'none', borderBottom: '1px solid #f8fafc', background: '#fff', cursor: 'pointer' }}>
+                  {contact.avatarUrl ? (
+                    <img src={contact.avatarUrl} alt={contact.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
+                      {initialsOf(contact.name)}
+                    </div>
+                  )}
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{contact.name}</p>
+                    <p style={{ fontSize: 11.5, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {contact.context || t(`messages.roles.${contact.role}`)}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

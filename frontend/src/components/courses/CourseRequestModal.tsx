@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle, X, AlertCircle, Monitor, MapPin } from 'lucide-react';
 import { createCourseRequest, type CourseRequestFormat } from '../../api/courseRequests';
@@ -42,6 +42,13 @@ export default function CourseRequestModal({
   const [note, setNote]   = useState<string>('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [error, setError] = useState<string>('');
+
+  // Escape bilan yopish — modal uchun odatiy kutilma
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();

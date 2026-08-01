@@ -1145,12 +1145,15 @@
     "administrationHint": "Savolingizga navbatchi administrator javob beradi",
     "toAdminChannel": "Administratsiyaga murojaat",
     "unknownUser": "Foydalanuvchi",
-    "defaultGreeting": "Assalomu alaykum!",
     "roles": {
       "STUDENT": "Talaba",
       "MENTOR": "Mentor",
       "ADMIN": "Administrator"
-    }
+    },
+    "loadOlder": "Eski xabarlar",
+    "firstMessageLabel": "Birinchi xabar",
+    "startAndSend": "Yuborish",
+    "noSearchResults": "Hech kim topilmadi."
   },
   "courseRequest": {
     "title": "Kurs haqida ma'lumot olish",

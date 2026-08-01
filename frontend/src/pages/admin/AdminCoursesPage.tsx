@@ -116,8 +116,9 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       durationMonths: Number(form.durationMonths) || 1,
       level: form.level,
       format: form.format,
-      // Manzil faqat offline/gibrid kursda ma'noli — bo'sh bo'lsa yuborilmaydi
-      location: form.location.uz.trim() ? form.location : null,
+      // Manzil faqat offline/gibrid kursda ma'noli. ONLINE'ga o'tkazilganda
+      // eski manzil bazada qolib ketmasligi uchun ataylab null yuboriladi.
+      location: form.format !== 'ONLINE' && form.location.uz.trim() ? form.location : null,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       published: form.published,
       mentorId: form.mentorId || null,

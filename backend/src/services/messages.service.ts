@@ -3,7 +3,7 @@ import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
 import { isUniqueViolation } from '../utils/prismaErrors';
 import { Actor } from '../utils/mentorAccess';
-import { excerpt, notify } from './notifications.service';
+import { excerpt, notifyMerged } from './notifications.service';
 
 /**
  * Rollar aro yozishma: talaba ↔ mentor, har kim ↔ administratsiya.
@@ -346,9 +346,11 @@ export async function startConversation(actor: Actor, input: StartConversationIn
     if (!recipient) {
       throw ApiError.notFound('Foydalanuvchi topilmadi');
     }
-    // Adminga yozish har doim umumiy administratsiya kanaliga tushadi —
-    // aks holda javob bergan admin ta'tilga chiqsa yozishma o'lik qolardi
-    if (recipient.role === 'ADMIN') {
+    // Adminga yozish umumiy administratsiya kanaliga tushadi — aks holda
+    // javob bergan admin ta'tilga chiqsa yozishma o'lik qolardi.
+    // ISTISNO: adminning O'ZI hamkasbiga yozsa, bu oddiy shaxsiy yozishma
+    // (aks holda u o'ziga tegishli kanalni ochishga urinib xato olardi).
+    if (recipient.role === 'ADMIN' && actor.role !== 'ADMIN') {
       conversationId = (await openAdminConversation(actor)).id;
     } else {
       await assertCanWriteTo(actor, recipient);
@@ -411,9 +413,12 @@ async function notifyRecipients(
     for (const participant of recipients) add(participant.user.role, participant.userId);
   }
 
+  // notifyMerged: bitta suhbat — bitta o'qilmagan bildirishnoma. Har xabar
+  // uchun yangi yozuv qo'shilsa, faol yozishma qo'ng'iroqdagi qolgan
+  // bildirishnomalarni ko'mib tashlardi.
   await Promise.all(
     [...byRole.entries()].map(([role, userIds]) =>
-      notify(userIds, {
+      notifyMerged(userIds, {
         type: 'NEW_MESSAGE',
         title: `Yangi xabar: ${senderName}`,
         body: excerpt(body),

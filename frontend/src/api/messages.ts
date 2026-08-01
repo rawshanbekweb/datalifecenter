@@ -66,8 +66,21 @@ export function sendMessage(conversationId: string, body: string): Promise<ChatM
   });
 }
 
+/**
+ * Suhbatni o'qilgan deb belgilaydi.
+ *
+ * Yon menyudagi o'qilmaganlar belgisi alohida komponentda — u SSE yoki
+ * zaxira pollingni kutsa, foydalanuvchi xabarni o'qib bo'lgach ham belgi
+ * bir necha daqiqa osilib turardi. Shu sabab shu yerdan hodisa yuboriladi.
+ */
+export const MESSAGES_READ_EVENT = 'datalife:messages-read';
+
 export function markConversationRead(conversationId: string): Promise<{ read: boolean }> {
-  return apiFetch(`/messages/conversations/${conversationId}/read`, { method: 'PATCH' });
+  return apiFetch<{ read: boolean }>(`/messages/conversations/${conversationId}/read`, { method: 'PATCH' })
+    .then((res) => {
+      window.dispatchEvent(new Event(MESSAGES_READ_EVENT));
+      return res;
+    });
 }
 
 export function getUnreadMessagesCount(): Promise<{ unreadCount: number }> {

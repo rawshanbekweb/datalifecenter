@@ -44,19 +44,40 @@ export function markAllNotificationsRead(): Promise<{ read: boolean }> {
   return apiFetch('/notifications/read-all', { method: 'PATCH' });
 }
 
-// SSE oqimiga obuna: yangi bildirishnoma kelganda onNotify chaqiriladi.
-// EventSource emas, fetch-stream ishlatiladi — EventSource Authorization
-// header'ni qo'llamaydi, Safari'da esa krossdomen cookie bloklanadi.
-// Qaytgan funksiya obunani to'xtatadi. Uzilishda eksponensial backoff
-// bilan qayta ulanadi.
-export function subscribeNotifications(onNotify: () => void): () => void {
-  let stopped = false;
-  let controller: AbortController | null = null;
+/**
+ * SSE oqimi — BUTUN SAHIFA UCHUN BITTA ULANISH.
+ *
+ * NEGA UMUMIY: ulanish serverda doimiy resurs egallaydi va bitta
+ * foydalanuvchiga 5 tadan ortiq ulanishga ruxsat berilmaydi
+ * (notificationStream.ts). Sahifada esa bir vaqtda uchta obunachi bor:
+ * bildirishnoma qo'ng'irog'i, yon menyudagi o'qilmagan xabarlar belgisi va
+ * xabarlar oynasi. Har biri o'z ulanishini ochsa, ikkinchi tabdayoq limit
+ * to'lib, server eng eski ulanishni uzib tashlardi — ya'ni allaqachon ochiq
+ * turgan tab jim qolardi. Shuning uchun ulanish bitta, obunachilar esa
+ * shu oqimni bo'lishadi (refcount bilan).
+ *
+ * EventSource emas, fetch-stream ishlatiladi — EventSource Authorization
+ * header'ni qo'llamaydi, Safari'da esa krossdomen cookie bloklanadi.
+ */
+const listeners = new Set<() => void>();
+let streamController: AbortController | null = null;
+let streamRunning = false;
+// Qaysi token 401/403 olgani — o'sha token bilan qayta urinilmaydi
+// (aks holda eskirgan sessiya cheksiz 401 tsiklini hosil qilardi)
+let rejectedToken: string | null = null;
 
-  const run = async (): Promise<void> => {
-    let retryMs = 5000;
-    while (!stopped) {
-      controller = new AbortController();
+function startStreamIfNeeded(): void {
+  if (streamRunning || listeners.size === 0) return;
+  if (rejectedToken !== null && (getToken() ?? null) === rejectedToken) return;
+  streamRunning = true;
+  void runStream();
+}
+
+async function runStream(): Promise<void> {
+  let retryMs = 5000;
+  try {
+    while (listeners.size > 0) {
+      streamController = new AbortController();
       try {
         const token = getToken();
         const res = await fetch(`${API_URL}/notifications/stream`, {
@@ -65,13 +86,17 @@ export function subscribeNotifications(onNotify: () => void): () => void {
             Accept: 'text/event-stream',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          signal: controller.signal,
+          signal: streamController.signal,
         });
         // Sessiya eskirgan/ruxsat yo'q — qayta ulanish foydasiz, to'xtaymiz
         // (keyingi oddiy so'rov 401 olib ilova logout oqimini ishga soladi)
-        if (res.status === 401 || res.status === 403) return;
+        if (res.status === 401 || res.status === 403) {
+          rejectedToken = token ?? null;
+          break;
+        }
         if (!res.ok || !res.body) throw new Error(`SSE ${res.status}`);
         retryMs = 5000; // muvaffaqiyatli ulanish — backoff qayta boshlanadi
+        rejectedToken = null;
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -85,23 +110,45 @@ export function subscribeNotifications(onNotify: () => void): () => void {
           buffer = events.pop() ?? '';
           for (const event of events) {
             if (event.split('\n').some((line) => line.startsWith('event: notify'))) {
-              onNotify();
+              // Bitta obunachining xatosi qolganlarini to'xtatmasligi kerak
+              for (const listener of [...listeners]) {
+                try {
+                  listener();
+                } catch {
+                  // e'tiborsiz
+                }
+              }
             }
           }
         }
       } catch {
         // tarmoq uzildi yoki abort — quyida qayta ulanamiz
       }
-      if (stopped) return;
+      if (listeners.size === 0) break;
       await new Promise((resolve) => setTimeout(resolve, retryMs));
       retryMs = Math.min(retryMs * 2, 60000);
     }
-  };
+  } finally {
+    streamRunning = false;
+    streamController = null;
+    // Oqim tugagunicha yangi obunachi qo'shilgan bo'lishi mumkin
+    // (komponent qayta ulangan payt) — u ulanishsiz qolmasin
+    startStreamIfNeeded();
+  }
+}
 
-  void run();
+/**
+ * Yangi bildirishnoma kelganda `onNotify` chaqiriladi.
+ * Qaytgan funksiya obunani bekor qiladi; oxirgi obunachi ketganda
+ * umumiy ulanish ham yopiladi.
+ */
+export function subscribeNotifications(onNotify: () => void): () => void {
+  listeners.add(onNotify);
+  startStreamIfNeeded();
+
   return () => {
-    stopped = true;
-    controller?.abort();
+    listeners.delete(onNotify);
+    if (listeners.size === 0) streamController?.abort();
   };
 }
 

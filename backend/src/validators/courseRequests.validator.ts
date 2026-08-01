@@ -29,7 +29,9 @@ export const listCourseRequestsQuerySchema = z.object({
 export const updateCourseRequestSchema = z
   .object({
     status: z.enum(['NEW', 'CONTACTED', 'ENROLLED', 'REJECTED']).optional(),
-    reply: z.string().trim().max(4000, 'Javob juda uzun').optional(),
+    // Bo'sh javob hech narsa qilmaydi — uni jimgina qabul qilib, "yuborildi"
+    // taassurotini bermaslik uchun aniq xato qaytariladi
+    reply: z.string().trim().min(1, 'Javob bo‘sh bo‘lmasligi kerak').max(4000, 'Javob juda uzun').optional(),
   })
   .refine((data) => data.status !== undefined || data.reply !== undefined, {
     message: 'Hech narsa o‘zgartirilmadi',
