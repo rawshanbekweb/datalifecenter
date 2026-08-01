@@ -390,7 +390,7 @@ async function processTable(
 async function main(): Promise<void> {
   console.log(DRY_RUN ? '== DRY RUN — bazaga yozilmaydi ==' : '== Tarjimalar yozilmoqda ==');
 
-  await processTable('Course', await prisma.course.findMany(), ['title', 'subtitle', 'description'],
+  await processTable('Course', await prisma.course.findMany(), ['title', 'subtitle', 'description', 'location'],
     (id, data) => prisma.course.update({ where: { id: String(id) }, data }));
 
   await processTable('Module', await prisma.module.findMany(), ['title'],

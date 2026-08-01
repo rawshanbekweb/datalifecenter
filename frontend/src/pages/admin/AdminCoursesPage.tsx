@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, AlertCircle, ListTree } from 'lucide-react';
+import { Plus, Pencil, Trash2, AlertCircle, ListTree, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listCoursesAdmin, createCourse, updateCourse, deleteCourse } from '../../api/courses';
 import { listMentors } from '../../api/mentors';
@@ -18,6 +18,12 @@ const LEVELS: { value: string; labelKey: string }[] = [
   { value: 'BEGINNER', labelKey: 'levels.BEGINNER' },
   { value: 'INTERMEDIATE', labelKey: 'levels.INTERMEDIATE' },
   { value: 'ADVANCED', labelKey: 'levels.ADVANCED' },
+];
+// Kurs qaysi shaklda o'tishi — offline guruhga yozilish admin orqali kechadi
+const FORMATS: { value: string; labelKey: string }[] = [
+  { value: 'ONLINE', labelKey: 'courseFormat.ONLINE' },
+  { value: 'OFFLINE', labelKey: 'courseFormat.OFFLINE' },
+  { value: 'HYBRID', labelKey: 'courseFormat.HYBRID' },
 ];
 const PRESETS: { nameKey: string; color: string; bg: string; border: string }[] = [
   { nameKey: 'admin.colors.blue',   color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
@@ -37,6 +43,8 @@ interface CourseFormState {
   price: number;
   durationMonths: number;
   level: string;
+  format: string;
+  location: LocalizedString;
   tags: string;
   published: boolean;
   mentorId: string;
@@ -59,16 +67,21 @@ interface Course {
   price: number | string;
   durationMonths: number;
   level: string;
+  format?: string;
+  location?: LocalizedString | null;
   tags?: string[];
   published: boolean;
   mentorId?: string;
   mentor?: { name: string };
   isFree?: boolean;
+  views?: number;
+  likesCount?: number;
 }
 
 const emptyForm: CourseFormState = {
   title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
-  price:0, durationMonths:1, level:'BEGINNER', tags:'', published:false, mentorId:'',
+  price:0, durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
+  tags:'', published:false, mentorId:'',
 };
 
 interface CourseFormProps {
@@ -102,6 +115,9 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       price: Number(form.price) || 0,
       durationMonths: Number(form.durationMonths) || 1,
       level: form.level,
+      format: form.format,
+      // Manzil faqat offline/gibrid kursda ma'noli — bo'sh bo'lsa yuborilmaydi
+      location: form.location.uz.trim() ? form.location : null,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       published: form.published,
       mentorId: form.mentorId || null,
@@ -169,6 +185,19 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           </select>
         </div>
       </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12 }}>
+        <div>
+          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fFormat')}</label>
+          <select className="inp" value={form.format} onChange={change('format')}>
+            {FORMATS.map((f) => <option key={f.value} value={f.value}>{t(f.labelKey)}</option>)}
+          </select>
+        </div>
+        {/* Manzil faqat offline mashg'ulot bo'lganda so'raladi */}
+        {form.format !== 'ONLINE' && (
+          <LocalizedField label={t('admin.courses.fLocation')} value={form.location}
+            onChange={(next) => setForm((f) => ({ ...f, location: next }))} />
+        )}
+      </div>
       <div>
         <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fTags')}</label>
         <input className="inp" value={form.tags} onChange={change('tags')} placeholder={t('admin.courses.tagsPlaceholder')} />
@@ -209,7 +238,8 @@ export default function AdminCoursesPage(): React.ReactElement {
     setEditing({
       id: course.id, title: course.title, subtitle: course.subtitle || emptyLocalizedString(), description: course.description,
       iconKey: course.iconKey, preset: presetIdx === -1 ? 0 : presetIdx, price: Number(course.price) || 0,
-      durationMonths: course.durationMonths, level: course.level, tags: (course.tags || []).join(', '),
+      durationMonths: course.durationMonths, level: course.level, format: course.format || 'ONLINE',
+      location: course.location || emptyLocalizedString(), tags: (course.tags || []).join(', '),
       published: course.published, mentorId: course.mentorId || '',
     });
   };
@@ -258,6 +288,10 @@ export default function AdminCoursesPage(): React.ReactElement {
                     {c.mentor?.name || t('admin.courses.noMentor')} · {c.isFree ? t('common.free') : t('admin.courses.priceUnit', { price: formatNumber(Number(c.price)) })}
                   </p>
                 </div>
+                <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:'#0891b2', flexShrink:0 }}
+                  title={t('admin.courses.viewsTitle')}>
+                  <Eye size={13}/> {c.views ?? 0}
+                </span>
                 <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#f8fafc', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8' }}>
                   {c.published ? t('admin.tags.published') : t('admin.tags.draft')}
                 </span>

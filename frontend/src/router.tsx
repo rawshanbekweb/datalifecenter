@@ -36,6 +36,7 @@ const StudentSessionsPage = lazyWithRetry(() => import('./pages/student/StudentS
 const StudentAssignmentsPage = lazyWithRetry(() => import('./pages/student/StudentAssignmentsPage'))
 const SubscriptionPage = lazyWithRetry(() => import('./pages/SubscriptionPage'))
 const StudentCertificatesPage = lazyWithRetry(() => import('./pages/student/StudentCertificatesPage'))
+const StudentMessagesPage = lazyWithRetry(() => import('./pages/student/StudentMessagesPage'))
 
 const MentorLayout = lazyWithRetry(() => import('./layouts/MentorLayout'))
 const MentorHomePage = lazyWithRetry(() => import('./pages/mentor/MentorHomePage'))
@@ -47,6 +48,7 @@ const MentorProfilePage = lazyWithRetry(() => import('./pages/mentor/MentorProfi
 const MentorQuestionsPage = lazyWithRetry(() => import('./pages/mentor/MentorQuestionsPage'))
 const MentorAssignmentsPage = lazyWithRetry(() => import('./pages/mentor/MentorAssignmentsPage'))
 const MentorRequestsPage = lazyWithRetry(() => import('./pages/mentor/MentorRequestsPage'))
+const MentorMessagesPage = lazyWithRetry(() => import('./pages/mentor/MentorMessagesPage'))
 
 const AdminLayout = lazyWithRetry(() => import('./layouts/AdminLayout'))
 const AdminDashboardPage = lazyWithRetry(() => import('./pages/admin/AdminDashboardPage'))
@@ -65,6 +67,8 @@ const AdminSiteSettingsPage = lazyWithRetry(() => import('./pages/admin/AdminSit
 const AdminTestimonialsPage = lazyWithRetry(() => import('./pages/admin/AdminTestimonialsPage'))
 const AdminCourseReviewsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseReviewsPage'))
 const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProjectsPage'))
+const AdminChatPage = lazyWithRetry(() => import('./pages/admin/AdminChatPage'))
+const AdminCourseRequestsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseRequestsPage'))
 
 // Sahifadan sahifaga o'tishda eng ko'p ko'rinadigan holat — kirish splash'i
 // faqat bir marta chiqadi, foydalanuvchi esa kunning qolgan qismida aynan
@@ -120,6 +124,7 @@ export function createAppRouter(basename: string) {
       { index: true, element: s(<DashboardPage />) },
       { path: 'sessions', element: s(<StudentSessionsPage />) },
       { path: 'assignments', element: s(<StudentAssignmentsPage />) },
+      { path: 'messages', element: s(<StudentMessagesPage />) },
       { path: 'subscription', element: s(<SubscriptionPage />) },
       { path: 'certificates', element: s(<StudentCertificatesPage />) },
       { path: 'profile', element: s(<ProfilePage />) },
@@ -138,6 +143,7 @@ export function createAppRouter(basename: string) {
       { path: 'questions', element: s(<MentorQuestionsPage />) },
       { path: 'assignments', element: s(<MentorAssignmentsPage />) },
       { path: 'requests', element: s(<MentorRequestsPage />) },
+      { path: 'messages', element: s(<MentorMessagesPage />) },
       { path: 'profile', element: s(<MentorProfilePage />) },
     ],
   },
@@ -151,6 +157,8 @@ export function createAppRouter(basename: string) {
       { path: 'subscriptions', element: s(<AdminSubscriptionsPage />) },
       { path: 'users', element: s(<AdminUsersPage />) },
       { path: 'messages', element: s(<AdminMessagesPage />) },
+      { path: 'chat', element: s(<AdminChatPage />) },
+      { path: 'course-requests', element: s(<AdminCourseRequestsPage />) },
       { path: 'announcements', element: s(<AdminAnnouncementsPage />) },
       { path: 'courses', element: s(<AdminCoursesPage />) },
       { path: 'courses/:id/curriculum', element: s(<AdminCurriculumPage />) },

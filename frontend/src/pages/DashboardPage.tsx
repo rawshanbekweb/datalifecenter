@@ -10,6 +10,7 @@ import { resolveIcon } from '../utils/iconMap';
 import { formatDate, formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
+import MyCourseRequestsPanel from '../components/courses/MyCourseRequestsPanel';
 import FileUpload from '../components/common/FileUpload';
 import { PAYMENT_INFO } from '../config/payment';
 import Loading from '../components/common/Loading';
@@ -360,6 +361,8 @@ export default function DashboardPage(): React.ReactElement {
         </m.div>
 
         <UpcomingSessionsPanel />
+
+        <MyCourseRequestsPanel />
 
         {status === 'ready' && enrollments.length > 0 && (() => {
           const active = enrollments.filter((e) => e.status === 'ACTIVE').length;

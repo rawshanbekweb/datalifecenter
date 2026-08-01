@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, BookOpen, GraduationCap, Mail, ArrowRight, Clock } from 'lucide-react';
+import { Users, BookOpen, GraduationCap, Mail, ArrowRight, Clock, Eye, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getAdminStats, AdminStats } from '../../api/admin';
+import { getAdminStats, AdminStats, TopContentItem } from '../../api/admin';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Loading from '../../components/common/Loading';
@@ -51,7 +51,16 @@ export default function AdminDashboardPage(): React.ReactElement {
     { label:t('admin.dashboard.cardCourses'), value:c.coursesTotal, sub:t('admin.dashboard.cardCoursesSub', { n: c.coursesPublished }), icon:BookOpen, color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', to:'/admin/courses' },
     { label:t('admin.dashboard.cardEnrollments'), value:c.enrollmentsTotal, sub:t('admin.dashboard.cardEnrollmentsSub', { pending: c.enrollmentsPending, active: c.enrollmentsActive }), icon:GraduationCap, color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0', to:'/admin/enrollments' },
     { label:t('admin.dashboard.cardMessages'), value:c.messagesNew, sub:t('admin.dashboard.cardMessagesSub', { blog: c.blogPostsTotal, mentors: c.mentorsTotal }), icon:Mail, color:'#d97706', bg:'#fffbeb', border:'#fde68a', to:'/admin/messages' },
+    { label:t('admin.dashboard.cardViews'), value:c.viewsTotal, sub:t('admin.dashboard.cardViewsSub', { n: c.likesTotal }), icon:Eye, color:'#0891b2', bg:'#ecfeff', border:'#a5f3fc', to:'/admin/courses' },
+    { label:t('admin.dashboard.cardCourseRequests'), value:c.courseRequestsNew, sub:t('admin.dashboard.cardCourseRequestsSub'), icon:GraduationCap, color:'#c2410c', bg:'#fff7ed', border:'#fed7aa', to:'/admin/course-requests' },
   ];
+
+  // Eng ko'p ko'rilgan kontent — qaysi mavzu ishlayotganini bir qarashda ko'rsatadi
+  const topLists: { titleKey: string; to: string; items: TopContentItem[] }[] = [
+    { titleKey:'admin.dashboard.topCourses',  to:'/admin/courses',  items: stats.topContent?.courses  ?? [] },
+    { titleKey:'admin.dashboard.topPosts',    to:'/admin/blog',     items: stats.topContent?.posts    ?? [] },
+    { titleKey:'admin.dashboard.topProjects', to:'/admin/projects', items: stats.topContent?.projects ?? [] },
+  ].filter((list) => list.items.length > 0);
 
   return (
     <div>
@@ -76,6 +85,33 @@ export default function AdminDashboardPage(): React.ReactElement {
           );
         })}
       </div>
+
+      {topLists.length > 0 && (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:14, marginBottom:28 }}>
+          {topLists.map((list) => (
+            <div key={list.titleKey} className="card" style={{ padding:20 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+                <p style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>{t(list.titleKey)}</p>
+                <Link to={list.to} style={{ fontSize:12, fontWeight:700, color:'#0ea5e9', textDecoration:'none' }}>{t('admin.common.all')}</Link>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                {list.items.map((item, i) => (
+                  <div key={item.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 10px', borderRadius:10, border:'1px solid #f1f5f9' }}>
+                    <span style={{ fontFamily:'var(--font-mono)', fontSize:11, fontWeight:700, color:'#cbd5e1', flexShrink:0 }}>{i + 1}</span>
+                    <p style={{ flex:1, minWidth:0, fontSize:12.5, fontWeight:600, color:'#334155', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{item.title}</p>
+                    <span style={{ display:'flex', alignItems:'center', gap:4, fontSize:11.5, color:'#0891b2', fontWeight:700, flexShrink:0 }}>
+                      <Eye size={12}/> {item.views}
+                    </span>
+                    <span style={{ display:'flex', alignItems:'center', gap:4, fontSize:11.5, color:'#f43f5e', fontWeight:700, flexShrink:0 }}>
+                      <Heart size={12}/> {item.likesCount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))', gap:14 }}>
         <div className="card" style={{ padding:20 }}>

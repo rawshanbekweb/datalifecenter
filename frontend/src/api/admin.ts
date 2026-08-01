@@ -12,6 +12,11 @@ export interface AdminStats {
     messagesNew: number;
     blogPostsTotal: number;
     mentorsTotal: number;
+    /** Ko'rib chiqilmagan kurs so'rovlari */
+    courseRequestsNew: number;
+    /** Butun sayt bo'ylab ko'rishlar va yoqtirishlar yig'indisi */
+    viewsTotal: number;
+    likesTotal: number;
   };
   recentEnrollments: {
     id: string;
@@ -30,6 +35,21 @@ export interface AdminStats {
     status: string;
     createdAt: string;
   }[];
+  /** Eng ko'p ko'rilgan kontent — har turdan 5 tadan */
+  topContent: {
+    courses: TopContentItem[];
+    posts: TopContentItem[];
+    projects: TopContentItem[];
+  };
+}
+
+export interface TopContentItem {
+  id: string;
+  title: string;
+  /** Loyihalarda alohida sahifa yo'q — slug bo'lmaydi */
+  slug?: string;
+  views: number;
+  likesCount: number;
 }
 
 export function getAdminStats(): Promise<AdminStats> {

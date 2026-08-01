@@ -197,6 +197,8 @@ interface CourseInput {
   currency: string;
   durationMonths: number;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  format: 'ONLINE' | 'OFFLINE' | 'HYBRID';
+  location?: LocalizedString | null;
   tags: string[];
   published: boolean;
   mentorId?: string | null;
@@ -210,6 +212,7 @@ export async function createCourse(input: CourseInput) {
       slug,
       isFree: input.price <= 0,
       subtitle: toJsonInput(input.subtitle),
+      location: toJsonInput(input.location),
     } as Prisma.CourseUncheckedCreateInput,
   });
 }
@@ -229,6 +232,7 @@ export async function updateCourse(id: string, input: Partial<CourseInput>) {
     data: {
       ...input,
       subtitle: toJsonInput(input.subtitle),
+      location: toJsonInput(input.location),
       ...(slug ? { slug } : {}),
       ...(isFree !== undefined ? { isFree } : {}),
     } as Prisma.CourseUncheckedUpdateInput,

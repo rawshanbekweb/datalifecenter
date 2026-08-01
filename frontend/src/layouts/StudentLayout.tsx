@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet, ClipboardList,
+  LayoutDashboard, Video, Award, UserRound, LogOut, Globe, Menu, X, Wallet, ClipboardList, MessagesSquare,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
@@ -13,12 +14,15 @@ interface NavItem {
   to: string;
   icon: React.ComponentType<{ size?: number | string }>;
   end?: boolean;
+  /** O'qilmagan xabarlar soni shu bo'limda ko'rsatiladi */
+  badge?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { labelKey: 'cabinet.nav.dashboard',     to: '/student',              icon: LayoutDashboard, end: true },
   { labelKey: 'cabinet.nav.sessions',      to: '/student/sessions',     icon: Video },
   { labelKey: 'cabinet.nav.assignments',   to: '/student/assignments',  icon: ClipboardList },
+  { labelKey: 'cabinet.nav.messages',      to: '/student/messages',     icon: MessagesSquare, badge: true },
   { labelKey: 'cabinet.nav.subscription',  to: '/student/subscription', icon: Wallet },
   { labelKey: 'cabinet.nav.certificates',  to: '/student/certificates', icon: Award },
   { labelKey: 'cabinet.nav.profile',       to: '/student/profile',      icon: UserRound },
@@ -27,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
 // Admin/mentor panel shell'ining talaba varianti — moviy aksent bilan
 export default function StudentLayout(): React.ReactElement {
   const { t } = useTranslation();
+  const unreadMessages = useUnreadMessages();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -64,6 +69,12 @@ export default function StudentLayout(): React.ReactElement {
                 borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
               })}>
               <Icon size={16} /> {t(item.labelKey)}
+              {/* O'qilmagan xabarlar — kabinetning qaysi bo'limida ekaningizdan qat'i nazar ko'rinadi */}
+              {item.badge && unreadMessages > 0 && (
+                <span style={{ marginLeft:'auto', fontSize:10.5, fontWeight:800, color:'#fff', background:'#f43f5e', borderRadius:20, padding:'1px 7px' }}>
+                  {unreadMessages}
+                </span>
+              )}
             </NavLink>
           );
         })}

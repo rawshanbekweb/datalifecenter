@@ -309,7 +309,11 @@
       "paidPrompt": "Kursga yozilish uchun so'rov yuboring.",
       "enroll": "Kursga yozilish",
       "reviewsTitle": "Talabalar sharhi",
-      "reviewsCount": "{{n}} ta sharh"
+      "reviewsCount": "{{n}} ta sharh",
+      "offlinePrompt": "Bu kurs offline o'tiladi — yozilish uchun administrator bilan bog'laning.",
+      "contactAdmin": "Ma'lumot olish",
+      "contactOffline": "Offline uchun bog'lanish",
+      "enrollOnline": "Online yozilish"
     },
     "certificate": {
       "title": "Sertifikatni tekshirish",
@@ -355,7 +359,8 @@
       "assignments": "Topshiriqlar",
       "subscription": "Obuna",
       "certificates": "Sertifikatlar",
-      "profile": "Profil"
+      "profile": "Profil",
+      "messages": "Xabarlar"
     }
   },
   "notifications": {
@@ -551,7 +556,8 @@
       "questions": "Savol-javob",
       "assignments": "Topshiriqlar",
       "requests": "Admin bilan aloqa",
-      "profile": "Profil"
+      "profile": "Profil",
+      "messages": "Xabarlar"
     },
     "notLinked": {
       "title": "Mentor profili bog'lanmagan",
@@ -710,7 +716,9 @@
       "announcements": "E'lonlar",
       "siteSettings": "Sayt sozlamalari",
       "testimonials": "Sharhlar",
-      "courseReviews": "Kurs sharhlari"
+      "courseReviews": "Kurs sharhlari",
+      "chat": "Yozishmalar",
+      "courseRequests": "Kurs so'rovlari"
     },
     "common": {
       "all": "Barchasi",
@@ -750,7 +758,14 @@
       "noEnrollments": "Hozircha yozilishlar yo'q.",
       "recentMessages": "Oxirgi xabarlar",
       "noMessages": "Hozircha xabarlar yo'q.",
-      "new": "Yangi"
+      "new": "Yangi",
+      "cardViews": "Ko'rishlar",
+      "cardViewsSub": "{{n}} ta yoqtirish",
+      "cardCourseRequests": "Kurs so'rovlari",
+      "cardCourseRequestsSub": "Ko'rib chiqilmagan murojaatlar",
+      "topCourses": "Eng ko'p ko'rilgan kurslar",
+      "topPosts": "Eng ko'p o'qilgan maqolalar",
+      "topProjects": "Eng ko'p ochilgan loyihalar"
     },
     "messages": {
       "title": "Xabarlar",
@@ -917,7 +932,10 @@
       "priceUnit": "{{price}} UZS",
       "curriculum": "Dastur",
       "curriculumTitle": "Kurs dasturi (modul/darslar)",
-      "confirmDelete": "Kursni o'chirishni tasdiqlaysizmi?"
+      "confirmDelete": "Kursni o'chirishni tasdiqlaysizmi?",
+      "fFormat": "Format",
+      "fLocation": "Manzil (offline)",
+      "viewsTitle": "Ko'rishlar soni"
     },
     "mentors": {
       "title": "Mentorlar",
@@ -1082,10 +1100,78 @@
         "QUIZ": "Test",
         "ASSIGNMENT": "Vazifa"
       }
+    },
+    "courseRequests": {
+      "title": "Kurs so'rovlari",
+      "sub": "Kursga qiziqqanlarning murojaatlari",
+      "subWaiting": "{{n}} ta yangi murojaat",
+      "empty": "Hozircha murojaat yo'q.",
+      "guest": "Hisobsiz mehmon",
+      "yourReply": "Sizning javobingiz",
+      "replyPlaceholder": "Javob yozing — o'quvchining xabarlariga tushadi",
+      "replyNotePlaceholder": "Izoh yozing (mehmonga xabar bormaydi)",
+      "sendReply": "Yuborish",
+      "status": {
+        "NEW": "Yangi",
+        "CONTACTED": "Bog'lanildi",
+        "ENROLLED": "Yozildi",
+        "REJECTED": "Rad etildi"
+      }
     }
   },
   "engagement": {
     "like": "Yoqtirish",
     "unlike": "Yoqtirishni olib tashlash"
+  },
+  "courseFormat": {
+    "ONLINE": "Online",
+    "OFFLINE": "Offline",
+    "HYBRID": "Online + Offline"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "studentSub": "Mentorlaringiz va administratsiya bilan yozishma",
+    "mentorSub": "O'quvchilaringiz va administratsiya bilan yozishma",
+    "adminSub": "Talabalar va mentorlar bilan yozishma",
+    "conversations": "Suhbatlar",
+    "newConversation": "Yangi xabar",
+    "emptyList": "Hozircha yozishma yo'q. Yangi xabar yozish uchun yuqoridagi tugmani bosing.",
+    "pickConversation": "Chapdan yozishmani tanlang yoki yangi xabar yozing",
+    "emptyThread": "Bu yerda hali xabar yo'q",
+    "placeholder": "Xabar yozing...",
+    "searchContacts": "Qidirish...",
+    "noContacts": "Yozish mumkin bo'lgan odam topilmadi. Kursga yozilganingizdan keyin mentoringizga yoza olasiz.",
+    "administration": "Administratsiya",
+    "administrationHint": "Savolingizga navbatchi administrator javob beradi",
+    "toAdminChannel": "Administratsiyaga murojaat",
+    "unknownUser": "Foydalanuvchi",
+    "defaultGreeting": "Assalomu alaykum!",
+    "roles": {
+      "STUDENT": "Talaba",
+      "MENTOR": "Mentor",
+      "ADMIN": "Administrator"
+    }
+  },
+  "courseRequest": {
+    "title": "Kurs haqida ma'lumot olish",
+    "doneTitle": "So'rovingiz qabul qilindi",
+    "doneSubUser": "Administrator tez orada bog'lanadi. Javob “Xabarlar” bo'limiga keladi.",
+    "doneSubGuest": "Administrator ko'rsatilgan telefon raqami orqali tez orada bog'lanadi.",
+    "formatLabel": "Qaysi shaklda o'qimoqchisiz?",
+    "nameLabel": "Ismingiz",
+    "phoneLabel": "Telefon raqamingiz",
+    "emailLabel": "Email (ixtiyoriy)",
+    "noteLabel": "Savol yoki izoh (ixtiyoriy)",
+    "notePlaceholder": "Masalan: qulay vaqt, guruh jadvali yoki to'lov haqida savol",
+    "submit": "So'rov yuborish",
+    "privacyHint": "Ma'lumotlaringiz faqat siz bilan bog'lanish uchun ishlatiladi.",
+    "myTitle": "Kurs bo'yicha so'rovlarim",
+    "replyLabel": "Administrator javobi",
+    "status": {
+      "NEW": "Ko'rib chiqilmoqda",
+      "CONTACTED": "Bog'lanildi",
+      "ENROLLED": "Yozildingiz",
+      "REJECTED": "Rad etildi"
+    }
   }
 }

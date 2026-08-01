@@ -7,8 +7,20 @@ export function isForeignKeyViolation(err: unknown): boolean {
   if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2003') {
     return true;
   }
+  return pgCodeOf(err) === '23001' || pgCodeOf(err) === '23503';
+}
+
+// Noyoblik buzilishi (P2002 / postgres 23505) — parallel ikki so'rov bir xil
+// yozuvni yaratmoqchi bo'lganda "mavjudini olamiz" yo'liga o'tish uchun
+export function isUniqueViolation(err: unknown): boolean {
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+    return true;
+  }
+  return pgCodeOf(err) === '23505';
+}
+
+function pgCodeOf(err: unknown): string | undefined {
   const own = (err as { code?: unknown })?.code;
   const cause = (err as { cause?: { code?: unknown; originalCode?: unknown } })?.cause;
-  const code = [own, cause?.code, cause?.originalCode].find((c) => typeof c === 'string');
-  return code === '23001' || code === '23503';
+  return [own, cause?.code, cause?.originalCode].find((c): c is string => typeof c === 'string');
 }

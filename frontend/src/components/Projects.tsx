@@ -3,9 +3,9 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Eye, GitBranch } from 'lucide-react';
 import { listProjects } from '../api/projects';
-import { registerView } from '../api/engagement';
 import LikeButton from './common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import { useViewRegistrar } from '../hooks/useContentView';
 import Loading from './common/Loading';
 
 interface ProjectItem {
@@ -36,13 +36,12 @@ function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
   const { t } = useTranslation();
   const host = hostnameOf(p.liveUrl);
   const engagement = useEngagementItem('project', p.id);
+  const registerView = useViewRegistrar();
 
   // Loyihaning alohida sahifasi yo'q — shuning uchun "ko'rish" deb loyiha
   // saytiga o'tish hisoblanadi. Bu "kartani ko'rdi"dan ko'ra ancha ma'noli
   // ko'rsatkich: qancha odam ishni haqiqatan ochib ko'rgan.
-  const handleVisit = (): void => {
-    void registerView('project', p.id).catch(() => undefined);
-  };
+  const handleVisit = (): void => registerView('project', p.id);
   return (
     <m.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, delay: (i % 3) * 0.1 }} className="card"

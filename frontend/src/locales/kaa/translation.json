@@ -309,7 +309,11 @@
       "paidPrompt": "Kursqa jazılıw ushın soraw jiberiń.",
       "enroll": "Kursqa jazılıw",
       "reviewsTitle": "Studentler pikiri",
-      "reviewsCount": "{{n}} pikir"
+      "reviewsCount": "{{n}} pikir",
+      "offlinePrompt": "Bul kurs offline ótedi — jazılıw ushın administrator menen baylanısıń.",
+      "contactAdmin": "Maǵlıwmat alıw",
+      "contactOffline": "Offline ushın baylanısıw",
+      "enrollOnline": "Online jazılıw"
     },
     "certificate": {
       "title": "Sertifikattı tekseriw",
@@ -355,7 +359,8 @@
       "assignments": "Tapsırmalar",
       "subscription": "Jazılım",
       "certificates": "Sertifikatlar",
-      "profile": "Profil"
+      "profile": "Profil",
+      "messages": "Xabarlar"
     }
   },
   "notifications": {
@@ -551,7 +556,8 @@
       "questions": "Soraw-juwap",
       "assignments": "Tapsırmalar",
       "requests": "Admin menen baylanıs",
-      "profile": "Profil"
+      "profile": "Profil",
+      "messages": "Xabarlar"
     },
     "notLinked": {
       "title": "Mentor profili baylanıspaǵan",
@@ -710,7 +716,9 @@
       "announcements": "Daǵazalar",
       "siteSettings": "Sayt sazlawları",
       "testimonials": "Pikirler",
-      "courseReviews": "Kurs pikirleri"
+      "courseReviews": "Kurs pikirleri",
+      "chat": "Jazısıwlar",
+      "courseRequests": "Kurs sorawları"
     },
     "common": {
       "all": "Barlıǵı",
@@ -750,7 +758,14 @@
       "noEnrollments": "Házirshe jazılıwlar joq.",
       "recentMessages": "Sońǵı xabarlar",
       "noMessages": "Házirshe xabarlar joq.",
-      "new": "Jańa"
+      "new": "Jańa",
+      "cardViews": "Kóriwler",
+      "cardViewsSub": "{{n}} unatıw",
+      "cardCourseRequests": "Kurs sorawları",
+      "cardCourseRequestsSub": "Kórip shıǵılmaǵan múrájatlar",
+      "topCourses": "Eń kóp kórilgen kurslar",
+      "topPosts": "Eń kóp oqılǵan maqalalar",
+      "topProjects": "Eń kóp ashılǵan joybarlar"
     },
     "messages": {
       "title": "Xabarlar",
@@ -917,7 +932,10 @@
       "priceUnit": "{{price}} UZS",
       "curriculum": "Baǵdarlama",
       "curriculumTitle": "Kurs baǵdarlaması (modul/sabaqlar)",
-      "confirmDelete": "Kurstı óshiriwdi tastıyıqlaysızba?"
+      "confirmDelete": "Kurstı óshiriwdi tastıyıqlaysızba?",
+      "fFormat": "Format",
+      "fLocation": "Mánzil (offline)",
+      "viewsTitle": "Kóriwler sanı"
     },
     "mentors": {
       "title": "Mentorlar",
@@ -1082,10 +1100,78 @@
         "QUIZ": "Test",
         "ASSIGNMENT": "Tapsırma"
       }
+    },
+    "courseRequests": {
+      "title": "Kurs sorawları",
+      "sub": "Kursqa qızıqqanlardıń múrájatları",
+      "subWaiting": "{{n}} jańa múrájat",
+      "empty": "Házirshe múrájat joq.",
+      "guest": "Esapsız miymán",
+      "yourReply": "Sizdiń juwabıńız",
+      "replyPlaceholder": "Juwap jazıń — oqıwshınıń xabarlarına túsedi",
+      "replyNotePlaceholder": "Pikir jazıń (miymanǵa xabar barmaydı)",
+      "sendReply": "Jiberiw",
+      "status": {
+        "NEW": "Jańa",
+        "CONTACTED": "Baylanısıldı",
+        "ENROLLED": "Jazıldı",
+        "REJECTED": "Biykarlandı"
+      }
     }
   },
   "engagement": {
     "like": "Unatıw",
     "unlike": "Unatıwdı alıp taslaw"
+  },
+  "courseFormat": {
+    "ONLINE": "Online",
+    "OFFLINE": "Offline",
+    "HYBRID": "Online + Offline"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "studentSub": "Mentorlarıńız hám administraciya menen jazısıw",
+    "mentorSub": "Oqıwshılarıńız hám administraciya menen jazısıw",
+    "adminSub": "Studentler hám mentorlar menen jazısıw",
+    "conversations": "Sáwbetler",
+    "newConversation": "Jańa xabar",
+    "emptyList": "Házirshe jazısıw joq. Jańa xabar jazıw ushın joqarıdaǵı túymeni basıń.",
+    "pickConversation": "Shep tárepten jazısıwdı saylań yamasa jańa xabar jazıń",
+    "emptyThread": "Bul jerde házirshe xabar joq",
+    "placeholder": "Xabar jazıń...",
+    "searchContacts": "Izlew...",
+    "noContacts": "Jazıwǵa bolatuǵın adam tabılmadı. Kursqa jazılǵannan keyin mentorıńızǵa jaza alasız.",
+    "administration": "Administraciya",
+    "administrationHint": "Sorawıńızǵa gezekshi administrator juwap beredi",
+    "toAdminChannel": "Administraciyaǵa múrájat",
+    "unknownUser": "Paydalanıwshı",
+    "defaultGreeting": "Assalawma áleykum!",
+    "roles": {
+      "STUDENT": "Student",
+      "MENTOR": "Mentor",
+      "ADMIN": "Administrator"
+    }
+  },
+  "courseRequest": {
+    "title": "Kurs haqqında maǵlıwmat alıw",
+    "doneTitle": "Sorawıńız qabıllandı",
+    "doneSubUser": "Administrator tez arada baylanısadı. Juwap “Xabarlar” bólimine keledi.",
+    "doneSubGuest": "Administrator kórsetilgen telefon nomeri arqalı tez arada baylanısadı.",
+    "formatLabel": "Qaysı formatta oqımaqshısız?",
+    "nameLabel": "Atıńız",
+    "phoneLabel": "Telefon nomerińiz",
+    "emailLabel": "Email (qálewi boyınsha)",
+    "noteLabel": "Soraw yamasa pikir (qálewi boyınsha)",
+    "notePlaceholder": "Mısalı: qolaylı waqıt, gruppa kestesi yamasa tólem haqqındaǵı soraw",
+    "submit": "Soraw jiberiw",
+    "privacyHint": "Maǵlıwmatlarıńız tek siz benen baylanısıw ushın paydalanıladı.",
+    "myTitle": "Kurs boyınsha sorawlarım",
+    "replyLabel": "Administrator juwabı",
+    "status": {
+      "NEW": "Kórip shıǵılmaqta",
+      "CONTACTED": "Baylanısıldı",
+      "ENROLLED": "Jazıldıńız",
+      "REJECTED": "Biykarlandı"
+    }
   }
 }

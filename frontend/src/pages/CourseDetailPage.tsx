@@ -2,17 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Clock, Star, Users, Eye, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard } from 'lucide-react';
+import { Clock, Star, Users, Eye, PlayCircle, Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle, CreditCard, MapPin, MessageCircle } from 'lucide-react';
 import { getCourseBySlug } from '../api/courses';
 import { createEnrollment, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
-import { registerView } from '../api/engagement';
 import { resolveIcon } from '../utils/iconMap';
 import { formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import { useContentView } from '../hooks/useContentView';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
 import CourseReviews from '../components/courses/CourseReviews';
+import CourseFormatBadge from '../components/courses/CourseFormatBadge';
+import CourseRequestModal from '../components/courses/CourseRequestModal';
 import Loading from '../components/common/Loading';
 
 interface Lesson {
@@ -54,6 +56,9 @@ interface CourseDetail {
   isFree: boolean;
   durationMonths: number;
   studentsCount: number;
+  format?: 'ONLINE' | 'OFFLINE' | 'HYBRID';
+  /** Offline mashg'ulot manzili */
+  location?: string | null;
   modules: CourseModule[];
   mentor?: CourseMentor | null;
   [key: string]: unknown;
@@ -80,6 +85,8 @@ export default function CourseDetailPage(): React.ReactElement {
   const [enrollError, setEnrollError]   = useState<string>('');
   const [enrollment, setEnrollment]     = useState<Enrollment | null>(null);
   const [payStatus, setPayStatus]       = useState<PayStatus>('idle');
+  // Adminga murojaat formasi: qaysi format bilan ochilgani muhim
+  const [requestFormat, setRequestFormat] = useState<'ONLINE' | 'OFFLINE' | null>(null);
 
   const engagement = useEngagementItem('course', course ? String(course.id) : undefined);
 
@@ -94,10 +101,7 @@ export default function CourseDetailPage(): React.ReactElement {
 
   // Ko'rishni alohida so'rov bilan qayd etamiz — dublikat server tomonda
   // qurilma bo'yicha to'siladi, xatosi sahifaga ta'sir qilmaydi
-  useEffect(() => {
-    if (!course?.id) return;
-    void registerView('course', String(course.id)).catch(() => undefined);
-  }, [course?.id]);
+  useContentView('course', course ? String(course.id) : undefined);
 
   // Foydalanuvchi bu kursga yozilganmi — sahifa ochilganda aniqlaymiz
   useEffect(() => {
@@ -128,6 +132,11 @@ export default function CourseDetailPage(): React.ReactElement {
 
   const Icon = resolveIcon(course.iconKey);
   const totalLessons = course.modules.reduce((sum: number, m: CourseModule) => sum + m.lessons.length, 0);
+  // Faqat offline o'tiladigan kursga sayt orqali yozilib bo'lmaydi;
+  // gibrid kursda online yozilish ham, offline uchun murojaat ham mumkin
+  const isOfflineOnly = course.format === 'OFFLINE';
+  const isHybrid = course.format === 'HYBRID';
+  const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
 
   const enroll = async (): Promise<void> => {
     setEnrollStatus('loading');
@@ -188,6 +197,12 @@ export default function CourseDetailPage(): React.ReactElement {
               <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}><Eye size={14}/> {engagement.views}</span>
             )}
             <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{t(`levels.${course.level}`)}</span>
+            <CourseFormatBadge format={course.format} size="md" />
+            {course.location && (
+              <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'#475569' }}>
+                <MapPin size={14}/> {course.location}
+              </span>
+            )}
             <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} size="md" color={course.color} />
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
               {course.isFree ? t('common.free') : `${formatNumber(Number(course.price))} ${course.currency}`}
@@ -230,13 +245,20 @@ export default function CourseDetailPage(): React.ReactElement {
               {!user && (
                 <>
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
-                    {t('pages.courseDetail.loginPrompt')}
+                    {isOfflineOnly ? t('pages.courseDetail.offlinePrompt') : t('pages.courseDetail.loginPrompt')}
                   </p>
-                  <Link to="/login" state={{ from: `/courses/${slug}` }}>
-                    <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
-                      {t('pages.courseDetail.loginAndEnroll')} <ArrowRight size={15}/>
-                    </button>
-                  </Link>
+                  {/* Offline kursda yozilish admin orqali — login talab qilinmaydi */}
+                  {!isOfflineOnly && (
+                    <Link to="/login" state={{ from: `/courses/${slug}` }}>
+                      <button className="btn-primary" style={{ width:'100%', justifyContent:'center', marginBottom:10 }}>
+                        {t('pages.courseDetail.loginAndEnroll')} <ArrowRight size={15}/>
+                      </button>
+                    </Link>
+                  )}
+                  <button onClick={() => setRequestFormat(defaultRequestFormat)}
+                    className={isOfflineOnly ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
+                    <MessageCircle size={15}/> {t('pages.courseDetail.contactAdmin')}
+                  </button>
                 </>
               )}
 
@@ -309,11 +331,22 @@ export default function CourseDetailPage(): React.ReactElement {
                     </div>
                   )}
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
-                    {course.isFree ? t('pages.courseDetail.freePrompt') : t('pages.courseDetail.paidPrompt')}
+                    {isOfflineOnly
+                      ? t('pages.courseDetail.offlinePrompt')
+                      : course.isFree ? t('pages.courseDetail.freePrompt') : t('pages.courseDetail.paidPrompt')}
                   </p>
-                  <button onClick={enroll} disabled={enrollStatus === 'loading'} className="btn-primary"
-                    style={{ width:'100%', justifyContent:'center', opacity: enrollStatus === 'loading' ? 0.7 : 1 }}>
-                    {enrollStatus === 'loading' ? t('common.sending') : <>{t('pages.courseDetail.enroll')} <ArrowRight size={15}/></>}
+                  {/* Offline guruhga o'zicha yozilib bo'lmaydi — joy va jadval admin bilan kelishiladi */}
+                  {!isOfflineOnly && (
+                    <button onClick={enroll} disabled={enrollStatus === 'loading'} className="btn-primary"
+                      style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: enrollStatus === 'loading' ? 0.7 : 1 }}>
+                      {enrollStatus === 'loading'
+                        ? t('common.sending')
+                        : <>{isHybrid ? t('pages.courseDetail.enrollOnline') : t('pages.courseDetail.enroll')} <ArrowRight size={15}/></>}
+                    </button>
+                  )}
+                  <button onClick={() => setRequestFormat(defaultRequestFormat)}
+                    className={isOfflineOnly ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
+                    <MessageCircle size={15}/> {isOfflineOnly || isHybrid ? t('pages.courseDetail.contactOffline') : t('pages.courseDetail.contactAdmin')}
                   </button>
                 </>
               )}
@@ -321,6 +354,16 @@ export default function CourseDetailPage(): React.ReactElement {
           </div>
         </div>
       </div>
+      {requestFormat && (
+        <CourseRequestModal
+          courseId={String(course.id)}
+          courseTitle={course.title}
+          courseFormat={course.format ?? 'ONLINE'}
+          initialFormat={requestFormat}
+          onClose={() => setRequestFormat(null)}
+        />
+      )}
+
       <style>{`@media(max-width:800px){.detail-grid{grid-template-columns:1fr!important}}`}</style>
     </section>
   );

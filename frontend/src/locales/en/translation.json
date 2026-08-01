@@ -309,7 +309,11 @@
       "paidPrompt": "Send a request to enroll in this course.",
       "enroll": "Enroll in course",
       "reviewsTitle": "Student reviews",
-      "reviewsCount": "{{n}} reviews"
+      "reviewsCount": "{{n}} reviews",
+      "offlinePrompt": "This course runs offline — contact an administrator to enrol.",
+      "contactAdmin": "Ask for details",
+      "contactOffline": "Contact us (offline)",
+      "enrollOnline": "Enrol online"
     },
     "certificate": {
       "title": "Verify certificate",
@@ -355,7 +359,8 @@
       "assignments": "Assignments",
       "subscription": "Subscription",
       "certificates": "Certificates",
-      "profile": "Profile"
+      "profile": "Profile",
+      "messages": "Messages"
     }
   },
   "notifications": {
@@ -551,7 +556,8 @@
       "questions": "Q&A",
       "assignments": "Assignments",
       "requests": "Contact admin",
-      "profile": "Profile"
+      "profile": "Profile",
+      "messages": "Messages"
     },
     "notLinked": {
       "title": "Mentor profile not linked",
@@ -710,7 +716,9 @@
       "announcements": "Announcements",
       "siteSettings": "Site settings",
       "testimonials": "Testimonials",
-      "courseReviews": "Course reviews"
+      "courseReviews": "Course reviews",
+      "chat": "Chat",
+      "courseRequests": "Course requests"
     },
     "common": {
       "all": "All",
@@ -750,7 +758,14 @@
       "noEnrollments": "No enrollments yet.",
       "recentMessages": "Recent messages",
       "noMessages": "No messages yet.",
-      "new": "New"
+      "new": "New",
+      "cardViews": "Views",
+      "cardViewsSub": "{{n}} likes",
+      "cardCourseRequests": "Course requests",
+      "cardCourseRequestsSub": "Requests awaiting review",
+      "topCourses": "Most viewed courses",
+      "topPosts": "Most read posts",
+      "topProjects": "Most opened projects"
     },
     "messages": {
       "title": "Messages",
@@ -917,7 +932,10 @@
       "priceUnit": "{{price}} UZS",
       "curriculum": "Curriculum",
       "curriculumTitle": "Course curriculum (modules/lessons)",
-      "confirmDelete": "Confirm deleting this course?"
+      "confirmDelete": "Confirm deleting this course?",
+      "fFormat": "Format",
+      "fLocation": "Address (offline)",
+      "viewsTitle": "Views"
     },
     "mentors": {
       "title": "Mentors",
@@ -1082,10 +1100,78 @@
         "QUIZ": "Quiz",
         "ASSIGNMENT": "Assignment"
       }
+    },
+    "courseRequests": {
+      "title": "Course requests",
+      "sub": "Enquiries from people interested in a course",
+      "subWaiting": "{{n}} new enquiries",
+      "empty": "No enquiries yet.",
+      "guest": "Guest without an account",
+      "yourReply": "Your reply",
+      "replyPlaceholder": "Write a reply — it lands in the student’s messages",
+      "replyNotePlaceholder": "Write a note (no message is sent to a guest)",
+      "sendReply": "Send",
+      "status": {
+        "NEW": "New",
+        "CONTACTED": "Contacted",
+        "ENROLLED": "Enrolled",
+        "REJECTED": "Rejected"
+      }
     }
   },
   "engagement": {
     "like": "Like",
     "unlike": "Remove like"
+  },
+  "courseFormat": {
+    "ONLINE": "Online",
+    "OFFLINE": "Offline",
+    "HYBRID": "Online + Offline"
+  },
+  "messages": {
+    "title": "Messages",
+    "studentSub": "Chat with your mentors and the administration",
+    "mentorSub": "Chat with your students and the administration",
+    "adminSub": "Chat with students and mentors",
+    "conversations": "Conversations",
+    "newConversation": "New message",
+    "emptyList": "No conversations yet. Use the button above to start one.",
+    "pickConversation": "Pick a conversation on the left or start a new one",
+    "emptyThread": "No messages here yet",
+    "placeholder": "Write a message...",
+    "searchContacts": "Search...",
+    "noContacts": "No one available to message yet. Once you join a course you can write to its mentor.",
+    "administration": "Administration",
+    "administrationHint": "The administrator on duty will reply",
+    "toAdminChannel": "Request to the administration",
+    "unknownUser": "User",
+    "defaultGreeting": "Hello!",
+    "roles": {
+      "STUDENT": "Student",
+      "MENTOR": "Mentor",
+      "ADMIN": "Administrator"
+    }
+  },
+  "courseRequest": {
+    "title": "Ask about this course",
+    "doneTitle": "Request received",
+    "doneSubUser": "An administrator will contact you shortly. The reply arrives in “Messages”.",
+    "doneSubGuest": "An administrator will call you on the number you provided.",
+    "formatLabel": "Which format do you prefer?",
+    "nameLabel": "Your name",
+    "phoneLabel": "Phone number",
+    "emailLabel": "Email (optional)",
+    "noteLabel": "Question or note (optional)",
+    "notePlaceholder": "For example: preferred time, group schedule or a payment question",
+    "submit": "Send request",
+    "privacyHint": "Your details are used only to get back to you.",
+    "myTitle": "My course requests",
+    "replyLabel": "Administrator reply",
+    "status": {
+      "NEW": "Under review",
+      "CONTACTED": "Contacted",
+      "ENROLLED": "Enrolled",
+      "REJECTED": "Rejected"
+    }
   }
 }

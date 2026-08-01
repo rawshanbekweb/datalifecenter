@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, BookOpen, Users, Video, MessageCircleQuestion, Inbox, UserRound, LogOut, Globe, Menu, X, ClipboardList,
+  LayoutDashboard, BookOpen, Users, Video, MessageCircleQuestion, Inbox, UserRound, LogOut, Globe, Menu, X, ClipboardList, MessagesSquare,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
@@ -13,6 +14,8 @@ interface NavItem {
   to: string;
   icon: React.ComponentType<{ size?: number | string }>;
   end?: boolean;
+  /** O'qilmagan xabarlar soni shu bo'limda ko'rsatiladi */
+  badge?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -23,12 +26,14 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'mentor.nav.questions', to: '/mentor/questions', icon: MessageCircleQuestion },
   { labelKey: 'mentor.nav.assignments', to: '/mentor/assignments', icon: ClipboardList },
   { labelKey: 'mentor.nav.requests',  to: '/mentor/requests', icon: Inbox },
+  { labelKey: 'mentor.nav.messages',  to: '/mentor/messages', icon: MessagesSquare, badge: true },
   { labelKey: 'mentor.nav.profile',   to: '/mentor/profile',  icon: UserRound },
 ];
 
 // Admin panel shell'ining mentor varianti — binafsha aksent bilan
 export default function MentorLayout(): React.ReactElement {
   const { t } = useTranslation();
+  const unreadMessages = useUnreadMessages();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -66,6 +71,12 @@ export default function MentorLayout(): React.ReactElement {
                 borderLeft: isActive ? '3px solid #9333ea' : '3px solid transparent',
               })}>
               <Icon size={16} /> {t(item.labelKey)}
+              {/* O'qilmagan xabarlar — kabinetning qaysi bo'limida ekaningizdan qat'i nazar ko'rinadi */}
+              {item.badge && unreadMessages > 0 && (
+                <span style={{ marginLeft:'auto', fontSize:10.5, fontWeight:800, color:'#fff', background:'#f43f5e', borderRadius:20, padding:'1px 7px' }}>
+                  {unreadMessages}
+                </span>
+              )}
             </NavLink>
           );
         })}

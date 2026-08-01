@@ -14,6 +14,15 @@ export async function createEnrollment(userId: string, courseId: string, locale:
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  // Offline guruhga o'zicha yozilib bo'lmaydi: joy, jadval va to'lov admin
+  // bilan kelishiladi — o'quvchi CourseRequest orqali murojaat qiladi
+  if (course.format === 'OFFLINE') {
+    throw ApiError.conflict(
+      'Bu kurs offline o‘tiladi — yozilish uchun administrator bilan bog‘laning',
+      'OFFLINE_COURSE_REQUEST_REQUIRED'
+    );
+  }
+
   const existing = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId, courseId } },
   });

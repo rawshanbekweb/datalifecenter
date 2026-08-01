@@ -155,7 +155,26 @@ export default function EngagementProvider({ children }: { children: React.React
       .finally(() => pending.current.delete(key));
   }, []);
 
-  const value = useMemo(() => ({ entries, register, toggle }), [entries, register, toggle]);
+  /**
+   * Ko'rish serverda qayd etilgach hisobni darhol qo'yadi.
+   *
+   * Ilgari bu qiymat faqat keyingi davriy so'rovda (30 soniyagacha)
+   * yangilanardi — foydalanuvchi maqolani ochib, o'z ko'rishi hisobga
+   * qo'shilmaganday ko'rinardi. Server qaytargan raqam eng ishonchli
+   * manba, shuning uchun uni darhol qo'llaymiz.
+   */
+  const applyViews = useCallback((target: EngagementTarget, id: string, views: number) => {
+    const key = entryKey(target, id);
+    setEntries((prev) => ({
+      ...prev,
+      [key]: { ...(prev[key] ?? { likesCount: 0, liked: false }), views },
+    }));
+  }, []);
+
+  const value = useMemo(
+    () => ({ entries, register, toggle, applyViews }),
+    [entries, register, toggle, applyViews],
+  );
 
   return <EngagementContext.Provider value={value}>{children}</EngagementContext.Provider>;
 }

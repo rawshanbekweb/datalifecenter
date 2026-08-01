@@ -4,12 +4,12 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Clock, Eye, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug } from '../api/blog';
-import { registerView } from '../api/engagement';
 import { resolveIcon } from '../utils/iconMap';
 import { formatDate } from '../utils/format';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import { useContentView } from '../hooks/useContentView';
 import Loading from '../components/common/Loading';
 
 interface BlogPost {
@@ -51,13 +51,9 @@ export default function BlogDetailPage(): React.ReactElement {
     return () => { cancelled = true; };
   }, [slug]);
 
-  // Ko'rish maqola ochilgach alohida so'rov bilan qayd etiladi (GET'ning
-  // o'zi hisoblamaydi — shu tufayli maqola javobi keshlanadi). Dublikat
-  // server tomonda qurilma bo'yicha to'siladi, xatosi jim yutiladi.
-  useEffect(() => {
-    if (!post?.id) return;
-    void registerView('blog', post.id).catch(() => undefined);
-  }, [post?.id]);
+  // Ko'rish maqola ochilgach alohida so'rov bilan qayd etiladi va
+  // hisoblagich darhol yangilanadi
+  useContentView('blog', post?.id);
 
   if (status === 'loading') {
     return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;

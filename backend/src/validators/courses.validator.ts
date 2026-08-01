@@ -21,6 +21,10 @@ export const createCourseSchema = z.object({
   currency: z.string().default('UZS'),
   durationMonths: z.coerce.number().int().min(1),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).default('BEGINNER'),
+  // Kurs qaysi shaklda o'tiladi; HYBRID — ikkalasi ham mavjud
+  format: z.enum(['ONLINE', 'OFFLINE', 'HYBRID']).default('ONLINE'),
+  // Offline mashg'ulot manzili
+  location: localizedStringNullish(),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
   mentorId: z.string().nullable().optional(),
@@ -41,6 +45,8 @@ export const updateCourseSchema = z.object({
   currency: z.string().optional(),
   durationMonths: z.coerce.number().int().min(1).optional(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
+  format: z.enum(['ONLINE', 'OFFLINE', 'HYBRID']).optional(),
+  location: localizedStringNullish(),
   tags: z.array(z.string()).optional(),
   published: z.boolean().optional(),
   mentorId: z.string().nullable().optional(),
