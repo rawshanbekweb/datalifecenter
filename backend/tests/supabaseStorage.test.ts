@@ -67,12 +67,17 @@ describe('Supabase Storage adapteri', () => {
     expect(url).not.toContain('/public/');
   });
 
+  // DIQQAT: bu javob shakli haqiqiy Supabase'dan olingan — bucket yo'qligida
+  // HTTP 400 keladi va "404" faqat tananing ichida bo'ladi. Avval kod HTTP
+  // statusga qarab tekshirgani uchun bucket avtomatik yaratilmasdi.
+  const bucketYoq = { status: 400, body: { statusCode: '404', error: 'Bucket not found', code: 'NoSuchBucket' } };
+
   it('bucket yo\'q bo\'lsa yaratib, yuklashni qaytadan uradi', async () => {
     let uploadAttempts = 0;
     mockFetch((url, init) => {
       if (url.endsWith('/bucket') && init.method === 'POST') return { body: { name: 'imgs' } };
       uploadAttempts += 1;
-      return uploadAttempts === 1 ? { status: 404, body: { message: 'Bucket not found' } } : { body: {} };
+      return uploadAttempts === 1 ? bucketYoq : { body: {} };
     });
     const supabase = await loadModule();
 
@@ -91,7 +96,7 @@ describe('Supabase Storage adapteri', () => {
       if (url.endsWith('/bucket')) return { body: {} };
       if (first) {
         first = false;
-        return { status: 404, body: {} };
+        return bucketYoq;
       }
       return { body: {} };
     });
@@ -148,6 +153,14 @@ describe('Supabase Storage adapteri', () => {
     const signed = await supabase.signUrls([{ bucket: 'vids', path: 'a.mp4' }], 3600);
 
     expect(signed.size).toBe(0);
+  });
+
+  it('boshqa xatoda bucket yaratishga urinmaydi', async () => {
+    mockFetch(() => ({ status: 403, body: { message: 'ruxsat yo\'q' } }));
+    const supabase = await loadModule();
+
+    await expect(supabase.upload(Buffer.from('b'), 'images', 'a.jpg', 'image/jpeg')).rejects.toThrow(/403/);
+    expect(calls.some((c) => c.url.endsWith('/bucket'))).toBe(false);
   });
 
   it('o\'chirishda 404 ni xato deb hisoblamaydi', async () => {

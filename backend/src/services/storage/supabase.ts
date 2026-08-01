@@ -76,13 +76,21 @@ export async function upload(
     });
 
   let res = await send();
-  if (res.status === 404) {
-    // "Bucket not found" — birinchi yuklashda yaratamiz va qayta uramiz
-    await ensureBucket(kind);
-    res = await send();
-  }
   if (!res.ok) {
-    throw new Error(`Supabase yuklash xatosi (${res.status}): ${await res.text()}`);
+    const detail = await res.text();
+    // DIQQAT: bucket yo'qligida Supabase HTTP 404 EMAS, HTTP 400 qaytaradi va
+    // "404" faqat javob TANASIDA bo'ladi:
+    //   {"statusCode":"404","error":"Bucket not found","code":"NoSuchBucket"}
+    // Shuning uchun holatni status bo'yicha emas, tana bo'yicha aniqlaymiz.
+    if (res.status === 404 || /NoSuchBucket|Bucket not found/i.test(detail)) {
+      await ensureBucket(kind);
+      res = await send();
+      if (!res.ok) {
+        throw new Error(`Supabase yuklash xatosi (${res.status}): ${await res.text()}`);
+      }
+    } else {
+      throw new Error(`Supabase yuklash xatosi (${res.status}): ${detail}`);
+    }
   }
 
   // Ochiq bucket — doimiy public URL; yopiq bucket — imzosiz kanonik URL
