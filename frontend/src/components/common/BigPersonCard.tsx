@@ -91,8 +91,19 @@ export default function BigPersonCard({
             rasm burchaklardan chiqib, orqa qatlamni yopib ketardi */}
         <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: PHOTO_RADIUS, overflow: 'hidden' }}>
           {showPhoto ? (
-            <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: focusPosition(focus), display: 'block', transition: 'transform 0.45s ease' }} />
+            <>
+              {/* Orqa qatlam — O'SHA rasmning xiralashtirilgan nusxasi.
+                  `contain` chetlarda bo'sh joy qoldiradi; uni tekis rang bilan
+                  to'ldirsak karta yamoqday ko'rinardi. Bir xil manba brauzer
+                  keshidan olinadi, ya'ni qo'shimcha yuklash bo'lmaydi. */}
+              <img src={photoUrl!} alt="" aria-hidden="true"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: focusPosition(focus), filter: 'blur(18px) saturate(1.15)', transform: 'scale(1.15)', opacity: 0.55 }} />
+              {/* Asosiy rasm ATAYIN `contain`: odam to'liq ko'rinishi kerak.
+                  `cover` bo'lganda tik suratlarning yuqori qismi kesilib,
+                  bosh kadrdan chiqib ketardi. */}
+              <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
+                style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', display: 'block', transition: 'transform 0.45s ease' }} />
+            </>
           ) : (
             <div className="person-big-img"
               style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg, ${placeholder.to}, ${placeholder.from})`, transition: 'transform 0.45s ease' }}>
