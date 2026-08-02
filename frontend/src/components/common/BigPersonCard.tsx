@@ -46,6 +46,16 @@ export interface BigPersonCardProps {
   tagTheme?: { bg: string; border: string };
 }
 
+/**
+ * Rasm karta chetidan qancha ichkarida turishi.
+ *
+ * Ataylab kichik (10px): maqsad rasmni "ramkaga solish", uni kichraytirib
+ * yuborish emas. Kattaroq qiymatda karta bo'sh joyga to'lib, rasm markadagi
+ * kichik surat bo'lib qolardi.
+ */
+const PHOTO_INSET = 10;
+const PHOTO_RADIUS = 14;
+
 function initialsOf(name: string): string {
   return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 }
@@ -71,45 +81,53 @@ export default function BigPersonCard({
     >
       {/* Rasm qismi ataylab havola EMAS: butun kartani ism ustidagi havola
           qoplaydi (.person-big-link::after). Aks holda ijtimoiy havolalar
-          <a> ichida <a> bo'lib qolardi — bu yaroqsiz HTML. */}
-      <div style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden' }}>
-        {showPhoto ? (
-          <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: focusPosition(focus), display: 'block', transition: 'transform 0.45s ease' }} />
-        ) : (
-          <div className="person-big-img"
-            style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg, ${placeholder.from}, ${placeholder.to})`, transition: 'transform 0.45s ease' }}>
-            <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'clamp(48px,7vw,72px)', color: accentColor, opacity: 0.75, letterSpacing: '-0.02em' }}>
-              {initialsOf(name)}
-            </span>
-          </div>
-        )}
+          <a> ichida <a> bo'lib qolardi — bu yaroqsiz HTML.
 
-        {/* Nishon rasm ustida — kartaning pastki matn qismini bo'shatadi */}
-        <span style={{ position: 'absolute', top: 14, left: 14, display: 'inline-flex', alignItems: 'center', gap: 5, maxWidth: 'calc(100% - 28px)', padding: '6px 11px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: 'rgba(255,255,255,0.94)', color: accentColor, backdropFilter: 'blur(6px)' }}>
-          <BadgeIcon size={12} style={{ flexShrink: 0 }} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{badge.label}</span>
-        </span>
+          Rasm karta chetiga tegib turmaydi: orqasida rangli qatlam qoladi va
+          rasmning o'zi ozgina kichrayadi. Ikkisi birga ishlaydi — yalang'och
+          oq fon ham yo'qoladi, kadrdagi odam ham "siqilib" turmaydi. */}
+      <div style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', padding: PHOTO_INSET, background: `linear-gradient(150deg, ${placeholder.from}, ${placeholder.to})` }}>
+        {/* Yaqinlashish animatsiyasi shu ichki qatlamda kesiladi, aks holda
+            rasm burchaklardan chiqib, orqa qatlamni yopib ketardi */}
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: PHOTO_RADIUS, overflow: 'hidden' }}>
+          {showPhoto ? (
+            <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: focusPosition(focus), display: 'block', transition: 'transform 0.45s ease' }} />
+          ) : (
+            <div className="person-big-img"
+              style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg, ${placeholder.to}, ${placeholder.from})`, transition: 'transform 0.45s ease' }}>
+              <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'clamp(44px,6.5vw,66px)', color: accentColor, opacity: 0.7, letterSpacing: '-0.02em' }}>
+                {initialsOf(name)}
+              </span>
+            </div>
+          )}
 
-        {cornerLabel && (
-          <span style={{ position: 'absolute', top: 14, right: 14, padding: '6px 11px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: 'rgba(15,23,42,0.82)', color: '#fff', backdropFilter: 'blur(6px)' }}>
-            {cornerLabel}
+          {/* Nishon rasm ustida — kartaning pastki matn qismini bo'shatadi */}
+          <span style={{ position: 'absolute', top: 12, left: 12, display: 'inline-flex', alignItems: 'center', gap: 5, maxWidth: 'calc(100% - 24px)', padding: '6px 11px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: 'rgba(255,255,255,0.94)', color: accentColor, backdropFilter: 'blur(6px)' }}>
+            <BadgeIcon size={12} style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{badge.label}</span>
           </span>
-        )}
 
-        {/* Ijtimoiy havolalar sichqoncha olib borilganda pastdan chiqadi.
-            Rasm ustida turgani uchun o'qilishi kerakli scrim bilan birga keladi. */}
-        {socials.length > 0 && (
-          <div className="person-big-socials"
-            style={{ position: 'absolute', left: 0, right: 0, bottom: 0, display: 'flex', gap: 8, justifyContent: 'center', padding: '34px 14px 14px', background: 'linear-gradient(to top, rgba(15,23,42,0.72), transparent)', opacity: 0, transform: 'translateY(8px)', transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
-            {socials.map(({ icon: Icon, href, label }) => (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${label}`} title={label}
-                style={{ width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.95)', color: '#0f172a', textDecoration: 'none' }}>
-                <Icon size={15} />
-              </a>
-            ))}
-          </div>
-        )}
+          {cornerLabel && (
+            <span style={{ position: 'absolute', top: 12, right: 12, padding: '6px 11px', borderRadius: 999, fontSize: 11.5, fontWeight: 700, background: 'rgba(15,23,42,0.82)', color: '#fff', backdropFilter: 'blur(6px)' }}>
+              {cornerLabel}
+            </span>
+          )}
+
+          {/* Ijtimoiy havolalar sichqoncha olib borilganda pastdan chiqadi.
+              Rasm ustida turgani uchun o'qilishi kerakli scrim bilan birga keladi. */}
+          {socials.length > 0 && (
+            <div className="person-big-socials"
+              style={{ position: 'absolute', left: 0, right: 0, bottom: 0, display: 'flex', gap: 8, justifyContent: 'center', padding: '34px 14px 14px', background: 'linear-gradient(to top, rgba(15,23,42,0.72), transparent)', opacity: 0, transform: 'translateY(8px)', transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
+              {socials.map(({ icon: Icon, href, label }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={`${name} — ${label}`} title={label}
+                  style={{ width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.95)', color: '#0f172a', textDecoration: 'none' }}>
+                  <Icon size={15} />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>

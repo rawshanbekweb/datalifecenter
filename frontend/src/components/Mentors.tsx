@@ -20,6 +20,16 @@ type Status = 'loading' | 'ready' | 'error';
  */
 const PREVIEW_COUNT = 6;
 
+/**
+ * Fon ataylab yumshoq gradient, tayyor `section-light`/`section-gray` emas.
+ *
+ * Tepadagi Kurslar bo'limi oq fonda: bu bo'lim ham tekis oq bo'lsa ikkalasi
+ * bitta uzun oq maydonga qo'shilib ketardi. Kulrangga o'tkazish esa pastdagi
+ * Xizmatlar bilan qo'shib yuborardi. Yumshoq gradient ikkala qo'shnidan ham
+ * ajratadi, lekin sahifadagi oq/kulrang navbatni buzmaydi.
+ */
+const SECTION_BG = 'linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #ffffff 100%)';
+
 // Ranglar ketma-ket almashadi — bir xil rangdagi kartalar qatori bo'lmasin.
 // `/mentors` sahifasidagi kartalar bilan bir xil palitra (MentorCard.tsx).
 const PALETTE = [
@@ -88,7 +98,7 @@ export default function Mentors(): React.ReactElement | null {
   if (status === 'ready' && mentors.length === 0) return null;
 
   return (
-    <section id="mentors" className="section-light" style={{ padding: '96px 0' }}>
+    <section id="mentors" style={{ padding: '96px 0', background: SECTION_BG }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
         <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: 48 }}>
