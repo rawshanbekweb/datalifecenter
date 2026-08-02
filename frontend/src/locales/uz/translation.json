@@ -229,6 +229,15 @@
       "loadError": "Kurslarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
       "allCourses": "Barcha Kurslar"
     },
+    "mentors": {
+      "pill": "Ta'lim jamoasi",
+      "titleStart": "Sizga o'rgatadigan ",
+      "titleAccent": "mentorlar",
+      "subtitle": "Sohasida ishlab turgan amaliyotchi mutaxassislar",
+      "badge": "Mentor",
+      "cta": "Barcha mentorlarni ko'rish",
+      "loadError": "Mentorlarni yuklab bo'lmadi."
+    },
     "blog": {
       "pill": "Bilimlar Markazi",
       "titleStart": "Blog &",

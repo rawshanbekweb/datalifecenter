@@ -183,6 +183,31 @@ button, input, select, textarea, optgroup {
 /* ── Divider ── */
 .divider { width: 48px; height: 3px; border-radius: 3px; background: #0ea5e9; margin: 16px 0; }
 
+/* ── Yirik rasmli odam kartasi (components/common/BigPersonCard.tsx) ──
+   Uslub ATAYIN global: karta bosh sahifadagi ikkita bo'limda (jamoa va
+   mentorlar) ishlatiladi va har biri o'z <style> blogini chiqarsa hujjatda
+   bir xil qoidalar takrorlanardi — Loading komponenti bilan bir xil sabab. */
+.person-big-card:hover .person-big-img { transform: scale(1.05); }
+.person-big-card:hover .person-big-socials { opacity: 1; transform: translateY(0); }
+/* Ismdagi havola butun kartani qoplaydi — rasm ham bosiladigan bo'ladi,
+   lekin HTML'da bitta <a> qoladi. Ijtimoiy havolalar undan yuqorida turadi. */
+.person-big-link::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+.person-big-socials { z-index: 2; }
+.person-big-link:focus-visible::after { outline: 2px solid #0d9488; outline-offset: -3px; border-radius: 16px; }
+/* Bio uzunligi har xil — karta balandligi tekis qolishi uchun 3 qatorda kesiladi */
+.person-big-bio {
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+/* Sichqonchasiz (sensorli) qurilmalarda hover yo'q — havolalar doim ko'rinadi */
+@media (hover: none) {
+  .person-big-socials { opacity: 1 !important; transform: none !important; }
+}
+/* Bosh sahifadagi odam kartalari to'ri */
+.person-big-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 1024px) { .person-big-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .person-big-grid { grid-template-columns: 1fr; } }
+
 /* ── Yuklanish indikatori (components/common/Loading.tsx) ──
    Uslub ATAYIN global: bu komponent 40+ joyda ishlatiladi va har biri o'z
    <style> blogini chiqarsa hujjatda o'nlab bir xil qoida paydo bo'lardi.

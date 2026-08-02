@@ -11,6 +11,7 @@ import { SITE_URL } from '../api/config';
 // birinchi ekranda ko'rinadigan kodni olib keladi, qolganlari parallel yuklanadi.
 const About = lazyWithRetry(() => import('../components/About'));
 const Courses = lazyWithRetry(() => import('../components/Courses'));
+const Mentors = lazyWithRetry(() => import('../components/Mentors'));
 const Services = lazyWithRetry(() => import('../components/Services'));
 const Projects = lazyWithRetry(() => import('../components/Projects'));
 const Team = lazyWithRetry(() => import('../components/Team'));
@@ -52,6 +53,11 @@ export default function HomePage(): React.ReactElement {
       {s(<Courses />, 'courses')}
       {s(<Services settings={settings.services} />, 'services')}
       {s(<Projects />, 'projects')}
+      {/* Mentorlar aynan shu yerda: "kim o'rgatadi" → "kompaniya ortida kim
+          turibdi" mantiqiy ketma-ketligi hosil bo'ladi. Fon ranglari ham shu
+          bilan to'g'ri navbatlashadi (Projects oq → Mentors kulrang → Team oq);
+          ilgari Projects va Team ketma-ket oq edi va orasida chegara ko'rinmasdi. */}
+      {s(<Mentors />, 'mentors')}
       {s(<Team />, 'team')}
       {s(<WhyUs settings={settings.why_us} />, 'why-us')}
       {s(<Testimonials />, 'testimonials')}

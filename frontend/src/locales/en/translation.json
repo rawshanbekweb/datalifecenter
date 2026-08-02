@@ -229,6 +229,15 @@
       "loadError": "Failed to load courses. Check that the backend is running.",
       "allCourses": "All Courses"
     },
+    "mentors": {
+      "pill": "Teaching team",
+      "titleStart": "The ",
+      "titleAccent": "mentors",
+      "subtitle": "Practising specialists who work in the field every day",
+      "badge": "Mentor",
+      "cta": "See all mentors",
+      "loadError": "Failed to load mentors."
+    },
     "blog": {
       "pill": "Knowledge Hub",
       "titleStart": "Blog &",

@@ -229,6 +229,15 @@
       "loadError": "Kurslardı júklep bolmadı. Backend iske túsirilgenin tekseriń.",
       "allCourses": "Barlıq kurslar"
     },
+    "mentors": {
+      "pill": "Bilimlendiriw jámáti",
+      "titleStart": "Sizge úyretetuǵın ",
+      "titleAccent": "mentorlar",
+      "subtitle": "Óz tarawında islep atırǵan ámeliyatshı qániygeler",
+      "badge": "Mentor",
+      "cta": "Barlıq mentorlardı kóriw",
+      "loadError": "Mentorlardı júklep bolmadı."
+    },
     "blog": {
       "pill": "Bilimler orayı",
       "titleStart": "Blog &",
