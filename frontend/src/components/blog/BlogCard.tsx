@@ -19,6 +19,7 @@ export interface BlogPostCardData {
   bg: string;
   border: string;
   views: number;
+  likesCount?: number;
   readMinutes: number;
   publishedAt: string;
   tags: string[];
@@ -42,7 +43,7 @@ function formatDate(dateStr: string): string {
 export default function BlogCard({ post, index = 0 }: BlogCardProps): React.ReactElement {
   const { t } = useTranslation();
   const Icon = resolveIcon(post.iconKey);
-  const engagement = useEngagementItem('blog', String(post.id));
+  const engagement = useEngagementItem('blog', String(post.id), { likesCount: post.likesCount, views: post.views });
   // Jonli qiymat kelmaguncha maqola bilan birga kelgan son ko'rsatiladi —
   // shu tufayli kartada hech qachon bo'sh joy yoki nol chaqnashi bo'lmaydi
   const views = engagement.views ?? post.views;

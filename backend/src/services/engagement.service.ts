@@ -87,6 +87,20 @@ export interface LikeResult {
   likesCount: number;
 }
 
+/** Hisoblagichni o'zgartirmasdan o'qiydi (poygada joriy qiymatni qaytarish uchun). */
+async function currentLikes(
+  tx: Prisma.TransactionClient,
+  target: EngagementTarget,
+  contentId: string,
+): Promise<number> {
+  switch (target) {
+    case 'BLOG_POST': return (await tx.blogPost.findUnique({ where: { id: contentId }, select: { likesCount: true } }))?.likesCount ?? 0;
+    case 'PROJECT': return (await tx.project.findUnique({ where: { id: contentId }, select: { likesCount: true } }))?.likesCount ?? 0;
+    case 'COURSE': return (await tx.course.findUnique({ where: { id: contentId }, select: { likesCount: true } }))?.likesCount ?? 0;
+    case 'TESTIMONIAL': return (await tx.testimonial.findUnique({ where: { id: contentId }, select: { likesCount: true } }))?.likesCount ?? 0;
+  }
+}
+
 /**
  * Yoqtirishni almashtiradi: qo'yilmagan bo'lsa qo'yadi, qo'yilgan bo'lsa oladi.
  *
@@ -102,18 +116,34 @@ export async function toggleLike(
   await assertPublished(target, contentId);
 
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.contentLike.findUnique({
-      where: { contentType_contentId_deviceId: { contentType: target, contentId, deviceId } },
-      select: { id: true },
+    // O'chirish `deleteMany` orqali: u nechta qator o'chganini qaytaradi.
+    // Shu bilan "o'qidim → o'chirdim" oralig'idagi poyga yopiladi — ikkita
+    // parallel bosishda faqat BITTASI 1 qaytaradi va faqat o'sha hisobni
+    // kamaytiradi, ikkinchisi 0 ko'rib yoqtirish qo'yishga o'tadi.
+    const removed = await tx.contentLike.deleteMany({
+      where: { contentType: target, contentId, deviceId },
     });
 
-    if (existing) {
-      await tx.contentLike.delete({ where: { id: existing.id } });
+    if (removed.count > 0) {
       const { likesCount } = await bumpCounter(tx, target, contentId, 'likesCount', -1);
       return { liked: false, likesCount };
     }
 
-    await tx.contentLike.create({ data: { contentType: target, contentId, deviceId } });
+    // `createMany` + `skipDuplicates` ATAYIN: oddiy `create` noyoblik buzilishida
+    // istisno tashlaydi, Postgres'da esa xato bergan so'rov BUTUN tranzaksiyani
+    // yaroqsiz qiladi — uni ushlab qolish ham yordam bermaydi, keyingi so'rov
+    // "current transaction is aborted" bilan yiqilardi. `skipDuplicates` esa
+    // ON CONFLICT DO NOTHING'ga aylanadi va nechta qator qo'shilganini qaytaradi.
+    const inserted = await tx.contentLike.createMany({
+      data: [{ contentType: target, contentId, deviceId }],
+      skipDuplicates: true,
+    });
+
+    if (inserted.count === 0) {
+      // Parallel so'rov allaqachon qo'ygan — hisobni ikki marta oshirmaymiz
+      return { liked: true, likesCount: await currentLikes(tx, target, contentId) };
+    }
+
     const { likesCount } = await bumpCounter(tx, target, contentId, 'likesCount', 1);
     return { liked: true, likesCount };
   });
@@ -145,25 +175,46 @@ export async function registerView(
   }
   await assertPublished(target, contentId);
 
-  const key = { contentType_contentId_deviceId: { contentType: target, contentId, deviceId } };
-  const seen = await prisma.contentView.findUnique({ where: key, select: { viewedAt: true } });
+  /**
+   * Dublikat tekshiruvi va hisoblash BITTA atomar qadamda bo'lishi shart.
+   *
+   * Ilgari bu "avval `findUnique` bilan ko'rdimmi deb tekshir, keyin
+   * `upsert` + `increment`" ko'rinishida edi. Ikki so'rov orasidagi oraliqda
+   * o'sha qurilmaning ikkinchi so'rovi ham tekshiruvdan o'tib ketardi (React
+   * StrictMode effektni ikki marta chaqiradi, foydalanuvchi ikki marta bosadi,
+   * sahifa tez yangilanadi) — natijada bitta ko'rish IKKI marta sanalardi.
+   *
+   * Endi yangilash `updateMany` ning `viewedAt < chegara` sharti bilan
+   * qilinadi: parallel so'rovlardan faqat bittasi 1 qator yangilaydi.
+   */
+  const cutoff = new Date(Date.now() - VIEW_DEDUP_MS);
+  const where = { contentType: target, contentId, deviceId };
 
-  if (seen && Date.now() - seen.viewedAt.getTime() < VIEW_DEDUP_MS) {
-    const current = await currentViews(target, contentId);
-    return { views: current, counted: false };
-  }
-
-  const { views } = await prisma.$transaction(async (tx) => {
-    // upsert: birinchi ko'rish — yangi yozuv, 24 soatdan keyingisi — vaqtni yangilash
-    await tx.contentView.upsert({
-      where: key,
-      create: { contentType: target, contentId, deviceId },
-      update: { viewedAt: new Date() },
+  // Belgilash va sanash BITTA tranzaksiyada: aks holda belgi qo'yilib,
+  // hisoblagich oshmay qolishi mumkin edi (ko'rish yo'qolardi).
+  const result = await prisma.$transaction(async (tx) => {
+    // 1) Eski yozuv bormi — vaqtini atomar yangilaymiz. Shart `viewedAt < chegara`
+    //    bo'lgani uchun parallel so'rovlardan faqat bittasi 1 qator yangilaydi.
+    const refreshed = await tx.contentView.updateMany({
+      where: { ...where, viewedAt: { lt: cutoff } },
+      data: { viewedAt: new Date() },
     });
+
+    if (refreshed.count === 0) {
+      // 2) Yangilanmadi: yo yozuv umuman yo'q, yo u hali "yangi" (24 soat ichida).
+      //    `skipDuplicates` — ON CONFLICT DO NOTHING; istisno tashlamaydi,
+      //    ya'ni tranzaksiya yaroqsiz holatga tushmaydi.
+      const created = await tx.contentView.createMany({ data: [where], skipDuplicates: true });
+      if (created.count === 0) return null; // yangi yozuv bor — dublikat
+    }
+
     return bumpCounter(tx, target, contentId, 'views', 1);
   });
 
-  return { views: views ?? 0, counted: true };
+  if (!result) {
+    return { views: await currentViews(target, contentId), counted: false };
+  }
+  return { views: result.views ?? 0, counted: true };
 }
 
 /** Dublikat ko'rishda hozirgi hisobni qaytarish uchun. */

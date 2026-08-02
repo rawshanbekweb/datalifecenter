@@ -18,6 +18,8 @@ interface ProjectItem {
   liveUrl?: string | null;
   repoUrl?: string | null;
   liveEmbed: boolean;
+  views?: number;
+  likesCount?: number;
   featured: boolean;
 }
 
@@ -35,7 +37,7 @@ function hostnameOf(url?: string | null): string {
 function ProjCard({ p, i }: { p: ProjectItem; i: number }): React.ReactElement {
   const { t } = useTranslation();
   const host = hostnameOf(p.liveUrl);
-  const engagement = useEngagementItem('project', p.id);
+  const engagement = useEngagementItem('project', p.id, { likesCount: p.likesCount, views: p.views });
   const registerView = useViewRegistrar();
 
   // Loyihaning alohida sahifasi yo'q — shuning uchun "ko'rish" deb loyiha

@@ -125,6 +125,62 @@ describe('Yoqtirish (like)', () => {
     expect(res.body.error.code).toBe('CONTENT_NOT_FOUND');
   });
 
+  /**
+   * Bir vaqtda kelgan bir xil so'rovlar.
+   *
+   * Ilgari ikkalasi ham "hali yoqtirilmagan / hali ko'rilmagan" degan
+   * xulosaga kelib ulgurardi: yoqtirishda ikkinchisi noyoblik xatosiga
+   * urilib 500 qaytarardi, ko'rishda esa hisob bitta o'rniga IKKI marta
+   * oshardi. Bu real holat — React StrictMode effektni ikki marta chaqiradi
+   * va foydalanuvchi yurakni tez ikki marta bosadi.
+   */
+  it('bir vaqtda kelgan ikkita ko\'rish bitta bo\'lib sanaladi', async () => {
+    const fresh = await admin.post('/api/blog').send({
+      title: { uz: 'Poyga sinovi' },
+      excerpt: { uz: 'Qisqacha' },
+      content: { uz: "To'liq matn kamida o'n belgidan iborat" },
+      category: 'Umumiy',
+      published: true,
+    }).expect(201);
+    const id = fresh.body.data.id as string;
+
+    const [a, b] = await Promise.all([
+      request(app).post(`/api/engagement/blog/${id}/view`).set('X-Device-Id', 'device-parallel'),
+      request(app).post(`/api/engagement/blog/${id}/view`).set('X-Device-Id', 'device-parallel'),
+    ]);
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(200);
+
+    const post = await prisma.blogPost.findUnique({ where: { id }, select: { views: true } });
+    expect(post?.views).toBe(1);
+    // Faqat bittasi haqiqatan sanalgan bo'lishi kerak
+    expect([a.body.data.counted, b.body.data.counted].filter(Boolean)).toHaveLength(1);
+  });
+
+  it('bir vaqtda kelgan ikkita yoqtirish xatoga olib kelmaydi', async () => {
+    const fresh = await admin.post('/api/blog').send({
+      title: { uz: 'Poyga sinovi ikki' },
+      excerpt: { uz: 'Qisqacha' },
+      content: { uz: "To'liq matn kamida o'n belgidan iborat" },
+      category: 'Umumiy',
+      published: true,
+    }).expect(201);
+    const id = fresh.body.data.id as string;
+
+    const [a, b] = await Promise.all([
+      request(app).post(`/api/engagement/blog/${id}/like`).set('X-Device-Id', 'device-parallel'),
+      request(app).post(`/api/engagement/blog/${id}/like`).set('X-Device-Id', 'device-parallel'),
+    ]);
+    // Ikkalasi ham 200 — 500 (noyoblik buzilishi) qaytmasligi kerak
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(200);
+
+    // Hisob haqiqiy yozuvlar soni bilan mos bo'lishi shart
+    const rows = await prisma.contentLike.count({ where: { contentType: 'BLOG_POST', contentId: id } });
+    const post = await prisma.blogPost.findUnique({ where: { id }, select: { likesCount: true } });
+    expect(post?.likesCount).toBe(rows);
+  });
+
   it("maqola o'chirilganda yoqtirishlar ham tozalanadi", async () => {
     await admin.delete(`/api/blog/${postId}`).expect(200);
     const left = await prisma.contentLike.count({ where: { contentType: 'BLOG_POST', contentId: postId } });

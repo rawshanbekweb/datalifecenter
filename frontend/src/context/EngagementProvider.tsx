@@ -95,15 +95,24 @@ export default function EngagementProvider({ children }: { children: React.React
           .then((list) => {
             if (cancelled) return;
             setEntries((prev) => {
+              let changed = false;
               const next = { ...prev };
               for (const s of list) {
                 const key = entryKey(target, s.contentId);
                 // Ayni damda serverga yuborilgan bosish bor — eski javob
                 // uni bekor qilib qo'ymasin
                 if (pending.current.has(key)) continue;
+                const old = prev[key];
+                if (old && old.likesCount === s.likesCount && old.views === s.views && old.liked === s.liked) {
+                  continue;
+                }
                 next[key] = { likesCount: s.likesCount, views: s.views, liked: s.liked };
+                changed = true;
               }
-              return next;
+              // Raqamlar o'zgarmagan bo'lsa AYNAN o'sha obyektni qaytaramiz:
+              // yangi identifikator butun daraxtni (o'nlab kartani) 30 soniyada
+              // bir marta bekorga qayta render qilardi
+              return changed ? next : prev;
             });
           })
           // Hisoblagich bezak: tarmoq xatosi sahifani buzmasligi kerak

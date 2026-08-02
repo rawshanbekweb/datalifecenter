@@ -16,17 +16,20 @@ import { EngagementContext } from '../context/engagement-context';
  */
 export function useContentView(target: EngagementTarget, id: string | undefined): void {
   const ctx = useContext(EngagementContext);
+  const applyViews = ctx?.applyViews;
   const sent = useRef<string | null>(null);
 
+  // Bog'liqlikda `ctx` emas, barqaror `applyViews` turadi — `ctx` obyekti har
+  // hisoblagich yangilanishida almashadi (useEngagementItem'dagi izohga qarang)
   useEffect(() => {
     if (!id || sent.current === id) return;
     sent.current = id;
 
     registerView(target, id)
-      .then((res) => ctx?.applyViews(target, id, res.views))
+      .then((res) => applyViews?.(target, id, res.views))
       // Hisoblagich bezak: tarmoq xatosi sahifani buzmasligi kerak
       .catch(() => undefined);
-  }, [ctx, target, id]);
+  }, [applyViews, target, id]);
 }
 
 /**
@@ -35,13 +38,14 @@ export function useContentView(target: EngagementTarget, id: string | undefined)
  */
 export function useViewRegistrar(): (target: EngagementTarget, id: string) => void {
   const ctx = useContext(EngagementContext);
+  const applyViews = ctx?.applyViews;
 
   return useCallback(
     (target: EngagementTarget, id: string) => {
       registerView(target, id)
-        .then((res) => ctx?.applyViews(target, id, res.views))
+        .then((res) => applyViews?.(target, id, res.views))
         .catch(() => undefined);
     },
-    [ctx],
+    [applyViews],
   );
 }

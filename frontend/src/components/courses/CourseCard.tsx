@@ -30,6 +30,7 @@ export interface CourseCardData {
   studentsCount: number;
   format?: CourseFormat;
   views?: number;
+  likesCount?: number;
   [key: string]: unknown;
 }
 
@@ -42,7 +43,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
   const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
-  const engagement = useEngagementItem('course', String(course.id));
+  const engagement = useEngagementItem('course', String(course.id), { likesCount: course.likesCount, views: course.views });
   // Paketli stats so'rovi kelguncha ro'yxat bilan kelgan qiymat ko'rsatiladi —
   // aks holda raqam avval yo'q bo'lib, keyin "sakrab" paydo bo'lardi
   const views = engagement.views ?? course.views ?? 0;

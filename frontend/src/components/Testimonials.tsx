@@ -15,6 +15,7 @@ interface Testimonial {
   avatarUrl?: string | null; focusX?: number; focusY?: number;
   text: string;
   rating: number;
+  likesCount?: number;
 }
 
 type TestimonialsStatus = 'loading' | 'ready' | 'error';
@@ -24,7 +25,7 @@ type TestimonialsStatus = 'loading' | 'ready' | 'error';
  * `.map()` callback'ida chaqirilmasligi kerak (React hook qoidalari).
  */
 function TestimonialCard({ item, index }: { item: Testimonial; index: number }): React.ReactElement {
-  const engagement = useEngagementItem('testimonial', item.id);
+  const engagement = useEngagementItem('testimonial', item.id, { likesCount: item.likesCount });
 
   return (
     <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }}
