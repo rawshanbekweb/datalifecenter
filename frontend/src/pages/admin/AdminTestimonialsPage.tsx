@@ -8,12 +8,16 @@ import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import Loading from '../../components/common/Loading';
+import ImageFocusPicker from '../../components/common/ImageFocusPicker';
+import { DEFAULT_FOCUS } from '../../utils/imageFocus';
 
 interface TestimonialFormState {
   id?: string;
   name: string;
   role: LocalizedString;
   avatarUrl: string;
+  focusX: number;
+  focusY: number;
   text: LocalizedString;
   rating: number;
   published: boolean;
@@ -25,6 +29,8 @@ interface Testimonial {
   name: string;
   role: LocalizedString;
   avatarUrl?: string | null;
+  focusX?: number;
+  focusY?: number;
   text: LocalizedString;
   rating: number;
   published: boolean;
@@ -34,7 +40,7 @@ interface Testimonial {
 
 type Status = 'loading' | 'ready' | 'error';
 
-const emptyForm: TestimonialFormState = { name:'', role: emptyLocalizedString(), avatarUrl:'', text: emptyLocalizedString(), rating:5, published:true, order:0 };
+const emptyForm: TestimonialFormState = { name:'', role: emptyLocalizedString(), avatarUrl:'', focusX: DEFAULT_FOCUS, focusY: DEFAULT_FOCUS, text: emptyLocalizedString(), rating:5, published:true, order:0 };
 
 interface TestimonialFormProps {
   initial: TestimonialFormState;
@@ -107,6 +113,8 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
           <input className="inp" type="number" min={1} max={5} value={form.rating} onChange={change('rating')} />
         </div>
       </div>
+      <ImageFocusPicker url={form.avatarUrl} focusX={form.focusX} focusY={form.focusY}
+        onChange={(focusX, focusY) => setForm((f: TestimonialFormState) => ({ ...f, focusX, focusY }))} />
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
         <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.testimonials.publishedCheck')}
       </label>
@@ -136,7 +144,7 @@ export default function AdminTestimonialsPage(): React.ReactElement {
   useEffect(load, []);
 
   const startEdit = (t: Testimonial): void => setEditing({
-    id: t.id, name: t.name, role: t.role, avatarUrl: t.avatarUrl || '', text: t.text, rating: t.rating, published: t.published, order: t.order,
+    id: t.id, name: t.name, role: t.role, avatarUrl: t.avatarUrl || '', focusX: t.focusX ?? DEFAULT_FOCUS, focusY: t.focusY ?? DEFAULT_FOCUS, text: t.text, rating: t.rating, published: t.published, order: t.order,
   });
 
   const remove = async (id: string): Promise<void> => {

@@ -9,7 +9,21 @@ datasource db {
 enum Role {
   STUDENT
   MENTOR
+  // Kompaniya xodimi — o'z jamoa profilini tahrirlaydigan kabinetga kiradi.
+  // MENTOR'dan farqi: o'quv jarayoniga (kurs/dars/topshiriq) aloqasi yo'q.
+  TEAM
   ADMIN
+}
+
+// Jamoa a'zosi qaysi bo'limda ishlaydi — ommaviy /team sahifasi shu bo'yicha guruhlanadi
+enum Department {
+  LEADERSHIP
+  ENGINEERING
+  DATA
+  DESIGN
+  MARKETING
+  EDUCATION
+  OPERATIONS
 }
 
 enum Level {
@@ -71,6 +85,11 @@ model User {
   role         Role         @default(STUDENT)
   isBlocked    Boolean      @default(false)
   avatarUrl    String?
+  // Rasm doira/kvadrat kadrga kesilganda markazda qoladigan nuqta (foizda).
+  // NEGA KERAK: portret suratda yuz yuqori qismda bo'ladi, sukutdagi 50/50
+  // kesish esa o'rtani oladi — natijada boshning yarmi kadrdan chiqib ketadi.
+  focusX       Int          @default(50)
+  focusY       Int          @default(50)
   // Parol o'zgarganda oshiriladi — eski JWT sessiyalari darhol bekor bo'ladi
   tokenVersion Int          @default(0)
   emailVerifiedAt DateTime?
@@ -85,6 +104,7 @@ model User {
   conversations ConversationParticipant[]
   sentMessages  Message[]
   courseRequests CourseRequest[]
+  teamProfile  TeamMember?
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   createdAt    DateTime     @default(now())
@@ -124,6 +144,9 @@ model Mentor {
   // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
   bio           Json
   photoUrl      String?
+  // Rasm kadrga kesilganda markazda qoladigan nuqta (foizda) — User.focusX izohiga qarang
+  focusX        Int      @default(50)
+  focusY        Int      @default(50)
   specialty     Json
   position      Json?
   linkedinUrl   String?
@@ -136,6 +159,8 @@ model Mentor {
   liveSessions  LiveSession[]
   assignments   Assignment[]
   requests      MentorRequest[]
+  // Mentor ayni paytda jamoa a'zosi ham bo'lishi mumkin (majburiy emas)
+  teamProfile   TeamMember?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -532,7 +557,65 @@ model Project {
   published     Boolean  @default(true)
   views         Int      @default(0)
   likesCount    Int      @default(0)
+  team          TeamMemberProject[]
   createdAt     DateTime @default(now())
+}
+
+// Kompaniya jamoasi — mentor bo'lmagan xodimlar (dasturchi, dizayner, PM, HR...) ham
+// shu yerda. Mentor modeli ataylab tegilmaydi: u faqat o'quv tomonini bildiradi,
+// jamoa a'zosi ixtiyoriy ravishda mentorProfile'ga bog'lanadi (mentorId).
+model TeamMember {
+  id          String     @id @default(cuid())
+  // Ommaviy sahifa manzili: /team/<slug>. Kabinet yo'llari bilan to'qnashmasligi
+  // uchun validator zahiralangan so'zlarni (profile, directory...) rad etadi.
+  slug        String     @unique
+  name        String
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  position    Json
+  bio         Json
+  department  Department @default(ENGINEERING)
+  // Rahbariyat/asoschilar bloki — sahifa boshida alohida ajratib ko'rsatiladi
+  leadership  Boolean    @default(false)
+  photoUrl    String?
+  // Rasm kadrga kesilganda markazda qoladigan nuqta (foizda) — User.focusX izohiga qarang
+  focusX      Int        @default(50)
+  focusY      Int        @default(50)
+  skills      String[]
+  email       String?
+  phone       String?
+  linkedinUrl String?
+  githubUrl   String?
+  telegramUrl String?
+  websiteUrl  String?
+  joinedAt    DateTime?
+  order       Int        @default(0)
+  featured    Boolean    @default(false)
+  published   Boolean    @default(true)
+  // Kabinetga kirish uchun — a'zo o'z profilini shu akkaunt orqali tahrirlaydi
+  user        User?      @relation(fields: [userId], references: [id])
+  userId      String?    @unique
+  mentor      Mentor?    @relation(fields: [mentorId], references: [id])
+  mentorId    String?    @unique
+  projects    TeamMemberProject[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([department, order])
+}
+
+// Kim qaysi loyihada, qanday rolda ishlagani. Oddiy ko'pga-ko'p emas — `role`
+// maydoni sabab aniq (explicit) bog'lovchi jadval.
+model TeamMemberProject {
+  teamMember   TeamMember @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+  teamMemberId String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    String
+  // Loyihadagi roli, ko'p tilli — bo'sh bo'lsa a'zoning lavozimi ko'rsatiladi
+  role         Json?
+  order        Int        @default(0)
+
+  @@id([teamMemberId, projectId])
+  @@index([projectId])
 }
 
 model Enrollment {
@@ -636,6 +719,9 @@ model Testimonial {
   // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
   role      Json
   avatarUrl String?
+  // Rasm kadrga kesilganda markazda qoladigan nuqta (foizda) — User.focusX izohiga qarang
+  focusX    Int      @default(50)
+  focusY    Int      @default(50)
   text      Json
   rating    Int      @default(5)
   published Boolean  @default(true)

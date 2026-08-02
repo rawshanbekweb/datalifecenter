@@ -31,9 +31,9 @@ const MESSAGES_PAGE_SIZE = 40;
 // Suhbatlar ro'yxati chegarasi — real hayotda bundan ko'p faol yozishma bo'lmaydi
 const CONVERSATIONS_LIMIT = 60;
 
-const userCard = { id: true, name: true, avatarUrl: true, role: true } satisfies Prisma.UserSelect;
+const userCard = { id: true, name: true, avatarUrl: true, focusX: true, focusY: true, role: true } satisfies Prisma.UserSelect;
 
-type UserCard = { id: string; name: string; avatarUrl: string | null; role: Role };
+type UserCard = { id: string; name: string; avatarUrl: string | null; focusX: number; focusY: number; role: Role };
 
 function directPairKey(a: string, b: string): string {
   return `direct:${[a, b].sort().join(':')}`;

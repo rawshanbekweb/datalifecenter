@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
 import { hashPassword } from '../utils/password';
+import { uniqueTeamSlug } from './team.service';
 
 const userSelect = {
   id: true,
@@ -11,13 +12,13 @@ const userSelect = {
   phone: true,
   role: true,
   isBlocked: true,
-  avatarUrl: true,
+  avatarUrl: true, focusX: true, focusY: true,
   createdAt: true,
   _count: { select: { enrollments: true } },
 } satisfies Prisma.UserSelect;
 
 interface ListUsersFilters {
-  role?: 'STUDENT' | 'MENTOR' | 'ADMIN';
+  role?: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
   search?: string;
   page: number;
   limit: number;
@@ -53,7 +54,7 @@ export async function listUsers(filters: ListUsersFilters) {
   };
 }
 
-export async function updateUserRole(id: string, role: 'STUDENT' | 'MENTOR' | 'ADMIN', actingUserId: string) {
+export async function updateUserRole(id: string, role: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN', actingUserId: string) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) {
     throw ApiError.notFound('Foydalanuvchi topilmadi');
@@ -84,6 +85,32 @@ export async function updateUserRole(id: string, role: 'STUDENT' | 'MENTOR' | 'A
               bio: { uz: `${user.name} — DATA LIFE mentori.` },
               specialty: { uz: 'Mentor' },
               featured: false,
+            },
+          });
+        }
+      }
+    }
+
+    // TEAM roli ham xuddi shunday: kabinet ochilishi uchun TeamMember yozuvi
+    // bo'lishi shart. Profil `published: false` bilan yaratiladi — xodim avval
+    // o'zini to'ldiradi, ommaviy /team sahifasiga admin nashr qilgach chiqadi.
+    if (role === 'TEAM') {
+      const linked = await tx.teamMember.findUnique({ where: { userId: id } });
+      if (!linked) {
+        const unlinkedSameName = await tx.teamMember.findFirst({ where: { userId: null, name: user.name } });
+        if (unlinkedSameName) {
+          await tx.teamMember.update({ where: { id: unlinkedSameName.id }, data: { userId: id } });
+        } else {
+          await tx.teamMember.create({
+            data: {
+              userId: id,
+              name: user.name,
+              slug: await uniqueTeamSlug(tx, user.name),
+              position: { uz: 'Xodim' },
+              bio: { uz: `${user.name} — DATA LIFE jamoasi a'zosi.` },
+              department: 'OPERATIONS',
+              email: user.email,
+              published: false,
             },
           });
         }

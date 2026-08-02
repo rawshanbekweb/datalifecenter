@@ -26,7 +26,13 @@ function toPublicUser(user: {
   role: string;
   phone: string | null;
   avatarUrl: string | null;
+  focusX: number;
+  focusY: number;
   emailVerifiedAt?: Date | null;
+  // Jamoa profili bog'langanmi. Mentor ham jamoa a'zosi bo'lishi mumkin,
+  // shuning uchun rolning o'zi yetarli emas — kabinet havolasi shu bayroqqa qarab
+  // ko'rsatiladi (frontend/src/components/Navbar.tsx).
+  teamProfile?: { id: string } | null;
 }) {
   return {
     id: user.id,
@@ -35,7 +41,11 @@ function toPublicUser(user: {
     role: user.role,
     phone: user.phone,
     avatarUrl: user.avatarUrl,
+    // Avatar kadrga kesilganda markazda qoladigan nuqta (foizda)
+    focusX: user.focusX,
+    focusY: user.focusY,
     emailVerified: !!user.emailVerifiedAt,
+    hasTeamProfile: !!user.teamProfile,
   };
 }
 
@@ -90,7 +100,10 @@ export async function register(input: RegisterInput) {
 const DUMMY_HASH_PROMISE = hashPassword(crypto.randomBytes(16).toString('hex'));
 
 export async function login(input: LoginInput) {
-  const user = await prisma.user.findUnique({ where: { email: input.email } });
+  const user = await prisma.user.findUnique({
+    where: { email: input.email },
+    include: { teamProfile: { select: { id: true } } },
+  });
   if (!user) {
     await comparePassword(input.password, await DUMMY_HASH_PROMISE);
     throw ApiError.unauthorized('Email yoki parol noto\'g\'ri', 'INVALID_CREDENTIALS');
@@ -143,7 +156,10 @@ export async function resendVerification(userId: string) {
 }
 
 export async function getMe(userId: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { teamProfile: { select: { id: true } } },
+  });
   if (!user) {
     throw ApiError.notFound('Foydalanuvchi topilmadi');
   }
@@ -154,6 +170,8 @@ interface UpdateProfileInput {
   name?: string;
   phone?: string | null;
   avatarUrl?: string | null;
+  focusX?: number;
+  focusY?: number;
 }
 
 export async function updateProfile(userId: string, input: UpdateProfileInput) {
@@ -161,7 +179,13 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   if (!user) {
     throw ApiError.notFound('Foydalanuvchi topilmadi');
   }
-  const updated = await prisma.user.update({ where: { id: userId }, data: input });
+  // teamProfile ham qaytariladi — aks holda profil saqlangach frontend'dagi
+  // hasTeamProfile bayrog'i noto'g'ri false'ga tushib, kabinet havolasi yo'qolardi
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: input,
+    include: { teamProfile: { select: { id: true } } },
+  });
   return toPublicUser(updated);
 }
 

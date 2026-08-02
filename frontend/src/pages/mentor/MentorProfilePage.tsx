@@ -8,6 +8,8 @@ import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import MentorNotLinked from './MentorNotLinked';
 import Loading from '../../components/common/Loading';
+import ImageFocusPicker from '../../components/common/ImageFocusPicker';
+import { DEFAULT_FOCUS } from '../../utils/imageFocus';
 
 interface MentorProfile {
   name: string;
@@ -15,6 +17,8 @@ interface MentorProfile {
   specialty: LocalizedString;
   position: LocalizedString;
   photoUrl: string;
+  focusX: number;
+  focusY: number;
   linkedinUrl: string;
   githubUrl: string;
   telegramUrl: string;
@@ -22,7 +26,7 @@ interface MentorProfile {
 
 const EMPTY: MentorProfile = {
   name: '', bio: emptyLocalizedString(), specialty: emptyLocalizedString(), position: emptyLocalizedString(),
-  photoUrl: '', linkedinUrl: '', githubUrl: '', telegramUrl: '',
+  photoUrl: '', focusX: DEFAULT_FOCUS, focusY: DEFAULT_FOCUS, linkedinUrl: '', githubUrl: '', telegramUrl: '',
 };
 
 const labelStyle: React.CSSProperties = { fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 };
@@ -44,7 +48,7 @@ export default function MentorProfilePage(): React.ReactElement {
         setForm({
           name: m.name || '', bio: m.bio || emptyLocalizedString(), specialty: m.specialty || emptyLocalizedString(),
           position: m.position || emptyLocalizedString(),
-          photoUrl: m.photoUrl || '', linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
+          photoUrl: m.photoUrl || '', focusX: m.focusX ?? DEFAULT_FOCUS, focusY: m.focusY ?? DEFAULT_FOCUS, linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
         });
         setStatus('ready');
       })
@@ -115,6 +119,8 @@ export default function MentorProfilePage(): React.ReactElement {
           <LocalizedField label={t('mentor.profile.position')} value={form.position} onChange={setLocalized('position')} />
           <LocalizedField label={t('mentor.profile.bio')} required multiline rows={4} value={form.bio} onChange={setLocalized('bio')} />
           <FileUpload kind="image" label={t('mentor.profile.photo')} value={form.photoUrl} onChange={set('photoUrl')} />
+          <ImageFocusPicker url={form.photoUrl} focusX={form.focusX} focusY={form.focusY}
+            onChange={(focusX, focusY) => setForm((f) => ({ ...f, focusX, focusY }))} />
 
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:13.5, fontWeight:800, color:'#0f172a', marginTop:6 }}>
             <Link2 size={15} style={{ color:'#0ea5e9' }}/> {t('mentor.profile.socialLinks')}

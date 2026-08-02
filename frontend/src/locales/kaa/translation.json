@@ -96,7 +96,10 @@
     "mentorCabinet": "Mentor",
     "myCabinet": "Jeke kabinet",
     "adminPanel": "Admin panel",
-    "mentorCabinetFull": "Mentor kabineti"
+    "mentorCabinetFull": "Mentor kabineti",
+    "team": "Komanda",
+    "teamCabinet": "Komanda",
+    "teamCabinetFull": "Komanda kabineti"
   },
   "footer": {
     "description": "Ózbekstandaǵı eń zamanagóy IT tálim orayı. Programmalastırıw hám sanlı ónimler — bizdiń missiyamız.",
@@ -116,7 +119,8 @@
       "aboutUs": "Biz haqqımızda",
       "blog": "Blog",
       "projects": "Joybarlar",
-      "partnership": "Sheriklik"
+      "partnership": "Sheriklik",
+      "team": "Bizin komandamız"
     },
     "newsletter": {
       "title": "IT jańalıqlarınan xabardar bolıń",
@@ -242,6 +246,14 @@
       "all": "Barlıǵı",
       "visitSite": "Saytqa ótiw",
       "view": "Kóriw"
+    },
+    "team": {
+      "pill": "Komanda",
+      "titleStart": "Jumıstı islewshi ",
+      "titleAccent": "adamlar",
+      "subtitle": "Kompaniyamız artında turǵan qánigeler menen tanısıń",
+      "cta": "Pútkil komandanı kóriw",
+      "loadError": "Komandanı júklew múmkin bolmadı."
     }
   },
   "pages": {
@@ -272,7 +284,7 @@
       "views": "{{n}} kóriw"
     },
     "mentors": {
-      "pill": "Bizdiń komanda",
+      "pill": "Bilimlendiriw komandası",
       "title": "Bizdiń",
       "accent": "mentorlarımız",
       "sub": "Óz tarawınıń professional qánigeleri sizge jol-joba kórsetedi",
@@ -329,6 +341,23 @@
     "notFound": {
       "title": "404 — Bet tabılmadı",
       "sub": "Siz izlegen bet joq yamasa kóshirilgen."
+    },
+    "team": {
+      "pill": "Bizin komandamız",
+      "title": "DATA LIFE",
+      "accent": "komandası",
+      "sub": "Kompaniyamızdı hár kúni aldıǵa alıp baratuǵın adamlar menen tanısıń",
+      "loadError": "Komanda maǵlıwmatların júklew múmkin bolmadı. Backend iske túsirilgenin tekseriń.",
+      "empty": "Házirshe komanda aǵzaları qosılmaǵan.",
+      "leadership": "Basshılıq",
+      "leadershipSub": "Kompaniya baǵdarın belgileytuǵın tiykarshılar hám basshılar",
+      "all": "Barlıǵı"
+    },
+    "teamMember": {
+      "back": "Komandaǵa qaytıw",
+      "notFound": "Xızmetker tabılmadı",
+      "notFoundSub": "Bul mánzilde komanda aǵzası joq — profil óshirilgen yamasa ele járiyalanbaǵan bolıwı múmkin.",
+      "loadError": "Maǵlıwmatlardı júklew múmkin bolmadı"
     }
   },
   "comingSoon": {
@@ -382,7 +411,15 @@
     "networkError": "Serverge baylanısıp bolmadı. Internet baylanısın tekseriń.",
     "timeout": "Júklew waqtı tamamlandı. Qayta urınıp kóriń.",
     "serverWaking": "Server oyanıp atır, qayta urınılmaqta...",
-    "ephemeralWarning": "Bult saqlaw sazlanbaǵan: júklengen fayl waqtınsha diskte qaladı hám keyingi deployda joǵaladı. Administrator CLOUDINARY_* sazlawların kiritiwi kerek."
+    "tooLarge": "Fayl kólemi {{max}} MB tan aspawı kerek",
+    "ephemeralWarning": "Bult saqlaw sazlanbaǵan: júklengen fayl waqtınsha diskte qaladı hám keyingi deployda joǵaladı. Administrator SUPABASE_* (yamasa CLOUDINARY_*) sazlawların kiritiwi kerek."
+  },
+  "imageFocus": {
+    "title": "Súwret fokusı",
+    "hint": "Súwret dóńgelek hám kvadrat kadrlarda kesiledi. Kadrda qalıwı kerek bolǵan jerdi (mısalı júzdi) basıń yamasa strelka klavishaları menen jıljıtıń.",
+    "previewRound": "Dóńgelek",
+    "previewCard": "Karta",
+    "reset": "Ortalıqqa qaytarıw"
   },
   "sessions": {
     "panelTitle": "Janlı sabaqlar",
@@ -722,7 +759,8 @@
       "testimonials": "Pikirler",
       "courseReviews": "Kurs pikirleri",
       "chat": "Jazısıwlar",
-      "courseRequests": "Kurs sorawları"
+      "courseRequests": "Kurs sorawları",
+      "team": "Komanda"
     },
     "common": {
       "all": "Barlıǵı",
@@ -847,7 +885,8 @@
     "roles": {
       "STUDENT": "Student",
       "MENTOR": "Mentor",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "TEAM": "Komanda"
     },
     "enrollments": {
       "title": "Jazılıwlar",
@@ -893,7 +932,8 @@
       "resetTitle": "Paroldi tiklew",
       "blockTitle": "Bloklaw",
       "unblockTitle": "Bloktan shıǵarıw",
-      "deleteTitle": "Óshiriw"
+      "deleteTitle": "Óshiriw",
+      "filterTeam": "Komanda"
     },
     "tags": {
       "featured": "Usınıs",
@@ -917,7 +957,8 @@
       "colorLabel": "Reń",
       "categoryReq": "Kategoriya *",
       "titleField": "Sarlawha",
-      "descField": "Tásiriplew"
+      "descField": "Tásiriplew",
+      "order": "Tártip"
     },
     "courses": {
       "title": "Kurslar",
@@ -1121,6 +1162,13 @@
         "ENROLLED": "Jazıldı",
         "REJECTED": "Biykarlandı"
       }
+    },
+    "team": {
+      "title": "Komanda",
+      "sub": "Kompaniya xızmetkerleri hám olardıń ashıq profilleri",
+      "newBtn": "Jańa aǵza",
+      "empty": "Házirshe komanda aǵzaları qosılmaǵan.",
+      "confirmDelete": "Komanda aǵzasın óshiriwdi tastıyıqlaysız ba?"
     }
   },
   "engagement": {
@@ -1221,6 +1269,90 @@
     },
     "notFound": {
       "title": "Bet tabılmadı"
+    },
+    "team": {
+      "title": "Komanda",
+      "description": "DATA LIFE komandası — programmistler, dizaynerler, maǵlıwmat injenerleri hám mentorlar."
+    }
+  },
+  "team": {
+    "cabinetTitle": "Komanda",
+    "dept": {
+      "LEADERSHIP": "Basshılıq",
+      "ENGINEERING": "Injenerlik",
+      "DATA": "Maǵlıwmatlar",
+      "DESIGN": "Dizayn",
+      "MARKETING": "Marketing",
+      "EDUCATION": "Bilimlendiriw",
+      "OPERATIONS": "Operaciyalar"
+    },
+    "card": {
+      "projectCount": "{{n}} joybarda qatnasqan",
+      "memberCount": "{{n}} aǵza"
+    },
+    "member": {
+      "about": "Haqqında",
+      "projects": "Joybarları",
+      "courses": "Alıp baratuǵın kursları",
+      "skills": "Kónlikpeler",
+      "contact": "Baylanıs",
+      "website": "Veb-sayt",
+      "leadership": "Basshılıq",
+      "alsoMentor": "Mentor da",
+      "joined": "{{date}} den berli"
+    },
+    "form": {
+      "name": "Atı Familiyası",
+      "position": "Lawazımı",
+      "positionPlaceholder": "Backend programmisti",
+      "bio": "Bio",
+      "photo": "Súwret",
+      "skills": "Kónlikpeler",
+      "skillsPlaceholder": "React, Node.js, PostgreSQL",
+      "skillsHint": "Enter yamasa útir menen qosıń",
+      "email": "Email",
+      "phone": "Telefon",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "telegramUrl": "Telegram",
+      "websiteUrl": "Veb-sayt",
+      "department": "Bólim",
+      "joinedAt": "Jumısqa kirgen sánesi",
+      "account": "Platformadaǵı akkauntı (komanda kabinetine kiriw ushın)",
+      "accountNone": "Baylanıspaǵan",
+      "accountHint": "Paydalanıwshıǵa dáslep \"Paydalanıwshılar\" bóliminde TEAM roli beriliwi usınıs etiledi.",
+      "mentorLink": "Mentor profili",
+      "mentorNone": "Baylanıspaǵan",
+      "mentorHint": "Bul xızmetker kurs ta alıp barsa, onı mentor profiline baylanıstırıń.",
+      "projects": "Joybarları",
+      "projectsHint": "Xızmetker qatnasqan joybarlardı belgileń — olar profilinde kórinedi.",
+      "leadership": "Basshılıq (bet basında ayırım)",
+      "published": "Saytta kórsetilsin",
+      "unpublished": "Járiyalanbaǵan"
+    },
+    "profile": {
+      "title": "Mening profilim",
+      "sub": "Sayttaǵı komanda betinde kórinetuǵın maǵlıwmatlarıńız",
+      "publicProfile": "Ashıq profil",
+      "saved": "Profil saqlandı",
+      "viewPublic": "Saytta kóriw",
+      "notPublished": "Járiyalanbaǵan",
+      "notPublishedHint": "Profilińiz ele saytta kórinbeydi. Tolıq toltırǵanıńızdan keyin administrator onı járiyalaydı."
+    },
+    "directory": {
+      "title": "Komanda aǵzaları",
+      "sub": "Xızmetleslerińiz hám olar menen baylanıs maǵlıwmatları",
+      "search": "At, lawazım yamasa kónlikpe boyınsha izlew",
+      "empty": "Hesh kim tabılmadı.",
+      "openProfile": "Profildi ashıw"
+    },
+    "nav": {
+      "profile": "Mening profilim",
+      "directory": "Komanda aǵzaları"
+    },
+    "notLinked": {
+      "title": "Komanda profili baylanıspaǵan",
+      "message": "Sizin akkauntıńızǵa komanda profili baylanıspaǵan. Administratorǵa múrájat etiń."
     }
   }
 }

@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { updateProfile, changePassword, resendVerification } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 import FileUpload from '../components/common/FileUpload';
+import ImageFocusPicker from '../components/common/ImageFocusPicker';
+import { DEFAULT_FOCUS } from '../utils/imageFocus';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -33,6 +35,11 @@ export default function ProfilePage(): React.ReactElement {
   const [name, setName]   = useState<string>(user?.name || '');
   const [phone, setPhone] = useState<string>((user?.phone as string) || '');
   const [avatarUrl, setAvatarUrl] = useState<string>((user?.avatarUrl as string) || '');
+  // Avatar doira kadrda kesiladi — foydalanuvchi qaysi joy markazda qolishini o'zi belgilaydi
+  const [focus, setFocus] = useState<{ x: number; y: number }>({
+    x: (user?.focusX as number) ?? DEFAULT_FOCUS,
+    y: (user?.focusY as number) ?? DEFAULT_FOCUS,
+  });
   const [profileStatus, setProfileStatus] = useState<FormStatus>('idle');
   const [profileError, setProfileError]   = useState<string>('');
 
@@ -49,7 +56,7 @@ export default function ProfilePage(): React.ReactElement {
     e.preventDefault();
     setProfileStatus('loading');
     try {
-      const updated = await updateProfile({ name, phone: phone || null, avatarUrl: avatarUrl || null });
+      const updated = await updateProfile({ name, phone: phone || null, avatarUrl: avatarUrl || null, focusX: focus.x, focusY: focus.y });
       applyUser(updated);
       setProfileStatus('success');
     } catch (err: unknown) {
@@ -136,6 +143,8 @@ export default function ProfilePage(): React.ReactElement {
           </div>
           <FileUpload kind="image" label={t('student.profile.avatar')} value={avatarUrl}
             onChange={(url) => { setAvatarUrl(url); setProfileStatus('idle'); }} />
+          <ImageFocusPicker url={avatarUrl} focusX={focus.x} focusY={focus.y}
+            onChange={(x, y) => { setFocus({ x, y }); setProfileStatus('idle'); }} />
           <div>
             <label style={labelStyle}>{t('student.profile.emailLocked')}</label>
             <input className="inp" value={user?.email || ''} disabled style={{ opacity:0.6, cursor:'not-allowed' }} />

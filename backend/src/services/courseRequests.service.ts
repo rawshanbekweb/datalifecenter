@@ -22,7 +22,7 @@ import { sendAdminMessageTo } from './messages.service';
 
 const requestInclude = {
   course: { select: { id: true, title: true, slug: true, format: true, color: true } },
-  user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+  user: { select: { id: true, name: true, email: true, avatarUrl: true, focusX: true, focusY: true } },
 } satisfies Prisma.CourseRequestInclude;
 
 export interface CreateCourseRequestInput {

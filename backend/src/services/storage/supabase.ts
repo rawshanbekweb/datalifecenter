@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { env } from '../../config/env';
 
 // Supabase Storage adapteri — Cloudinary'ga muqobil (Cloudinary O'zbekistondan
@@ -55,9 +56,28 @@ async function ensureBucket(kind: Kind): Promise<void> {
   }
 }
 
+/**
+ * Yuklanadigan manba.
+ *
+ * ATAYIN OQIM, Buffer emas: 500 MB dars videosi butunlay xotiraga o'qilsa
+ * Render'ning 512 MB instansiyasi OOM bilan o'ladi. Oqimda esa fayl diskdan
+ * soketga bo'lak-bo'lak, backpressure bilan ko'chadi.
+ *
+ * `open()` — FABRIKA, oqimning o'zi emas: bucket yo'q bo'lsa so'rov qaytadan
+ * yuboriladi, bir marta o'qib bo'lingan oqimni esa qayta o'qib bo'lmaydi.
+ */
+export interface UploadSource {
+  open: () => Readable;
+  /** Content-Length uchun — bo'lmasa so'rov chunked ketadi va Supabase hajmni oldindan bila olmaydi */
+  size: number;
+}
+
+/** Fayl bulut xotiradagi hajm chekloviga sig'madi — foydalanuvchiga tushunarli xabar berish uchun */
+export class StorageLimitError extends Error {}
+
 /** Faylni yuklaydi va bazaga saqlanadigan URL qaytaradi. */
 export async function upload(
-  body: Buffer,
+  source: UploadSource,
   kind: Kind,
   objectName: string,
   contentType: string
@@ -69,15 +89,27 @@ export async function upload(
       method: 'POST',
       headers: authHeaders({
         'Content-Type': contentType,
+        'Content-Length': String(source.size),
         'cache-control': 'max-age=31536000',
         'x-upsert': 'true',
       }),
-      body: new Uint8Array(body),
-    });
+      // Node oqimi web oqimiga o'giriladi. `duplex: 'half'` — tanasi oqim
+      // bo'lgan so'rov uchun majburiy (undici talab qiladi), aks holda fetch
+      // "RequestInit: duplex option is required" bilan yiqiladi.
+      body: Readable.toWeb(source.open()) as unknown as RequestInit['body'],
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' });
 
   let res = await send();
   if (!res.ok) {
     const detail = await res.text();
+    // Supabase loyihasidagi global fayl limiti (Free rejada 50 MB) — bu bizning
+    // VIDEO_MAX_MB'dan past bo'lishi mumkin, o'shanda xato shu yerdan keladi
+    if (res.status === 413 || /maximum allowed size|payload too large|EntityTooLarge/i.test(detail)) {
+      throw new StorageLimitError(
+        `Supabase hajm cheklovi (${res.status}): ${detail}`
+      );
+    }
     // DIQQAT: bucket yo'qligida Supabase HTTP 404 EMAS, HTTP 400 qaytaradi va
     // "404" faqat javob TANASIDA bo'ladi:
     //   {"statusCode":"404","error":"Bucket not found","code":"NoSuchBucket"}

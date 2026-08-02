@@ -4,13 +4,14 @@ import { Star } from 'lucide-react';
 import { listCourseReviews } from '../../api/reviews';
 import { formatDate } from '../../utils/format';
 import Loading from '../common/Loading';
+import { focusPosition } from '../../utils/imageFocus';
 
 interface Review {
   id: string;
   rating: number;
   comment: string;
   createdAt: string;
-  user: { name: string; avatarUrl?: string | null };
+  user: { name: string; avatarUrl?: string | null; focusX?: number; focusY?: number };
 }
 
 interface CourseReviewsProps {
@@ -57,7 +58,7 @@ export default function CourseReviews({ slug, rating, reviewsCount, color = '#0e
             <div key={r.id} className="card" style={{ padding: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 {r.user.avatarUrl ? (
-                  <img src={r.user.avatarUrl} alt={r.user.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <img src={r.user.avatarUrl} alt={r.user.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', objectPosition: focusPosition(r.user), flexShrink: 0 }} />
                 ) : (
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f0f9ff', border: '1.5px solid #bae6fd', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 800, color: '#0ea5e9', fontSize: 13 }}>
                     {r.user.name.charAt(0).toUpperCase()}

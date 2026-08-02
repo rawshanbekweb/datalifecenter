@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2,
+  LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
   Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'admin.nav.courses',        to: '/admin/courses',     icon: BookOpen },
   { labelKey: 'admin.nav.users',          to: '/admin/users',       icon: Users },
   { labelKey: 'admin.nav.mentors',        to: '/admin/mentors',     icon: UserSquare2 },
+  { labelKey: 'admin.nav.team',           to: '/admin/team',        icon: UsersRound },
   { labelKey: 'admin.nav.mentorRequests', to: '/admin/mentor-requests', icon: Inbox },
   { labelKey: 'admin.nav.blog',           to: '/admin/blog',        icon: Newspaper },
   { labelKey: 'admin.nav.partners',       to: '/admin/partners',    icon: Handshake },

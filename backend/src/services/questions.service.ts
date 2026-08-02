@@ -41,7 +41,7 @@ export async function createQuestion(actor: Actor, input: { lessonId: string; bo
   const lesson = await assertCanAccessLesson(input.lessonId, actor);
   const question = await prisma.lessonQuestion.create({
     data: { lessonId: input.lessonId, userId: actor.userId, body: input.body },
-    include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    include: { user: { select: { id: true, name: true, avatarUrl: true, focusX: true, focusY: true } } },
   });
 
   const mentorUserId = lesson.module.course.mentor?.userId;
@@ -62,7 +62,7 @@ export async function listLessonQuestions(lessonId: string, actor: Actor) {
   return prisma.lessonQuestion.findMany({
     where: { lessonId },
     orderBy: { createdAt: 'desc' },
-    include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    include: { user: { select: { id: true, name: true, avatarUrl: true, focusX: true, focusY: true } } },
   });
 }
 
@@ -82,7 +82,7 @@ export async function listMentorQuestions(userId: string, locale: SupportedLocal
     where: { lesson: { module: { courseId: { in: courseIds } } } },
     orderBy: [{ answeredAt: { sort: 'asc', nulls: 'first' } }, { createdAt: 'desc' }],
     include: {
-      user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+      user: { select: { id: true, name: true, email: true, avatarUrl: true, focusX: true, focusY: true } },
       lesson: {
         select: {
           id: true,
@@ -118,7 +118,7 @@ export async function answerQuestion(id: string, answer: string, actor: Actor) {
   const updated = await prisma.lessonQuestion.update({
     where: { id },
     data: { answer, answeredAt: new Date() },
-    include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    include: { user: { select: { id: true, name: true, avatarUrl: true, focusX: true, focusY: true } } },
   });
 
   if (question.userId !== actor.userId) {

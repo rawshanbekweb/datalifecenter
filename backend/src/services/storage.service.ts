@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { createReadStream } from 'fs';
 import path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { env } from '../config/env';
@@ -38,15 +39,24 @@ if (cloudinaryEnabled) {
 }
 
 // Lokal faylni bulut xotiraga yuklab, doimiy URL qaytaradi.
-// Cloudinary uchun video — upload_large (100 MB dan katta fayllar bo'laklab yuboriladi).
+//
+// Ikkala provayder ham faylni DISKDAN OQIM bilan oladi, xotiraga to'liq
+// o'qimaydi: Cloudinary — upload_large (bo'laklab), Supabase — HTTP so'rov
+// tanasi oqim sifatida. 500 MB video Buffer'ga o'qilsa kichik instansiya
+// (Render 512 MB) OOM bilan o'lardi.
 export async function uploadToCloud(
   filePath: string,
   kind: 'images' | 'videos',
   contentType = 'application/octet-stream'
 ): Promise<{ url: string }> {
   if (storageProvider === 'supabase') {
-    const body = await fs.readFile(filePath);
-    const url = await supabase.upload(body, kind, path.basename(filePath), contentType);
+    const { size } = await fs.stat(filePath);
+    const url = await supabase.upload(
+      { open: () => createReadStream(filePath), size },
+      kind,
+      path.basename(filePath),
+      contentType
+    );
     return { url };
   }
 

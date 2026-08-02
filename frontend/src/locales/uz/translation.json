@@ -96,7 +96,10 @@
     "mentorCabinet": "Mentor",
     "myCabinet": "Shaxsiy kabinet",
     "adminPanel": "Admin panel",
-    "mentorCabinetFull": "Mentor kabineti"
+    "mentorCabinetFull": "Mentor kabineti",
+    "team": "Jamoa",
+    "teamCabinet": "Jamoa",
+    "teamCabinetFull": "Jamoa kabineti"
   },
   "footer": {
     "description": "O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash va raqamli mahsulotlar — bizning missiyamiz.",
@@ -116,7 +119,8 @@
       "aboutUs": "Biz Haqimizda",
       "blog": "Blog",
       "projects": "Loyihalar",
-      "partnership": "Hamkorlik"
+      "partnership": "Hamkorlik",
+      "team": "Jamoamiz"
     },
     "newsletter": {
       "title": "IT yangiliklardan xabardor bo'ling",
@@ -242,6 +246,14 @@
       "all": "Barchasi",
       "visitSite": "Saytga o'tish",
       "view": "Ko'rish"
+    },
+    "team": {
+      "pill": "Jamoa",
+      "titleStart": "Ishni bajaradigan ",
+      "titleAccent": "odamlar",
+      "subtitle": "Kompaniyamiz ortida turgan mutaxassislar bilan tanishing",
+      "cta": "Butun jamoani ko'rish",
+      "loadError": "Jamoani yuklab bo'lmadi."
     }
   },
   "pages": {
@@ -272,7 +284,7 @@
       "views": "{{n}} ko'rishlar"
     },
     "mentors": {
-      "pill": "Bizning jamoa",
+      "pill": "Ta'lim jamoasi",
       "title": "Bizning",
       "accent": "mentorlarimiz",
       "sub": "Sohasining professional mutaxassislari sizga yo'l-yo'riq ko'rsatadi",
@@ -329,6 +341,23 @@
     "notFound": {
       "title": "404 — Sahifa topilmadi",
       "sub": "Siz qidirgan sahifa mavjud emas yoki ko'chirilgan."
+    },
+    "team": {
+      "pill": "Bizning jamoa",
+      "title": "DATA LIFE",
+      "accent": "jamoasi",
+      "sub": "Kompaniyamizni har kuni oldinga olib boradigan odamlar bilan tanishing",
+      "loadError": "Jamoa ma'lumotlarini yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
+      "empty": "Hozircha jamoa a'zolari qo'shilmagan.",
+      "leadership": "Rahbariyat",
+      "leadershipSub": "Kompaniya yo'nalishini belgilaydigan asoschilar va rahbarlar",
+      "all": "Barchasi"
+    },
+    "teamMember": {
+      "back": "Jamoaga qaytish",
+      "notFound": "Xodim topilmadi",
+      "notFoundSub": "Bu manzilda jamoa a'zosi yo'q — profil o'chirilgan yoki hali nashr qilinmagan bo'lishi mumkin.",
+      "loadError": "Ma'lumotni yuklab bo'lmadi"
     }
   },
   "comingSoon": {
@@ -382,7 +411,15 @@
     "networkError": "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring.",
     "timeout": "Yuklash vaqti tugadi. Qayta urinib ko’ring.",
     "serverWaking": "Server uyg'onmoqda, qayta urinilmoqda...",
-    "ephemeralWarning": "Bulut xotira sozlanmagan: yuklangan fayl vaqtinchalik diskda qoladi va keyingi deployda yo'qoladi. Administrator CLOUDINARY_* sozlamalarini kiritishi kerak."
+    "tooLarge": "Fayl hajmi {{max}} MB dan oshmasligi kerak",
+    "ephemeralWarning": "Bulut xotira sozlanmagan: yuklangan fayl vaqtinchalik diskda qoladi va keyingi deployda yo'qoladi. Administrator SUPABASE_* (yoki CLOUDINARY_*) sozlamalarini kiritishi kerak."
+  },
+  "imageFocus": {
+    "title": "Rasm fokusi",
+    "hint": "Rasm doira va kvadrat kadrlarda kesiladi. Kadrda qolishi kerak bo'lgan joyni (masalan yuzni) bosing yoki strelka tugmalari bilan suring.",
+    "previewRound": "Doira",
+    "previewCard": "Karta",
+    "reset": "Markazga qaytarish"
   },
   "sessions": {
     "panelTitle": "Jonli darslar",
@@ -722,7 +759,8 @@
       "testimonials": "Sharhlar",
       "courseReviews": "Kurs sharhlari",
       "chat": "Yozishmalar",
-      "courseRequests": "Kurs so'rovlari"
+      "courseRequests": "Kurs so'rovlari",
+      "team": "Jamoa"
     },
     "common": {
       "all": "Barchasi",
@@ -847,7 +885,8 @@
     "roles": {
       "STUDENT": "Talaba",
       "MENTOR": "Mentor",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "TEAM": "Jamoa"
     },
     "enrollments": {
       "title": "Yozilishlar",
@@ -893,7 +932,8 @@
       "resetTitle": "Parolni tiklash",
       "blockTitle": "Bloklash",
       "unblockTitle": "Blokdan chiqarish",
-      "deleteTitle": "O'chirish"
+      "deleteTitle": "O'chirish",
+      "filterTeam": "Jamoa"
     },
     "tags": {
       "featured": "Tavsiya",
@@ -917,7 +957,8 @@
       "colorLabel": "Rang",
       "categoryReq": "Kategoriya *",
       "titleField": "Sarlavha",
-      "descField": "Tavsif"
+      "descField": "Tavsif",
+      "order": "Tartib"
     },
     "courses": {
       "title": "Kurslar",
@@ -1121,6 +1162,13 @@
         "ENROLLED": "Yozildi",
         "REJECTED": "Rad etildi"
       }
+    },
+    "team": {
+      "title": "Jamoa",
+      "sub": "Kompaniya xodimlari va ularning ommaviy profillari",
+      "newBtn": "Yangi a'zo",
+      "empty": "Hozircha jamoa a'zolari qo'shilmagan.",
+      "confirmDelete": "Jamoa a'zosini o'chirishni tasdiqlaysizmi?"
     }
   },
   "engagement": {
@@ -1221,6 +1269,90 @@
     },
     "notFound": {
       "title": "Sahifa topilmadi"
+    },
+    "team": {
+      "title": "Jamoa",
+      "description": "DATA LIFE jamoasi — dasturchilar, dizaynerlar, ma'lumot muhandislari va mentorlar bilan tanishing."
+    }
+  },
+  "team": {
+    "cabinetTitle": "Jamoa",
+    "dept": {
+      "LEADERSHIP": "Rahbariyat",
+      "ENGINEERING": "Muhandislik",
+      "DATA": "Ma'lumotlar",
+      "DESIGN": "Dizayn",
+      "MARKETING": "Marketing",
+      "EDUCATION": "Ta'lim",
+      "OPERATIONS": "Operatsiyalar"
+    },
+    "card": {
+      "projectCount": "{{n}} ta loyihada ishtirok etgan",
+      "memberCount": "{{n}} ta a'zo"
+    },
+    "member": {
+      "about": "Haqida",
+      "projects": "Loyihalari",
+      "courses": "Olib boradigan kurslari",
+      "skills": "Ko'nikmalar",
+      "contact": "Bog'lanish",
+      "website": "Veb-sayt",
+      "leadership": "Rahbariyat",
+      "alsoMentor": "Mentor ham",
+      "joined": "{{date}} dan beri"
+    },
+    "form": {
+      "name": "Ism Familiya",
+      "position": "Lavozim",
+      "positionPlaceholder": "Backend dasturchi",
+      "bio": "Bio",
+      "photo": "Rasm",
+      "skills": "Ko'nikmalar",
+      "skillsPlaceholder": "React, Node.js, PostgreSQL",
+      "skillsHint": "Enter yoki vergul bilan qo'shing",
+      "email": "Email",
+      "phone": "Telefon",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "telegramUrl": "Telegram",
+      "websiteUrl": "Veb-sayt",
+      "department": "Bo'lim",
+      "joinedAt": "Ishga kirgan sana",
+      "account": "Platformadagi hisobi (jamoa kabinetiga kirish uchun)",
+      "accountNone": "Bog'lanmagan",
+      "accountHint": "Foydalanuvchiga avval \"Foydalanuvchilar\" bo'limida TEAM roli berilishi tavsiya etiladi.",
+      "mentorLink": "Mentor profili",
+      "mentorNone": "Bog'lanmagan",
+      "mentorHint": "Bu xodim kurs ham olib borsa, uni mentor profiliga bog'lang.",
+      "projects": "Loyihalari",
+      "projectsHint": "Xodim ishtirok etgan loyihalarni belgilang — ular profilida ko'rinadi.",
+      "leadership": "Rahbariyat (sahifa boshida alohida)",
+      "published": "Saytda ko'rsatilsin",
+      "unpublished": "Nashr qilinmagan"
+    },
+    "profile": {
+      "title": "Mening profilim",
+      "sub": "Saytdagi jamoa sahifasida ko'rinadigan ma'lumotlaringiz",
+      "publicProfile": "Ommaviy profil",
+      "saved": "Profil saqlandi",
+      "viewPublic": "Saytda ko'rish",
+      "notPublished": "Nashr qilinmagan",
+      "notPublishedHint": "Profilingiz hali saytda ko'rinmaydi. To'ldirib bo'lganingizdan keyin administrator uni nashr qiladi."
+    },
+    "directory": {
+      "title": "Jamoa a'zolari",
+      "sub": "Hamkasblaringiz va ular bilan bog'lanish ma'lumotlari",
+      "search": "Ism, lavozim yoki ko'nikma bo'yicha qidirish",
+      "empty": "Hech kim topilmadi.",
+      "openProfile": "Profilni ochish"
+    },
+    "nav": {
+      "profile": "Mening profilim",
+      "directory": "Jamoa a'zolari"
+    },
+    "notLinked": {
+      "title": "Jamoa profili bog'lanmagan",
+      "message": "Sizning hisobingizga jamoa profili bog'lanmagan. Administratorga murojaat qiling."
     }
   }
 }

@@ -13,6 +13,7 @@ const About = lazyWithRetry(() => import('../components/About'));
 const Courses = lazyWithRetry(() => import('../components/Courses'));
 const Services = lazyWithRetry(() => import('../components/Services'));
 const Projects = lazyWithRetry(() => import('../components/Projects'));
+const Team = lazyWithRetry(() => import('../components/Team'));
 const WhyUs = lazyWithRetry(() => import('../components/WhyUs'));
 const Testimonials = lazyWithRetry(() => import('../components/Testimonials'));
 const Blog = lazyWithRetry(() => import('../components/Blog'));
@@ -51,6 +52,7 @@ export default function HomePage(): React.ReactElement {
       {s(<Courses />, 'courses')}
       {s(<Services settings={settings.services} />, 'services')}
       {s(<Projects />, 'projects')}
+      {s(<Team />, 'team')}
       {s(<WhyUs settings={settings.why_us} />, 'why-us')}
       {s(<Testimonials />, 'testimonials')}
       {s(<Blog />, 'blog')}

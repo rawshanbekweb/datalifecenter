@@ -29,6 +29,11 @@ export async function resetDb(): Promise<void> {
     prisma.module.deleteMany(),
     prisma.course.deleteMany(),
     prisma.blogPost.deleteMany(),
+    // TeamMemberProject onDelete: Cascade — lekin Project qatorlari testlarda
+    // qolib ketmasligi uchun bog'lanishlar ochiq-oydin tozalanadi
+    prisma.teamMemberProject.deleteMany(),
+    prisma.teamMember.deleteMany(),
+    prisma.project.deleteMany(),
     prisma.mentor.deleteMany(),
     prisma.partner.deleteMany(),
     prisma.contactMessage.deleteMany(),

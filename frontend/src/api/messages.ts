@@ -1,11 +1,11 @@
 import { apiFetch } from './client';
 
-export type UserRole = 'STUDENT' | 'MENTOR' | 'ADMIN';
+export type UserRole = 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
 
 export interface MessageUser {
   id: string;
   name: string;
-  avatarUrl: string | null;
+  avatarUrl: string | null; focusX?: number; focusY?: number;
   role: UserRole;
 }
 

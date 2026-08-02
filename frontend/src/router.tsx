@@ -16,6 +16,8 @@ const AboutPage = lazyWithRetry(() => import('./pages/AboutPage'))
 const CoursesPage = lazyWithRetry(() => import('./pages/CoursesPage'))
 const CourseDetailPage = lazyWithRetry(() => import('./pages/CourseDetailPage'))
 const MentorsPage = lazyWithRetry(() => import('./pages/MentorsPage'))
+const TeamPage = lazyWithRetry(() => import('./pages/TeamPage'))
+const TeamMemberPage = lazyWithRetry(() => import('./pages/TeamMemberPage'))
 const PartnersPage = lazyWithRetry(() => import('./pages/PartnersPage'))
 const BlogPage = lazyWithRetry(() => import('./pages/BlogPage'))
 const BlogDetailPage = lazyWithRetry(() => import('./pages/BlogDetailPage'))
@@ -50,6 +52,10 @@ const MentorAssignmentsPage = lazyWithRetry(() => import('./pages/mentor/MentorA
 const MentorRequestsPage = lazyWithRetry(() => import('./pages/mentor/MentorRequestsPage'))
 const MentorMessagesPage = lazyWithRetry(() => import('./pages/mentor/MentorMessagesPage'))
 
+const TeamLayout = lazyWithRetry(() => import('./layouts/TeamLayout'))
+const TeamProfilePage = lazyWithRetry(() => import('./pages/team/TeamProfilePage'))
+const TeamDirectoryPage = lazyWithRetry(() => import('./pages/team/TeamDirectoryPage'))
+
 const AdminLayout = lazyWithRetry(() => import('./layouts/AdminLayout'))
 const AdminDashboardPage = lazyWithRetry(() => import('./pages/admin/AdminDashboardPage'))
 const AdminEnrollmentsPage = lazyWithRetry(() => import('./pages/admin/AdminEnrollmentsPage'))
@@ -60,6 +66,7 @@ const AdminAnnouncementsPage = lazyWithRetry(() => import('./pages/admin/AdminAn
 const AdminCoursesPage = lazyWithRetry(() => import('./pages/admin/AdminCoursesPage'))
 const AdminCurriculumPage = lazyWithRetry(() => import('./pages/admin/AdminCurriculumPage'))
 const AdminMentorsPage = lazyWithRetry(() => import('./pages/admin/AdminMentorsPage'))
+const AdminTeamPage = lazyWithRetry(() => import('./pages/admin/AdminTeamPage'))
 const AdminMentorRequestsPage = lazyWithRetry(() => import('./pages/admin/AdminMentorRequestsPage'))
 const AdminPartnersPage = lazyWithRetry(() => import('./pages/admin/AdminPartnersPage'))
 const AdminBlogPage = lazyWithRetry(() => import('./pages/admin/AdminBlogPage'))
@@ -99,6 +106,11 @@ export function createAppRouter(basename: string) {
       { path: 'courses', element: s(<CoursesPage />) },
       { path: 'courses/:slug', element: s(<CourseDetailPage />) },
       { path: 'mentors', element: s(<MentorsPage />) },
+      { path: 'team', element: s(<TeamPage />) },
+      // Xodimning shaxsiy sahifasi. Kabinet yo'llari (/team/profile, /team/directory)
+      // statik segment bo'lgani uchun React Router ularni bu dinamik yo'ldan
+      // ustun qo'yadi; backend ham o'sha so'zlarni slug sifatida bermaydi.
+      { path: 'team/:slug', element: s(<TeamMemberPage />) },
       { path: 'partners', element: s(<PartnersPage />) },
       { path: 'blog', element: s(<BlogPage />) },
       { path: 'blog/:slug', element: s(<BlogDetailPage />) },
@@ -148,6 +160,18 @@ export function createAppRouter(basename: string) {
     ],
   },
   {
+    path: '/team',
+
+    // MENTOR ham kiritilgan: mentor ayni paytda jamoa a'zosi bo'lishi mumkin.
+    // Jamoa profili bo'lmasa sahifaning o'zi "bog'lanmagan" xabarini ko'rsatadi.
+    element: <ProtectedRoute role={['TEAM', 'MENTOR', 'ADMIN']}>{s(<TeamLayout />)}</ProtectedRoute>,
+    errorElement: <RouteErrorPage />,
+    children: [
+      { path: 'profile', element: s(<TeamProfilePage />) },
+      { path: 'directory', element: s(<TeamDirectoryPage />) },
+    ],
+  },
+  {
     path: '/admin',
     element: <ProtectedRoute role="ADMIN">{s(<AdminLayout />)}</ProtectedRoute>,
     errorElement: <RouteErrorPage />,
@@ -163,6 +187,7 @@ export function createAppRouter(basename: string) {
       { path: 'courses', element: s(<AdminCoursesPage />) },
       { path: 'courses/:id/curriculum', element: s(<AdminCurriculumPage />) },
       { path: 'mentors', element: s(<AdminMentorsPage />) },
+      { path: 'team', element: s(<AdminTeamPage />) },
       { path: 'mentor-requests', element: s(<AdminMentorRequestsPage />) },
       { path: 'partners', element: s(<AdminPartnersPage />) },
       { path: 'blog', element: s(<AdminBlogPage />) },

@@ -4,7 +4,9 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 import { verifyFileSignature } from '../utils/fileSignature';
+import { IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '../config/uploads';
 import { cloudStorageEnabled, storageProvider, uploadToCloud } from '../services/storage.service';
+import { StorageLimitError } from '../services/storage/supabase';
 
 function publicUrl(req: Request, folder: 'images' | 'videos', filename: string): string {
   return `${req.protocol}://${req.get('host')}/uploads/${folder}/${filename}`;
@@ -34,6 +36,14 @@ function makeUploadHandler(folder: 'images' | 'videos') {
       } catch (err) {
         console.error('Bulut xotiraga yuklash xatosi:', err);
         await fs.unlink(file.path).catch(() => {});
+        // Bulut xotiraning o'z chegarasi bizning limitdan past — buni "qayta
+        // urinib ko'ring" deb ko'rsatish noto'g'ri, qayta urinish yordam bermaydi
+        if (err instanceof StorageLimitError) {
+          throw ApiError.badRequest(
+            "Fayl bulut xotira hajmi chegarasidan katta. Kichikroq fayl yuklang yoki administrator xotira rejasini oshirsin.",
+            'STORAGE_LIMIT_EXCEEDED'
+          );
+        }
         throw ApiError.badRequest("Faylni bulut xotirasiga yuklab bo'lmadi. Qayta urinib ko'ring.", 'CLOUD_UPLOAD_FAILED');
       }
       await fs.unlink(file.path).catch(() => {});
@@ -58,7 +68,16 @@ export const uploadVideoHandler = makeUploadHandler('videos');
  * ephemeral diskda qoladi va keyingi deployda yo'qoladi. Bu jimgina
  * yo'qotish: admin buni faqat oylar keyin, sayt bo'ylab singan rasmlarni
  * ko'rganda sezadi. Shuning uchun panel yuklashdan OLDIN ogohlantirsin.
+ *
+ * Hajm limitlari ham shu yerdan beriladi — mijoz katta faylni tarmoqqa
+ * chiqarmasdan, tanlangan zahoti rad etsin (limit ikki joyda qo'lda
+ * yozilmasin degani ham).
  */
 export const uploadConfigHandler = asyncHandler(async (_req: Request, res: Response) => {
-  sendSuccess(res, { cloudStorage: cloudStorageEnabled, provider: storageProvider });
+  sendSuccess(res, {
+    cloudStorage: cloudStorageEnabled,
+    provider: storageProvider,
+    imageMaxBytes: IMAGE_MAX_BYTES,
+    videoMaxBytes: VIDEO_MAX_BYTES,
+  });
 });

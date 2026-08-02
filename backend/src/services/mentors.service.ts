@@ -40,6 +40,9 @@ interface MentorInput {
   bio: LocalizedString;
   specialty: LocalizedString;
   photoUrl?: string;
+  // Rasm kadrga kesilganda markazda qoladigan nuqta (foizda)
+  focusX?: number;
+  focusY?: number;
   position?: LocalizedString | null;
   linkedinUrl?: string;
   githubUrl?: string;
@@ -96,7 +99,7 @@ export async function getMentorMe(userId: string) {
 // Mentor o'z profilini tahrirlaydi (faqat ochiq maydonlar — featured/order/userId emas)
 export async function updateMentorMe(
   userId: string,
-  input: Partial<Pick<MentorInput, 'name' | 'bio' | 'specialty' | 'photoUrl' | 'position' | 'linkedinUrl' | 'githubUrl' | 'telegramUrl'>>
+  input: Partial<Pick<MentorInput, 'name' | 'bio' | 'specialty' | 'photoUrl' | 'focusX' | 'focusY' | 'position' | 'linkedinUrl' | 'githubUrl' | 'telegramUrl'>>
 ) {
   const mentorId = await requireMentorId(userId);
   return prisma.mentor.update({

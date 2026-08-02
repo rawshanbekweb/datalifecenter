@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { localizedString, localizedStringNullish } from './shared/localizedString.validator';
+import { imageFocusFields } from './shared/imageFocus.validator';
 
 export const createMentorSchema = z.object({
   name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
   bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak"),
   specialty: localizedString(2, 'Soha kiritilishi shart'),
   photoUrl: z.string().optional(),
+  ...imageFocusFields,
   position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
@@ -21,6 +23,7 @@ export const updateMentorMeSchema = z.object({
   bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
   specialty: localizedString(2, 'Soha kiritilishi shart').optional(),
   photoUrl: z.string().optional(),
+  ...imageFocusFields,
   position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),
@@ -33,6 +36,7 @@ export const updateMentorSchema = z.object({
   bio: localizedString(5, "Bio kamida 5 ta belgidan iborat bo'lishi kerak").optional(),
   specialty: localizedString(2, 'Soha kiritilishi shart').optional(),
   photoUrl: z.string().optional(),
+  ...imageFocusFields,
   position: localizedStringNullish(),
   linkedinUrl: z.string().optional(),
   githubUrl: z.string().optional(),

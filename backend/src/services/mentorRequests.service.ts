@@ -32,7 +32,7 @@ export async function listMyRequests(userId: string) {
 export async function listAllRequests() {
   return prisma.mentorRequest.findMany({
     orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
-    include: { mentor: { select: { id: true, name: true, photoUrl: true, user: { select: { email: true } } } } },
+    include: { mentor: { select: { id: true, name: true, photoUrl: true, focusX: true, focusY: true, user: { select: { email: true } } } } },
   });
 }
 
@@ -56,7 +56,7 @@ export async function updateRequest(id: string, input: { reply?: string; status?
   const updated = await prisma.mentorRequest.update({
     where: { id },
     data,
-    include: { mentor: { select: { id: true, name: true, photoUrl: true, user: { select: { email: true } } } } },
+    include: { mentor: { select: { id: true, name: true, photoUrl: true, focusX: true, focusY: true, user: { select: { email: true } } } } },
   });
 
   if (input.reply !== undefined && request.mentor.userId) {

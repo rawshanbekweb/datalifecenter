@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { imageFocusFields } from './shared/imageFocus.validator';
 
 export const registerSchema = z.object({
   name: z.string().min(2, 'Ism kamida 2 ta belgidan iborat bo\'lishi kerak'),
@@ -17,6 +18,7 @@ export const updateProfileSchema = z
     name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
     phone: z.string().nullish().or(z.literal('').transform(() => null)),
     avatarUrl: z.string().url("Rasm URL noto'g'ri").nullish().or(z.literal('').transform(() => null)),
+    ...imageFocusFields,
   })
   .refine((data) => Object.keys(data).length > 0, { message: 'Kamida bitta maydon yuborilishi kerak' });
 

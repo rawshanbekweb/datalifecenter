@@ -30,6 +30,7 @@ const LINKS: Record<string, FooterLink[]> = {
   ],
   company: [
     { labelKey: 'links.aboutUs', href: '/about' },
+    { labelKey: 'links.team', href: '/team' },
     { labelKey: 'links.blog', href: '/blog' },
     { labelKey: 'links.projects', href: '/#projects' },
     { labelKey: 'links.partnership', href: '/partners' },

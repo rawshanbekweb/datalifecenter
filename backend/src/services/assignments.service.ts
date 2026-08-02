@@ -9,10 +9,10 @@ import { excerpt, notify } from './notifications.service';
 
 const assignmentInclude = {
   course: { select: { id: true, title: true, slug: true, color: true, bg: true, border: true, iconKey: true } },
-  mentor: { select: { id: true, name: true, photoUrl: true } },
+  mentor: { select: { id: true, name: true, photoUrl: true, focusX: true, focusY: true } },
 } satisfies Prisma.AssignmentInclude;
 
-const submissionUserSelect = { select: { id: true, name: true, email: true, avatarUrl: true } };
+const submissionUserSelect = { select: { id: true, name: true, email: true, avatarUrl: true, focusX: true, focusY: true } };
 
 interface CreateAssignmentInput {
   courseId: string;

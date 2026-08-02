@@ -14,7 +14,7 @@ export interface AssignmentSubmission {
   feedback?: string | null;
   reviewedAt?: string | null;
   submittedAt: string;
-  user: { id: string; name: string; email: string; avatarUrl?: string | null };
+  user: { id: string; name: string; email: string; avatarUrl?: string | null; focusX?: number; focusY?: number };
 }
 
 interface AssignmentBase {
@@ -25,7 +25,7 @@ interface AssignmentBase {
   dueAt?: string | null;
   createdAt: string;
   course: { id: string; title: string; slug: string; color: string; bg: string; border: string; iconKey: string };
-  mentor: { id: string; name: string; photoUrl?: string | null };
+  mentor: { id: string; name: string; photoUrl?: string | null; focusX?: number; focusY?: number };
 }
 
 // Talaba ko'rinishi — GET /assignments/mine

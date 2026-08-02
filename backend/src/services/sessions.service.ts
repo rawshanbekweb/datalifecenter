@@ -8,7 +8,7 @@ import { notify } from './notifications.service';
 
 const sessionInclude = {
   course: { select: { id: true, title: true, slug: true, color: true, bg: true, border: true, iconKey: true } },
-  mentor: { select: { id: true, name: true, photoUrl: true } },
+  mentor: { select: { id: true, name: true, photoUrl: true, focusX: true, focusY: true } },
 } satisfies Prisma.LiveSessionInclude;
 
 // Mentor "yakunlash"ni unutsa ham sessiya abadiy LIVE/SCHEDULED bo'lib qolmasin:

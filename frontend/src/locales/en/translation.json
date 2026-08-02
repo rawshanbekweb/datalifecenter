@@ -96,7 +96,10 @@
     "mentorCabinet": "Mentor",
     "myCabinet": "My account",
     "adminPanel": "Admin panel",
-    "mentorCabinetFull": "Mentor dashboard"
+    "mentorCabinetFull": "Mentor dashboard",
+    "team": "Team",
+    "teamCabinet": "Team",
+    "teamCabinetFull": "Team cabinet"
   },
   "footer": {
     "description": "The most modern IT education center in Uzbekistan. Programming and digital products are our mission.",
@@ -116,7 +119,8 @@
       "aboutUs": "About Us",
       "blog": "Blog",
       "projects": "Projects",
-      "partnership": "Partnership"
+      "partnership": "Partnership",
+      "team": "Our team"
     },
     "newsletter": {
       "title": "Stay up to date with IT news",
@@ -242,6 +246,14 @@
       "all": "All",
       "visitSite": "Visit site",
       "view": "View"
+    },
+    "team": {
+      "pill": "Team",
+      "titleStart": "The people who ",
+      "titleAccent": "do the work",
+      "subtitle": "Meet the specialists behind the company",
+      "cta": "See the whole team",
+      "loadError": "Could not load the team."
     }
   },
   "pages": {
@@ -272,7 +284,7 @@
       "views": "{{n}} views"
     },
     "mentors": {
-      "pill": "Our team",
+      "pill": "Teaching team",
       "title": "Our",
       "accent": "Mentors",
       "sub": "Professionals in their field will guide you every step of the way",
@@ -329,6 +341,23 @@
     "notFound": {
       "title": "404 — Page not found",
       "sub": "The page you are looking for does not exist or has been moved."
+    },
+    "team": {
+      "pill": "Our team",
+      "title": "The DATA LIFE",
+      "accent": "team",
+      "sub": "Meet the people who move the company forward every day",
+      "loadError": "Could not load the team. Check that the backend is running.",
+      "empty": "No team members have been added yet.",
+      "leadership": "Leadership",
+      "leadershipSub": "The founders and leaders who set the company direction",
+      "all": "All"
+    },
+    "teamMember": {
+      "back": "Back to the team",
+      "notFound": "Team member not found",
+      "notFoundSub": "There is no team member at this address — the profile may have been removed or is not published yet.",
+      "loadError": "Could not load the profile"
     }
   },
   "comingSoon": {
@@ -382,7 +411,15 @@
     "networkError": "Could not reach the server. Check your internet connection.",
     "timeout": "The upload timed out. Please try again.",
     "serverWaking": "The server is waking up, retrying...",
-    "ephemeralWarning": "Cloud storage is not configured: the file stays on a temporary disk and will be lost on the next deploy. An administrator needs to set the CLOUDINARY_* variables."
+    "tooLarge": "The file must not exceed {{max}} MB",
+    "ephemeralWarning": "Cloud storage is not configured: the file stays on a temporary disk and will be lost on the next deploy. An administrator needs to set the SUPABASE_* (or CLOUDINARY_*) variables."
+  },
+  "imageFocus": {
+    "title": "Image focus",
+    "hint": "The image gets cropped into round and square frames. Click the part that must stay in frame (a face, for example), or nudge it with the arrow keys.",
+    "previewRound": "Circle",
+    "previewCard": "Card",
+    "reset": "Reset to center"
   },
   "sessions": {
     "panelTitle": "Live lessons",
@@ -722,7 +759,8 @@
       "testimonials": "Testimonials",
       "courseReviews": "Course reviews",
       "chat": "Chat",
-      "courseRequests": "Course requests"
+      "courseRequests": "Course requests",
+      "team": "Team"
     },
     "common": {
       "all": "All",
@@ -847,7 +885,8 @@
     "roles": {
       "STUDENT": "Student",
       "MENTOR": "Mentor",
-      "ADMIN": "Admin"
+      "ADMIN": "Admin",
+      "TEAM": "Team"
     },
     "enrollments": {
       "title": "Enrollments",
@@ -893,7 +932,8 @@
       "resetTitle": "Reset password",
       "blockTitle": "Block",
       "unblockTitle": "Unblock",
-      "deleteTitle": "Delete"
+      "deleteTitle": "Delete",
+      "filterTeam": "Team"
     },
     "tags": {
       "featured": "Featured",
@@ -917,7 +957,8 @@
       "colorLabel": "Color",
       "categoryReq": "Category *",
       "titleField": "Title",
-      "descField": "Description"
+      "descField": "Description",
+      "order": "Order"
     },
     "courses": {
       "title": "Courses",
@@ -1121,6 +1162,13 @@
         "ENROLLED": "Enrolled",
         "REJECTED": "Rejected"
       }
+    },
+    "team": {
+      "title": "Team",
+      "sub": "Company staff and their public profiles",
+      "newBtn": "New member",
+      "empty": "No team members have been added yet.",
+      "confirmDelete": "Delete this team member?"
     }
   },
   "engagement": {
@@ -1221,6 +1269,90 @@
     },
     "notFound": {
       "title": "Page not found"
+    },
+    "team": {
+      "title": "Team",
+      "description": "The DATA LIFE team — engineers, designers, data specialists and mentors."
+    }
+  },
+  "team": {
+    "cabinetTitle": "Team",
+    "dept": {
+      "LEADERSHIP": "Leadership",
+      "ENGINEERING": "Engineering",
+      "DATA": "Data",
+      "DESIGN": "Design",
+      "MARKETING": "Marketing",
+      "EDUCATION": "Education",
+      "OPERATIONS": "Operations"
+    },
+    "card": {
+      "projectCount": "Worked on {{n}} projects",
+      "memberCount": "{{n}} members"
+    },
+    "member": {
+      "about": "About",
+      "projects": "Projects",
+      "courses": "Courses taught",
+      "skills": "Skills",
+      "contact": "Contact",
+      "website": "Website",
+      "leadership": "Leadership",
+      "alsoMentor": "Also a mentor",
+      "joined": "Joined {{date}}"
+    },
+    "form": {
+      "name": "Full name",
+      "position": "Position",
+      "positionPlaceholder": "Backend developer",
+      "bio": "Bio",
+      "photo": "Photo",
+      "skills": "Skills",
+      "skillsPlaceholder": "React, Node.js, PostgreSQL",
+      "skillsHint": "Add with Enter or a comma",
+      "email": "Email",
+      "phone": "Phone",
+      "linkedinUrl": "LinkedIn",
+      "githubUrl": "GitHub",
+      "telegramUrl": "Telegram",
+      "websiteUrl": "Website",
+      "department": "Department",
+      "joinedAt": "Start date",
+      "account": "Platform account (for team cabinet access)",
+      "accountNone": "Not linked",
+      "accountHint": "Give the user the TEAM role in the Users section first.",
+      "mentorLink": "Mentor profile",
+      "mentorNone": "Not linked",
+      "mentorHint": "If this person also teaches courses, link their mentor profile.",
+      "projects": "Projects",
+      "projectsHint": "Select the projects this person worked on — they appear on the profile.",
+      "leadership": "Leadership (shown in its own block on top)",
+      "published": "Show on the site",
+      "unpublished": "Not published"
+    },
+    "profile": {
+      "title": "My profile",
+      "sub": "What visitors see on the public team page",
+      "publicProfile": "Public profile",
+      "saved": "Profile saved",
+      "viewPublic": "View on the site",
+      "notPublished": "Not published",
+      "notPublishedHint": "Your profile is not visible on the site yet. Once you have filled it in, an administrator will publish it."
+    },
+    "directory": {
+      "title": "Team members",
+      "sub": "Your colleagues and how to reach them",
+      "search": "Search by name, position or skill",
+      "empty": "Nobody found.",
+      "openProfile": "Open profile"
+    },
+    "nav": {
+      "profile": "My profile",
+      "directory": "Team members"
+    },
+    "notLinked": {
+      "title": "Team profile not linked",
+      "message": "Your account is not linked to a team profile. Please contact an administrator."
     }
   }
 }

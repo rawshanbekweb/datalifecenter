@@ -6,7 +6,7 @@ export interface LessonQuestion {
   answer?: string | null;
   answeredAt?: string | null;
   createdAt: string;
-  user: { id: string; name: string; email?: string; avatarUrl?: string | null };
+  user: { id: string; name: string; email?: string; avatarUrl?: string | null; focusX?: number; focusY?: number };
   lesson?: {
     id: string;
     title: string;
@@ -22,7 +22,7 @@ export interface MentorRequest {
   reply?: string | null;
   repliedAt?: string | null;
   createdAt: string;
-  mentor?: { id: string; name: string; photoUrl?: string | null; user?: { email: string } | null };
+  mentor?: { id: string; name: string; photoUrl?: string | null; focusX?: number; focusY?: number; user?: { email: string } | null };
 }
 
 // ---------- Dars savol-javoblari ----------

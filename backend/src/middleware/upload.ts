@@ -9,6 +9,7 @@ import {
   VIDEOS_DIR,
   VIDEO_MAX_BYTES,
   VIDEO_MIME_EXT,
+  toMb,
 } from '../config/uploads';
 
 function makeStorage(dir: string, mimeExt: Record<string, string>) {
@@ -55,5 +56,12 @@ function wrapMulter(mw: RequestHandler, sizeMessage: string): RequestHandler {
     });
 }
 
-export const uploadImage = wrapMulter(imageMulter.single('file'), "Rasm hajmi 5 MB dan oshmasligi kerak");
-export const uploadVideo = wrapMulter(videoMulter.single('file'), "Video hajmi 500 MB dan oshmasligi kerak");
+// Xabardagi raqam limitdan hisoblanadi — limit o'zgarganda matn eskirib qolmasin
+export const uploadImage = wrapMulter(
+  imageMulter.single('file'),
+  `Rasm hajmi ${toMb(IMAGE_MAX_BYTES)} MB dan oshmasligi kerak`
+);
+export const uploadVideo = wrapMulter(
+  videoMulter.single('file'),
+  `Video hajmi ${toMb(VIDEO_MAX_BYTES)} MB dan oshmasligi kerak`
+);

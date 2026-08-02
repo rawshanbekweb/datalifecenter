@@ -22,6 +22,9 @@ interface TestimonialInput {
   name: string;
   role: LocalizedString;
   avatarUrl?: string;
+  // Rasm kadrga kesilganda markazda qoladigan nuqta (foizda)
+  focusX?: number;
+  focusY?: number;
   text: LocalizedString;
   rating: number;
   published: boolean;

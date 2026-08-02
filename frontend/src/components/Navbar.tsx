@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap, Users } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
 import NotificationBell from './common/NotificationBell';
@@ -20,6 +20,7 @@ const NAV: NavItem[] = [
   { labelKey: 'nav.about', to: '/about' },
   { labelKey: 'nav.courses', to: '/courses' },
   { labelKey: 'nav.mentors', to: '/mentors' },
+  { labelKey: 'nav.team', to: '/team' },
   { labelKey: 'nav.partners', to: '/partners' },
   { labelKey: 'nav.blog', to: '/blog' },
   { labelKey: 'nav.contact', to: '/contact' },
@@ -103,6 +104,12 @@ export default function Navbar(): React.ReactElement {
                     <GraduationCap size={16}/> {t('nav.mentorCabinet')}
                   </Link>
                 )}
+                {/* Rolga emas, profil bog'langanligiga qaraladi — mentor ham jamoa a'zosi bo'lishi mumkin */}
+                {user.hasTeamProfile && (
+                  <Link to="/team/profile" style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#0d9488' }}>
+                    <Users size={16}/> {t('nav.teamCabinet')}
+                  </Link>
+                )}
                 <Link to={roleHome(user.role)} style={{ display:'flex', alignItems:'center', gap:6, textDecoration:'none', fontSize:14, fontWeight:600, color:'#475569' }}>
                   <LayoutDashboard size={16}/> {user.name.split(' ')[0]}
                 </Link>
@@ -159,6 +166,13 @@ export default function Navbar(): React.ReactElement {
                   <MotionLink to="/mentor" onClick={() => setOpen(false)}>
                     <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#9333ea', borderColor:'#e9d5ff' }}>
                       <GraduationCap size={15}/> {t('nav.mentorCabinetFull')}
+                    </button>
+                  </MotionLink>
+                )}
+                {user.hasTeamProfile && (
+                  <MotionLink to="/team/profile" onClick={() => setOpen(false)}>
+                    <button className="btn-outline" style={{ width: '100%', marginTop: 14, justifyContent: 'center', color:'#0d9488', borderColor:'#99f6e4' }}>
+                      <Users size={15}/> {t('nav.teamCabinetFull')}
                     </button>
                   </MotionLink>
                 )}

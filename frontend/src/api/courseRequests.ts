@@ -17,7 +17,7 @@ export interface CourseRequest {
   repliedAt: string | null;
   createdAt: string;
   course: { id: string; title: string; slug: string; format: string; color: string };
-  user: { id: string; name: string; email: string; avatarUrl: string | null } | null;
+  user: { id: string; name: string; email: string; avatarUrl: string | null; focusX?: number; focusY?: number } | null;
 }
 
 export interface CreateCourseRequestInput {

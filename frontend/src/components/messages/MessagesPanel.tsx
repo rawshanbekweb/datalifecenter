@@ -18,6 +18,7 @@ import { subscribeNotifications } from '../../api/notifications';
 import { useAuth } from '../../hooks/useAuth';
 import Loading from '../common/Loading';
 import { useToast } from '../common/Feedback';
+import { focusPosition } from '../../utils/imageFocus';
 
 /**
  * Talaba, mentor va admin kabinetlaridagi YAGONA yozishma oynasi.
@@ -396,7 +397,7 @@ export default function MessagesPanel({ accent = '#0ea5e9' }: Props): React.Reac
   );
 }
 
-function Avatar({ user, kind, accent }: { user: { name: string; avatarUrl: string | null } | null; kind: 'DIRECT' | 'ADMIN'; accent: string }): React.ReactElement {
+function Avatar({ user, kind, accent }: { user: { name: string; avatarUrl: string | null; focusX?: number; focusY?: number } | null; kind: 'DIRECT' | 'ADMIN'; accent: string }): React.ReactElement {
   // Administratsiya kanali aniq odam emas — qalqon belgisi bilan ko'rsatiladi
   if (!user) {
     return (
@@ -406,7 +407,7 @@ function Avatar({ user, kind, accent }: { user: { name: string; avatarUrl: strin
     );
   }
   if (user.avatarUrl) {
-    return <img src={user.avatarUrl} alt={user.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
+    return <img src={user.avatarUrl} alt={user.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', objectPosition: focusPosition(user), flexShrink: 0 }} />;
   }
   return (
     <div style={{ width: 34, height: 34, borderRadius: '50%', background: kind === 'ADMIN' ? '#0f172a' : accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
@@ -544,7 +545,7 @@ function ContactPicker({ contacts, search, onSearch, onClose, onStart, allowAdmi
                 <button key={contact.id} onClick={() => setTarget({ recipientId: contact.id, name: contact.name })}
                   style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '11px 16px', border: 'none', borderBottom: '1px solid #f8fafc', background: '#fff', cursor: 'pointer' }}>
                   {contact.avatarUrl ? (
-                    <img src={contact.avatarUrl} alt={contact.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <img src={contact.avatarUrl} alt={contact.name} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', objectPosition: focusPosition(contact), flexShrink: 0 }} />
                   ) : (
                     <div style={{ width: 34, height: 34, borderRadius: '50%', background: accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>
                       {initialsOf(contact.name)}

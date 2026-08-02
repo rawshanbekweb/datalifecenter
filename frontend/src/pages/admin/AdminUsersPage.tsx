@@ -11,6 +11,7 @@ import Loading from '../../components/common/Loading';
 const ROLE_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
   STUDENT: { labelKey: 'admin.roles.STUDENT', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd' },
   MENTOR:  { labelKey: 'admin.roles.MENTOR',  color: '#9333ea', bg: '#faf5ff', border: '#e9d5ff' },
+  TEAM:    { labelKey: 'admin.roles.TEAM',    color: '#0d9488', bg: '#f0fdfa', border: '#99f6e4' },
   ADMIN:   { labelKey: 'admin.roles.ADMIN',   color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' },
 };
 
@@ -18,6 +19,7 @@ const ROLE_FILTERS: { value: string; labelKey: string }[] = [
   { value: '',        labelKey: 'admin.common.all' },
   { value: 'STUDENT', labelKey: 'admin.users.filterStudents' },
   { value: 'MENTOR',  labelKey: 'admin.users.filterMentors' },
+  { value: 'TEAM',    labelKey: 'admin.users.filterTeam' },
   { value: 'ADMIN',   labelKey: 'admin.users.filterAdmins' },
 ];
 
@@ -170,6 +172,7 @@ export default function AdminUsersPage(): React.ReactElement {
                   style={{ width:130, fontSize:12.5, padding:'8px 10px', flexShrink:0, opacity: busy ? 0.6 : 1 }}>
                   <option value="STUDENT">{t('admin.roles.STUDENT')}</option>
                   <option value="MENTOR">{t('admin.roles.MENTOR')}</option>
+                  <option value="TEAM">{t('admin.roles.TEAM')}</option>
                   <option value="ADMIN">{t('admin.roles.ADMIN')}</option>
                 </select>
                 <div style={{ display:'flex', gap:6, flexShrink:0 }}>

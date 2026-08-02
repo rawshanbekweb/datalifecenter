@@ -2,6 +2,7 @@ import { API_URL } from './config';
 import { apiFetch } from './client';
 import { getToken } from './token';
 import i18n from '../i18n/i18n';
+import { downscaleImage } from '../utils/imageResize';
 
 export interface UploadResult {
   url: string;
@@ -13,10 +14,28 @@ export interface UploadResult {
 export interface UploadConfig {
   /** false bo'lsa fayllar ephemeral diskda qoladi va deployda yo'qoladi */
   cloudStorage: boolean;
+  /** Serverdagi limitlar — mijoz shu bo'yicha oldindan tekshiradi */
+  imageMaxBytes?: number;
+  videoMaxBytes?: number;
 }
 
+/**
+ * Sozlamalar bir marta so'raladi va butun panel bo'ylab bo'lishiladi —
+ * bitta formada 3-4 ta yuklash maydoni bo'lishi mumkin, har biri alohida
+ * so'rov yubormasin.
+ */
+let configPromise: Promise<UploadConfig> | null = null;
+
 export function getUploadConfig(): Promise<UploadConfig> {
-  return apiFetch('/uploads/config');
+  if (!configPromise) {
+    configPromise = apiFetch<UploadConfig>('/uploads/config').catch((err: unknown) => {
+      // Keyingi urinishda qayta so'ralsin — bitta uzilish butun sessiyaga
+      // "sozlama yo'q" bo'lib qolmasin
+      configPromise = null;
+      throw err;
+    });
+  }
+  return configPromise;
 }
 
 /**
@@ -105,17 +124,47 @@ function once(
   });
 }
 
+/**
+ * Hajmni yuborishdan OLDIN tekshiradi.
+ *
+ * Limitdan katta fayl serverda baribir rad etiladi, lekin bunga qadar butun
+ * fayl tarmoqqa chiqib bo'ladi — sekin internetda bu bir necha daqiqa kutib,
+ * oxirida xato ko'rish demakdir. Limit serverdan keladi, shuning uchun ikki
+ * tomonda ikki xil raqam bo'lib qolmaydi.
+ *
+ * Sozlamani olib bo'lmasa tekshiruv o'tkazib yuboriladi — yuklashning o'zi
+ * ishlashi kerak, oxirgi so'z baribir serverda.
+ */
+async function assertSizeAllowed(file: File, kind: 'image' | 'video'): Promise<void> {
+  let max: number | undefined;
+  try {
+    const cfg = await getUploadConfig();
+    max = kind === 'image' ? cfg.imageMaxBytes : cfg.videoMaxBytes;
+  } catch {
+    return;
+  }
+  if (max && file.size > max) {
+    throw new UploadError(i18n.t('upload.tooLarge', { max: Math.round(max / (1024 * 1024)) }), false);
+  }
+}
+
 // fetch o'rniga XHR — yuklash jarayonini (progress) ko'rsatish uchun
 export async function uploadFile(
   file: File,
   kind: 'image' | 'video',
   onProgress?: (percent: number) => void
 ): Promise<UploadResult> {
+  // Rasm avval kichraytiriladi, tekshiruv esa HAQIQATAN yuborilayotgan
+  // baytlarga qo'llanadi — telefon surati kichraytirilgach limitga sig'sa,
+  // foydalanuvchini bekorga rad etmaymiz. Video o'z holicha ketadi.
+  const payload = kind === 'image' ? await downscaleImage(file) : file;
+  await assertSizeAllowed(payload, kind);
+
   let lastError: unknown;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     try {
-      return await once(file, kind, onProgress);
+      return await once(payload, kind, onProgress);
     } catch (err) {
       lastError = err;
       if (!(err instanceof UploadError) || !err.retryable || attempt === MAX_ATTEMPTS - 1) break;

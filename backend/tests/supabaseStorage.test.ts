@@ -1,3 +1,4 @@
+import { Readable } from 'stream';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Supabase Storage adapteri sof HTTP qatlami — bu yerda tarmoqqa chiqmasdan,
@@ -13,6 +14,23 @@ const API = `${SUPABASE_URL}/storage/v1`;
 type FetchCall = { url: string; init: RequestInit };
 
 let calls: FetchCall[] = [];
+
+// Yuklash manbai — fayl o'rniga xotiradagi baytlar. `open()` har chaqirilganda
+// YANGI oqim qaytaradi: adapter so'rovni qayta yuborishi mumkin (bucket
+// yaratilgandan keyin), bir marta o'qilgan oqim esa qayta o'qilmaydi.
+const BYTES = Buffer.from('bytes');
+
+function source(): { open: () => Readable; size: number; opened: () => number } {
+  let opens = 0;
+  return {
+    open: () => {
+      opens += 1;
+      return Readable.from(BYTES);
+    },
+    size: BYTES.length,
+    opened: () => opens,
+  };
+}
 
 function mockFetch(handler: (url: string, init: RequestInit) => { status?: number; body?: unknown }) {
   vi.stubGlobal('fetch', async (input: string | URL, init: RequestInit = {}) => {
@@ -50,18 +68,21 @@ describe('Supabase Storage adapteri', () => {
     mockFetch(() => ({ body: { Key: 'imgs/rasm.jpg' } }));
     const supabase = await loadModule();
 
-    const url = await supabase.upload(Buffer.from('bytes'), 'images', 'rasm.jpg', 'image/jpeg');
+    const url = await supabase.upload(source(), 'images', 'rasm.jpg', 'image/jpeg');
 
     expect(url).toBe(`${API}/object/public/imgs/rasm.jpg`);
     expect(calls[0].url).toBe(`${API}/object/imgs/rasm.jpg`);
-    expect((calls[0].init.headers as Record<string, string>).Authorization).toBe('Bearer service-role-key');
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers.Authorization).toBe('Bearer service-role-key');
+    // Tana oqim bo'lgani uchun hajm qo'lda beriladi — bo'lmasa so'rov chunked ketadi
+    expect(headers['Content-Length']).toBe(String(BYTES.length));
   });
 
   it('video uchun imzosiz kanonik URL qaytaradi (public emas)', async () => {
     mockFetch(() => ({ body: {} }));
     const supabase = await loadModule();
 
-    const url = await supabase.upload(Buffer.from('bytes'), 'videos', 'dars.mp4', 'video/mp4');
+    const url = await supabase.upload(source(), 'videos', 'dars.mp4', 'video/mp4');
 
     expect(url).toBe(`${API}/object/vids/dars.mp4`);
     expect(url).not.toContain('/public/');
@@ -81,10 +102,14 @@ describe('Supabase Storage adapteri', () => {
     });
     const supabase = await loadModule();
 
-    const url = await supabase.upload(Buffer.from('bytes'), 'images', 'rasm.jpg', 'image/jpeg');
+    const src = source();
+    const url = await supabase.upload(src, 'images', 'rasm.jpg', 'image/jpeg');
 
     expect(url).toBe(`${API}/object/public/imgs/rasm.jpg`);
     expect(uploadAttempts).toBe(2);
+    // Ikkinchi urinish uchun oqim QAYTADAN ochilishi shart — bir marta o'qilgani
+    // ikkinchi so'rovda bo'sh tana bo'lib ketardi
+    expect(src.opened()).toBe(2);
     // Rasm bucketi ochiq, video bucketi yopiq bo'lib yaratilishi kerak
     const created = calls.find((c) => c.url.endsWith('/bucket'));
     expect(JSON.parse(String(created?.init.body))).toMatchObject({ id: 'imgs', public: true });
@@ -102,7 +127,7 @@ describe('Supabase Storage adapteri', () => {
     });
     const supabase = await loadModule();
 
-    await supabase.upload(Buffer.from('bytes'), 'videos', 'dars.mp4', 'video/mp4');
+    await supabase.upload(source(), 'videos', 'dars.mp4', 'video/mp4');
 
     const created = calls.find((c) => c.url.endsWith('/bucket'));
     expect(JSON.parse(String(created?.init.body))).toMatchObject({ id: 'vids', public: false });
@@ -159,7 +184,20 @@ describe('Supabase Storage adapteri', () => {
     mockFetch(() => ({ status: 403, body: { message: 'ruxsat yo\'q' } }));
     const supabase = await loadModule();
 
-    await expect(supabase.upload(Buffer.from('b'), 'images', 'a.jpg', 'image/jpeg')).rejects.toThrow(/403/);
+    await expect(supabase.upload(source(), 'images', 'a.jpg', 'image/jpeg')).rejects.toThrow(/403/);
+    expect(calls.some((c) => c.url.endsWith('/bucket'))).toBe(false);
+  });
+
+  // Supabase loyihasining global fayl chekloviga (Free rejada 50 MB) tushgan
+  // yuklash — "qayta urinib ko'ring" emas, alohida xato bo'lishi kerak
+  it('hajm chekloviga tushsa StorageLimitError beradi', async () => {
+    mockFetch(() => ({ status: 413, body: { statusCode: '413', error: 'Payload too large', message: 'The object exceeded the maximum allowed size' } }));
+    const supabase = await loadModule();
+
+    await expect(supabase.upload(source(), 'videos', 'dars.mp4', 'video/mp4')).rejects.toBeInstanceOf(
+      supabase.StorageLimitError
+    );
+    // Bucket yaratishga urinmaydi — muammo bucketda emas
     expect(calls.some((c) => c.url.endsWith('/bucket'))).toBe(false);
   });
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Department, PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 import { hashPassword } from '../src/utils/password';
@@ -44,6 +44,59 @@ const PROJECTS = [
   { title: 'FinTech Mobile App', category: 'Mobile', techStack: ['Flutter', 'Firebase', 'Stripe', 'BLoC'], description: 'Zamonaviy banking ilovasi. Naqd pul transferi va investitsiya boshqaruvi.' },
   { title: 'CyberGuard Dashboard', category: 'Security', techStack: ['Python', 'Django', 'Elasticsearch', 'React'], description: 'Enterprise darajadagi kiberxavfsizlik monitoring tizimi.' },
   { title: 'AI Content Generator', category: 'AI/ML', techStack: ['Python', 'OpenAI', 'FastAPI', 'Next.js'], description: "GPT asosidagi matn va kod generatsiya qiluvchi SaaS platforma." },
+];
+
+// Kompaniya jamoasi. Mentor bo'lganlari (ismi mentorSpecs bilan bir xil)
+// avtomatik ravishda o'z mentor profiliga bog'lanadi.
+const TEAM_MEMBERS: {
+  name: string;
+  position: string;
+  bio: string;
+  department: Department;
+  skills: string[];
+  projectIndexes: number[];
+  leadership?: boolean;
+}[] = [
+  {
+    name: 'Rustam Nazarov', position: 'Asoschi va CEO', department: 'LEADERSHIP', leadership: true,
+    bio: "DATA LIFE asoschisi. IT ta'lim va dasturiy ta'minot ishlab chiqishda 10 yildan ortiq tajriba.",
+    skills: ['Strategiya', 'Product', 'Jamoa boshqaruvi'], projectIndexes: [0, 1],
+  },
+  {
+    name: 'Dilnoza Yusupova', position: 'Texnik direktor (CTO)', department: 'LEADERSHIP', leadership: true,
+    bio: "Kompaniyaning texnik yo'nalishini belgilaydi va backend jamoasini boshqaradi.",
+    skills: ['Node.js', 'PostgreSQL', 'Arxitektura', 'DevOps'], projectIndexes: [0, 3],
+  },
+  {
+    name: 'Aziz Karimov', position: 'Frontend jamoa yetakchisi', department: 'ENGINEERING',
+    bio: "Mijoz interfeyslarini loyihalaydi va Frontend kursini olib boradi.",
+    skills: ['React', 'TypeScript', 'Next.js'], projectIndexes: [0, 3],
+  },
+  {
+    name: 'Sardor Rashidov', position: 'Kiberxavfsizlik muhandisi', department: 'ENGINEERING',
+    bio: 'Loyihalar xavfsizligini ta\'minlaydi va Cyber Security kursini olib boradi.',
+    skills: ['Pentest', 'Python', 'Elasticsearch'], projectIndexes: [2],
+  },
+  {
+    name: 'Kamola Ergasheva', position: 'Product dizayner', department: 'DESIGN',
+    bio: 'Mahsulot interfeysi va brend identikasi ustida ishlaydi.',
+    skills: ['Figma', 'UI/UX', 'Design System'], projectIndexes: [1, 0],
+  },
+  {
+    name: 'Bekzod Tursunov', position: "Ma'lumot muhandisi", department: 'DATA',
+    bio: "Ma'lumot oqimlari va analitika tizimlarini quradi.",
+    skills: ['Python', 'Airflow', 'SQL', 'Spark'], projectIndexes: [3],
+  },
+  {
+    name: 'Nilufar Saidova', position: 'Marketing rahbari', department: 'MARKETING',
+    bio: "Kompaniya brendi va o'quv dasturlarini bozorga olib chiqadi.",
+    skills: ['SMM', 'Kontent', 'Analitika'], projectIndexes: [],
+  },
+  {
+    name: 'Jasur Qodirov', position: 'Loyihalar menejeri', department: 'OPERATIONS',
+    bio: 'Mijoz loyihalarining muddat va sifatini nazorat qiladi.',
+    skills: ['Agile', 'Scrum', 'Jira'], projectIndexes: [1, 2],
+  },
 ];
 
 // Bosh sahifadagi hozirgi hardcoded qiymatlar — birinchi deploy'da sayt
@@ -172,6 +225,8 @@ async function main() {
 
   const mentorPasswordHash = await hashPassword('Mentor123!');
   const mentorsByCourseId = new Map<string, string>();
+  // Ta'lim bo'limidagi jamoa a'zolari mentor profiliga bog'lanadi
+  const mentorIdsByName = new Map<string, string>();
 
   for (const m of mentorSpecs) {
     const email = `${slugify(m.name)}@datalife.uz`;
@@ -194,6 +249,7 @@ async function main() {
     for (const courseId of m.courseIds) {
       mentorsByCourseId.set(courseId, mentor.id);
     }
+    mentorIdsByName.set(m.name, mentor.id);
   }
 
   for (const c of COURSES) {
@@ -270,6 +326,46 @@ async function main() {
     });
   }
   console.log(`Seeded ${PROJECTS.length} projects`);
+
+  // Jamoa: mentorlar ta'lim tomonini, qolganlar kompaniyaning boshqa
+  // bo'limlarini ko'rsatadi. Har biriga TEAM roli beriladi — a'zo o'z profilini
+  // /team/profile kabinetida o'zi tahrirlay oladi.
+  const teamPasswordHash = await hashPassword('Team123!');
+  for (const [i, tm] of TEAM_MEMBERS.entries()) {
+    const email = `${slugify(tm.name)}@datalife.uz`;
+    // Mentorlar allaqachon MENTOR roli bilan yaratilgan — rolini o'zgartirmaymiz
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: { email, name: tm.name, passwordHash: teamPasswordHash, role: 'TEAM' },
+    });
+    const slug = slugify(tm.name);
+    const existing = await prisma.teamMember.findUnique({ where: { slug } });
+    if (existing) continue;
+
+    await prisma.teamMember.create({
+      data: {
+        slug,
+        userId: user.id,
+        mentorId: mentorIdsByName.get(tm.name) ?? null,
+        name: tm.name,
+        position: { uz: tm.position },
+        bio: { uz: tm.bio },
+        department: tm.department,
+        leadership: tm.leadership ?? false,
+        skills: tm.skills,
+        email,
+        order: i,
+        featured: i < 3,
+        projects: {
+          createMany: {
+            data: tm.projectIndexes.map((p, order) => ({ projectId: `seed-project-${p}`, order })),
+          },
+        },
+      },
+    });
+  }
+  console.log(`Seeded ${TEAM_MEMBERS.length} team members`);
 
   for (const [i, p] of BLOG_POSTS.entries()) {
     await prisma.blogPost.upsert({

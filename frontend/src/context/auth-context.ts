@@ -5,6 +5,9 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
+  /** Jamoa profiliga bog'langanmi — mentor ham jamoa a'zosi bo'lishi mumkin,
+   *  shuning uchun jamoa kabineti havolasi rolga emas, shu bayroqqa qaraydi. */
+  hasTeamProfile?: boolean;
   [key: string]: unknown;
 }
 

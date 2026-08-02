@@ -9,6 +9,8 @@ import LocalizedField from '../../components/admin/LocalizedField';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import Loading from '../../components/common/Loading';
+import ImageFocusPicker from '../../components/common/ImageFocusPicker';
+import { DEFAULT_FOCUS } from '../../utils/imageFocus';
 
 interface MentorFormState {
   id?: string | number;
@@ -16,6 +18,8 @@ interface MentorFormState {
   bio: LocalizedString;
   specialty: LocalizedString;
   photoUrl: string;
+  focusX: number;
+  focusY: number;
   linkedinUrl: string;
   githubUrl: string;
   telegramUrl: string;
@@ -29,6 +33,8 @@ interface Mentor {
   bio: LocalizedString;
   specialty: LocalizedString;
   photoUrl?: string | null;
+  focusX?: number;
+  focusY?: number;
   linkedinUrl?: string | null;
   githubUrl?: string | null;
   telegramUrl?: string | null;
@@ -40,7 +46,7 @@ interface Mentor {
 
 type Status = 'loading' | 'ready' | 'error';
 
-const emptyForm: MentorFormState = { name:'', bio: emptyLocalizedString(), specialty: emptyLocalizedString(), photoUrl:'', linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false, userId:'' };
+const emptyForm: MentorFormState = { name:'', bio: emptyLocalizedString(), specialty: emptyLocalizedString(), photoUrl:'', focusX: DEFAULT_FOCUS, focusY: DEFAULT_FOCUS, linkedinUrl:'', githubUrl:'', telegramUrl:'', featured:false, userId:'' };
 
 function initials(name: string): string {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -100,6 +106,8 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
       <LocalizedField label={t('admin.mentors.fBio')} required multiline value={form.bio} onChange={(next) => setForm((f) => ({ ...f, bio: next }))} />
       <FileUpload kind="image" label={t('admin.mentors.fPhoto')} value={form.photoUrl}
         onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
+      <ImageFocusPicker url={form.photoUrl} focusX={form.focusX} focusY={form.focusY}
+        onChange={(focusX, focusY) => setForm((f: MentorFormState) => ({ ...f, focusX, focusY }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>LinkedIn</label>
@@ -160,7 +168,7 @@ export default function AdminMentorsPage(): React.ReactElement {
 
   const startEdit = (m: Mentor): void => setEditing({
     id: m.id, name: m.name, bio: m.bio, specialty: m.specialty,
-    photoUrl: m.photoUrl || '', linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
+    photoUrl: m.photoUrl || '', focusX: m.focusX ?? DEFAULT_FOCUS, focusY: m.focusY ?? DEFAULT_FOCUS, linkedinUrl: m.linkedinUrl || '', githubUrl: m.githubUrl || '', telegramUrl: m.telegramUrl || '',
     featured: m.featured, userId: m.userId || '',
   });
 

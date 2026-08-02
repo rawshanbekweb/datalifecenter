@@ -6,12 +6,13 @@ import { listTestimonials } from '../api/testimonials';
 import LikeButton from './common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
 import Loading from './common/Loading';
+import { focusPosition } from '../utils/imageFocus';
 
 interface Testimonial {
   id: string;
   name: string;
   role: string;
-  avatarUrl?: string | null;
+  avatarUrl?: string | null; focusX?: number; focusY?: number;
   text: string;
   rating: number;
 }
@@ -38,7 +39,7 @@ function TestimonialCard({ item, index }: { item: Testimonial; index: number }):
       <p style={{ fontSize:13.5, color:'#475569', lineHeight:1.8, marginBottom:20, flex:1 }}>{item.text}</p>
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         {item.avatarUrl ? (
-          <img src={item.avatarUrl} alt={item.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', flexShrink:0 }} />
+          <img src={item.avatarUrl} alt={item.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', objectPosition: focusPosition(item), flexShrink:0 }} />
         ) : (
           <div style={{ width:40, height:40, borderRadius:'50%', background:'#f0f9ff', border:'1.5px solid #bae6fd', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontWeight:800, color:'#0ea5e9', fontSize:15 }}>
             {item.name.charAt(0).toUpperCase()}

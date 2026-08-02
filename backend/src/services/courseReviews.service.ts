@@ -29,7 +29,7 @@ export async function listReviews(slug: string) {
   return prisma.courseReview.findMany({
     where: { courseId: course.id, published: true },
     orderBy: { createdAt: 'desc' },
-    include: { user: { select: { name: true, avatarUrl: true } } },
+    include: { user: { select: { name: true, avatarUrl: true, focusX: true, focusY: true } } },
   });
 }
 

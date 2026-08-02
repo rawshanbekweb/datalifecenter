@@ -5,9 +5,9 @@ export interface AdminUser {
   email: string;
   name: string;
   phone?: string | null;
-  role: 'STUDENT' | 'MENTOR' | 'ADMIN';
+  role: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
   isBlocked: boolean;
-  avatarUrl?: string | null;
+  avatarUrl?: string | null; focusX?: number; focusY?: number;
   createdAt: string;
   _count: { enrollments: number };
 }

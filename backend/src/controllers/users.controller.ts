@@ -6,7 +6,7 @@ import { ApiError } from '../utils/ApiError';
 
 export const listUsersHandler = asyncHandler(async (req: Request, res: Response) => {
   const filters = req.validatedQuery as {
-    role?: 'STUDENT' | 'MENTOR' | 'ADMIN';
+    role?: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
     search?: string;
     page: number;
     limit: number;

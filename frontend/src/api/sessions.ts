@@ -13,7 +13,7 @@ export interface LiveSession {
   durationMin: number;
   status: SessionStatus;
   course: { id: string; title: string; slug: string; color: string; bg: string; border: string; iconKey: string };
-  mentor: { id: string; name: string; photoUrl?: string | null };
+  mentor: { id: string; name: string; photoUrl?: string | null; focusX?: number; focusY?: number };
   targetStudentIds: string[];
 }
 
@@ -27,7 +27,7 @@ export interface ManagedLiveSession {
   durationMin: number;
   status: SessionStatus;
   course: { id: string; title: LocalizedString; slug: string; color: string; bg: string; border: string; iconKey: string };
-  mentor: { id: string; name: string; photoUrl?: string | null };
+  mentor: { id: string; name: string; photoUrl?: string | null; focusX?: number; focusY?: number };
   targetStudentIds: string[];
 }
 

@@ -3,22 +3,14 @@ import { Upload, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getUploadConfig, uploadFile } from '../../api/uploads';
 
-/**
- * Bulut xotira holati bir marta so'raladi va butun panel bo'ylab
- * bo'lishiladi — har bir yuklash maydoni alohida so'rov yubormasin
- * (bitta formada 3-4 ta maydon bo'lishi mumkin).
- */
-let cloudStoragePromise: Promise<boolean> | null = null;
-
+// Sozlamalar getUploadConfig() ichida keshlanadi — har bir maydon alohida
+// so'rov yubormaydi (bitta formada 3-4 ta maydon bo'lishi mumkin).
 function checkCloudStorage(): Promise<boolean> {
-  if (!cloudStoragePromise) {
-    cloudStoragePromise = getUploadConfig()
-      .then((cfg) => cfg.cloudStorage)
-      // Holatni bilib bo'lmadi — ogohlantirishni ko'rsatmaymiz (noto'g'ri
-      // signal bermaslik uchun), yuklashning o'zi baribir ishlaydi
-      .catch(() => true);
-  }
-  return cloudStoragePromise;
+  return getUploadConfig()
+    .then((cfg) => cfg.cloudStorage)
+    // Holatni bilib bo'lmadi — ogohlantirishni ko'rsatmaymiz (noto'g'ri
+    // signal bermaslik uchun), yuklashning o'zi baribir ishlaydi
+    .catch(() => true);
 }
 
 interface FileUploadProps {

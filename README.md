@@ -80,6 +80,7 @@ frontend odatdagidek `npm run dev` bilan. Postgres hostga `5433` portda ochilgan
 | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | yo'q* | Fayl xotirasi (Supabase Storage). *Render/Railway'da shu yoki Cloudinary majburiy |
 | `SUPABASE_BUCKET_IMAGES/VIDEOS` | yo'q | Bucket nomlari (default `datalife-images`/`datalife-videos`) |
 | `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | yo'q* | Muqobil fayl xotirasi. **Cloudinary O'zbekistondan bloklangan** |
+| `IMAGE_MAX_MB` / `VIDEO_MAX_MB` | yo'q | Yuklash chegaralari (default 15 / 500). Bulut xotiraning o'z chegarasidan oshirmang — Supabase Free rejasida loyiha bo'yicha 50 MB |
 | `SENTRY_DSN`            | yo'q     | Xatolarni Sentry'ga yuborish (sentry.io)            |
 | `CLICK_*` / `PAYME_*`   | yo'q     | To'lov shlyuzlari (sozlanmasa tugmalar ko'rinmaydi) |
 
