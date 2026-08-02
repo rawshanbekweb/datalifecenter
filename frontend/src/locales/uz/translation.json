@@ -231,8 +231,8 @@
     },
     "mentors": {
       "pill": "Ta'lim jamoasi",
-      "titleStart": "Sizga o'rgatadigan ",
-      "titleAccent": "mentorlar",
+      "titleStart": "",
+      "titleAccent": "Mentorlar",
       "subtitle": "Sohasida ishlab turgan amaliyotchi mutaxassislar",
       "badge": "Mentor",
       "cta": "Barcha mentorlarni ko'rish",
@@ -255,14 +255,6 @@
       "all": "Barchasi",
       "visitSite": "Saytga o'tish",
       "view": "Ko'rish"
-    },
-    "team": {
-      "pill": "Jamoa",
-      "titleStart": "Ishni bajaradigan ",
-      "titleAccent": "odamlar",
-      "subtitle": "Kompaniyamiz ortida turgan mutaxassislar bilan tanishing",
-      "cta": "Butun jamoani ko'rish",
-      "loadError": "Jamoani yuklab bo'lmadi."
     }
   },
   "pages": {

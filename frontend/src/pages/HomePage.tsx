@@ -14,7 +14,6 @@ const Courses = lazyWithRetry(() => import('../components/Courses'));
 const Mentors = lazyWithRetry(() => import('../components/Mentors'));
 const Services = lazyWithRetry(() => import('../components/Services'));
 const Projects = lazyWithRetry(() => import('../components/Projects'));
-const Team = lazyWithRetry(() => import('../components/Team'));
 const WhyUs = lazyWithRetry(() => import('../components/WhyUs'));
 const Testimonials = lazyWithRetry(() => import('../components/Testimonials'));
 const Blog = lazyWithRetry(() => import('../components/Blog'));
@@ -51,14 +50,12 @@ export default function HomePage(): React.ReactElement {
       <Hero settings={settings.hero} />
       {s(<About settings={settings.about} />, 'about')}
       {s(<Courses />, 'courses')}
+      {/* Kurslardan keyin: tashrifchi avval nimani o'rganishini, so'ng kim
+          o'rgatishini ko'radi. Jamoa (xodimlar) bo'limi bosh sahifada
+          ATAYIN yo'q — to'liq ro'yxat /team sahifasida. */}
+      {s(<Mentors />, 'mentors')}
       {s(<Services settings={settings.services} />, 'services')}
       {s(<Projects />, 'projects')}
-      {/* Mentorlar aynan shu yerda: "kim o'rgatadi" → "kompaniya ortida kim
-          turibdi" mantiqiy ketma-ketligi hosil bo'ladi. Fon ranglari ham shu
-          bilan to'g'ri navbatlashadi (Projects oq → Mentors kulrang → Team oq);
-          ilgari Projects va Team ketma-ket oq edi va orasida chegara ko'rinmasdi. */}
-      {s(<Mentors />, 'mentors')}
-      {s(<Team />, 'team')}
       {s(<WhyUs settings={settings.why_us} />, 'why-us')}
       {s(<Testimonials />, 'testimonials')}
       {s(<Blog />, 'blog')}

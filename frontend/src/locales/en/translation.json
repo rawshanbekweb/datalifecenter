@@ -231,8 +231,8 @@
     },
     "mentors": {
       "pill": "Teaching team",
-      "titleStart": "The ",
-      "titleAccent": "mentors",
+      "titleStart": "",
+      "titleAccent": "Mentors",
       "subtitle": "Practising specialists who work in the field every day",
       "badge": "Mentor",
       "cta": "See all mentors",
@@ -255,14 +255,6 @@
       "all": "All",
       "visitSite": "Visit site",
       "view": "View"
-    },
-    "team": {
-      "pill": "Team",
-      "titleStart": "The people who ",
-      "titleAccent": "do the work",
-      "subtitle": "Meet the specialists behind the company",
-      "cta": "See the whole team",
-      "loadError": "Could not load the team."
     }
   },
   "pages": {

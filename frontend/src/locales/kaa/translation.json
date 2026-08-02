@@ -231,8 +231,8 @@
     },
     "mentors": {
       "pill": "Bilimlendiriw jámáti",
-      "titleStart": "Sizge úyretetuǵın ",
-      "titleAccent": "mentorlar",
+      "titleStart": "",
+      "titleAccent": "Mentorlar",
       "subtitle": "Óz tarawında islep atırǵan ámeliyatshı qániygeler",
       "badge": "Mentor",
       "cta": "Barlıq mentorlardı kóriw",
@@ -255,14 +255,6 @@
       "all": "Barlıǵı",
       "visitSite": "Saytqa ótiw",
       "view": "Kóriw"
-    },
-    "team": {
-      "pill": "Komanda",
-      "titleStart": "Jumıstı islewshi ",
-      "titleAccent": "adamlar",
-      "subtitle": "Kompaniyamız artında turǵan qánigeler menen tanısıń",
-      "cta": "Pútkil komandanı kóriw",
-      "loadError": "Komandanı júklew múmkin bolmadı."
     }
   },
   "pages": {

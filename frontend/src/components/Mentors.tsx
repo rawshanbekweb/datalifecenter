@@ -88,7 +88,7 @@ export default function Mentors(): React.ReactElement | null {
   if (status === 'ready' && mentors.length === 0) return null;
 
   return (
-    <section id="mentors" className="section-gray" style={{ padding: '96px 0' }}>
+    <section id="mentors" className="section-light" style={{ padding: '96px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
         <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ textAlign: 'center', marginBottom: 48 }}>
