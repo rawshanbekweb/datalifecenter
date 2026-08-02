@@ -181,6 +181,21 @@ bilan tarmoqsiz, faqat tasnif ko'rsatiladi.
 4. Birinchi deploy'dan keyin kontent kerak bo'lsa, Render Shell'da:
    `SEED_FORCE=true ADMIN_PASSWORD=<kuchli parol> npm run seed`
 
+> **To'liq seed jonli bazada nimani buzadi:** hamkor logotiplarini
+> placeholder'ga qaytaradi, kurs narxlarini seed qiymatiga tushiradi va
+> `Team123!`/`Student123!` kabi ochiq ma'lum parolli demo akkauntlar ochadi.
+> Shuning uchun ishlab turgan saytda undan foydalanmang.
+>
+> Faqat jamoa a'zolari kerak bo'lsa xavfsiz muqobil bor — boshqa hech qanday
+> jadvalga tegmaydi, akkaunt ochmaydi va takroran ishga tushirilsa dublikat
+> yaratmaydi:
+>
+> ```bash
+> npm run seed:team                      # qo'shadi
+> npm run seed:team -- --dry-run         # faqat ko'rsatadi, yozmaydi
+> npm run seed:team -- --published=false # yopiq holda qo'shadi
+> ```
+
 > **Diqqat:** bulut xotira sozlanmasa, yuklangan rasm/videolar Render'ning
 > ephemeral diskida saqlanadi va **har deploy'da yo'qoladi**.
 

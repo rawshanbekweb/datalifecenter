@@ -14,7 +14,8 @@
     "seed": "tsx prisma/seed.ts",
     "translate:content": "tsx scripts/translate-content.ts",
     "check:uploads": "tsx scripts/check-uploads.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed:team": "tsx scripts/seed-team.ts"
   },
   "engines": {
     "node": ">=20"
