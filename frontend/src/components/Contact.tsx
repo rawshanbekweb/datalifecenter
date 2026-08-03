@@ -44,13 +44,13 @@ type ContactStatus = 'idle' | 'loading' | 'success' | 'error';
 
 const DEFAULT_CONTACT: Required<ContactSettings> = {
   phone: '+998 99 208 11 77',
-  telegram: '@datalife_uz',
+  telegram: '@datalifecentre',
   email: 'info@datalife.uz',
-  address: "Qoraqolpog'iston, Nukus",
-  addressSub: "Amir Temur ko'chasi, 108",
+  address: "Nukus, Qoraqalpog'iston Respublikasi, O'zbekiston",
+  addressSub: 'FJ67+2WX',
   hours: [
-    { day: 'Dushanba — Juma', time: '09:00 — 19:00', closed: false },
-    { day: 'Shanba', time: '09:00 — 19:00', closed: false },
+    { day: 'Dushanba — Juma', time: '09:00 — 18:00', closed: false },
+    { day: 'Shanba', time: '09:00 — 18:00', closed: false },
     { day: 'Yakshanba', time: 'Yopiq', closed: true },
   ],
 };

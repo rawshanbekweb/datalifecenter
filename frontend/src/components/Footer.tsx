@@ -45,9 +45,9 @@ const SOCIALS: SocialItem[] = [
   { icon:GitBranch,    label:'GitHub',    href:'' },
   { icon:MessageCircle,label:'Twitter/X', href:'' },
   { icon:Briefcase,    label:'LinkedIn',  href:'' },
-  { icon:Camera,       label:'Instagram', href:'' },
+  { icon:Camera,       label:'Instagram', href:'https://instagram.com/data_life_centre' },
   { icon:Play,         label:'YouTube',   href:'' },
-  { icon:Send,         label:'Telegram',  href:'' },
+  { icon:Send,         label:'Telegram',  href:'https://t.me/datalifecentre' },
 ].filter((s) => s.href);
 
 export default function Footer(): React.ReactElement {
