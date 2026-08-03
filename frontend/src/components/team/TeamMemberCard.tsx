@@ -5,7 +5,7 @@ import { GitBranch, Briefcase, Send, Globe, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TeamMember } from '../../types/team';
 import { departmentMeta, initials } from './departments';
-import { focusPosition } from '../../utils/imageFocus';
+import FocusImage from '../common/FocusImage';
 
 interface TeamMemberCardProps {
   member: TeamMember;
@@ -52,11 +52,14 @@ export default function TeamMemberCard({ member, index = 0, large = false }: Tea
     >
       <Link to={`/team/${member.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         {showPhoto ? (
-          <img
+          <FocusImage
             src={member.photoUrl!}
             alt={member.name}
+            size={size}
+            radius="circle"
+            focus={member}
             onError={() => setPhotoFailed(true)}
-            style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', objectPosition: focusPosition(member), margin: '0 auto 16px', border: `2px solid ${theme.border}`, display: 'block' }}
+            style={{ margin: '0 auto 16px', border: `2px solid ${theme.border}` }}
           />
         ) : (
           <div style={{ display: 'flex', width: size, height: size, borderRadius: '50%', margin: '0 auto 16px', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${theme.border}`, fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: large ? 28 : 22, color: theme.color }}>

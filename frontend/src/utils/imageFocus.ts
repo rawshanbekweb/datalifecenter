@@ -70,3 +70,29 @@ export function focusPanX(source: ImageFocus | null | undefined): string {
   const dx = ((DEFAULT_FOCUS - clampFocus(source?.focusX ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
   return `translateX(${dx.toFixed(2)}%)`;
 }
+
+/**
+ * Dumaloq/kvadrat avatarda (`object-fit: cover`) rasmni CHAPGA/O'NGGA surish.
+ *
+ * MUAMMO: portret surat kvadrat kadrda enига to'liq to'ladi — gorizontal
+ * ortiqcha joy QOLMAYDI va `object-position` hech narsani surmaydi
+ * (vertikal esa ishlaydi, balandlikda ortiqcha qism bor).
+ *
+ * YECHIM: rasm kerakli miqdorda kattalashtiriladi va shu hosil bo'lgan
+ * ortiqcha joy ichida suriladi. Kattalashtirish ANIQ hisoblanadi:
+ * `scale(1 + 2|p|/100)` da har chetda `|p|%` joy paydo bo'ladi, ya'ni
+ * `translateX(p%)` uchun tayin yetadi va ortiqcha yaqinlashtirish
+ * bo'lmaydi.
+ *
+ * CSS `transform` o'ngdan chapga qo'llanadi: avval `scale`, keyin
+ * `translateX`. Foiz esa elementning KATTALASHMAGAN o'lchamiga nisbatan
+ * hisoblanadi — shuning uchun siljish va bo'sh joy aynan mos tushadi.
+ *
+ * Fokus markazda (50) bo'lsa `none` qaytadi: mavjud avatarlar
+ * kattalashmaydi ham, qimirlamaydi ham.
+ */
+export function avatarPan(source: ImageFocus | null | undefined): string {
+  const p = ((DEFAULT_FOCUS - clampFocus(source?.focusX ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
+  if (Math.abs(p) < 0.01) return 'none';
+  return `translateX(${p.toFixed(2)}%) scale(${(1 + (2 * Math.abs(p)) / 100).toFixed(4)})`;
+}

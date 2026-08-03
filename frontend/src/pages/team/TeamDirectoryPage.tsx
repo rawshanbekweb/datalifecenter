@@ -7,7 +7,7 @@ import { TeamMember } from '../../types/team';
 import { departmentMeta, initials } from '../../components/team/departments';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Loading from '../../components/common/Loading';
-import { focusPosition } from '../../utils/imageFocus';
+import FocusImage from '../../components/common/FocusImage';
 
 type Status = 'loading' | 'ready' | 'error';
 
@@ -61,7 +61,7 @@ export default function TeamDirectoryPage(): React.ReactElement {
             return (
               <div key={mem.id} className="card" style={{ padding: 14, display: 'flex', alignItems: 'center', gap: 13, flexWrap: 'wrap' }}>
                 {mem.photoUrl ? (
-                  <img src={mem.photoUrl} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', objectPosition: focusPosition(mem), flexShrink: 0 }} />
+                  <FocusImage src={mem.photoUrl} alt="" size={40} radius="circle" focus={mem} />
                 ) : (
                   <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: meta.bg, border: `1.5px solid ${meta.border}`, flexShrink: 0, fontSize: 13, fontWeight: 800, color: meta.color }}>
                     {initials(mem.name)}

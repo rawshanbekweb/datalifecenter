@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Crosshair, RotateCcw } from 'lucide-react';
 import { clampFocus, DEFAULT_FOCUS, FOCUS_BASE_POSITION, focusPanX } from '../../utils/imageFocus';
+import FocusImage from './FocusImage';
 
 interface ImageFocusPickerProps {
   /** Rasm manzili — bo'sh bo'lsa komponent umuman ko'rinmaydi */
@@ -57,7 +58,6 @@ export default function ImageFocusPicker({ url, focusX, focusY, onChange }: Imag
   };
 
   const isDefault = focusX === DEFAULT_FOCUS && focusY === DEFAULT_FOCUS;
-  const position = `${focusX}% ${focusY}%`;
 
   return (
     <div style={{ marginTop: 8, padding: 12, borderRadius: 12, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
@@ -103,8 +103,11 @@ export default function ImageFocusPicker({ url, focusX, focusY, onChange }: Imag
 
         {/* Natija — saytdagi haqiqiy kadrlar bilan bir xil o'lchamda */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          {/* Saytdagi dumaloq avatarlar bilan bir xil komponent — natija
+              aynan shunday chiqadi */}
           <figure style={{ textAlign: 'center' }}>
-            <img src={url} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', objectPosition: position, border: '2px solid #e2e8f0', display: 'block' }} />
+            <FocusImage src={url} alt="" size={72} radius="circle" focus={{ focusX, focusY }}
+              style={{ border: '2px solid #e2e8f0' }} />
             <figcaption style={{ fontSize: 10.5, color: '#94a3b8', marginTop: 4 }}>{t('imageFocus.previewRound')}</figcaption>
           </figure>
           {/* Bosh sahifadagi yirik karta bilan AYNAN bir xil chiziladi

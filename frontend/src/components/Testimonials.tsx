@@ -6,7 +6,7 @@ import { listTestimonials } from '../api/testimonials';
 import LikeButton from './common/LikeButton';
 import { useEngagementItem } from '../hooks/useEngagementItem';
 import Loading from './common/Loading';
-import { focusPosition } from '../utils/imageFocus';
+import FocusImage from './common/FocusImage';
 
 interface Testimonial {
   id: string;
@@ -40,7 +40,7 @@ function TestimonialCard({ item, index }: { item: Testimonial; index: number }):
       <p style={{ fontSize:13.5, color:'#475569', lineHeight:1.8, marginBottom:20, flex:1 }}>{item.text}</p>
       <div style={{ display:'flex', alignItems:'center', gap:12 }}>
         {item.avatarUrl ? (
-          <img src={item.avatarUrl} alt={item.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', objectPosition: focusPosition(item), flexShrink:0 }} />
+          <FocusImage src={item.avatarUrl} alt={item.name} size={40} radius="circle" focus={item} />
         ) : (
           <div style={{ width:40, height:40, borderRadius:'50%', background:'#f0f9ff', border:'1.5px solid #bae6fd', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontWeight:800, color:'#0ea5e9', fontSize:15 }}>
             {item.name.charAt(0).toUpperCase()}

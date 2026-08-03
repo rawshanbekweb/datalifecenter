@@ -12,7 +12,7 @@ import Loading from '../components/common/Loading';
 import Seo from '../components/common/Seo';
 import JsonLd from '../components/common/JsonLd';
 import { SITE_URL } from '../api/config';
-import { focusPosition } from '../utils/imageFocus';
+import FocusImage from '../components/common/FocusImage';
 
 interface ApiError {
   status?: number;
@@ -92,8 +92,8 @@ export default function TeamMemberPage(): React.ReactElement {
         <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}
           className="card team-hero" style={{ padding: 32, background: theme.bg, border: `1.5px solid ${theme.border}`, display: 'flex', gap: 28, alignItems: 'center', marginBottom: 24 }}>
           {showPhoto ? (
-            <img src={member.photoUrl!} alt={member.name} onError={() => setPhotoFailed(true)}
-              style={{ width: 132, height: 132, borderRadius: 20, objectFit: 'cover', objectPosition: focusPosition(member), border: `2px solid ${theme.border}`, flexShrink: 0 }} />
+            <FocusImage src={member.photoUrl!} alt={member.name} size={132} radius={20} focus={member}
+              onError={() => setPhotoFailed(true)} style={{ border: `2px solid ${theme.border}` }} />
           ) : (
             <div style={{ width: 132, height: 132, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', border: `2px solid ${theme.border}`, fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 40, color: theme.color, flexShrink: 0 }}>
               {initials(member.name)}

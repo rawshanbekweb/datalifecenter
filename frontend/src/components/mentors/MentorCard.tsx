@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { GitBranch, Briefcase, Send } from 'lucide-react';
-import { focusPosition } from '../../utils/imageFocus';
+import FocusImage from '../common/FocusImage';
 
 interface MentorCourse {
   id: string | number;
@@ -68,9 +68,9 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
       style={{ padding:24, textAlign:'center', background:theme.bg, border:`1.5px solid ${theme.border}` }}>
 
       {showPhoto ? (
-        <img src={mentor.photoUrl!} alt={mentor.name}
+        <FocusImage src={mentor.photoUrl!} alt={mentor.name} size={72} radius="circle" focus={mentor}
           onError={() => setPhotoFailed(true)}
-          style={{ width:72, height:72, borderRadius:'50%', objectFit:'cover', objectPosition: focusPosition(mentor), margin:'0 auto 16px', border:`2px solid ${theme.border}` }} />
+          style={{ margin:'0 auto 16px', border:`2px solid ${theme.border}` }} />
       ) : (
         <div style={{ display:'flex', width:72, height:72, borderRadius:'50%', margin:'0 auto 16px', alignItems:'center', justifyContent:'center', background:'#fff', border:`2px solid ${theme.border}`, fontFamily:'var(--font-sans)', fontWeight:800, fontSize:22, color:theme.color }}>
           {initials(mentor.name)}

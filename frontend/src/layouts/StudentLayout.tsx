@@ -8,7 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
-import { focusPosition } from '../utils/imageFocus';
+import FocusImage from '../components/common/FocusImage';
 
 interface NavItem {
   labelKey: string;
@@ -127,8 +127,8 @@ export default function StudentLayout(): React.ReactElement {
               <p style={{ fontSize:11, color:'#94a3b8' }}>{user?.email}</p>
             </div>
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl as string} alt={user?.name}
-                style={{ width:36, height:36, borderRadius:'50%', objectFit:'cover', objectPosition: focusPosition(user as { focusX?: number; focusY?: number }), flexShrink:0 }} />
+              <FocusImage src={user.avatarUrl as string} alt={user?.name ?? ''} size={36} radius="circle"
+                focus={user as { focusX?: number; focusY?: number }} />
             ) : (
               <div style={{ width:36, height:36, borderRadius:'50%', background:'#0ea5e9', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, fontWeight:800, flexShrink:0 }}>
                 {(user?.name || 'T').charAt(0).toUpperCase()}
