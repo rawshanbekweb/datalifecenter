@@ -59,6 +59,16 @@ const record = (line: string) => {
   console.log(`  ${APPLY ? '✓' : '·'} ${line}`);
 };
 
+// Yoqtirish/ko'rish jadvallarida foreign key YO'Q (polimorf) — kontent o'chsa
+// ular o'z-o'zidan ketmaydi. Servislar buni `purgeEngagement()` bilan qiladi,
+// bu skript esa to'g'ridan-to'g'ri Prisma bilan o'chirgani uchun shu yerda takrorlanadi.
+async function purgeEngagement(contentType: 'BLOG_POST' | 'PROJECT' | 'TESTIMONIAL', contentId: string): Promise<void> {
+  await prisma.$transaction([
+    prisma.contentLike.deleteMany({ where: { contentType, contentId } }),
+    prisma.contentView.deleteMany({ where: { contentType, contentId } }),
+  ]);
+}
+
 const titleUz = (title: unknown): string =>
   typeof title === 'object' && title !== null ? String((title as Record<string, unknown>).uz ?? '') : String(title ?? '');
 
@@ -111,7 +121,10 @@ async function cleanDemoBlog(): Promise<void> {
   for (const post of posts) {
     if (!DEMO_BLOG_TITLES.includes(titleUz(post.title))) continue;
     record(`Blog o'chiriladi: "${titleUz(post.title)}" (views=${post.views}, slug=${post.slug})`);
-    if (APPLY) await prisma.blogPost.delete({ where: { id: post.id } });
+    if (APPLY) {
+      await purgeEngagement('BLOG_POST', post.id);
+      await prisma.blogPost.delete({ where: { id: post.id } });
+    }
   }
 }
 
@@ -129,14 +142,20 @@ async function cleanDemoRows(): Promise<void> {
   for (const p of projects) {
     if (!DEMO_PROJECT_TITLES.includes(titleUz(p.title))) continue;
     record(`Loyiha o'chiriladi: "${titleUz(p.title)}"`);
-    if (APPLY) await prisma.project.delete({ where: { id: p.id } });
+    if (APPLY) {
+      await purgeEngagement('PROJECT', p.id);
+      await prisma.project.delete({ where: { id: p.id } });
+    }
   }
 
   const testimonials = await prisma.testimonial.findMany({ select: { id: true, name: true } });
   for (const t of testimonials) {
     if (!DEMO_TESTIMONIAL_NAMES.includes(t.name)) continue;
     record(`Sharh o'chiriladi: "${t.name}"`);
-    if (APPLY) await prisma.testimonial.delete({ where: { id: t.id } });
+    if (APPLY) {
+      await purgeEngagement('TESTIMONIAL', t.id);
+      await prisma.testimonial.delete({ where: { id: t.id } });
+    }
   }
 }
 
