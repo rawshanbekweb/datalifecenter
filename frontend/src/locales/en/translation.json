@@ -139,16 +139,24 @@
   },
   "home": {
     "hero": {
+      "pill": "DATA LIFE IT Center",
       "tagline": "Build your IT future starting today",
-      "description": "Get professional education in modern programming, artificial intelligence and digital technologies. Build your career with real projects and experienced mentors.",
+      "description": "We build websites, software and startup solutions, and we teach IT tracks. Real projects, worked on with practising specialists.",
       "ctaPrimary": "Start learning",
       "ctaSecondary": "Contact us",
       "fallbackStats": {
         "graduates": "Graduates",
-        "courses": "Courses",
-        "experience": "Years of Experience",
+        "courses": "Tracks",
+        "specialists": "Specialists",
         "hours": "Working Hours"
       }
+    },
+    "moments": {
+      "badge": "A day at DATA LIFE",
+      "prev": "Previous photo",
+      "next": "Next photo",
+      "pause": "Pause",
+      "play": "Resume"
     },
     "about": {
       "pill": "About Us",
@@ -752,6 +760,7 @@
       "blog": "Blog",
       "partners": "Partners",
       "projects": "Projects",
+      "moments": "Day gallery",
       "messages": "Messages",
       "announcements": "Announcements",
       "siteSettings": "Site settings",
@@ -1005,6 +1014,19 @@
       "fLogo": "Logo *",
       "fWebsite": "Website",
       "confirmDelete": "Confirm deleting this partner?"
+    },
+    "moments": {
+      "title": "A day at DATA LIFE",
+      "sub": "The gallery at the top of the home page — photos of notable moments at the office",
+      "newBtn": "New photo",
+      "fImage": "Photo *",
+      "fCaption": "Short caption",
+      "fDate": "Date of the event",
+      "fOrder": "Order (lower comes first)",
+      "publishedCheck": "Show on the site",
+      "hidden": "Hidden",
+      "empty": "No photos yet. The first one you add will appear at the top of the home page.",
+      "confirmDelete": "Delete this photo?"
     },
     "projects": {
       "title": "Projects",

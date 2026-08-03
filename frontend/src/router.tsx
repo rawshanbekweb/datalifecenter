@@ -74,6 +74,7 @@ const AdminSiteSettingsPage = lazyWithRetry(() => import('./pages/admin/AdminSit
 const AdminTestimonialsPage = lazyWithRetry(() => import('./pages/admin/AdminTestimonialsPage'))
 const AdminCourseReviewsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseReviewsPage'))
 const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProjectsPage'))
+const AdminMomentsPage = lazyWithRetry(() => import('./pages/admin/AdminMomentsPage'))
 const AdminChatPage = lazyWithRetry(() => import('./pages/admin/AdminChatPage'))
 const AdminCourseRequestsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseRequestsPage'))
 
@@ -195,6 +196,7 @@ export function createAppRouter(basename: string) {
       { path: 'testimonials', element: s(<AdminTestimonialsPage />) },
       { path: 'course-reviews', element: s(<AdminCourseReviewsPage />) },
       { path: 'projects', element: s(<AdminProjectsPage />) },
+      { path: 'moments', element: s(<AdminMomentsPage />) },
     ],
   },
   ], { basename })

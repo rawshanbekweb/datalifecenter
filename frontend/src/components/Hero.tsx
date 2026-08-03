@@ -1,21 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Code2, Cpu, Globe, CheckCircle } from 'lucide-react';
-
-interface TerminalLine {
-  t: string;
-  c: string;
-}
-
-interface BadgeItem {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  bg: string;
-  border: string;
-  ic: string;
-}
+import { ArrowRight } from 'lucide-react';
+import MomentsStory from './home/MomentsStory';
+import { useMoments } from '../hooks/useMoments';
 
 interface ParticleNode {
   x: number;
@@ -34,12 +22,13 @@ interface HeroProps {
   settings?: { stats?: StatItem[] };
 }
 
-// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi
+// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi.
+// FAQAT tekshirilgan qiymatlar (About.tsx dagi izohga qarang).
 const DEFAULT_STATS: StatItem[] = [
-  { value: '2,000+', label: 'home.hero.fallbackStats.graduates' },
-  { value: '7+', label: 'home.hero.fallbackStats.courses' },
-  { value: '5+', label: 'home.hero.fallbackStats.experience' },
-  { value: '09:00–19:00', label: 'home.hero.fallbackStats.hours' },
+  { value: '3000+', label: 'home.hero.fallbackStats.graduates' },
+  { value: '7', label: 'home.hero.fallbackStats.courses' },
+  { value: '12', label: 'home.hero.fallbackStats.specialists' },
+  { value: '09:00–18:00', label: 'home.hero.fallbackStats.hours' },
 ];
 
 /* Animated particle canvas — light version */
@@ -80,48 +69,16 @@ function ParticleCanvas(): React.ReactElement {
   return <canvas ref={ref} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />;
 }
 
-/* Terminal widget — white version */
-const LINES: TerminalLine[] = [
-  { t: '> Initializing DATA LIFE...',       c: '#94a3b8' },
-  { t: '> Loading modules... ████ 100%',    c: '#0ea5e9' },
-  { t: '> Frontend: React & TS   ✓',        c: '#16a34a' },
-  { t: '> Backend:  Node.js & DB  ✓',       c: '#16a34a' },
-  { t: '> Security: Activated     ✓',       c: '#16a34a' },
-  { t: '> Welcome to DATA LIFE!',           c: '#0f172a' },
-];
-function Terminal(): React.ReactElement {
-  const [shown, setShown] = useState<TerminalLine[]>([]);
-  const [idx, setIdx] = useState<number>(0);
-  useEffect(() => {
-    if (idx >= LINES.length) return;
-    const t = setTimeout(() => { setShown((p: TerminalLine[]) => [...p, LINES[idx]]); setIdx((i: number) => i + 1); }, 420 + idx * 200);
-    return () => clearTimeout(t);
-  }, [idx]);
-  return (
-    <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: 16, padding: '18px 20px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
-        {(['#f87171','#fbbf24','#34d399'] as string[]).map((c: string) => <span key={c} style={{ width:10, height:10, borderRadius:'50%', background:c, display:'inline-block' }} />)}
-        <span style={{ marginLeft: 10, fontSize: 11, color: '#94a3b8', fontFamily:'var(--font-mono)' }}>datalife — terminal</span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-        {shown.map((l: TerminalLine, i: number) => (
-          <m.p key={i} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
-            style={{ fontFamily:'var(--font-mono)', fontSize: 12, color: l.c, lineHeight: 1.6 }}>{l.t}</m.p>
-        ))}
-        {idx < LINES.length && <span style={{ fontFamily:'var(--font-mono)', fontSize: 12, color: '#0ea5e9', animation: 'blink 1s infinite' }}>█</span>}
-      </div>
-    </div>
-  );
-}
-
-const BADGES: BadgeItem[] = [
-  { icon: Code2,    label: 'Frontend',   value: 'React & TypeScript', bg: '#f0f9ff', border: '#bae6fd', ic: '#0ea5e9' },
-  { icon: Cpu,      label: 'Backend',    value: 'Node.js & APIs',     bg: '#faf5ff', border: '#e9d5ff', ic: '#9333ea' },
-  { icon: Globe,    label: 'Deployment', value: 'Cloud & DevOps',     bg: '#f0fdf4', border: '#bbf7d0', ic: '#16a34a' },
-];
-
+/*
+ * O'ng ustunda ilgari yasama "terminal" animatsiyasi va uch dona statik
+ * texnologiya kartasi turardi — ular haqiqiy hech narsani ko'rsatmasdi va
+ * sahifaga sun'iy tus berardi. O'rniga ofisdagi haqiqiy voqealar galereyasi
+ * (MomentsStory) qo'yildi; surat bo'lmasa Hero bir ustunli bo'lib qoladi.
+ */
 export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
   const { t } = useTranslation();
+  const moments = useMoments();
+  const hasMoments = moments.length > 0;
   const stats = settings?.stats?.length
     ? settings.stats
     : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
@@ -135,14 +92,14 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
       <ParticleCanvas />
 
       <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', padding: '120px 24px 80px', width: '100%' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center' }} className="hero-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: hasMoments ? '1fr 1fr' : '1fr', gap: 72, alignItems: 'center', maxWidth: hasMoments ? undefined : 720, marginInline: hasMoments ? undefined : 'auto' }} className="hero-grid">
 
           {/* LEFT */}
           <div>
             <m.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}>
               <span className="pill">
                 <span style={{ width:6, height:6, borderRadius:'50%', background:'#0ea5e9', display:'inline-block', animation:'blink 1.5s infinite' }} />
-                Next-Gen IT Education Center
+                {t('home.hero.pill')}
               </span>
             </m.div>
 
@@ -180,27 +137,13 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
             </m.div>
           </div>
 
-          {/* RIGHT */}
-          <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}
-            style={{ display:'flex', flexDirection:'column', gap:14 }}>
-            <Terminal />
-            {BADGES.map((b: BadgeItem) => {
-              const Icon = b.icon;
-              return (
-                <m.div key={b.label} whileHover={{ x:4, scale:1.02 }}
-                  style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 18px', borderRadius:14, background:b.bg, border:`1.5px solid ${b.border}`, cursor:'default' }}>
-                  <div style={{ width:38, height:38, borderRadius:10, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' }}>
-                    <Icon size={18} style={{ color: b.ic }} />
-                  </div>
-                  <div>
-                    <p style={{ fontSize:11, color:'#94a3b8', marginBottom:1 }}>{b.label}</p>
-                    <p style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{b.value}</p>
-                  </div>
-                  <CheckCircle size={16} style={{ color:'#16a34a', marginLeft:'auto' }} />
-                </m.div>
-              );
-            })}
-          </m.div>
+          {/* RIGHT — ofisdagi voqealar galereyasi. Surat bo'lmasa umuman
+              chizilmaydi va chapdagi ustun markazga o'tadi. */}
+          {hasMoments && (
+            <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}>
+              <MomentsStory items={moments} />
+            </m.div>
+          )}
         </div>
       </div>
       <style>{`

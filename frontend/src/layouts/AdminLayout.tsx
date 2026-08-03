@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList, Camera,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -31,6 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'admin.nav.blog',           to: '/admin/blog',        icon: Newspaper },
   { labelKey: 'admin.nav.partners',       to: '/admin/partners',    icon: Handshake },
   { labelKey: 'admin.nav.projects',       to: '/admin/projects',    icon: LayoutGrid },
+  { labelKey: 'admin.nav.moments',        to: '/admin/moments',     icon: Camera },
   { labelKey: 'admin.nav.chat',           to: '/admin/chat',        icon: MessagesSquare, badge: true },
   { labelKey: 'admin.nav.courseRequests', to: '/admin/course-requests', icon: ClipboardList },
   { labelKey: 'admin.nav.messages',       to: '/admin/messages',    icon: Mail },

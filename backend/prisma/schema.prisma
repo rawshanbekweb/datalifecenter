@@ -527,6 +527,31 @@ model LessonProgress {
   @@unique([userId, lessonId])
 }
 
+// Bosh sahifadagi "DATA LIFE'da bir kun" galereyasi — ofisdagi e'tiborli
+// voqealar suratlari. Ko'rinishi Instagram "story" siga o'xshash: tepada
+// bo'lakli progress chizig'i, o'zi almashib turadi, chapga/o'ngga suriladi.
+//
+// Nega alohida model: `Project` (portfolio) va `Partner` dan mutlaqo boshqa
+// maqsad — bu yerda sana va qisqa izoh muhim, havola/tex-stack esa kerak emas.
+model Moment {
+  id         String   @id @default(cuid())
+  imageUrl   String
+  // Rasm kadrga kesilganda markazda qoladigan nuqta — User.focusX izohiga qarang
+  focusX     Int      @default(50)
+  focusY     Int      @default(50)
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title      Json
+  caption    Json?
+  // Voqea sanasi (rasm yuklangan kun emas) — kartada ko'rsatiladi
+  happenedAt DateTime?
+  order      Int      @default(0)
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([published, order])
+}
+
 model Partner {
   id         String   @id @default(cuid())
   name       String

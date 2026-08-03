@@ -139,16 +139,24 @@
   },
   "home": {
     "hero": {
+      "pill": "DATA LIFE IT Center",
       "tagline": "IT keleshegin búginnen jaratıń",
-      "description": "Zamanagóy programmalastırıw, jasalma intellekt hám sanlı texnologiyalar boyınsha professional tálim alıń. Real joybarlar hám tájiriybeli mentorlar menen karera qurıń.",
+      "description": "Sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵamız hám IT baǵdarları boyınsha oqıtamız. Ámeliyatshı qániygeler menen real joybarlarda islewmiz.",
       "ctaPrimary": "Oqıwdı baslaw",
       "ctaSecondary": "Baylanısıw",
       "fallbackStats": {
         "graduates": "Pitkeriwshiler",
-        "courses": "Kurslar",
-        "experience": "Jıllıq tájiriybe",
+        "courses": "Baǵdarlar",
+        "specialists": "Qániygeler",
         "hours": "Jumıs waqtı"
       }
+    },
+    "moments": {
+      "badge": "DATA LIFE'de bir kún",
+      "prev": "Aldınǵı súwret",
+      "next": "Keyingi súwret",
+      "pause": "Toqtatıw",
+      "play": "Dawam etiw"
     },
     "about": {
       "pill": "Biz haqqımızda",
@@ -752,6 +760,7 @@
       "blog": "Blog",
       "partners": "Sheriklar",
       "projects": "Joybarlar",
+      "moments": "Bir kún galereyası",
       "messages": "Xabarlar",
       "announcements": "Daǵazalar",
       "siteSettings": "Sayt sazlawları",
@@ -1005,6 +1014,19 @@
       "fLogo": "Logotip *",
       "fWebsite": "Veb-sayt",
       "confirmDelete": "Sherikti óshiriwdi tastıyıqlaysızba?"
+    },
+    "moments": {
+      "title": "DATA LIFE'de bir kún",
+      "sub": "Bas bettiń joqarısındaǵı galereya — ofistegi itibarlı waqıyalar súwretleri",
+      "newBtn": "Jańa súwret",
+      "fImage": "Súwret *",
+      "fCaption": "Qısqa túsinik",
+      "fDate": "Waqıya sánesi",
+      "fOrder": "Tártip (kishisi aldında)",
+      "publishedCheck": "Saytta kórsetilsin",
+      "hidden": "Jasırın",
+      "empty": "Ele súwret qosılmaǵan. Birinshi súwret qosılsa, ol bas bettiń joqarısında kórinedi.",
+      "confirmDelete": "Súwretti óshiriwdi tastıyıqlaysız ba?"
     },
     "projects": {
       "title": "Joybarlar",

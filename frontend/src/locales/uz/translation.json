@@ -139,16 +139,24 @@
   },
   "home": {
     "hero": {
+      "pill": "DATA LIFE IT Center",
       "tagline": "IT kelajagini bugundan yarating",
       "description": "Sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz hamda IT yo'nalishlari bo'yicha o'qitamiz. Amaliyotchi mutaxassislar bilan real loyihalarda ishlaymiz.",
       "ctaPrimary": "O'qishni boshlash",
       "ctaSecondary": "Bog'lanish",
       "fallbackStats": {
         "graduates": "Bitiruvchilar",
-        "courses": "Kurslar",
-        "experience": "Yillik Tajriba",
+        "courses": "Yo'nalishlar",
+        "specialists": "Mutaxassislar",
         "hours": "Ish Vaqti"
       }
+    },
+    "moments": {
+      "badge": "DATA LIFE'da bir kun",
+      "prev": "Oldingi surat",
+      "next": "Keyingi surat",
+      "pause": "To'xtatish",
+      "play": "Davom ettirish"
     },
     "about": {
       "pill": "Biz Haqimizda",
@@ -752,6 +760,7 @@
       "blog": "Blog",
       "partners": "Hamkorlar",
       "projects": "Loyihalar",
+      "moments": "Bir kun galereyasi",
       "messages": "Xabarlar",
       "announcements": "E'lonlar",
       "siteSettings": "Sayt sozlamalari",
@@ -1005,6 +1014,19 @@
       "fLogo": "Logotip *",
       "fWebsite": "Veb-sayt",
       "confirmDelete": "Hamkorni o'chirishni tasdiqlaysizmi?"
+    },
+    "moments": {
+      "title": "DATA LIFE'da bir kun",
+      "sub": "Bosh sahifaning yuqorisidagi galereya — ofisdagi e'tiborli voqealar suratlari",
+      "newBtn": "Yangi surat",
+      "fImage": "Surat *",
+      "fCaption": "Qisqa izoh",
+      "fDate": "Voqea sanasi",
+      "fOrder": "Tartib (kichigi oldinda)",
+      "publishedCheck": "Saytda ko'rsatilsin",
+      "hidden": "Yashirin",
+      "empty": "Hali surat qo'shilmagan. Birinchi suratni qo'shsangiz, u bosh sahifaning yuqorisida ko'rinadi.",
+      "confirmDelete": "Suratni o'chirishni tasdiqlaysizmi?"
     },
     "projects": {
       "title": "Loyihalar",
