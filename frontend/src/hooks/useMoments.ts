@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listMoments } from '../api/moments';
-import { MomentItem } from '../components/home/MomentsStory';
+import { MomentItem } from '../components/home/MomentsGallery';
 
 /**
  * Bosh sahifadagi "DATA LIFE'da bir kun" galereyasi uchun suratlar.

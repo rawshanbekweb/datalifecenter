@@ -211,6 +211,35 @@ button, input, select, textarea, optgroup {
 @media (max-width: 1024px) { .person-big-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .person-big-grid { grid-template-columns: 1fr; } }
 
+/* ── "Bir kun" rasm lentasi (components/home/MomentsGallery.tsx) ──
+   Uzluksiz oqim. Masofa (`--dl-flow-x`) va davomiylik (`--dl-flow-dur`)
+   komponentda o'lchanadi: lenta AYNAN bitta to'plam kengligiga siljiydi,
+   shunda ikkinchi nusxa birinchisining o'rniga tushib, ulanish joyi
+   ko'rinmaydi. Tezlik surat soniga bog'liq emas.
+
+   Chetlarda yumshoq so'nish — suratlar kesilgandek emas, oqib kirayotgandek
+   ko'rinadi. */
+@keyframes dl-flow {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--dl-flow-x)); }
+}
+
+.dl-flow-wrap {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+}
+
+.dl-flow { animation: dl-flow var(--dl-flow-dur, 40s) linear infinite; will-change: transform; }
+
+/* Sichqoncha ustida to'xtaydi — suratni ko'zdan kechirish uchun */
+.dl-flow-wrap:hover .dl-flow { animation-play-state: paused; }
+
+/* Harakat kamaytirilgan bo'lsa oqim yo'q — lenta qo'lda suriladi */
+@media (prefers-reduced-motion: reduce) {
+  .dl-flow { animation: none; }
+  .dl-flow-wrap { overflow-x: auto; }
+}
+
 /* ── Yuklanish indikatori (components/common/Loading.tsx) ──
    Uslub ATAYIN global: bu komponent 40+ joyda ishlatiladi va har biri o'z
    <style> blogini chiqarsa hujjatda o'nlab bir xil qoida paydo bo'lardi.

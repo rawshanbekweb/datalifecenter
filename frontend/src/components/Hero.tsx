@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
-import MomentsStory from './home/MomentsStory';
+import MomentsGallery from './home/MomentsGallery';
 import { useMoments } from '../hooks/useMoments';
 
 interface ParticleNode {
@@ -136,11 +136,13 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
             </m.div>
           </div>
 
-          {/* RIGHT — ofisdagi voqealar galereyasi. Surat hali qo'shilmagan
-              bo'lsa MomentsStory kadr "izi"ni chizadi, ya'ni bu yer hech
-              qachon bo'sh qolmaydi. */}
+          {/* RIGHT — ofisdagi voqealar lentasi. Surat hali qo'shilmagan
+              bo'lsa shablon chiziladi, ya'ni bu yer hech qachon bo'sh
+              qolmaydi. Lenta ustundan kengroq oqadi: `overflow: visible`
+              bilan u o'ng chetdan tashqariga chiqib, sahifa qirg'og'igacha
+              davom etayotgandek ko'rinadi. */}
           <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}>
-            <MomentsStory items={moments} />
+            <MomentsGallery items={moments} />
           </m.div>
         </div>
       </div>
