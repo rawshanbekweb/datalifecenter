@@ -5,9 +5,13 @@ import { MomentItem } from '../components/home/MomentsStory';
 /**
  * Bosh sahifadagi "DATA LIFE'da bir kun" galereyasi uchun suratlar.
  *
- * Xato bo'lsa bo'sh ro'yxat qaytaradi — Hero shunda galereyani umuman
- * ko'rsatmaydi va bir ustunli ko'rinishga o'tadi, ya'ni sayt buzuq
- * ko'rinmaydi.
+ * DIQQAT: `apiFetch` javobning `data` maydonini OCHIB qaytaradi, ya'ni bu
+ * yerga massivning o'zi keladi — `{ data: [...] }` emas. Ilgari shu yerda
+ * `res.data` qidirilgani uchun ro'yxat har doim bo'sh qolib, saytda surat
+ * yuklangan bo'lsa ham galereya "bo'sh" ko'rinardi.
+ *
+ * Xato bo'lsa bo'sh ro'yxat qaytadi — MomentsStory shunda kadr "izi"ni
+ * chizadi, ya'ni sayt buzuq ko'rinmaydi.
  */
 export function useMoments(): MomentItem[] {
   const [items, setItems] = useState<MomentItem[]>([]);
@@ -15,7 +19,7 @@ export function useMoments(): MomentItem[] {
   useEffect(() => {
     let cancelled = false;
     listMoments()
-      .then((res) => { if (!cancelled) setItems(Array.isArray(res?.data) ? res.data : []); })
+      .then((res) => { if (!cancelled) setItems(Array.isArray(res) ? (res as MomentItem[]) : []); })
       .catch(() => { if (!cancelled) setItems([]); });
     return () => { cancelled = true; };
   }, []);
