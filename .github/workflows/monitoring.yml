@@ -6,6 +6,13 @@
 # logotipi begona CDN'dan bloklangani — bularning hech biri /api/health'da
 # ko'rinmaydi va oylar davomida sezilmasligi mumkin (aynan shunday bo'lgan).
 #
+# IKKI DARAJA (2026-08-03 da ajratildi): skript kritik nosozlikni (API/baza/sayt
+# yiqilgan) kontent nuqsonidan (bitta buzuq rasm) farqlaydi. Sabab: bitta
+# hamkor logotipi Instagram'dan bloklangani uchun monitoring kunlar davomida
+# har 30 daqiqada qizil turgan edi — bunday doimiy qizil holatda haqiqiy
+# nosozlik ko'zga tashlanmay qoladi. Endi kontent nuqsoni workflow'ni
+# yiqitmaydi: u job summary'da ko'rinadi va kuniga bir marta xabar qilinadi.
+#
 # OGOHLANTIRISH: workflow yiqilsa GitHub repo egasiga email yuboradi. Telegram
 # xabari uchun repo Settings → Secrets and variables → Actions'da ikkita secret
 # qo'shilishi kerak: TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID. Ular bo'lmasa
@@ -17,12 +24,19 @@ on:
     # Har 30 daqiqada. GitHub cron'i kafolatlangan emas — band paytda kechikadi,
     # bu monitoring uchun muammo emas (nosozlik bir necha daqiqa kechroq bilinadi).
     - cron: '*/30 * * * *'
+    # Kunlik kontent hisoboti (09:10 UTC ≈ 14:10 Toshkent) — buzuq rasm kabi
+    # nuqsonlar aynan shu ishga tushishda Telegram'ga yuboriladi, qolgan
+    # paytlarda faqat job summary'da qoladi.
+    - cron: '10 9 * * *'
   workflow_dispatch:
 
 # Bir vaqtda bitta tekshiruv — kechikkan cron'lar bir-birining ustiga chiqmasin
 concurrency:
   group: monitoring
   cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   check:
@@ -41,16 +55,27 @@ jobs:
 
       - name: Sog'liq tekshiruvi
         id: monitor
+        # Kritik nosozlikda skript 1 bilan chiqadi, lekin job'ni shu yerda
+        # to'xtatmaymiz — avval ogohlantirish yuborilishi kerak. Yiqilish eng
+        # oxirgi qadamda ataylab qayta tiklanadi.
+        continue-on-error: true
         run: node scripts/monitor.mjs
         env:
           API_URL: https://datalife.onrender.com
           SITE_URL: https://datalife.uz
 
       - name: Telegram'ga ogohlantirish
-        # Faqat tekshiruv yiqilganda va token sozlangan bo'lsa
-        if: failure() && env.TELEGRAM_BOT_TOKEN != ''
+        # Kritik nosozlikda — har safar; kontent nuqsonida — faqat kunlik
+        # hisobotda yoki qo'lda ishga tushirilganda.
+        if: >-
+          env.TELEGRAM_BOT_TOKEN != ''
+          && (steps.monitor.outputs.status == 'fail'
+              || (steps.monitor.outputs.status == 'warn'
+                  && (github.event.schedule == '10 9 * * *' || github.event_name == 'workflow_dispatch')))
         env:
+          STATUS: ${{ steps.monitor.outputs.status }}
           PROBLEMS: ${{ steps.monitor.outputs.problems }}
+          WARNINGS: ${{ steps.monitor.outputs.warnings }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         # Xabar Node orqali JSON bilan yuboriladi: qobiq orqali (curl
         # --data-urlencode) yuborilganda matn qobiqning kodlashiga bog'liq
@@ -58,18 +83,34 @@ jobs:
         # UTF-8" xatosini berishi mumkin — bu lokal sinovda aynan shunday bo'ldi.
         run: |
           node -e "
-            const text = 'DATA LIFE — saytda muammo aniqlandi\n\n'
-              + (process.env.PROBLEMS || 'Tafsilotlar log da')
-              + '\n\nBatafsil: ' + process.env.RUN_URL;
+            const critical = process.env.STATUS === 'fail';
+            const parts = [
+              critical
+                ? 'DATA LIFE — SAYTDA NOSOZLIK'
+                : 'DATA LIFE — kontent tuzatilishi kerak (kunlik hisobot)',
+            ];
+            const problems = (process.env.PROBLEMS || '').trim();
+            const warnings = (process.env.WARNINGS || '').trim();
+            if (problems) parts.push('', 'Nosozlik:', problems);
+            if (warnings) parts.push('', 'Ogohlantirish:', warnings);
+            parts.push('', 'Batafsil: ' + process.env.RUN_URL);
             fetch('https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json; charset=utf-8' },
               body: JSON.stringify({
                 chat_id: process.env.TELEGRAM_CHAT_ID,
-                text,
+                text: parts.join('\n'),
                 disable_web_page_preview: true,
               }),
             })
               .then((r) => r.json())
               .then((j) => console.log(j.ok ? 'Telegram: yuborildi' : 'Telegram XATO: ' + JSON.stringify(j)));
           "
+
+      - name: Nosozlik bo'lsa workflow yiqilsin
+        # Faqat kritik holat. Kontent ogohlantirishi run'ni yashil qoldiradi —
+        # tafsilotlar job summary'da.
+        if: steps.monitor.outputs.status == 'fail'
+        run: |
+          echo "Kritik nosozlik aniqlandi — yuqoridagi 'Sog'liq tekshiruvi' logiga qarang"
+          exit 1

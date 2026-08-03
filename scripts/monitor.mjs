@@ -21,10 +21,19 @@ const SITE = (process.env.SITE_URL || 'https://datalife.uz').replace(/\/$/, '');
 // deb hisoblab, soxta ogohlantirish yuborardik.
 const TIMEOUT_MS = 90_000;
 
+// IKKI DARAJA. Ilgari hammasi bitta ro'yxat edi va bitta buzuq hamkor logotipi
+// ham butun workflow'ni yiqitardi — monitoring kunlar davomida uzluksiz qizil
+// turgani uchun haqiqiy nosozlik (baza yiqilishi) shu shovqin ichida ko'zga
+// tashlanmay qolardi. Endi:
+//   problems — sayt ishlamayapti: darhol yiqilish + ogohlantirish
+//   warnings — sayt ishlayapti, lekin kontentda nuqson (buzuq rasm): yiqilmaydi,
+//              hisobotda ko'rinadi va kuniga bir marta xabar qilinadi
 const problems = [];
+const warnings = [];
 const notes = [];
 
 const fail = (area, detail) => problems.push(`${area}: ${detail}`);
+const warn = (area, detail) => warnings.push(`${area}: ${detail}`);
 
 async function get(url, init = {}) {
   const started = Date.now();
@@ -139,18 +148,59 @@ async function checkImages(items) {
   if (urls.length === 0) return;
 
   let checked = 0;
+  const broken = [];
   for (const { url, label } of urls) {
     // Nisbiy yo'l frontendning o'z fayli (repo ichida keladi) — tekshirishga arzimaydi
     if (!/^https?:\/\//i.test(url)) continue;
     checked += 1;
     const { res, error } = await get(url, { method: 'HEAD' });
     if (error) {
-      fail('Rasm', `${label}: ${error}`);
+      broken.push(`${label}: ${error}`);
     } else if (!res.ok) {
-      fail('Rasm', `${label}: HTTP ${res.status} — ${url.slice(0, 70)}`);
+      broken.push(`${label}: HTTP ${res.status} — ${url.slice(0, 70)}`);
     }
   }
-  notes.push(`${checked} ta rasm tekshirildi`);
+  notes.push(`${checked} ta rasm tekshirildi${broken.length ? `, ${broken.length} tasi buzuq` : ''}`);
+
+  // Bitta-yarimta buzuq rasm — kontent nuqsoni (karta zaxira ko'rinishga tushadi,
+  // sayt ishlayveradi). Lekin ko'pchiligi birdan yiqilsa bu boshqa narsa: fayl
+  // xotirasi yoki CDN butunlay ishdan chiqqan — bunisi kritik.
+  const massFailure = checked >= 3 && broken.length > checked / 2;
+  for (const detail of broken) {
+    if (massFailure) fail('Rasm', detail);
+    else warn('Rasm', detail);
+  }
+  if (massFailure) {
+    fail('Fayl xotirasi', `${checked} ta rasmdan ${broken.length} tasi ochilmadi — ommaviy nosozlikka o'xshaydi`);
+  }
+}
+
+const bullets = (list) => list.map((p) => `• ${p}`).join('\n');
+
+// Workflow qadamlari shu qiymatlarni o'qiydi (ogohlantirish yuborish shartlari)
+async function writeOutputs() {
+  const { appendFileSync } = await import('node:fs');
+  const status = problems.length ? 'fail' : warnings.length ? 'warn' : 'ok';
+
+  if (process.env.GITHUB_OUTPUT) {
+    // Bo'sh ro'yxat uchun heredoc umuman yozilmaydi — aks holda qiymat bitta
+    // bo'sh qatordan iborat bo'lib qolardi va workflow uni "bor" deb hisoblab
+    // xabarga bo'sh "Nosozlik:" sarlavhasini qo'shib yuborardi.
+    let out = `status=${status}\n`;
+    if (problems.length) out += `problems<<EOF\n${bullets(problems)}\nEOF\n`;
+    if (warnings.length) out += `warnings<<EOF\n${bullets(warnings)}\nEOF\n`;
+    appendFileSync(process.env.GITHUB_OUTPUT, out);
+  }
+
+  // Actions sahifasida ko'rinadigan hisobot — ogohlantirishlar workflow'ni
+  // yiqitmagani uchun ular faqat log ichida qolib ketmasligi kerak
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    const lines = [`## Monitoring — ${status === 'ok' ? '✅ hammasi joyida' : status === 'warn' ? '⚠️ kontentda nuqson' : '❌ nosozlik'}`, ''];
+    for (const note of notes) lines.push(`- ${note}`);
+    if (problems.length) lines.push('', `### ❌ Nosozlik (${problems.length} ta)`, ...problems.map((p) => `- ${p}`));
+    if (warnings.length) lines.push('', `### ⚠️ Kontent ogohlantirishi (${warnings.length} ta)`, ...warnings.map((p) => `- ${p}`));
+    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+  }
 }
 
 async function main() {
@@ -165,23 +215,21 @@ async function main() {
 
   for (const note of notes) console.log(`  ${note}`);
 
-  if (problems.length === 0) {
+  if (warnings.length) {
+    console.log(`\nOGOHLANTIRISH (${warnings.length} ta) — sayt ishlayapti, kontent tuzatilishi kerak:`);
+    for (const w of warnings) console.log(`  ⚠ ${w}`);
+  }
+
+  if (problems.length) {
+    console.log(`\nMUAMMO (${problems.length} ta):`);
+    for (const p of problems) console.log(`  ✗ ${p}`);
+    // Faqat kritik nosozlikda yiqilamiz — ogohlantirish workflow'ni qizartirmaydi
+    process.exitCode = 1;
+  } else if (warnings.length === 0) {
     console.log('\nHammasi joyida.');
-    return;
   }
 
-  console.log(`\nMUAMMO (${problems.length} ta):`);
-  for (const p of problems) console.log(`  ✗ ${p}`);
-
-  // Workflow shu kod bo'yicha yiqiladi va ogohlantirish yuboradi
-  process.exitCode = 1;
-
-  // Telegram uchun qisqa matn (workflow shu faylni o'qiydi)
-  if (process.env.GITHUB_OUTPUT) {
-    const { appendFileSync } = await import('node:fs');
-    const summary = problems.map((p) => `• ${p}`).join('\n');
-    appendFileSync(process.env.GITHUB_OUTPUT, `problems<<EOF\n${summary}\nEOF\n`);
-  }
+  await writeOutputs();
 }
 
 main().catch((err) => {
