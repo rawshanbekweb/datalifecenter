@@ -153,6 +153,8 @@
     },
     "moments": {
       "badge": "DATA LIFE'de bir kún",
+      "emptyTitle": "Tez arada usı jerde",
+      "emptyText": "Ofisimizdegi kúnler, sabaqlar hám itibarlı waqıyalar súwretleri jaylastırıladı.",
       "prev": "Aldınǵı súwret",
       "next": "Keyingi súwret",
       "pause": "Toqtatıw",

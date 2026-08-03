@@ -153,6 +153,8 @@
     },
     "moments": {
       "badge": "DATA LIFE'da bir kun",
+      "emptyTitle": "Tez orada shu yerda",
+      "emptyText": "Ofisimizdagi kunlar, darslar va e'tiborli voqealar suratlari joylanadi.",
       "prev": "Oldingi surat",
       "next": "Keyingi surat",
       "pause": "To'xtatish",

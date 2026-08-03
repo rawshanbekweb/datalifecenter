@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Camera, Pause, Play } from 'lucide-react';
+import { Camera, ImagePlus, Pause, Play } from 'lucide-react';
 import { focusPosition, ImageFocus } from '../../utils/imageFocus';
 
 /**
@@ -36,6 +36,78 @@ const TICK_MS = 50;
 // Barmoq shu masofadan ko'p sursa — slayd almashadi, kamida — bosish deb qaraladi
 const SWIPE_PX = 40;
 
+// Kadrning umumiy o'lchamlari — to'ldirilgan holat bilan bo'sh "iz" holati
+// AYNAN bir xil bo'lishi uchun bitta joyda saqlanadi
+const FRAME: React.CSSProperties = {
+  position: 'relative', aspectRatio: '4 / 5', borderRadius: 20, overflow: 'hidden',
+  boxShadow: '0 12px 40px rgba(15,23,42,0.16)', border: '1px solid rgba(255,255,255,0.6)',
+};
+
+const BADGE: React.CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999,
+  background: 'rgba(15,23,42,0.42)', backdropFilter: 'blur(6px)',
+  color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.01em',
+};
+
+/**
+ * Surat hali qo'shilmagandagi "iz" — bo'sh joy qoldirmaydi, kelajakdagi
+ * kadrning konturini ko'rsatadi.
+ *
+ * ATAYIN soxta kontent EMAS: hech qanday yasama surat yoki to'qima matn yo'q,
+ * faqat kadr ramkasi, belgi va bir qatorlik izoh. Shu bilan birga bu birinchi
+ * so'rov kelguncha ko'rinadigan yuklanish holati ham bo'lib xizmat qiladi.
+ */
+function EmptyFrame(): React.ReactElement {
+  const { t } = useTranslation();
+  return (
+    <div style={{ ...FRAME, background: 'linear-gradient(160deg,#0f172a 0%,#1e293b 55%,#0c4a6e 100%)' }}>
+      {/* Data/kod uslubidagi to'r — Loader.tsx dagi motiv bilan bir xil */}
+      <span aria-hidden="true" style={{
+        position: 'absolute', inset: 0, opacity: 0.28,
+        backgroundImage: 'linear-gradient(rgba(148,163,184,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.25) 1px, transparent 1px)',
+        backgroundSize: '34px 34px',
+        maskImage: 'radial-gradient(circle at 50% 45%, #000 35%, transparent 78%)',
+        WebkitMaskImage: 'radial-gradient(circle at 50% 45%, #000 35%, transparent 78%)',
+      }} />
+
+      {/* Bo'sh progress bo'lagi — to'ldirilgan holatdagi bilan bir xil joyda */}
+      <div style={{ position: 'absolute', top: 12, left: 12, right: 12, display: 'flex', gap: 4 }}>
+        <span style={{ flex: 1, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.18)' }} />
+      </div>
+
+      <div style={{ position: 'absolute', top: 28, left: 14, right: 14 }}>
+        <span style={BADGE}><Camera size={12} /> {t('home.moments.badge')}</span>
+      </div>
+
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 14, padding: 28, textAlign: 'center',
+      }}>
+        <m.span
+          initial={{ opacity: 0.55, scale: 0.97 }}
+          animate={{ opacity: [0.55, 0.9, 0.55], scale: [0.97, 1, 0.97] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            width: 78, height: 78, borderRadius: 22, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '1.5px dashed rgba(125,211,252,0.55)', background: 'rgba(14,165,233,0.10)',
+          }}
+        >
+          <ImagePlus size={30} style={{ color: '#7dd3fc' }} />
+        </m.span>
+
+        <div>
+          <p style={{ fontSize: 15, fontWeight: 800, color: '#e2e8f0', lineHeight: 1.35 }}>
+            {t('home.moments.emptyTitle')}
+          </p>
+          <p style={{ fontSize: 12.5, color: '#94a3b8', lineHeight: 1.65, marginTop: 6, maxWidth: 260 }}>
+            {t('home.moments.emptyText')}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function formatDay(value: string | null | undefined, locale: string): string | null {
   if (!value) return null;
   const d = new Date(value);
@@ -43,7 +115,7 @@ function formatDay(value: string | null | undefined, locale: string): string | n
   return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-export default function MomentsStory({ items }: MomentsStoryProps): React.ReactElement | null {
+export default function MomentsStory({ items }: MomentsStoryProps): React.ReactElement {
   const { t, i18n } = useTranslation();
   const [index, setIndex] = useState<number>(0);
   const [elapsed, setElapsed] = useState<number>(0);
@@ -77,7 +149,14 @@ export default function MomentsStory({ items }: MomentsStoryProps): React.ReactE
     return () => clearInterval(id);
   }, [paused, reduceMotion, count]);
 
-  if (count === 0) return null;
+  // Surat yo'q (yoki hali yuklanmadi) — bo'sh joy emas, kadr "izi" turadi
+  if (count === 0) {
+    return (
+      <div style={{ position: 'relative', width: '100%', maxWidth: 420, marginInline: 'auto' }}>
+        <EmptyFrame />
+      </div>
+    );
+  }
 
   const current = items[index];
   const day = formatDay(current.happenedAt, i18n.language);
@@ -89,12 +168,7 @@ export default function MomentsStory({ items }: MomentsStoryProps): React.ReactE
       onMouseLeave={() => setPaused(false)}
     >
       <div
-        style={{
-          position: 'relative', aspectRatio: '4 / 5', borderRadius: 20, overflow: 'hidden',
-          background: 'linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%)',
-          boxShadow: '0 12px 40px rgba(15,23,42,0.16)', border: '1px solid rgba(255,255,255,0.6)',
-          touchAction: 'pan-y',
-        }}
+        style={{ ...FRAME, background: 'linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%)', touchAction: 'pan-y' }}
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           const start = touchStartX.current;
@@ -141,13 +215,7 @@ export default function MomentsStory({ items }: MomentsStoryProps): React.ReactE
 
         {/* Sarlavha qatori */}
         <div style={{ position: 'absolute', top: 28, left: 14, right: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', borderRadius: 999,
-            background: 'rgba(15,23,42,0.42)', backdropFilter: 'blur(6px)',
-            color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.01em',
-          }}>
-            <Camera size={12} /> {t('home.moments.badge')}
-          </span>
+          <span style={BADGE}><Camera size={12} /> {t('home.moments.badge')}</span>
 
           {count > 1 && (
             <button

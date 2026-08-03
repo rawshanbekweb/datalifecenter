@@ -153,6 +153,8 @@
     },
     "moments": {
       "badge": "A day at DATA LIFE",
+      "emptyTitle": "Coming here soon",
+      "emptyText": "Photos of our days at the office, classes and notable moments will appear here.",
       "prev": "Previous photo",
       "next": "Next photo",
       "pause": "Pause",

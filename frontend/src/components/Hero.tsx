@@ -78,7 +78,6 @@ function ParticleCanvas(): React.ReactElement {
 export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
   const { t } = useTranslation();
   const moments = useMoments();
-  const hasMoments = moments.length > 0;
   const stats = settings?.stats?.length
     ? settings.stats
     : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
@@ -92,7 +91,7 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
       <ParticleCanvas />
 
       <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', padding: '120px 24px 80px', width: '100%' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: hasMoments ? '1fr 1fr' : '1fr', gap: 72, alignItems: 'center', maxWidth: hasMoments ? undefined : 720, marginInline: hasMoments ? undefined : 'auto' }} className="hero-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center' }} className="hero-grid">
 
           {/* LEFT */}
           <div>
@@ -137,13 +136,12 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
             </m.div>
           </div>
 
-          {/* RIGHT — ofisdagi voqealar galereyasi. Surat bo'lmasa umuman
-              chizilmaydi va chapdagi ustun markazga o'tadi. */}
-          {hasMoments && (
-            <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}>
-              <MomentsStory items={moments} />
-            </m.div>
-          )}
+          {/* RIGHT — ofisdagi voqealar galereyasi. Surat hali qo'shilmagan
+              bo'lsa MomentsStory kadr "izi"ni chizadi, ya'ni bu yer hech
+              qachon bo'sh qolmaydi. */}
+          <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}>
+            <MomentsStory items={moments} />
+          </m.div>
         </div>
       </div>
       <style>{`
