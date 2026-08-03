@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap, Users } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
+import { useHasTeam } from '../hooks/useHasTeam';
 import NotificationBell from './common/NotificationBell';
 import LanguageSwitcher from './common/LanguageSwitcher';
 import React from 'react';
@@ -13,6 +14,9 @@ interface NavItem {
   labelKey: string;
   to: string;
   end?: boolean;
+  // Jamoa jadvali bo'sh bo'lsa havola umuman ko'rsatilmaydi — mehmon bosib
+  // bo'sh sahifaga tushmasin (`useHasTeam`)
+  requiresTeam?: boolean;
 }
 
 const NAV: NavItem[] = [
@@ -20,7 +24,7 @@ const NAV: NavItem[] = [
   { labelKey: 'nav.about', to: '/about' },
   { labelKey: 'nav.courses', to: '/courses' },
   { labelKey: 'nav.mentors', to: '/mentors' },
-  { labelKey: 'nav.team', to: '/team' },
+  { labelKey: 'nav.team', to: '/team', requiresTeam: true },
   { labelKey: 'nav.partners', to: '/partners' },
   { labelKey: 'nav.blog', to: '/blog' },
   { labelKey: 'nav.contact', to: '/contact' },
@@ -35,6 +39,8 @@ export default function Navbar(): React.ReactElement {
   const [open, setOpen]         = useState<boolean>(false);
   const { user, logout }        = useAuth();
   const navigate = useNavigate();
+  const hasTeam = useHasTeam();
+  const navItems = useMemo(() => NAV.filter((n) => !n.requiresTeam || hasTeam), [hasTeam]);
 
   const handleLogout = async (): Promise<void> => {
     await logout();
@@ -83,7 +89,7 @@ export default function Navbar(): React.ReactElement {
 
           {/* Desktop nav */}
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }} className="nav-desktop">
-            {NAV.map((n: NavItem) => (
+            {navItems.map((n: NavItem) => (
               <NavLink key={n.labelKey} to={n.to} end={n.end} style={linkStyle}>
                 {t(n.labelKey)}
               </NavLink>
@@ -140,10 +146,10 @@ export default function Navbar(): React.ReactElement {
         {open && (
           <m.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             style={{ position: 'fixed', top: 70, left: 12, right: 12, zIndex: 99, background: '#fff', borderRadius: 20, padding: '16px 20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
-            {NAV.map((n: NavItem, i: number) => (
+            {navItems.map((n: NavItem, i: number) => (
               <MotionNavLink key={n.labelKey} to={n.to} end={n.end} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 onClick={() => setOpen(false)}
-                style={{ display: 'block', padding: '12px 4px', textDecoration: 'none', fontWeight: 600, fontSize: 15, color: '#0f172a', borderBottom: i < NAV.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                style={{ display: 'block', padding: '12px 4px', textDecoration: 'none', fontWeight: 600, fontSize: 15, color: '#0f172a', borderBottom: i < navItems.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                 {t(n.labelKey)}
               </MotionNavLink>
             ))}
