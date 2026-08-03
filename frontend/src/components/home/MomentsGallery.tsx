@@ -133,7 +133,9 @@ export default function MomentsGallery({ items }: MomentsGalleryProps): React.Re
   );
 
   return (
-    <div className="dl-flow-wrap" style={{ height: ROW_HEIGHT, overflow: 'hidden' }}>
+    /* `width: 100%` + `minWidth: 0` — lenta ustunni kengaytirib yubormasin;
+       ortiqcha qismi shu yerda kesiladi va oqim shundan hosil bo'ladi */
+    <div className="dl-flow-wrap" style={{ height: ROW_HEIGHT, overflow: 'hidden', width: '100%', minWidth: 0 }}>
       <div
         className="dl-flow"
         style={{

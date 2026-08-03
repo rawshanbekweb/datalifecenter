@@ -141,7 +141,12 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
               qolmaydi. Lenta ustundan kengroq oqadi: `overflow: visible`
               bilan u o'ng chetdan tashqariga chiqib, sahifa qirg'og'igacha
               davom etayotgandek ko'rinadi. */}
-          <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}>
+          <m.div initial={{ opacity:0, x:36 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.28, duration:0.7 }}
+            /* minWidth:0 SHART: grid elementi sukut bo'yicha kontentidan
+               kichraya olmaydi (`min-width: auto`), lenta esa `max-content`
+               kenglikda — shuning uchun o'ng ustun kengayib, chapdagi
+               matnni qisib qo'yardi. */
+            style={{ minWidth: 0 }}>
             <MomentsGallery items={moments} />
           </m.div>
         </div>
