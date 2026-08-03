@@ -39,13 +39,13 @@ function withAlpha(hex: string, alpha: string): string {
 // Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi.
 //
 // FAQAT TEKSHIRILGAN raqamlar: kompaniya bergan ma'lumot (2019-yildan beri,
-// 3000+ bitiruvchi, 7 yo'nalish, 11 mutaxassis). Ilgari bu yerda o'ylab
+// 3000+ bitiruvchi, 7 yo'nalish, 12 mutaxassis). Ilgari bu yerda o'ylab
 // topilgan qiymatlar turardi ("2,000+" bitiruvchi, "180+" loyiha, "5+" yil)
 // va ular jonli saytda haqiqiy statistika bo'lib ko'rinardi.
 const DEFAULT_STATS: RawStatItem[] = [
   { icon: 'Users',          value: '3000+', label: 'home.about.fallback.graduates',   color: '#0ea5e9' },
   { icon: 'BookOpen',       value: '7',     label: 'home.about.fallback.directions',  color: '#9333ea' },
-  { icon: 'GraduationCap',  value: '11',    label: 'home.about.fallback.specialists', color: '#16a34a' },
+  { icon: 'GraduationCap',  value: '12',    label: 'home.about.fallback.specialists', color: '#16a34a' },
   { icon: 'Award',          value: '2019',  label: 'home.about.fallback.founded',     color: '#d97706' },
 ];
 

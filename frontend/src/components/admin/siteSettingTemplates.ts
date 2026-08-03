@@ -56,7 +56,7 @@ const HERO_TEMPLATES: SectionTemplate<'hero'>[] = [
       stats: [
         { value: '3000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates') },
         { value: '7', label: L("Yo'nalishlar", 'Направления', 'Tracks') },
-        { value: '11', label: L('Mutaxassislar', 'Специалисты', 'Specialists') },
+        { value: '12', label: L('Mutaxassislar', 'Специалисты', 'Specialists') },
         { value: '2019', label: L('Tashkil etilgan', 'Основан', 'Founded') },
       ],
     },
@@ -78,7 +78,7 @@ const ABOUT_TEMPLATES: SectionTemplate<'about'>[] = [
       stats: [
         { icon: 'Users', value: '3000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates'), color: '#0ea5e9' },
         { icon: 'BookOpen', value: '7', label: L("Yo'nalishlar", 'Направления', 'Tracks'), color: '#8b5cf6' },
-        { icon: 'GraduationCap', value: '11', label: L('Mutaxassislar', 'Специалисты', 'Specialists'), color: '#6366f1' },
+        { icon: 'GraduationCap', value: '12', label: L('Mutaxassislar', 'Специалисты', 'Specialists'), color: '#6366f1' },
         { icon: 'Award', value: '2019', label: L('Tashkil etilgan', 'Основан', 'Founded'), color: '#f59e0b' },
       ],
       features: [
@@ -275,7 +275,7 @@ const WHY_US_TEMPLATES: SectionTemplate<'why_us'>[] = [
             'More than 3000 graduates have gained a profession here.'),
         },
         {
-          icon: 'Users', color: '#0ea5e9', stat: '11',
+          icon: 'Users', color: '#0ea5e9', stat: '12',
           title: L('Jamoa', 'Команда', 'Team'),
           desc: L('Amaliyotchi mentorlar va mutaxassislardan iborat jamoa.',
             'Команда практикующих менторов и специалистов.',
