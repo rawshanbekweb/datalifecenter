@@ -36,31 +36,27 @@ function withAlpha(hex: string, alpha: string): string {
   return `${hex}${alpha}`;
 }
 
-// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi
+// Fallback — API bo'sh/xato bo'lsa; label'lar t() kaliti sifatida saqlanadi.
+//
+// FAQAT TEKSHIRILGAN raqamlar: kompaniya bergan ma'lumot (2019-yildan beri,
+// 3000+ bitiruvchi, 7 yo'nalish, 11 mutaxassis). Ilgari bu yerda o'ylab
+// topilgan qiymatlar turardi ("2,000+" bitiruvchi, "180+" loyiha, "5+" yil)
+// va ular jonli saytda haqiqiy statistika bo'lib ko'rinardi.
 const DEFAULT_STATS: RawStatItem[] = [
-  { icon: 'Users',     value: '2,000+', label: 'home.about.fallback.graduates',  color: '#0ea5e9' },
-  { icon: 'BookOpen',  value: '7+',     label: 'home.about.fallback.courses',    color: '#9333ea' },
-  { icon: 'Briefcase', value: '180+',   label: 'home.about.fallback.projects',   color: '#16a34a' },
-  { icon: 'Award',     value: '5+',     label: 'home.about.fallback.experience', color: '#d97706' },
+  { icon: 'Users',          value: '3000+', label: 'home.about.fallback.graduates',   color: '#0ea5e9' },
+  { icon: 'BookOpen',       value: '7',     label: 'home.about.fallback.directions',  color: '#9333ea' },
+  { icon: 'GraduationCap',  value: '11',    label: 'home.about.fallback.specialists', color: '#16a34a' },
+  { icon: 'Award',          value: '2019',  label: 'home.about.fallback.founded',     color: '#d97706' },
 ];
 
 const DEFAULT_FEATURE_KEYS: string[] = [
   'home.about.fallback.feat1', 'home.about.fallback.feat2',
   'home.about.fallback.feat3', 'home.about.fallback.feat4',
-  'home.about.fallback.feat5', 'home.about.fallback.feat6',
 ];
 
-const DEFAULT_SKILLS: SkillItem[] = [
-  { label: 'Frontend Development', pct: 95 },
-  { label: 'Backend Development',  pct: 88 },
-  { label: 'Cyber Security',       pct: 82 },
-  { label: 'Mobile Development',   pct: 78 },
-];
-
-const DEFAULT_SATISFACTION: SatisfactionItem[] = [
-  { value: '98%', label: 'Satisfaction' },
-  { value: '92%', label: 'Employment' },
-];
+// Ko'nikma foizi va "mamnunlik/ishga joylashish" ko'rsatkichlari uchun
+// ZAXIRA YO'Q: ularning har qanday qiymati o'ylab topilgan bo'lardi.
+// Admin panel orqali kiritilsagina ko'rsatiladi.
 
 export default function About({ settings }: AboutProps = {}): React.ReactElement {
   const { t } = useTranslation();
@@ -68,8 +64,11 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
     ? settings.stats
     : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
   const FEATURES = settings?.features?.length ? settings.features : DEFAULT_FEATURE_KEYS.map((k) => t(k));
-  const SKILLS = settings?.skills?.length ? settings.skills : DEFAULT_SKILLS;
-  const SATISFACTION = settings?.satisfaction?.length ? settings.satisfaction : DEFAULT_SATISFACTION;
+  const SKILLS = settings?.skills ?? [];
+  const SATISFACTION = settings?.satisfaction ?? [];
+  // Ikkalasi ham bo'sh bo'lsa o'ng ustundagi karta faqat logotipdan iborat
+  // bo'lib, buzuq element taassurotini berardi — butunlay ko'rsatilmaydi.
+  const showSkillCard = SKILLS.length > 0 || SATISFACTION.length > 0;
   return (
     <section id="about" className="section-gray" style={{ padding: '104px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
@@ -83,7 +82,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
         </m.div>
 
         {/* Two columns */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:56, alignItems:'center', marginBottom:64 }} className="about-grid">
+        <div style={{ display:'grid', gridTemplateColumns: showSkillCard ? '1fr 1fr' : '1fr', gap:56, alignItems:'center', marginBottom:64, maxWidth: showSkillCard ? undefined : 760, marginInline: showSkillCard ? undefined : 'auto' }} className="about-grid">
 
           {/* Left */}
           <m.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
@@ -106,14 +105,15 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
             </div>
           </m.div>
 
-          {/* Right — Skills card */}
+          {/* Right — Skills card. Faqat admin ma'lumot kiritgan bo'lsa. */}
+          {showSkillCard && (
           <m.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="card" style={{ padding:28, boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                <img src="/assets/logotype.png" alt="DATA LIFE" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
+                <img src="/assets/logotype.png" alt="DATA LIFE IT Center" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
                 <div>
                   <p style={{ fontWeight:700, color:'#0f172a' }}>DATA LIFE</p>
-                  <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'var(--font-mono)' }}>IT Education Center</p>
+                  <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'var(--font-mono)' }}>IT Center</p>
                 </div>
               </div>
 
@@ -141,6 +141,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
               </div>
             </div>
           </m.div>
+          )}
         </div>
 
         {/* Stats row */}

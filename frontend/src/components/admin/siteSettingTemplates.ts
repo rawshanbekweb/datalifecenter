@@ -45,36 +45,19 @@ export function applyTemplate<K extends SectionKey>(current: Sections[K], templa
 
 const HERO_TEMPLATES: SectionTemplate<'hero'>[] = [
   {
-    id: 'hero-education',
-    name: L("Ta'lim markazi", 'Учебный центр', 'Education center'),
+    id: 'hero-datalife',
+    name: L('DATA LIFE IT Center', 'DATA LIFE IT Center', 'DATA LIFE IT Center'),
     desc: L(
-      "Bitiruvchilar, mentorlar va ishga joylashish ko'rsatkichlari",
-      'Выпускники, менторы и показатели трудоустройства',
-      'Graduates, mentors and placement rate',
+      "Kompaniyaning tekshirilgan ko'rsatkichlari",
+      'Проверенные показатели компании',
+      "The company's verified figures",
     ),
     data: {
       stats: [
-        { value: '2000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates') },
-        { value: '40+', label: L('Mentorlar', 'Менторы', 'Mentors') },
-        { value: '25+', label: L('Kurslar', 'Курсы', 'Courses') },
-        { value: '95%', label: L('Ishga joylashish', 'Трудоустройство', 'Job placement') },
-      ],
-    },
-  },
-  {
-    id: 'hero-company',
-    name: L('IT kompaniya', 'IT компания', 'IT company'),
-    desc: L(
-      "Loyihalar, mijozlar va tajriba ko'rsatkichlari",
-      'Проекты, клиенты и опыт',
-      'Projects, clients and experience',
-    ),
-    data: {
-      stats: [
-        { value: '180+', label: L('Yakunlangan loyihalar', 'Завершённых проектов', 'Completed projects') },
-        { value: '50+', label: L('Doimiy mijozlar', 'Постоянных клиентов', 'Regular clients') },
-        { value: '8', label: L('Yillik tajriba', 'Лет опыта', 'Years of experience') },
-        { value: '24/7', label: L("Qo'llab-quvvatlash", 'Поддержка', 'Support') },
+        { value: '3000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates') },
+        { value: '7', label: L("Yo'nalishlar", 'Направления', 'Tracks') },
+        { value: '11', label: L('Mutaxassislar', 'Специалисты', 'Specialists') },
+        { value: '2019', label: L('Tashkil etilgan', 'Основан', 'Founded') },
       ],
     },
   },
@@ -84,70 +67,31 @@ const HERO_TEMPLATES: SectionTemplate<'hero'>[] = [
 
 const ABOUT_TEMPLATES: SectionTemplate<'about'>[] = [
   {
-    id: 'about-education',
-    name: L("Ta'lim markazi", 'Учебный центр', 'Education center'),
+    id: 'about-datalife',
+    name: L('DATA LIFE IT Center', 'DATA LIFE IT Center', 'DATA LIFE IT Center'),
     desc: L(
-      "To'liq to'plam: kartochkalar, afzalliklar, yo'nalishlar va mamnuniyat",
-      'Полный набор: карточки, преимущества, направления и удовлетворённость',
-      'Full set: cards, features, tracks and satisfaction',
+      "Tekshirilgan ko'rsatkichlar va afzalliklar",
+      'Проверенные показатели и преимущества',
+      'Verified figures and advantages',
     ),
     data: {
       stats: [
-        { icon: 'Users', value: '2000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates'), color: '#0ea5e9' },
-        { icon: 'GraduationCap', value: '40+', label: L('Mentorlar', 'Менторы', 'Mentors'), color: '#6366f1' },
-        { icon: 'BookOpen', value: '25+', label: L('Kurslar', 'Курсы', 'Courses'), color: '#8b5cf6' },
-        { icon: 'Award', value: '95%', label: L('Ishga joylashish', 'Трудоустройство', 'Job placement'), color: '#10b981' },
+        { icon: 'Users', value: '3000+', label: L('Bitiruvchilar', 'Выпускники', 'Graduates'), color: '#0ea5e9' },
+        { icon: 'BookOpen', value: '7', label: L("Yo'nalishlar", 'Направления', 'Tracks'), color: '#8b5cf6' },
+        { icon: 'GraduationCap', value: '11', label: L('Mutaxassislar', 'Специалисты', 'Specialists'), color: '#6366f1' },
+        { icon: 'Award', value: '2019', label: L('Tashkil etilgan', 'Основан', 'Founded'), color: '#f59e0b' },
       ],
       features: [
-        L('Amaliyotga asoslangan zamonaviy dastur', 'Современная программа на основе практики', 'Modern practice-based curriculum'),
-        L("Har bir talabaga shaxsiy mentor biriktiriladi", 'За каждым студентом закреплён личный ментор', 'A personal mentor for every student'),
-        L("Real mijoz loyihalarida ishlash imkoniyati", 'Работа над реальными клиентскими проектами', 'Work on real client projects'),
-        L("Kurs yakunida xalqaro tan olingan sertifikat", 'Международно признанный сертификат по окончании', 'Internationally recognised certificate'),
-        L("Bitiruvchilarga ish topishda ko'maklashamiz", 'Помогаем выпускникам с трудоустройством', 'We help graduates find jobs'),
+        L('Amaliyotchi mentorlar', 'Практикующие менторы', 'Practising mentors'),
+        L('Real loyihalarda ishlash', 'Работа над реальными проектами', 'Work on real projects'),
+        L('Kurs yakunida sertifikat', 'Сертификат по окончании курса', 'Certificate on completion'),
+        L("Dasturiy ta'minot ishlab chiqish", 'Разработка программного обеспечения', 'Software development'),
       ],
-      skills: [
-        { label: L('Frontend development', 'Frontend разработка', 'Frontend development'), pct: 92 },
-        { label: L('Backend development', 'Backend разработка', 'Backend development'), pct: 88 },
-        { label: L('Mobil ilovalar', 'Мобильные приложения', 'Mobile applications'), pct: 80 },
-        { label: L('Data Science', 'Data Science', 'Data Science'), pct: 75 },
-      ],
-      satisfaction: [
-        { value: '4.9', label: L("O'rtacha baho", 'Средняя оценка', 'Average rating') },
-        { value: '98%', label: L('Tavsiya qilishadi', 'Рекомендуют нас', 'Would recommend') },
-      ],
-    },
-  },
-  {
-    id: 'about-company',
-    name: L('IT kompaniya', 'IT компания', 'IT company'),
-    desc: L(
-      'Xizmat sifati va texnologik kompetensiyalarga urg‘u',
-      'Акцент на качестве услуг и технологических компетенциях',
-      'Focused on service quality and technical competence',
-    ),
-    data: {
-      stats: [
-        { icon: 'Briefcase', value: '180+', label: L('Loyihalar', 'Проекты', 'Projects'), color: '#0ea5e9' },
-        { icon: 'Users', value: '50+', label: L('Mijozlar', 'Клиенты', 'Clients'), color: '#6366f1' },
-        { icon: 'Trophy', value: '8', label: L('Yillik tajriba', 'Лет опыта', 'Years of experience'), color: '#f59e0b' },
-        { icon: 'HeartHandshake', value: '99%', label: L('Mijoz mamnuniyati', 'Довольных клиентов', 'Client satisfaction'), color: '#10b981' },
-      ],
-      features: [
-        L('Har bir loyihaga alohida jamoa ajratiladi', 'Для каждого проекта выделяется отдельная команда', 'A dedicated team for every project'),
-        L('Shaffof narx va aniq muddatlar', 'Прозрачные цены и чёткие сроки', 'Transparent pricing and clear deadlines'),
-        L('Topshirilgandan keyin ham texnik yordam', 'Техподдержка и после сдачи проекта', 'Technical support after delivery'),
-        L('Kod sifati va xavfsizlik auditi', 'Аудит качества кода и безопасности', 'Code quality and security audits'),
-      ],
-      skills: [
-        { label: L('Veb ilovalar', 'Веб-приложения', 'Web applications'), pct: 95 },
-        { label: L('Mobil ishlanmalar', 'Мобильная разработка', 'Mobile development'), pct: 85 },
-        { label: L('Bulut infratuzilmasi', 'Облачная инфраструктура', 'Cloud infrastructure'), pct: 78 },
-        { label: L('Ma’lumotlar tahlili', 'Аналитика данных', 'Data analytics'), pct: 82 },
-      ],
-      satisfaction: [
-        { value: '4.8', label: L("O'rtacha baho", 'Средняя оценка', 'Average rating') },
-        { value: '92%', label: L('Qayta murojaat', 'Повторные обращения', 'Repeat clients') },
-      ],
+      // skills / satisfaction ATAYIN bo'sh: o'lchanmagan foiz kiritilsa u
+      // saytda haqiqiy ko'rsatkich bo'lib ko'rinardi. Bo'sh bo'lsa bosh
+      // sahifadagi o'ng ustun kartasi umuman chiqmaydi.
+      skills: [],
+      satisfaction: [],
     },
   },
 ];
@@ -301,95 +245,48 @@ const SERVICES_TEMPLATES: SectionTemplate<'services'>[] = [
 
 // ── Why us ───────────────────────────────────────────────────────────────────
 
+// DIQQAT: har bir kartaning `stat` maydoni sxema bo'yicha MAJBURIY va u
+// saytda yirik raqam bo'lib chiqadi. Shu sabab bu yerda faqat kompaniya
+// tasdiqlagan qiymatlar ishlatiladi (2019, 3000+, 11, 7). "92% ishga
+// joylashish", "180+ loyiha", "24/7" kabi o'lchanmagan da'volar OLIB
+// TASHLANDI — ular shablon bosilishi bilan haqiqiy statistika bo'lib
+// ko'rinardi.
 const WHY_US_TEMPLATES: SectionTemplate<'why_us'>[] = [
   {
-    id: 'why-education',
-    name: L("Ta'lim afzalliklari", 'Преимущества обучения', 'Learning advantages'),
-    desc: L('Mentorlar, amaliyot, sertifikat va karera yordami',
-      'Менторы, практика, сертификат и помощь в карьере',
-      'Mentors, practice, certificates and career support'),
+    id: 'why-datalife',
+    name: L('DATA LIFE IT Center', 'DATA LIFE IT Center', 'DATA LIFE IT Center'),
+    desc: L('Tekshirilgan ko\'rsatkichlarga asoslangan 4 ta karta',
+      'Четыре карточки на основе проверенных показателей',
+      'Four cards based on verified figures'),
     data: {
       items: [
         {
-          icon: 'GraduationCap', color: '#0ea5e9', stat: '40+',
-          title: L('Tajribali mentorlar', 'Опытные менторы', 'Experienced mentors'),
-          desc: L('IT sohasida 5 yildan ortiq tajribaga ega amaliyotchi mutaxassislar.',
-            'Практикующие специалисты с опытом более 5 лет в IT.',
-            'Practising specialists with 5+ years of industry experience.'),
+          icon: 'Trophy', color: '#f59e0b', stat: '2019',
+          title: L('Tajriba', 'Опыт', 'Experience'),
+          desc: L('2019-yildan beri dasturiy ta\'minot ishlab chiqamiz va o\'qitamiz.',
+            'С 2019 года разрабатываем программное обеспечение и обучаем.',
+            'Building software and teaching since 2019.'),
         },
         {
-          icon: 'Zap', color: '#8b5cf6', stat: '70%',
-          title: L("Amaliy ta'lim", 'Практическое обучение', 'Practical learning'),
-          desc: L('Nazariyadan ko‘ra amaliyot ustuvor: real vazifalar va hakatonlar.',
-            'Практика важнее теории: реальные задачи и хакатоны.',
-            'Practice over theory: real tasks and hackathons.'),
+          icon: 'GraduationCap', color: '#10b981', stat: '3000+',
+          title: L('Bitiruvchilar', 'Выпускники', 'Graduates'),
+          desc: L('3000 dan ortiq bitiruvchi markazimizda kasb egallagan.',
+            'Более 3000 выпускников получили профессию в нашем центре.',
+            'More than 3000 graduates have gained a profession here.'),
         },
         {
-          icon: 'Briefcase', color: '#10b981', stat: '180+',
-          title: L('Real loyihalar', 'Реальные проекты', 'Real projects'),
-          desc: L("O'qish davomida haqiqiy mijozlar uchun loyihalarda qatnashasiz.",
-            'Во время обучения вы участвуете в проектах для реальных клиентов.',
-            'During the course you work on projects for real clients.'),
+          icon: 'Users', color: '#0ea5e9', stat: '11',
+          title: L('Jamoa', 'Команда', 'Team'),
+          desc: L('Amaliyotchi mentorlar va mutaxassislardan iborat jamoa.',
+            'Команда практикующих менторов и специалистов.',
+            'A team of practising mentors and specialists.'),
         },
         {
-          icon: 'HeartHandshake', color: '#f59e0b', stat: '92%',
-          title: L("Karera qo'llab-quvvatlash", 'Карьерная поддержка', 'Career support'),
-          desc: L('Rezyume tayyorlash, intervyuga tayyorgarlik va ish topishda yordam.',
-            'Составление резюме, подготовка к интервью и помощь с трудоустройством.',
-            'Resume writing, interview preparation and job placement help.'),
-        },
-        {
-          icon: 'Trophy', color: '#ec4899', stat: '3000+',
-          title: L('Sertifikatlar', 'Сертификаты', 'Certificates'),
-          desc: L('Soha tomonidan tan olingan, onlayn tekshirib bo‘ladigan sertifikatlar.',
-            'Признанные отраслью сертификаты с онлайн-проверкой.',
-            'Industry-recognised certificates with online verification.'),
-        },
-        {
-          icon: 'Users', color: '#6366f1', stat: '2500+',
-          title: L('Kuchli hamjamiyat', 'Сильное сообщество', 'Strong community'),
-          desc: L('Bitiruvchilar tarmog‘i: tanishuv, tajriba almashish va yangi imkoniyatlar.',
-            'Сеть выпускников: знакомства, обмен опытом и новые возможности.',
-            'An alumni network for connections, shared experience and opportunities.'),
-        },
-      ],
-    },
-  },
-  {
-    id: 'why-partnership',
-    name: L('Hamkorlik afzalliklari', 'Преимущества сотрудничества', 'Partnership advantages'),
-    desc: L('Mijozlarga qaratilgan qisqa variant (4 ta kartochka)',
-      'Краткий вариант для клиентов (4 карточки)',
-      'Short client-facing variant (4 cards)'),
-    data: {
-      items: [
-        {
-          icon: 'Zap', color: '#0ea5e9', stat: '2x',
-          title: L('Tez natija', 'Быстрый результат', 'Fast delivery'),
-          desc: L('Ishni bosqichlarga bo‘lamiz — birinchi natijani 2 hafta ichida ko‘rasiz.',
-            'Делим работу на этапы — первый результат вы увидите за 2 недели.',
-            'We work in stages — you see the first result within 2 weeks.'),
-        },
-        {
-          icon: 'Shield', color: '#10b981', stat: '100%',
-          title: L('Shaffof shartnoma', 'Прозрачный договор', 'Transparent contract'),
-          desc: L('Aniq narx, aniq muddat va yashirin to‘lovlarsiz shartlar.',
-            'Чёткая цена, чёткие сроки и никаких скрытых платежей.',
-            'Clear pricing, clear deadlines and no hidden fees.'),
-        },
-        {
-          icon: 'HeartHandshake', color: '#f59e0b', stat: '24/7',
-          title: L("Doimiy qo'llab-quvvatlash", 'Постоянная поддержка', 'Ongoing support'),
-          desc: L('Loyiha topshirilgandan keyin ham texnik yordam davom etadi.',
-            'Техническая поддержка продолжается и после сдачи проекта.',
-            'Technical support continues after the project is delivered.'),
-        },
-        {
-          icon: 'Award', color: '#8b5cf6', stat: '8',
-          title: L('Yillik tajriba', 'Лет опыта', 'Years of experience'),
-          desc: L('Turli sohalarda yakunlangan yuzlab loyiha tajribasi.',
-            'Опыт сотен завершённых проектов в разных отраслях.',
-            'Hundreds of completed projects across different industries.'),
+          icon: 'BookOpen', color: '#8b5cf6', stat: '7',
+          title: L("Yo'nalishlar", 'Направления', 'Tracks'),
+          desc: L("Kompyuter savodxonligidan kiberxavfsizlikkacha 7 ta yo'nalish.",
+            'Семь направлений — от компьютерной грамотности до кибербезопасности.',
+            'Seven tracks — from computer literacy to cyber security.'),
         },
       ],
     },

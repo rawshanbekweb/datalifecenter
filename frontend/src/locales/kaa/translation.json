@@ -102,7 +102,7 @@
     "teamCabinetFull": "Komanda kabineti"
   },
   "footer": {
-    "description": "Ózbekstandaǵı eń zamanagóy IT tálim orayı. Programmalastırıw hám sanlı ónimler — bizdiń missiyamız.",
+    "description": "DATA LIFE IT Center — 2019-jıldan berli baǵdarlamalıq támiynat islep shıǵamız hám IT baǵdarları boyınsha oqıtamız.",
     "sections": {
       "courses": "Kurslar",
       "services": "Xızmetler",
@@ -154,22 +154,20 @@
       "pill": "Biz haqqımızda",
       "titleStart": "Biz",
       "titleAccent": "haqqımızda",
-      "subtitle": "Ózbekstandaǵı eń innovaciyalıq IT tálim orayı",
-      "headingStart": "Keleshek texnologiyaların",
-      "headingAccent": "búgin úyreniń",
-      "para1": "programmalastırıwdı oqıtıwǵa, sanlı ónimler jaratıwǵa hám keleshek qánigelerin tayarlawǵa qánigelesken zamanagóy IT orayı.",
-      "para2": "Maqsetimiz — hár bir oqıwshını IT sanaatınıń haqıyqıy professional qánigesine aylandırıw.",
+      "subtitle": "Nókiste jaylasqan IT kompaniya hám oqıw orayı",
+      "headingStart": "Baǵdarlamalıq sheshimler hám",
+      "headingAccent": "IT bilimlendiriw",
+      "para1": "— 2019-jılı shólkemlestirilgen IT kompaniya. Buyırtpashılar ushın sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵamız.",
+      "para2": "Sonıń menen birge 7 baǵdar boyınsha oqıtamız — islep shıǵarıwdaǵı tájiriybemiz tuwrıdan-tuwrı sabaqlarǵa ótedi.",
       "fallback": {
         "graduates": "Pitkeriwshiler",
-        "courses": "Kurslar",
-        "projects": "Joybarlar",
-        "experience": "Jıllıq tájiriybe",
-        "feat1": "Professional sertifikatlar",
+        "directions": "Baǵdarlar",
+        "specialists": "Qániygeler",
+        "founded": "Shólkemlestirilgen",
+        "feat1": "Ámeliyatshı mentorlar",
         "feat2": "Real joybarlarda islew",
-        "feat3": "Tájiriybeli mentorlar",
-        "feat4": "Karera qollap-quwatlawı",
-        "feat5": "Zamanagóy oqıw baǵdarlaması",
-        "feat6": "Kishi toparlar (maks 15)"
+        "feat3": "Juwmaqlawshı sertifikat",
+        "feat4": "Baǵdarlamalıq támiynat islep shıǵıw"
       }
     },
     "services": {

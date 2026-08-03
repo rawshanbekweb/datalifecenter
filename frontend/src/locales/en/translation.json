@@ -102,7 +102,7 @@
     "teamCabinetFull": "Team cabinet"
   },
   "footer": {
-    "description": "The most modern IT education center in Uzbekistan. Programming and digital products are our mission.",
+    "description": "DATA LIFE IT Center — building software and teaching IT since 2019.",
     "sections": {
       "courses": "Courses",
       "services": "Services",
@@ -154,22 +154,20 @@
       "pill": "About Us",
       "titleStart": "About",
       "titleAccent": "Us",
-      "subtitle": "The most innovative IT education center in Uzbekistan",
-      "headingStart": "Learn the technologies of the future",
-      "headingAccent": "today",
-      "para1": "a modern IT center specializing in programming education, building digital products and training the specialists of tomorrow.",
-      "para2": "Our goal is to turn every student into a true professional of the IT industry.",
+      "subtitle": "An IT company and training centre in Nukus",
+      "headingStart": "Software solutions and",
+      "headingAccent": "IT education",
+      "para1": "— an IT company founded in 2019. We build websites, software and startup solutions for our clients.",
+      "para2": "Alongside that we teach seven tracks — our production experience feeds straight into the classroom.",
       "fallback": {
         "graduates": "Graduates",
-        "courses": "Courses",
-        "projects": "Projects",
-        "experience": "Years of Experience",
-        "feat1": "Professional certificates",
+        "directions": "Tracks",
+        "specialists": "Specialists",
+        "founded": "Founded",
+        "feat1": "Practising mentors",
         "feat2": "Work on real projects",
-        "feat3": "Experienced mentors",
-        "feat4": "Career support",
-        "feat5": "Modern curriculum",
-        "feat6": "Small groups (max 15)"
+        "feat3": "Certificate on completion",
+        "feat4": "Software development"
       }
     },
     "services": {

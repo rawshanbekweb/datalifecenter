@@ -36,11 +36,15 @@ export const aboutSchema = z.object({
     .min(1, atLeastOne('statistika kartasi'))
     .max(6, atMost(6, 'statistika kartasi')),
   features: z.array(localizedString(1, 'Matn kerak')).min(1, atLeastOne('afzallik')).max(10, atMost(10, 'afzallik')),
-  skills: z.array(skillItemSchema).min(1, atLeastOne("ko'nikma")).max(8, atMost(8, "ko'nikma")),
+  // Ko'nikma foizi va mamnunlik ko'rsatkichi IXTIYORIY: ularning har qanday
+  // qiymati o'lchanmagan bo'lsa o'ylab topilgan raqam bo'lardi. Bo'sh
+  // qoldirilsa bosh sahifadagi o'ng ustun kartasi umuman ko'rsatilmaydi
+  // (frontend/src/components/About.tsx).
+  skills: z.array(skillItemSchema).max(8, atMost(8, "ko'nikma")).default([]),
   satisfaction: z
     .array(z.object({ value: z.string().min(1, 'Qiymat kerak').max(10), label: localizedString(1, 'Nom kerak') }))
-    .min(1, atLeastOne('indikator'))
-    .max(4, atMost(4, 'indikator')),
+    .max(4, atMost(4, 'indikator'))
+    .default([]),
 });
 
 const serviceItemSchema = z.object({

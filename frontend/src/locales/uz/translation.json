@@ -102,7 +102,7 @@
     "teamCabinetFull": "Jamoa kabineti"
   },
   "footer": {
-    "description": "O'zbekistondagi eng zamonaviy IT ta'lim markazi. Dasturlash va raqamli mahsulotlar — bizning missiyamiz.",
+    "description": "DATA LIFE IT Center — 2019-yildan beri dasturiy ta'minot ishlab chiqamiz va IT yo'nalishlari bo'yicha o'qitamiz.",
     "sections": {
       "courses": "Kurslar",
       "services": "Xizmatlar",
@@ -140,7 +140,7 @@
   "home": {
     "hero": {
       "tagline": "IT kelajagini bugundan yarating",
-      "description": "Zamonaviy dasturlash, sun'iy intellekt va raqamli texnologiyalar bo'yicha professional ta'lim oling. Real loyihalar va tajribali mentorlar bilan karera quring.",
+      "description": "Sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz hamda IT yo'nalishlari bo'yicha o'qitamiz. Amaliyotchi mutaxassislar bilan real loyihalarda ishlaymiz.",
       "ctaPrimary": "O'qishni boshlash",
       "ctaSecondary": "Bog'lanish",
       "fallbackStats": {
@@ -154,22 +154,20 @@
       "pill": "Biz Haqimizda",
       "titleStart": "Biz",
       "titleAccent": "Haqimizda",
-      "subtitle": "O'zbekistondagi eng innovatsion IT ta'lim markazi",
-      "headingStart": "Kelajak texnologiyalarini",
-      "headingAccent": "bugun o'rganing",
-      "para1": "dasturlash o'qitish, raqamli mahsulotlar yaratish va kelajak mutaxassislarini tayyorlashga ixtisoslashgan zamonaviy IT markazi.",
-      "para2": "Maqsadimiz — har bir o'quvchini IT sanoatining haqiqiy professional mutaxassisiga aylantirish.",
+      "subtitle": "Nukusda joylashgan IT kompaniya va o'quv markazi",
+      "headingStart": "Dasturiy yechimlar va",
+      "headingAccent": "IT ta'lim",
+      "para1": "— 2019-yilda tashkil etilgan IT kompaniya. Buyurtmachilar uchun sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz.",
+      "para2": "Shu bilan birga 7 ta yo'nalish bo'yicha o'qitamiz — ishlab chiqarishdagi tajribamiz to'g'ridan-to'g'ri darslarga o'tadi.",
       "fallback": {
         "graduates": "Bitiruvchilar",
-        "courses": "Kurslar",
-        "projects": "Loyihalar",
-        "experience": "Yillik Tajriba",
-        "feat1": "Professional sertifikatlar",
+        "directions": "Yo'nalishlar",
+        "specialists": "Mutaxassislar",
+        "founded": "Tashkil etilgan",
+        "feat1": "Amaliyotchi mentorlar",
         "feat2": "Real loyihalarda ishlash",
-        "feat3": "Tajribali mentorlar",
-        "feat4": "Karera qo'llab-quvvatlash",
-        "feat5": "Zamonaviy o'quv dasturi",
-        "feat6": "Kichik guruhlar (max 15)"
+        "feat3": "Yakuniy sertifikat",
+        "feat4": "Dasturiy ta'minot ishlab chiqish"
       }
     },
     "services": {
