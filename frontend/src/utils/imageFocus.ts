@@ -32,3 +32,16 @@ export function focusPosition(source: ImageFocus | null | undefined): string {
   const y = clampFocus(source?.focusY ?? DEFAULT_FOCUS);
   return `${x}% ${y}%`;
 }
+
+/**
+ * Kadr pastiga "tayangan" rasm uchun `object-position`.
+ *
+ * `object-fit: contain` bilan ishlatiladi: vertikal joylashuv doim past
+ * (odam kadr tagida turadi), gorizontalni esa fokus nuqtasi belgilaydi —
+ * kesib olingan portret kadr o'rtasida bo'lmasa admin uni surib qo'ya oladi.
+ * `focusY` bu holatda ATAYIN e'tiborga olinmaydi: `contain` hech narsani
+ * kesmaydi, ya'ni vertikal siljitishning ma'nosi yo'q.
+ */
+export function focusPositionBottom(source: ImageFocus | null | undefined): string {
+  return `${clampFocus(source?.focusX ?? DEFAULT_FOCUS)}% 100%`;
+}

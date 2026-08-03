@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { focusPosition, ImageFocus } from '../../utils/imageFocus';
+import { focusPositionBottom, ImageFocus } from '../../utils/imageFocus';
 
 /**
  * Bosh sahifadagi yirik rasmli odam kartasi — jamoa a'zolari va mentorlar
@@ -56,6 +56,31 @@ export interface BigPersonCardProps {
 const PHOTO_INSET = 10;
 const PHOTO_RADIUS = 14;
 
+/**
+ * Bosh ortidagi yumshoq yorug'lik — "studiya foni" taassurotini beradi.
+ * Tekis gradient ustida odam yassi ko'rinardi.
+ */
+const HEAD_GLOW = 'radial-gradient(ellipse 68% 52% at 50% 20%, rgba(255,255,255,0.8), transparent 72%)';
+/**
+ * Oyoq ostidagi kontakt soyasi — odam kadr tagida "turgandek" bo'ladi.
+ * Busiz kesib olingan portret fon ustiga yopishtirilgandek osilib turardi.
+ */
+const GROUND_SHADOW = 'radial-gradient(ellipse 46% 7% at 50% 100%, rgba(15,23,42,0.22), transparent 70%)';
+
+/**
+ * Rasm sahna balandligining necha foizini egallashi.
+ *
+ * 100% EMAS — tepada ataylab bo'sh joy qoldiriladi. Sichqoncha olib
+ * borilganda rasm `scale(1.05)` bilan kattalashadi va pastdan o'sadi
+ * (`transform-origin: 50% 100%`), ya'ni tepasi 90 × 1.05 = 94.5% ga
+ * ko'tariladi va kadr chetiga yetmaydi. To'liq balandlikda esa hover
+ * paytida boshning tepasi kesilib qolardi.
+ *
+ * O'zgartirilsa `index.css` dagi hover koeffitsienti bilan birga
+ * tekshirilishi kerak: PHOTO_HEIGHT × scale < 100 bo'lishi shart.
+ */
+const PHOTO_HEIGHT = '90%';
+
 function initialsOf(name: string): string {
   return name.split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 }
@@ -83,34 +108,50 @@ export default function BigPersonCard({
           qoplaydi (.person-big-link::after). Aks holda ijtimoiy havolalar
           <a> ichida <a> bo'lib qolardi — bu yaroqsiz HTML.
 
-          Rasm karta chetiga tegib turmaydi: orqasida rangli qatlam qoladi va
-          rasmning o'zi ozgina kichrayadi. Ikkisi birga ishlaydi — yalang'och
-          oq fon ham yo'qoladi, kadrdagi odam ham "siqilib" turmaydi. */}
-      <div style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', padding: PHOTO_INSET, background: `linear-gradient(150deg, ${placeholder.from}, ${placeholder.to})` }}>
+          Rasm karta chetiga tegib turmaydi: orqasida ochroq matte qatlam
+          qoladi va rasmning o'zi ozgina kichrayadi — yalang'och oq fon ham
+          yo'qoladi, kadrdagi odam ham "siqilib" turmaydi. */}
+      <div style={{ position: 'relative', aspectRatio: '4 / 5', overflow: 'hidden', padding: PHOTO_INSET, background: placeholder.from }}>
         {/* Yaqinlashish animatsiyasi shu ichki qatlamda kesiladi, aks holda
-            rasm burchaklardan chiqib, orqa qatlamni yopib ketardi */}
-        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: PHOTO_RADIUS, overflow: 'hidden' }}>
+            rasm burchaklardan chiqib, orqa qatlamni yopib ketardi.
+
+            Fon — studiya foni kabi: tepadan pastga quyuqlashadigan gradient,
+            bosh ortida yorug'lik dog'i, tagida kontakt soyasi. */}
+        <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: PHOTO_RADIUS, overflow: 'hidden', background: `linear-gradient(180deg, ${placeholder.from} 0%, ${placeholder.to} 100%)` }}>
           {showPhoto ? (
             <>
-              {/* Orqa qatlam — O'SHA rasmning xiralashtirilgan nusxasi.
-                  `contain` chetlarda bo'sh joy qoldiradi; uni tekis rang bilan
-                  to'ldirsak karta yamoqday ko'rinardi. Bir xil manba brauzer
-                  keshidan olinadi, ya'ni qo'shimcha yuklash bo'lmaydi. */}
-              <img src={photoUrl!} alt="" aria-hidden="true"
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: focusPosition(focus), filter: 'blur(18px) saturate(1.15)', transform: 'scale(1.15)', opacity: 0.55 }} />
-              {/* Asosiy rasm ATAYIN `contain`: odam to'liq ko'rinishi kerak.
-                  `cover` bo'lganda tik suratlarning yuqori qismi kesilib,
-                  bosh kadrdan chiqib ketardi. */}
+              {/* Yorug'lik va soya rasmdan OLDIN keladi — ikkalasi ham
+                  joylashtirilgan qatlam, ya'ni ustma-ust tushishini DOM
+                  tartibi hal qiladi va rasm eng ustida qoladi. */}
+              <span aria-hidden="true" style={{ position: 'absolute', inset: 0, background: HEAD_GLOW }} />
+              <span aria-hidden="true" style={{ position: 'absolute', inset: 0, background: GROUND_SHADOW }} />
+              {/* `scale-down` = `contain` va `none` ning kichigi, ya'ni rasm
+                  KATTALASHTIRILMAYDI. Katta portret kadrga sig'adi (odam
+                  to'liq ko'rinadi, hech qayeri kesilmaydi), kichkina fayl esa
+                  o'z o'lchamida qoladi — aks holda 116x117 logotip karta
+                  bo'ylab cho'zilib loyqa dog' bo'lib turardi.
+
+                  `object-position` pastga tayangan: shaffof fonli kesib
+                  olingan portret kadr tagida TURADI, o'rtada osilib qolmaydi.
+                  Gorizontal siljish fokus nuqtasidan olinadi. */}
               <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
-                style={{ position: 'relative', width: '100%', height: '100%', objectFit: 'contain', display: 'block', transition: 'transform 0.45s ease' }} />
+                loading="lazy" decoding="async"
+                style={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: PHOTO_HEIGHT, objectFit: 'scale-down', objectPosition: focusPositionBottom(focus), display: 'block', transition: 'transform 0.45s ease' }} />
             </>
           ) : (
-            <div className="person-big-img"
-              style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(150deg, ${placeholder.to}, ${placeholder.from})`, transition: 'transform 0.45s ease' }}>
-              <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'clamp(44px,6.5vw,66px)', color: accentColor, opacity: 0.7, letterSpacing: '-0.02em' }}>
-                {initialsOf(name)}
-              </span>
-            </div>
+            /* Rasmsiz karta ham AYNAN o'sha sahnada turadi (yorug'lik + soya) —
+               busiz zaxira ko'rinish qo'shni kartalar yonida yassi va begona
+               ko'rinardi. Bosh harflar gradientning o'zi ustida. */
+            <>
+              <span aria-hidden="true" style={{ position: 'absolute', inset: 0, background: HEAD_GLOW }} />
+              <span aria-hidden="true" style={{ position: 'absolute', inset: 0, background: GROUND_SHADOW }} />
+              <div className="person-big-img"
+                style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.45s ease' }}>
+                <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 800, fontSize: 'clamp(44px,6.5vw,66px)', color: accentColor, opacity: 0.55, letterSpacing: '-0.02em' }}>
+                  {initialsOf(name)}
+                </span>
+              </div>
+            </>
           )}
 
           {/* Nishon rasm ustida — kartaning pastki matn qismini bo'shatadi */}

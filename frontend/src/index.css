@@ -187,6 +187,9 @@ button, input, select, textarea, optgroup {
    Uslub ATAYIN global: karta bosh sahifadagi ikkita bo'limda (jamoa va
    mentorlar) ishlatiladi va har biri o'z <style> blogini chiqarsa hujjatda
    bir xil qoidalar takrorlanardi — Loading komponenti bilan bir xil sabab. */
+/* Yaqinlashish kadr TAGIDAN o'sadi: rasm pastga tayangani uchun markazdan
+   kattalashtirilsa odam kadr ostiga siljib, oyoq ostidagi soyadan uzilardi. */
+.person-big-img { transform-origin: 50% 100%; }
 .person-big-card:hover .person-big-img { transform: scale(1.05); }
 .person-big-card:hover .person-big-socials { opacity: 1; transform: translateY(0); }
 /* Ismdagi havola butun kartani qoplaydi — rasm ham bosiladigan bo'ladi,
