@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Crosshair, RotateCcw } from 'lucide-react';
-import { clampFocus, DEFAULT_FOCUS } from '../../utils/imageFocus';
+import { clampFocus, DEFAULT_FOCUS, FOCUS_BASE_POSITION, focusPan } from '../../utils/imageFocus';
 
 interface ImageFocusPickerProps {
   /** Rasm manzili — bo'sh bo'lsa komponent umuman ko'rinmaydi */
@@ -107,8 +107,16 @@ export default function ImageFocusPicker({ url, focusX, focusY, onChange }: Imag
             <img src={url} alt="" style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', objectPosition: position, border: '2px solid #e2e8f0', display: 'block' }} />
             <figcaption style={{ fontSize: 10.5, color: '#94a3b8', marginTop: 4 }}>{t('imageFocus.previewRound')}</figcaption>
           </figure>
+          {/* Bosh sahifadagi yirik karta bilan AYNAN bir xil chiziladi
+              (BigPersonCard): rasm kesilmaydi (`scale-down`), pastga tayanadi
+              va fokus `transform` bo'lib tushadi. Avval bu yerda `cover`
+              ishlatilardi — admin ko'rgan natija saytdagidan boshqa edi. */}
           <figure style={{ textAlign: 'center' }}>
-            <img src={url} alt="" style={{ width: 76, height: 95, borderRadius: 10, objectFit: 'cover', objectPosition: position, border: '2px solid #e2e8f0', display: 'block' }} />
+            <div style={{ position: 'relative', width: 76, height: 95, borderRadius: 10, overflow: 'hidden', border: '2px solid #e2e8f0', background: 'linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 100%)' }}>
+              <span style={{ position: 'absolute', inset: 0, transform: focusPan({ focusX, focusY }) }}>
+                <img src={url} alt="" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: '90%', objectFit: 'scale-down', objectPosition: FOCUS_BASE_POSITION, display: 'block' }} />
+              </span>
+            </div>
             <figcaption style={{ fontSize: 10.5, color: '#94a3b8', marginTop: 4 }}>{t('imageFocus.previewCard')}</figcaption>
           </figure>
         </div>

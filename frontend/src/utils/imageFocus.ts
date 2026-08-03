@@ -34,14 +34,32 @@ export function focusPosition(source: ImageFocus | null | undefined): string {
 }
 
 /**
- * Kadr pastiga "tayangan" rasm uchun `object-position`.
+ * Kadr pastiga "tayangan" rasmning tayanch nuqtasi: gorizontal markaz,
+ * vertikal past. Siljitish bu yerda EMAS — uni `focusPan()` beradi.
  *
- * `object-fit: contain` bilan ishlatiladi: vertikal joylashuv doim past
- * (odam kadr tagida turadi), gorizontalni esa fokus nuqtasi belgilaydi —
- * kesib olingan portret kadr o'rtasida bo'lmasa admin uni surib qo'ya oladi.
- * `focusY` bu holatda ATAYIN e'tiborga olinmaydi: `contain` hech narsani
- * kesmaydi, ya'ni vertikal siljitishning ma'nosi yo'q.
+ * NEGA: `object-fit: scale-down|contain` rasmni kadrga sig'diradi, ya'ni
+ * ko'p holatda ortiqcha joy QOLMAYDI va `object-position` hech narsani
+ * surmaydi (kvadrat va keng rasmlarda umuman, portretda bir necha piksel).
+ * Shuning uchun fokus nuqtasi `object-position` orqali emas, `transform`
+ * orqali qo'llanadi.
  */
-export function focusPositionBottom(source: ImageFocus | null | undefined): string {
-  return `${clampFocus(source?.focusX ?? DEFAULT_FOCUS)}% 100%`;
+export const FOCUS_BASE_POSITION = '50% 100%';
+
+/**
+ * Fokus nuqtasini kadr ichida siljitish uchun CSS `transform` qiymati.
+ *
+ * `object-position` dan farqi: bo'sh joy bor-yo'qligiga bog'liq emas —
+ * rasm har doim suriladi. Shu sabab kesilmaydigan (`scale-down`) rasmni
+ * ham chapga/o'ngga va tepaga/pastga surish mumkin bo'ladi.
+ *
+ * Fokus 50/50 (sukut) → siljish YO'Q, ya'ni eski yozuvlar va yangi
+ * rasmlar avvalgidek ko'rinadi. Chegara ataylab ±MAX_PAN foiz: undan
+ * ortig'i odamni kadrdan chiqarib yuborardi.
+ */
+const MAX_PAN = 15;
+
+export function focusPan(source: ImageFocus | null | undefined): string {
+  const dx = ((DEFAULT_FOCUS - clampFocus(source?.focusX ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
+  const dy = ((DEFAULT_FOCUS - clampFocus(source?.focusY ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
+  return `translate(${dx.toFixed(2)}%, ${dy.toFixed(2)}%)`;
 }

@@ -31,7 +31,16 @@ const publicInclude = {
 export async function listTeam(locale: SupportedLocale) {
   const members = await prisma.teamMember.findMany({
     where: { published: true },
-    orderBy: [{ leadership: 'desc' }, { featured: 'desc' }, { order: 'asc' }, { name: 'asc' }],
+    // Rahbariyat bloki birinchi bo'lib qoladi (u sahifada alohida ajratiladi),
+    // undan keyin rasmi borlar oldinda — rasmsiz kartalar suratlilar orasida
+    // bo'sh ko'rinadi. `nulls: 'last'` = photoUrl NULL bo'lganlar oxirida.
+    orderBy: [
+      { leadership: 'desc' },
+      { photoUrl: { sort: 'asc', nulls: 'last' } },
+      { featured: 'desc' },
+      { order: 'asc' },
+      { name: 'asc' },
+    ],
     include: publicInclude,
   });
   return resolveLocaleDeep(members, locale);

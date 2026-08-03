@@ -6,9 +6,16 @@ import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/locali
 import { Actor, mentorNotLinkedError, requireMentorId } from '../utils/mentorAccess';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 
+// Rasmi bor mentorlar oldinda: rasmsiz karta bosh harflar bilan zaxira
+// ko'rinishga tushadi va yonidagi suratli kartalar orasida bo'sh ko'rinadi.
+// `nulls: 'last'` — photoUrl NULL bo'lganlar oxiriga suriladi.
+// ESLATMA: bo'sh satr ('') NULL emas, ya'ni "rasmli" hisoblanadi; admin
+// formasi rasmni o'chirganda NULL yozishiga tayanadi.
+const PHOTO_FIRST = { photoUrl: { sort: 'asc', nulls: 'last' } } as const;
+
 export async function listMentors(locale: SupportedLocale) {
   const mentors = await prisma.mentor.findMany({
-    orderBy: [{ featured: 'desc' }, { order: 'asc' }],
+    orderBy: [PHOTO_FIRST, { featured: 'desc' }, { order: 'asc' }],
     include: { courses: { select: { id: true, title: true, slug: true } } },
   });
   return resolveLocaleDeep(mentors, locale);
