@@ -4,6 +4,7 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/localizedField';
 import { Actor, mentorNotLinkedError, requireMentorId } from '../utils/mentorAccess';
+import { inheritPhoto, PersonPhoto } from '../utils/personPhoto';
 import { isForeignKeyViolation } from '../utils/prismaErrors';
 
 // Rasmi bor mentorlar oldinda: rasmsiz karta bosh harflar bilan zaxira
@@ -13,25 +14,37 @@ import { isForeignKeyViolation } from '../utils/prismaErrors';
 // formasi rasmni o'chirganda NULL yozishiga tayanadi.
 const PHOTO_FIRST = { photoUrl: { sort: 'asc', nulls: 'last' } } as const;
 
+// O'z rasmi bo'lmasa jamoa profilidan olinadi (utils/personPhoto.ts).
+// `teamProfile` javobga chiqmaydi — u faqat shu zaxira uchun o'qiladi.
+const publicInclude = {
+  courses: { select: { id: true, title: true, slug: true } },
+  teamProfile: { select: { photoUrl: true, focusX: true, focusY: true } },
+} satisfies Prisma.MentorInclude;
+
+function withTeamPhoto<T extends PersonPhoto & { teamProfile: PersonPhoto | null }>(mentor: T) {
+  const { teamProfile, ...rest } = inheritPhoto(mentor, mentor.teamProfile);
+  return rest;
+}
+
 export async function listMentors(locale: SupportedLocale) {
   const mentors = await prisma.mentor.findMany({
     orderBy: [PHOTO_FIRST, { featured: 'desc' }, { order: 'asc' }],
-    include: { courses: { select: { id: true, title: true, slug: true } } },
+    include: publicInclude,
   });
-  return resolveLocaleDeep(mentors, locale);
+  return resolveLocaleDeep(mentors.map(withTeamPhoto), locale);
 }
 
 export async function getMentorById(id: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { id },
-    include: { courses: { select: { id: true, title: true, slug: true } } },
+    include: publicInclude,
   });
 
   if (!mentor) {
     throw ApiError.notFound('Mentor topilmadi');
   }
 
-  return resolveLocaleDeep(mentor, locale);
+  return resolveLocaleDeep(withTeamPhoto(mentor), locale);
 }
 
 // Admin tahrirlash paneli uchun — xom {uz,ru,kaa,en} obyektini qaytaradi

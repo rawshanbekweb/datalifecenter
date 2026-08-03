@@ -158,6 +158,106 @@ describe('Jamoa — rasm fokusi', () => {
   });
 });
 
+// Ommaviy ro'yxatlar keshlanadi (middleware/publicCache), kesh esa faqat API
+// orqali yozilganda tozalanadi. Quyidagi testlar yozuvlarni to'g'ridan-to'g'ri
+// Prisma bilan yaratadi, shuning uchun har so'rovga alohida kalit kerak —
+// aks holda oldingi testdan qolgan javob qaytadi.
+let cacheKey = 0;
+const fresh = (path: string): string => `${path}?cb=${++cacheKey}`;
+
+describe("Jamoa — mentor bilan rasm bo'lishish", () => {
+  it("a'zoning o'z rasmi bo'lmasa bog'langan mentor rasmini oladi (fokus bilan birga)", async () => {
+    const mentor = await prisma.mentor.create({
+      data: {
+        name: 'Suratli Mentor',
+        bio: { uz: 'Mentor bio' },
+        specialty: { uz: 'Backend' },
+        photoUrl: 'https://misol.uz/mentor.webp',
+        focusX: 40,
+        focusY: 20,
+      },
+    });
+    await prisma.teamMember.create({
+      data: {
+        slug: 'suratli-mentor',
+        name: 'Suratli Mentor',
+        position: { uz: 'Mentor / Backend' },
+        bio,
+        department: 'EDUCATION',
+        published: true,
+        mentorId: mentor.id,
+      },
+    });
+
+    const res = await request(app).get(fresh('/api/team')).expect(200);
+    const member = res.body.data.find((m: { slug: string }) => m.slug === 'suratli-mentor');
+    expect(member.photoUrl).toBe('https://misol.uz/mentor.webp');
+    // Fokus rasm bilan BIRGA ko'chadi — aks holda begona rasm qabul qiluvchi
+    // yozuvning fokusi bilan kadrlanib, yuz kadrdan chiqib ketardi
+    expect(member.focusX).toBe(40);
+    expect(member.focusY).toBe(20);
+  });
+
+  it("teskarisi ham ishlaydi: mentorda rasm bo'lmasa jamoa profilinikini oladi", async () => {
+    const mentor = await prisma.mentor.create({
+      data: { name: 'Rasmsiz Mentor', bio: { uz: 'Bio' }, specialty: { uz: 'Frontend' } },
+    });
+    await prisma.teamMember.create({
+      data: {
+        slug: 'rasmsiz-mentor',
+        name: 'Rasmsiz Mentor',
+        position: { uz: 'Mentor / Frontend' },
+        bio,
+        department: 'EDUCATION',
+        published: true,
+        mentorId: mentor.id,
+        photoUrl: 'https://misol.uz/jamoa.webp',
+        focusX: 60,
+        focusY: 30,
+      },
+    });
+
+    const res = await request(app).get(fresh('/api/mentors')).expect(200);
+    const found = res.body.data.find((m: { id: string }) => m.id === mentor.id);
+    expect(found.photoUrl).toBe('https://misol.uz/jamoa.webp');
+    expect(found.focusX).toBe(60);
+    // Ichki zaxira maydoni ommaviy javobga chiqib ketmasligi kerak
+    expect(found.teamProfile).toBeUndefined();
+  });
+
+  it("o'z rasmi bor bo'lsa bog'langan profilniki uni BOSIB KETMAYDI", async () => {
+    const mentor = await prisma.mentor.create({
+      data: {
+        name: 'Ikki Rasmli',
+        bio: { uz: 'Bio' },
+        specialty: { uz: 'Python' },
+        photoUrl: 'https://misol.uz/mentorniki.webp',
+        focusX: 10,
+        focusY: 10,
+      },
+    });
+    await prisma.teamMember.create({
+      data: {
+        slug: 'ikki-rasmli',
+        name: 'Ikki Rasmli',
+        position: { uz: 'Mentor / Python' },
+        bio,
+        department: 'EDUCATION',
+        published: true,
+        mentorId: mentor.id,
+        photoUrl: 'https://misol.uz/jamoaniki.webp',
+        focusX: 90,
+        focusY: 90,
+      },
+    });
+
+    const res = await request(app).get(fresh('/api/team')).expect(200);
+    const member = res.body.data.find((m: { slug: string }) => m.slug === 'ikki-rasmli');
+    expect(member.photoUrl).toBe('https://misol.uz/jamoaniki.webp');
+    expect(member.focusX).toBe(90);
+  });
+});
+
 describe('Jamoa — xodimning shaxsiy kabineti', () => {
   it("profil bog'lanmagan bo'lsa tushunarli kod qaytadi", async () => {
     const res = await staff.get('/api/team/me').expect(403);

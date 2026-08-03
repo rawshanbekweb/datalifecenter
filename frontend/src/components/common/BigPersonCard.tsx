@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { FOCUS_BASE_POSITION, focusPan, ImageFocus } from '../../utils/imageFocus';
+import { FOCUS_BASE_POSITION, focusPanX, ImageFocus } from '../../utils/imageFocus';
 
 /**
  * Bosh sahifadagi yirik rasmli odam kartasi — jamoa a'zolari va mentorlar
@@ -138,7 +138,7 @@ export default function BigPersonCard({
                   tushadi, rasmning o'ziga emas: hover'dagi `scale(1.05)`
                   (.person-big-img, index.css) inline transform'ni bosib
                   ketardi. Ikki qatlam — ikki transform, to'qnashuv yo'q. */}
-              <span style={{ position: 'absolute', inset: 0, transform: focusPan(focus) }}>
+              <span style={{ position: 'absolute', inset: 0, transform: focusPanX(focus) }}>
                 <img src={photoUrl!} alt={name} onError={() => setPhotoFailed(true)} className="person-big-img"
                   loading="lazy" decoding="async"
                   style={{ position: 'absolute', left: 0, right: 0, bottom: 0, width: '100%', height: PHOTO_HEIGHT, objectFit: 'scale-down', objectPosition: FOCUS_BASE_POSITION, display: 'block', transition: 'transform 0.45s ease' }} />

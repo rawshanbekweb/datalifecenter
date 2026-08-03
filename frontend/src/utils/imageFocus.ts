@@ -46,20 +46,27 @@ export function focusPosition(source: ImageFocus | null | undefined): string {
 export const FOCUS_BASE_POSITION = '50% 100%';
 
 /**
- * Fokus nuqtasini kadr ichida siljitish uchun CSS `transform` qiymati.
+ * Yirik kartada rasmni CHAPGA/O'NGGA surish uchun CSS `transform`.
  *
  * `object-position` dan farqi: bo'sh joy bor-yo'qligiga bog'liq emas —
- * rasm har doim suriladi. Shu sabab kesilmaydigan (`scale-down`) rasmni
- * ham chapga/o'ngga va tepaga/pastga surish mumkin bo'ladi.
+ * rasm har doim suriladi. Aynan shu kerak, chunki `scale-down` rasmni
+ * kadrga sig'diradi va gorizontal ortiqcha joy qolmaydi.
  *
- * Fokus 50/50 (sukut) → siljish YO'Q, ya'ni eski yozuvlar va yangi
- * rasmlar avvalgidek ko'rinadi. Chegara ataylab ±MAX_PAN foiz: undan
- * ortig'i odamni kadrdan chiqarib yuborardi.
+ * FAQAT gorizontal, ATAYIN. Ikki sabab:
+ *  1. Yirik karta dizayni bo'yicha rasm kadr TAGIGA tayanadi (odam yerda
+ *     turadi) — vertikal siljish shu tayanchni buzardi.
+ *  2. `focusY` dumaloq avatarlarda (MentorCard, TeamMemberCard — ular
+ *     `cover` bilan chizadi) allaqachon ishlaydi va admin uni yuz tepada
+ *     ko'rinsin deb 0 ga yaqin qiymatga qo'ygan. O'sha qiymat bu yerda ham
+ *     qo'llanganda rasm ~15% pastga surilib, oyoq qismi kesilardi.
+ *
+ * Fokus 50 (sukut) → siljish YO'Q, ya'ni mavjud rasmlar avvalgidek
+ * ko'rinadi. Chegara ±MAX_PAN foiz: undan ortig'i odamni kadrdan
+ * chiqarib yuborardi.
  */
 const MAX_PAN = 15;
 
-export function focusPan(source: ImageFocus | null | undefined): string {
+export function focusPanX(source: ImageFocus | null | undefined): string {
   const dx = ((DEFAULT_FOCUS - clampFocus(source?.focusX ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
-  const dy = ((DEFAULT_FOCUS - clampFocus(source?.focusY ?? DEFAULT_FOCUS)) / 50) * MAX_PAN;
-  return `translate(${dx.toFixed(2)}%, ${dy.toFixed(2)}%)`;
+  return `translateX(${dx.toFixed(2)}%)`;
 }

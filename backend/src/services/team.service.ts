@@ -3,6 +3,7 @@ import { prisma } from '../config/prisma';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/localizedField';
+import { inheritPhoto } from '../utils/personPhoto';
 import { slugify } from '../utils/slugify';
 
 // /team/<slug> ommaviy sahifasi kabinet yo'llari bilan bitta manzil fazosida
@@ -25,7 +26,9 @@ const publicInclude = {
     orderBy: { order: 'asc' },
     select: projectSelect,
   },
-  mentor: { select: { id: true, specialty: true } },
+  // photoUrl/focusX/focusY — a'zoning o'z rasmi bo'lmasa mentor profilidan
+  // olinadi (utils/personPhoto.ts)
+  mentor: { select: { id: true, specialty: true, photoUrl: true, focusX: true, focusY: true } },
 } satisfies Prisma.TeamMemberInclude;
 
 export async function listTeam(locale: SupportedLocale) {
@@ -43,7 +46,7 @@ export async function listTeam(locale: SupportedLocale) {
     ],
     include: publicInclude,
   });
-  return resolveLocaleDeep(members, locale);
+  return resolveLocaleDeep(members.map((m) => inheritPhoto(m, m.mentor)), locale);
 }
 
 export async function getTeamMemberBySlug(slug: string, locale: SupportedLocale) {
@@ -55,6 +58,9 @@ export async function getTeamMemberBySlug(slug: string, locale: SupportedLocale)
         select: {
           id: true,
           specialty: true,
+          photoUrl: true,
+          focusX: true,
+          focusY: true,
           courses: { select: { id: true, title: true, slug: true } },
         },
       },
@@ -65,7 +71,7 @@ export async function getTeamMemberBySlug(slug: string, locale: SupportedLocale)
     throw ApiError.notFound('Jamoa a\'zosi topilmadi');
   }
 
-  return resolveLocaleDeep(member, locale);
+  return resolveLocaleDeep(inheritPhoto(member, member.mentor), locale);
 }
 
 // Admin tahrirlash paneli uchun — xom {uz,ru,kaa,en} obyektini qaytaradi
