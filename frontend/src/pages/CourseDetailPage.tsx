@@ -34,9 +34,12 @@ interface CourseModule {
 }
 
 interface CourseMentor {
+  id: string;
   name: string;
   specialty?: string;
   bio?: string;
+  /** Kursning asosiy mentori — ro'yxatda birinchi turadi */
+  isLead?: boolean;
 }
 
 type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -64,7 +67,8 @@ interface CourseDetail {
   /** Offline mashg'ulot manzili */
   location?: string | null;
   modules: CourseModule[];
-  mentor?: CourseMentor | null;
+  /** Kursni olib boradigan mentorlar — asosiysi birinchi */
+  mentors?: CourseMentor[];
   [key: string]: unknown;
 }
 
@@ -181,7 +185,10 @@ export default function CourseDetailPage(): React.ReactElement {
           name: course.title,
           description: course.subtitle || course.description,
           provider: { '@type': 'Organization', name: 'DATA LIFE', url: SITE_URL },
-          ...(course.mentor?.name ? { instructor: { '@type': 'Person', name: course.mentor.name } } : {}),
+          // schema.org `instructor` bir nechta bo'lishi mumkin — barcha mentorlar sanaladi
+          ...(course.mentors?.length
+            ? { instructor: course.mentors.map((m) => ({ '@type': 'Person', name: m.name })) }
+            : {}),
           ...(Number(course.rating) > 0 && course.reviewsCount
             ? {
                 aggregateRating: {
@@ -259,12 +266,22 @@ export default function CourseDetailPage(): React.ReactElement {
           </div>
 
           <div>
-            {course.mentor && (
+            {course.mentors && course.mentors.length > 0 && (
               <div className="card" style={{ padding:20, marginBottom:16 }}>
-                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>{t('pages.courseDetail.mentor')}</p>
-                <p style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>{course.mentor.name}</p>
-                <p style={{ fontSize:12, color:course.color, fontWeight:600, marginBottom:8 }}>{course.mentor.specialty}</p>
-                <p style={{ fontSize:12, color:'#64748b', lineHeight:1.7 }}>{course.mentor.bio}</p>
+                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>
+                  {course.mentors.length > 1 ? t('pages.courseDetail.mentors') : t('pages.courseDetail.mentor')}
+                </p>
+                {course.mentors.map((mentor, i) => (
+                  <div key={mentor.id} style={{
+                    // Ajratuvchi chiziq faqat mentorlar ORASIDA — kartaning tepasida emas
+                    marginTop: i === 0 ? 0 : 14, paddingTop: i === 0 ? 0 : 14,
+                    borderTop: i === 0 ? 'none' : '1px solid #f1f5f9',
+                  }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>{mentor.name}</p>
+                    <p style={{ fontSize:12, color:course.color, fontWeight:600, marginBottom:8 }}>{mentor.specialty}</p>
+                    <p style={{ fontSize:12, color:'#64748b', lineHeight:1.7 }}>{mentor.bio}</p>
+                  </div>
+                ))}
               </div>
             )}
             <div className="card" style={{ padding:20 }}>

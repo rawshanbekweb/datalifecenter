@@ -47,12 +47,20 @@ interface CourseFormState {
   location: LocalizedString;
   tags: string;
   published: boolean;
-  mentorId: string;
+  /** Kurs mentorlari — RO'YXAT TARTIBI muhim: birinchisi asosiy mentor */
+  mentorIds: string[];
 }
 
 interface Mentor {
   id: string;
   name: string;
+}
+
+/** Kursga biriktirilgan mentor (backend `mentors` massivini tekis qaytaradi) */
+interface CourseMentor {
+  id: string;
+  name: string;
+  isLead: boolean;
 }
 
 interface Course {
@@ -71,8 +79,7 @@ interface Course {
   location?: LocalizedString | null;
   tags?: string[];
   published: boolean;
-  mentorId?: string;
-  mentor?: { name: string };
+  mentors?: CourseMentor[];
   isFree?: boolean;
   views?: number;
   likesCount?: number;
@@ -81,8 +88,62 @@ interface Course {
 const emptyForm: CourseFormState = {
   title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
   price:0, durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
-  tags:'', published:false, mentorId:'',
+  tags:'', published:false, mentorIds:[],
 };
+
+/**
+ * Kursning mentorlari — bir nechtasini tanlash mumkin.
+ *
+ * Ko'p tanlovli `<select multiple>` ATAYIN ishlatilmadi: unda tartib
+ * ko'rinmaydi (kim asosiy ekani bilinmaydi), Ctrl bilan tanlash esa
+ * sensorli ekranda umuman ishlamaydi. Shuning uchun oddiy belgilash
+ * ro'yxati: bosilgan tartibda qo'shiladi, birinchisi asosiy bo'ladi.
+ */
+function MentorPicker({ mentors, selected, onChange }: {
+  mentors: Mentor[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+}): React.ReactElement {
+  const { t } = useTranslation();
+
+  const toggle = (id: string): void => {
+    onChange(selected.includes(id) ? selected.filter((m) => m !== id) : [...selected, id]);
+  };
+
+  return (
+    <div>
+      <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>
+        {t('admin.courses.fMentors')}
+      </label>
+      {mentors.length === 0 && <p style={{ fontSize:12, color:'#94a3b8' }}>{t('admin.courses.noMentorsYet')}</p>}
+      <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+        {mentors.map((m) => {
+          const index = selected.indexOf(m.id);
+          const isSelected = index !== -1;
+          const isLead = index === 0;
+          return (
+            <button key={m.id} type="button" onClick={() => toggle(m.id)}
+              style={{
+                display:'flex', alignItems:'center', gap:7, height:34, padding:'0 12px', borderRadius:9,
+                fontSize:12.5, fontWeight:600, cursor:'pointer',
+                border: isSelected ? '1.5px solid #0ea5e9' : '1px solid #e2e8f0',
+                background: isSelected ? '#f0f9ff' : '#fff',
+                color: isSelected ? '#0284c7' : '#64748b',
+              }}>
+              {m.name}
+              {isLead && (
+                <span className="tag" style={{ background:'#fff', borderColor:'#bae6fd', color:'#0284c7', fontSize:10, fontWeight:700 }}>
+                  {t('admin.courses.leadMentor')}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p style={{ fontSize:11, color:'#94a3b8', marginTop:6 }}>{t('admin.courses.mentorsHint')}</p>
+    </div>
+  );
+}
 
 interface CourseFormProps {
   initial: CourseFormState;
@@ -121,7 +182,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       location: form.format !== 'ONLINE' && form.location.uz.trim() ? form.location : null,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       published: form.published,
-      mentorId: form.mentorId || null,
+      mentorIds: form.mentorIds,
     };
     try {
       if (form.id) {
@@ -169,7 +230,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           </select>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fPrice')}</label>
           <input className="inp" type="number" min="0" value={form.price} onChange={change('price')} />
@@ -178,14 +239,9 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fDuration')}</label>
           <input className="inp" type="number" min="1" value={form.durationMonths} onChange={change('durationMonths')} required />
         </div>
-        <div>
-          <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fMentor')}</label>
-          <select className="inp" value={form.mentorId} onChange={change('mentorId')}>
-            <option value="">{t('admin.courses.mentorNone')}</option>
-            {mentors.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-          </select>
-        </div>
       </div>
+      <MentorPicker mentors={mentors} selected={form.mentorIds}
+        onChange={(next) => setForm((f) => ({ ...f, mentorIds: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fFormat')}</label>
@@ -241,7 +297,9 @@ export default function AdminCoursesPage(): React.ReactElement {
       iconKey: course.iconKey, preset: presetIdx === -1 ? 0 : presetIdx, price: Number(course.price) || 0,
       durationMonths: course.durationMonths, level: course.level, format: course.format || 'ONLINE',
       location: course.location || emptyLocalizedString(), tags: (course.tags || []).join(', '),
-      published: course.published, mentorId: course.mentorId || '',
+      // Backend mentorlarni asosiysi birinchi bo'ladigan tartibda qaytaradi —
+      // shu tartib formada ham saqlanadi
+      published: course.published, mentorIds: (course.mentors || []).map((m) => m.id),
     });
   };
 
@@ -286,7 +344,9 @@ export default function AdminCoursesPage(): React.ReactElement {
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{c.title.uz}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>
-                    {c.mentor?.name || t('admin.courses.noMentor')} · {c.isFree ? t('common.free') : t('admin.courses.priceUnit', { price: formatNumber(Number(c.price)) })}
+                    {c.mentors?.length ? c.mentors.map((m) => m.name).join(', ') : t('admin.courses.noMentor')}
+                    {' · '}
+                    {c.isFree ? t('common.free') : t('admin.courses.priceUnit', { price: formatNumber(Number(c.price)) })}
                   </p>
                 </div>
                 <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:'#0891b2', flexShrink:0 }}

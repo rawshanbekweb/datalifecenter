@@ -4,6 +4,7 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, resolveLocaleDeep, toJsonInput, toUzText } from '../utils/localizedField';
 import { audienceRecipientIds, filterEnrolledStudentIds } from '../utils/courseAudience';
+import { isCourseMentor, leadMentorId } from '../utils/courseMentors';
 import { notify } from './notifications.service';
 
 const sessionInclude = {
@@ -68,15 +69,18 @@ export async function createSession(input: CreateSessionInput, actor: Actor) {
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  // Sessiyaning muallifi bitta mentor bo'ladi: uni o'tkazadigan odam.
+  // Admin kurs nomidan yaratsa — kursning asosiy mentori muallif bo'ladi.
   let mentorId: string;
   if (actor.role === 'ADMIN') {
-    if (!course.mentorId) {
+    const lead = await leadMentorId(course.id);
+    if (!lead) {
       throw ApiError.conflict('Bu kursga mentor biriktirilmagan', 'COURSE_HAS_NO_MENTOR');
     }
-    mentorId = course.mentorId;
+    mentorId = lead;
   } else {
     const mentor = await getOwnMentor(actor.userId);
-    if (course.mentorId !== mentor.id) {
+    if (!(await isCourseMentor(course.id, mentor.id))) {
       throw ApiError.forbidden("Bu kurs sizga biriktirilmagan");
     }
     mentorId = mentor.id;
@@ -139,7 +143,8 @@ export async function getSessionForViewer(id: string, actor: Actor, locale: Supp
   if (actor.role !== 'ADMIN') {
     const mentor =
       actor.role === 'MENTOR' ? await prisma.mentor.findUnique({ where: { userId: actor.userId } }) : null;
-    const isOwnerMentor = mentor !== null && session.mentorId === mentor.id;
+    // Kursning istalgan mentori jonli darsga kira oladi (o'zi o'tkazmasa ham)
+    const isOwnerMentor = mentor !== null && (await isCourseMentor(session.courseId, mentor.id));
 
     if (!isOwnerMentor) {
       const enrollment = await prisma.enrollment.findFirst({
@@ -157,10 +162,16 @@ export async function getSessionForViewer(id: string, actor: Actor, locale: Supp
   return resolveLocaleDeep(presentStatus(session), locale);
 }
 
-// Mentor: o'z sessiyalari; Admin: hammasi
+// Mentor: o'z KURSLARIDAGI sessiyalar; Admin: hammasi.
+//
+// Faqat o'zi yaratganlari emas: kursni bir necha mentor birga olib boradi va
+// ular bir-birining jadvalini ko'rishi kerak (aks holda ikki mentor bir vaqtga
+// dars qo'yib yuborardi).
 export async function listManagedSessions(actor: Actor) {
   const where: Prisma.LiveSessionWhereInput =
-    actor.role === 'ADMIN' ? {} : { mentorId: (await getOwnMentor(actor.userId)).id };
+    actor.role === 'ADMIN'
+      ? {}
+      : { course: { mentors: { some: { mentorId: (await getOwnMentor(actor.userId)).id } } } };
 
   const sessions = await prisma.liveSession.findMany({
     where,
@@ -171,6 +182,9 @@ export async function listManagedSessions(actor: Actor) {
   return sessions.map(presentStatus);
 }
 
+// Sessiyani kursning HAR QANDAY mentori tahrirlay oladi — jamoa bo'lib
+// o'tiladigan kursda kasal bo'lib qolgan hamkasbining darsini ko'chirish
+// yoki bekor qilish oddiy holat.
 async function getOwnedSession(id: string, actor: Actor) {
   const session = await prisma.liveSession.findUnique({ where: { id } });
   if (!session) {
@@ -178,7 +192,7 @@ async function getOwnedSession(id: string, actor: Actor) {
   }
   if (actor.role !== 'ADMIN') {
     const mentor = await getOwnMentor(actor.userId);
-    if (session.mentorId !== mentor.id) {
+    if (!(await isCourseMentor(session.courseId, mentor.id))) {
       throw ApiError.forbidden('Bu sessiya sizga tegishli emas');
     }
   }

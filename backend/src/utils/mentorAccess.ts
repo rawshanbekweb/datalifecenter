@@ -22,8 +22,16 @@ export async function requireMentorId(userId: string): Promise<string> {
   return mentor.id;
 }
 
-// ADMIN hamma kursni, mentor faqat o'ziga biriktirilgan kursni boshqaradi
-export function canManageCourse(actor: Actor, courseMentorUserId: string | null | undefined): boolean {
+/**
+ * ADMIN hamma kursni, mentor faqat o'ziga biriktirilgan kursni boshqaradi.
+ *
+ * Kursda bir nechta mentor bo'lishi mumkin, shuning uchun bu yerga ULARNING
+ * BARCHASINING hisob id'si beriladi: har biri kursni teng boshqaradi (savolga
+ * javob beradi, dasturni tahrirlaydi). Mentor profiliga user bog'lanmagan
+ * bo'lsa (admin qo'lda kiritgan) ro'yxatda null turadi va hech kimga mos
+ * kelmaydi.
+ */
+export function canManageCourse(actor: Actor, courseMentorUserIds: (string | null | undefined)[]): boolean {
   if (actor.role === 'ADMIN') return true;
-  return !!courseMentorUserId && courseMentorUserId === actor.userId;
+  return courseMentorUserIds.some((id) => !!id && id === actor.userId);
 }

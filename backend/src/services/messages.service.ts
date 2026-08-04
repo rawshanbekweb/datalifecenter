@@ -58,7 +58,7 @@ async function studentSharesCourseWithMentor(studentId: string, mentorUserId: st
     where: {
       userId: studentId,
       status: { in: ['ACTIVE', 'COMPLETED'] },
-      course: { mentor: { userId: mentorUserId } },
+      course: { mentors: { some: { mentor: { userId: mentorUserId } } } },
     },
     select: { id: true },
   });
@@ -476,7 +476,7 @@ export async function listContacts(actor: Actor, search?: string): Promise<Conta
     const enrollments = await prisma.enrollment.findMany({
       where: {
         status: { in: ['ACTIVE', 'COMPLETED'] },
-        course: { mentor: { userId: actor.userId } },
+        course: { mentors: { some: { mentor: { userId: actor.userId } } } },
         user: { isBlocked: false, ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}) },
       },
       select: { user: { select: userCard }, course: { select: { title: true } } },
@@ -485,25 +485,36 @@ export async function listContacts(actor: Actor, search?: string): Promise<Conta
     return dedupeContacts(enrollments.map((e) => ({ ...e.user, context: uzTitle(e.course.title) })));
   }
 
-  // Talaba — o'zi yozilgan kurslarning mentorlari
+  // Talaba — o'zi yozilgan kurslarning mentorlari (kursda bir nechta bo'lishi mumkin)
   const enrollments = await prisma.enrollment.findMany({
     where: {
       userId: actor.userId,
       status: { in: ['ACTIVE', 'COMPLETED'] },
-      course: { mentor: { userId: { not: null } } },
+      course: { mentors: { some: { mentor: { userId: { not: null } } } } },
     },
     select: {
-      course: { select: { title: true, mentor: { select: { user: { select: userCard } } } } },
+      course: {
+        select: {
+          title: true,
+          mentors: {
+            orderBy: [{ isLead: 'desc' }, { order: 'asc' }],
+            select: { mentor: { select: { user: { select: userCard } } } },
+          },
+        },
+      },
     },
     take: 100,
   });
 
   const contacts: ContactCard[] = [];
   for (const enrollment of enrollments) {
-    const user = enrollment.course.mentor?.user;
-    // Mentor profili bor, lekin unga user hisobi bog'lanmagan bo'lishi
-    // mumkin (admin qo'lda kiritgan mentor) — bunday mentorga yozib bo'lmaydi
-    if (user) contacts.push({ ...user, context: uzTitle(enrollment.course.title) });
+    for (const link of enrollment.course.mentors) {
+      // Mentor profili bor, lekin unga user hisobi bog'lanmagan bo'lishi
+      // mumkin (admin qo'lda kiritgan mentor) — bunday mentorga yozib bo'lmaydi
+      if (link.mentor.user) {
+        contacts.push({ ...link.mentor.user, context: uzTitle(enrollment.course.title) });
+      }
+    }
   }
 
   return dedupeContacts(contacts);

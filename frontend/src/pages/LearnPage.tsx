@@ -34,7 +34,8 @@ interface LearnCourse {
   bg: string;
   border: string;
   modules: LearnModule[];
-  mentor?: { name: string; specialty?: string } | null;
+  /** Kursning mentorlari — asosiysi birinchi */
+  mentors?: { id: string; name: string; specialty?: string }[];
 }
 
 const TYPE_ICONS: Record<LearnLesson['contentType'], React.ComponentType<{ size?: number | string; style?: React.CSSProperties }>> = {
@@ -157,7 +158,11 @@ export default function LearnPage(): React.ReactElement {
           <h1 style={{ fontFamily:'var(--font-sans)', fontSize:'clamp(18px,2.4vw,24px)', fontWeight:800, color:'#0f172a', flex:1, minWidth:200 }}>
             {course.title}
           </h1>
-          {course.mentor && <span className="tag" style={{ borderColor:course.border, color:course.color, fontWeight:700 }}>{t('pages.courseDetail.mentor')}: {course.mentor.name}</span>}
+          {course.mentors?.map((mentor) => (
+            <span key={mentor.id} className="tag" style={{ borderColor:course.border, color:course.color, fontWeight:700 }}>
+              {mentor.name}
+            </span>
+          ))}
         </div>
 
         {totalLessons > 0 && hasEnrollment && (

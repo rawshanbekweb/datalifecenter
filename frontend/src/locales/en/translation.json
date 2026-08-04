@@ -334,7 +334,8 @@
       "offlinePrompt": "This course runs offline — contact an administrator to enrol.",
       "contactAdmin": "Ask for details",
       "contactOffline": "Contact us (offline)",
-      "enrollOnline": "Enrol online"
+      "enrollOnline": "Enrol online",
+      "mentors": "Mentors"
     },
     "certificate": {
       "title": "Verify certificate",
@@ -625,7 +626,10 @@
       "noEnrollments": "No one has enrolled in your courses yet.",
       "moduleCount": "{{modules}} modules · {{students}} students",
       "published": "Published",
-      "draft": "Draft"
+      "draft": "Draft",
+      "statViews": "Views",
+      "statLikes": "Likes",
+      "leadMentor": "Lead mentor"
     },
     "enrollStatus": {
       "PENDING": "Pending",
@@ -753,6 +757,7 @@
     "backToSite": "Back to site",
     "nav": {
       "dashboard": "Dashboard",
+      "analytics": "Monitoring",
       "enrollments": "Enrollments",
       "subscriptions": "Subscriptions",
       "courses": "Courses",
@@ -978,8 +983,6 @@
       "fLevel": "Level",
       "fPrice": "Price (UZS, free = 0)",
       "fDuration": "Duration (months)",
-      "fMentor": "Mentor",
-      "mentorNone": "Not selected",
       "fTags": "Tags (comma-separated)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Published (visible on site)",
@@ -990,7 +993,11 @@
       "confirmDelete": "Confirm deleting this course?",
       "fFormat": "Format",
       "fLocation": "Address (offline)",
-      "viewsTitle": "Views"
+      "viewsTitle": "Views",
+      "fMentors": "Mentors",
+      "leadMentor": "lead",
+      "mentorsHint": "You can pick several. The first one selected becomes the lead mentor.",
+      "noMentorsYet": "Add a mentor first."
     },
     "mentors": {
       "title": "Mentors",
@@ -1192,6 +1199,28 @@
       "newBtn": "New member",
       "empty": "No team members have been added yet.",
       "confirmDelete": "Delete this team member?"
+    },
+    "analytics": {
+      "title": "Monitoring",
+      "sub": "Views, likes and growth over time",
+      "rangeDays": "{{n}} days",
+      "views": "Views",
+      "likes": "Likes",
+      "newUsers": "New users",
+      "enrollments": "New enrollments",
+      "vsPrevious": "Previous period: {{n}}",
+      "deltaNew": "New",
+      "deltaNone": "No change",
+      "dailyTitle": "Daily: {{metric}}",
+      "byTypeTitle": "By section",
+      "byTypeSub": "Views within the period",
+      "topTitle": "Most viewed content",
+      "topSub": "Within the selected period",
+      "noData": "No data for this period.",
+      "typeCourse": "Courses",
+      "typePost": "Articles",
+      "typeProject": "Projects",
+      "typeTestimonial": "Testimonials"
     }
   },
   "engagement": {

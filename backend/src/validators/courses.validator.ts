@@ -9,6 +9,12 @@ export const listCoursesQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(12),
 });
 
+/**
+ * Kursning mentorlari. Yuborilmasa ro'yxat tegilmaydi; bo'sh massiv esa
+ * "mentor biriktirilmagan" degani. Birinchi element asosiy mentor bo'ladi.
+ */
+const courseMentorIds = z.array(z.string()).optional();
+
 export const createCourseSchema = z.object({
   title: localizedString(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
   subtitle: localizedStringNullish(),
@@ -27,7 +33,7 @@ export const createCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
-  mentorId: z.string().nullable().optional(),
+  mentorIds: courseMentorIds,
 });
 
 // DIQQAT: createCourseSchema.partial() ishlatib bo'lmaydi — zod .partial()da ham
@@ -49,5 +55,5 @@ export const updateCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).optional(),
   published: z.boolean().optional(),
-  mentorId: z.string().nullable().optional(),
+  mentorIds: courseMentorIds,
 });

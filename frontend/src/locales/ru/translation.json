@@ -334,7 +334,8 @@
       "offlinePrompt": "Курс проходит оффлайн — для записи свяжитесь с администратором.",
       "contactAdmin": "Узнать подробнее",
       "contactOffline": "Связаться (оффлайн)",
-      "enrollOnline": "Записаться онлайн"
+      "enrollOnline": "Записаться онлайн",
+      "mentors": "Менторы"
     },
     "certificate": {
       "title": "Проверка сертификата",
@@ -625,7 +626,10 @@
       "noEnrollments": "На ваши курсы пока никто не записался.",
       "moduleCount": "{{modules}} модулей · {{students}} студентов",
       "published": "Опубликован",
-      "draft": "Черновик"
+      "draft": "Черновик",
+      "statViews": "Просмотры",
+      "statLikes": "Лайки",
+      "leadMentor": "Основной ментор"
     },
     "enrollStatus": {
       "PENDING": "Ожидает",
@@ -753,6 +757,7 @@
     "backToSite": "Вернуться на сайт",
     "nav": {
       "dashboard": "Панель управления",
+      "analytics": "Мониторинг",
       "enrollments": "Записи",
       "subscriptions": "Подписки",
       "courses": "Курсы",
@@ -978,8 +983,6 @@
       "fLevel": "Уровень",
       "fPrice": "Цена (UZS, бесплатно = 0)",
       "fDuration": "Длительность (мес.)",
-      "fMentor": "Ментор",
-      "mentorNone": "Не выбран",
       "fTags": "Теги (через запятую)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Опубликован (виден на сайте)",
@@ -990,7 +993,11 @@
       "confirmDelete": "Подтвердить удаление курса?",
       "fFormat": "Формат",
       "fLocation": "Адрес (оффлайн)",
-      "viewsTitle": "Просмотры"
+      "viewsTitle": "Просмотры",
+      "fMentors": "Менторы",
+      "leadMentor": "основной",
+      "mentorsHint": "Можно выбрать нескольких. Первый выбранный станет основным ментором.",
+      "noMentorsYet": "Сначала добавьте ментора."
     },
     "mentors": {
       "title": "Менторы",
@@ -1192,6 +1199,28 @@
       "newBtn": "Новый участник",
       "empty": "Участники команды пока не добавлены.",
       "confirmDelete": "Удалить участника команды?"
+    },
+    "analytics": {
+      "title": "Мониторинг",
+      "sub": "Просмотры, лайки и динамика роста",
+      "rangeDays": "{{n}} дн.",
+      "views": "Просмотры",
+      "likes": "Лайки",
+      "newUsers": "Новые пользователи",
+      "enrollments": "Новые записи",
+      "vsPrevious": "За прошлый период: {{n}}",
+      "deltaNew": "Новое",
+      "deltaNone": "Без изменений",
+      "dailyTitle": "По дням: {{metric}}",
+      "byTypeTitle": "По разделам",
+      "byTypeSub": "Просмотры за период",
+      "topTitle": "Самый просматриваемый контент",
+      "topSub": "За выбранный период",
+      "noData": "За этот период данных нет.",
+      "typeCourse": "Курсы",
+      "typePost": "Статьи",
+      "typeProject": "Проекты",
+      "typeTestimonial": "Отзывы"
     }
   },
   "engagement": {

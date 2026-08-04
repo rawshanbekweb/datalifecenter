@@ -34,7 +34,7 @@ beforeAll(async () => {
   const mentor = await prisma.mentor.create({
     data: { name: 'Mentor Mentorov', bio: { uz: 'Bio' }, specialty: { uz: 'Backend' }, userId: mentorUser.id },
   });
-  await prisma.course.update({ where: { id: course.body.data.id }, data: { mentorId: mentor.id } });
+  await prisma.courseMentor.create({ data: { courseId: course.body.data.id, mentorId: mentor.id, isLead: true } });
   await prisma.enrollment.create({
     data: { userId: enrolledUserId, courseId: course.body.data.id, status: 'ACTIVE', paymentStatus: 'PAID' },
   });

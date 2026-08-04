@@ -8,6 +8,7 @@ import { slugify } from '../utils/slugify';
 import { signVideoUrls } from './storage.service';
 import { hasActiveSubscription } from './subscriptions.service';
 import { purgeEngagement } from './engagement.service';
+import { flatMentors, mentorsBrief, mentorsFull, setCourseMentors } from '../utils/courseMentors';
 
 interface ListCoursesFilters {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -36,7 +37,7 @@ export async function listCourses(filters: ListCoursesFilters, locale: Supported
       skip: (filters.page - 1) * filters.limit,
       take: filters.limit,
       include: {
-        mentor: { select: { id: true, name: true } },
+        ...mentorsBrief,
         modules: { select: { id: true, title: true, order: true }, orderBy: { order: 'asc' } },
       },
     }),
@@ -44,7 +45,7 @@ export async function listCourses(filters: ListCoursesFilters, locale: Supported
   ]);
 
   return {
-    items: resolveLocaleDeep(items, locale),
+    items: resolveLocaleDeep(items.map((c) => ({ ...c, mentors: flatMentors(c.mentors) })), locale),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
@@ -53,7 +54,7 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
   const course = await prisma.course.findFirst({
     where: { slug, published: true },
     include: {
-      mentor: true,
+      ...mentorsFull,
       modules: {
         orderBy: { order: 'asc' },
         include: { lessons: { orderBy: { order: 'asc' } } },
@@ -74,6 +75,7 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
   return resolveLocaleDeep(
     {
       ...course,
+      mentors: flatMentors(course.mentors),
       modules: course.modules.map((mod) => ({
         ...mod,
         lessons: mod.lessons.map((lesson) => ({
@@ -102,17 +104,18 @@ async function signVideoUrlMap<L extends { id: string; videoUrl: string | null }
 }
 
 export async function listCoursesAdmin() {
-  return prisma.course.findMany({
+  const courses = await prisma.course.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { mentor: { select: { id: true, name: true } } },
+    include: mentorsBrief,
   });
+  return courses.map((c) => ({ ...c, mentors: flatMentors(c.mentors) }));
 }
 
 export async function getCourseByIdAdmin(id: string) {
   const course = await prisma.course.findUnique({
     where: { id },
     include: {
-      mentor: { select: { id: true, name: true } },
+      ...mentorsBrief,
       modules: {
         orderBy: { order: 'asc' },
         include: { lessons: { orderBy: { order: 'asc' } } },
@@ -122,14 +125,25 @@ export async function getCourseByIdAdmin(id: string) {
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
   }
-  return course;
+  return { ...course, mentors: flatMentors(course.mentors) };
+}
+
+/**
+ * Saqlashdan keyin qaytariladigan shakl: kurs maydonlari + mentorlar.
+ *
+ * `getCourseByIdAdmin` emas — u butun dasturni (modullar va darslar bilan)
+ * ham o'qiydi, kurs sozlamalarini saqlashda esa u umuman kerak emas.
+ */
+async function getCourseWithMentors(id: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { id }, include: mentorsBrief });
+  return { ...course, mentors: flatMentors(course.mentors) };
 }
 
 export async function getCourseForLearning(slug: string, userId: string, role: string, locale: SupportedLocale) {
   const course = await prisma.course.findFirst({
     where: { slug, published: true },
     include: {
-      mentor: true,
+      ...mentorsFull,
       modules: {
         orderBy: { order: 'asc' },
         include: { lessons: { orderBy: { order: 'asc' } } },
@@ -184,6 +198,7 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
   const signedCourse = resolveLocaleDeep(
     {
       ...course,
+      mentors: flatMentors(course.mentors),
       modules: course.modules.map((mod) => ({
         ...mod,
         lessons: mod.lessons.map((lesson) => ({ ...lesson, videoUrl: signed.get(lesson.id) ?? null })),
@@ -223,23 +238,31 @@ interface CourseInput {
   location?: LocalizedString | null;
   tags: string[];
   published: boolean;
-  mentorId?: string | null;
+  /** Kursni olib boradigan mentorlar — birinchisi asosiy (utils/courseMentors.ts) */
+  mentorIds?: string[];
 }
 
 export async function createCourse(input: CourseInput) {
+  const { mentorIds, ...fields } = input;
   const slug = await uniqueSlug(input.title.uz);
-  return prisma.course.create({
+  const course = await prisma.course.create({
     data: {
-      ...input,
+      ...fields,
       slug,
       isFree: input.price <= 0,
       subtitle: toJsonInput(input.subtitle),
       location: toJsonInput(input.location),
     } as Prisma.CourseUncheckedCreateInput,
   });
+
+  if (mentorIds?.length) {
+    await setCourseMentors(course.id, mentorIds);
+  }
+  return getCourseWithMentors(course.id);
 }
 
 export async function updateCourse(id: string, input: Partial<CourseInput>) {
+  const { mentorIds, ...fields } = input;
   const course = await prisma.course.findUnique({ where: { id } });
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
@@ -249,16 +272,22 @@ export async function updateCourse(id: string, input: Partial<CourseInput>) {
   const slug = input.title && input.title.uz !== currentTitle.uz ? await uniqueSlug(input.title.uz, id) : undefined;
   const isFree = input.price !== undefined ? input.price <= 0 : undefined;
 
-  return prisma.course.update({
+  await prisma.course.update({
     where: { id },
     data: {
-      ...input,
+      ...fields,
       subtitle: toJsonInput(input.subtitle),
       location: toJsonInput(input.location),
       ...(slug ? { slug } : {}),
       ...(isFree !== undefined ? { isFree } : {}),
     } as Prisma.CourseUncheckedUpdateInput,
   });
+
+  // Maydon yuborilmagan bo'lsa mentorlar tegilmaydi (qisman yangilash)
+  if (mentorIds !== undefined) {
+    await setCourseMentors(id, mentorIds);
+  }
+  return getCourseWithMentors(id);
 }
 
 export async function deleteCourse(id: string) {

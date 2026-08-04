@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, GraduationCap, ArrowRight } from 'lucide-react';
+import { BookOpen, Users, GraduationCap, ArrowRight, Eye, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getMentorDashboard } from '../../api/mentors';
 import { resolveIcon } from '../../utils/iconMap';
@@ -19,6 +19,10 @@ interface MentorCourse {
   bg: string;
   border: string;
   published: boolean;
+  views: number;
+  likesCount: number;
+  /** Kursning asosiy mentori shu odammi (kursda bir nechta mentor bo'lishi mumkin) */
+  isLead: boolean;
   _count: { enrollments: number; modules: number };
 }
 
@@ -36,7 +40,14 @@ interface MentorDashboardData {
     user: { id: string; name: string; email: string };
     course: { id: string; title: string; slug: string };
   }[];
-  stats: { totalStudents: number; activeStudents: number; coursesCount: number };
+  stats: {
+    totalStudents: number;
+    activeStudents: number;
+    coursesCount: number;
+    /** Mentor kurslarining jami ko'rish/yoqtirish soni */
+    totalViews: number;
+    totalLikes: number;
+  };
 }
 
 const STATUS_META: Record<string, { labelKey: string; color: string; bg: string; border: string }> = {
@@ -82,6 +93,10 @@ export default function MentorHomePage(): React.ReactElement {
               { label:t('mentor.home.statCourses'), value:data.stats.coursesCount, icon:BookOpen, color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff' },
               { label:t('mentor.home.statTotalStudents'), value:data.stats.totalStudents, icon:Users, color:'#0ea5e9', bg:'#f0f9ff', border:'#bae6fd' },
               { label:t('mentor.home.statActiveStudents'), value:data.stats.activeStudents, icon:GraduationCap, color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0' },
+              // Mentor o'z kurslariga qiziqishni ham ko'radi — raqamlar kurs
+              // qatorida saqlanadi, qo'shimcha so'rov talab qilmaydi
+              { label:t('mentor.home.statViews'), value:data.stats.totalViews, icon:Eye, color:'#0891b2', bg:'#ecfeff', border:'#a5f3fc' },
+              { label:t('mentor.home.statLikes'), value:data.stats.totalLikes, icon:Heart, color:'#f43f5e', bg:'#fff1f2', border:'#fecdd3' },
             ].map((card) => {
               const Icon = card.icon;
               return (
@@ -115,6 +130,15 @@ export default function MentorHomePage(): React.ReactElement {
                     <p style={{ fontSize:14, fontWeight:800, color:'#0f172a' }}>{c.title}</p>
                     <p style={{ fontSize:12, color:'#64748b' }}>{t('mentor.home.moduleCount', { modules: c._count.modules, students: c._count.enrollments })}</p>
                   </div>
+                  <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, fontWeight:700, color:'#0891b2', flexShrink:0 }}>
+                    <Eye size={13}/> {c.views}
+                  </span>
+                  {/* Kursda bir nechta mentor bo'lsa — kim asosiy ekani ko'rinib tursin */}
+                  {c.isLead && (
+                    <span className="tag" style={{ background:'#f0f9ff', borderColor:'#bae6fd', color:'#0284c7', fontWeight:700, flexShrink:0 }}>
+                      {t('mentor.home.leadMentor')}
+                    </span>
+                  )}
                   <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#fff', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8', flexShrink:0 }}>
                     {c.published ? t('mentor.home.published') : t('mentor.home.draft')}
                   </span>

@@ -334,7 +334,8 @@
       "offlinePrompt": "Bul kurs offline ótedi — jazılıw ushın administrator menen baylanısıń.",
       "contactAdmin": "Maǵlıwmat alıw",
       "contactOffline": "Offline ushın baylanısıw",
-      "enrollOnline": "Online jazılıw"
+      "enrollOnline": "Online jazılıw",
+      "mentors": "Mentorlar"
     },
     "certificate": {
       "title": "Sertifikattı tekseriw",
@@ -625,7 +626,10 @@
       "noEnrollments": "Kurslarıńızǵa álle hesh kim jazılmaǵan.",
       "moduleCount": "{{modules}} modul · {{students}} student",
       "published": "Járiyalanǵan",
-      "draft": "Qaralama"
+      "draft": "Qaralama",
+      "statViews": "Kóriwler",
+      "statLikes": "Unatıwlar",
+      "leadMentor": "Tiykarǵı mentor"
     },
     "enrollStatus": {
       "PENDING": "Kútilmekte",
@@ -753,6 +757,7 @@
     "backToSite": "Saytqa qaytıw",
     "nav": {
       "dashboard": "Basqarıw paneli",
+      "analytics": "Monitoring",
       "enrollments": "Jazılıwlar",
       "subscriptions": "Jazılıwlar (obuna)",
       "courses": "Kurslar",
@@ -978,8 +983,6 @@
       "fLevel": "Dáreje",
       "fPrice": "Baha (UZS, biypul = 0)",
       "fDuration": "Dawamlılıǵı (ay)",
-      "fMentor": "Mentor",
-      "mentorNone": "Saylanbaǵan",
       "fTags": "Tegler (útir menen)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Járiyalanǵan (saytta kórinedi)",
@@ -990,7 +993,11 @@
       "confirmDelete": "Kurstı óshiriwdi tastıyıqlaysızba?",
       "fFormat": "Format",
       "fLocation": "Mánzil (offline)",
-      "viewsTitle": "Kóriwler sanı"
+      "viewsTitle": "Kóriwler sanı",
+      "fMentors": "Mentorlar",
+      "leadMentor": "tiykarǵı",
+      "mentorsHint": "Bir neshewin saylaw múmkin. Birinshi saylanǵanı tiykarǵı mentor boladı.",
+      "noMentorsYet": "Aldın mentor qosıń."
     },
     "mentors": {
       "title": "Mentorlar",
@@ -1192,6 +1199,28 @@
       "newBtn": "Jańa aǵza",
       "empty": "Házirshe komanda aǵzaları qosılmaǵan.",
       "confirmDelete": "Komanda aǵzasın óshiriwdi tastıyıqlaysız ba?"
+    },
+    "analytics": {
+      "title": "Monitoring",
+      "sub": "Kóriwler, unatıwlar hám ósiw dinamikası",
+      "rangeDays": "{{n}} kún",
+      "views": "Kóriwler",
+      "likes": "Unatıwlar",
+      "newUsers": "Jańa paydalanıwshılar",
+      "enrollments": "Jańa jazılıwlar",
+      "vsPrevious": "Aldıńǵı dáwirde: {{n}}",
+      "deltaNew": "Jańa",
+      "deltaNone": "Ózgerissiz",
+      "dailyTitle": "Kúnlik: {{metric}}",
+      "byTypeTitle": "Bólimler boyınsha",
+      "byTypeSub": "Dáwir ishindegi kóriwler",
+      "topTitle": "Eń kóp kórilgen kontent",
+      "topSub": "Saylanǵan dáwir ishinde",
+      "noData": "Bul dáwirde maǵlıwmat joq.",
+      "typeCourse": "Kurslar",
+      "typePost": "Maqalalar",
+      "typeProject": "Joybarlar",
+      "typeTestimonial": "Pikirler"
     }
   },
   "engagement": {

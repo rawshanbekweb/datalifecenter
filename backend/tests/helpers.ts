@@ -27,6 +27,9 @@ export async function resetDb(): Promise<void> {
     prisma.announcement.deleteMany(),
     prisma.lesson.deleteMany(),
     prisma.module.deleteMany(),
+    // Kurs ↔ mentor bog'lanishi cascade bilan o'chadi, lekin mentor
+    // qatorlari kursdan KEYIN o'chirilgani uchun tartib ochiq yozildi
+    prisma.courseMentor.deleteMany(),
     prisma.course.deleteMany(),
     prisma.blogPost.deleteMany(),
     // TeamMemberProject onDelete: Cascade — lekin Project qatorlari testlarda
@@ -37,6 +40,10 @@ export async function resetDb(): Promise<void> {
     prisma.mentor.deleteMany(),
     prisma.partner.deleteMany(),
     prisma.contactMessage.deleteMany(),
+    // Qiziqish hisoblagichlarida foreign key yo'q (polimorf) — o'zi tozalanmaydi
+    prisma.contentLike.deleteMany(),
+    prisma.contentView.deleteMany(),
+    prisma.engagementDaily.deleteMany(),
     prisma.user.deleteMany(),
   ]);
 }

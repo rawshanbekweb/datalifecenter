@@ -3,16 +3,17 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { Actor, canManageCourse, mentorNotLinkedError } from '../utils/mentorAccess';
+import { mentorsForAccess } from '../utils/courseMentors';
 import { excerpt, notify } from './notifications.service';
 
-// Dars qaysi kursga tegishli va bu kurs mentorining userId'si
+// Dars qaysi kursga tegishli va bu kurs mentorlarining userId'lari
 async function lessonCourseInfo(lessonId: string) {
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
     select: {
       id: true,
       title: true,
-      module: { select: { course: { select: { id: true, title: true, mentor: { select: { userId: true } } } } } },
+      module: { select: { course: { select: { id: true, title: true, ...mentorsForAccess } } } },
     },
   });
   if (!lesson) {
@@ -21,12 +22,17 @@ async function lessonCourseInfo(lessonId: string) {
   return lesson;
 }
 
+/** Darsdagi kursning mentor hisoblari — ruxsat va bildirishnoma uchun */
+function mentorUserIds(course: { mentors: { mentor: { userId: string | null } }[] }): string[] {
+  return course.mentors.map((m) => m.mentor.userId).filter((id): id is string => id !== null);
+}
+
 // Savol berish/o'qish uchun ruxsat: yozilgan o'quvchi, kurs mentori yoki admin
 async function assertCanAccessLesson(lessonId: string, actor: Actor) {
   const lesson = await lessonCourseInfo(lessonId);
   const courseId = lesson.module.course.id;
 
-  if (canManageCourse(actor, lesson.module.course.mentor?.userId)) return lesson;
+  if (canManageCourse(actor, mentorUserIds(lesson.module.course))) return lesson;
 
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: actor.userId, courseId } },
@@ -44,9 +50,11 @@ export async function createQuestion(actor: Actor, input: { lessonId: string; bo
     include: { user: { select: { id: true, name: true, avatarUrl: true, focusX: true, focusY: true } } },
   });
 
-  const mentorUserId = lesson.module.course.mentor?.userId;
-  if (mentorUserId && mentorUserId !== actor.userId) {
-    await notify(mentorUserId, {
+  // Kursning BARCHA mentorlariga xabar beriladi — javob birinchi bo'sh
+  // bo'lgani beradi. Savol bergan mentorning o'ziga qaytmaydi.
+  const recipients = mentorUserIds(lesson.module.course).filter((id) => id !== actor.userId);
+  if (recipients.length) {
+    await notify(recipients, {
       type: 'NEW_QUESTION',
       title: `Yangi savol: ${toUzText(lesson.title)}`,
       body: excerpt(input.body),
@@ -70,12 +78,12 @@ export async function listLessonQuestions(lessonId: string, actor: Actor) {
 export async function listMentorQuestions(userId: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
-    select: { id: true, courses: { select: { id: true } } },
+    select: { id: true, courseLinks: { select: { courseId: true } } },
   });
   if (!mentor) {
     throw mentorNotLinkedError();
   }
-  const courseIds = mentor.courses.map((c) => c.id);
+  const courseIds = mentor.courseLinks.map((link) => link.courseId);
   if (!courseIds.length) return [];
 
   const questions = await prisma.lessonQuestion.findMany({
@@ -104,7 +112,7 @@ export async function answerQuestion(id: string, answer: string, actor: Actor) {
       lesson: {
         select: {
           title: true,
-          module: { select: { course: { select: { slug: true, mentor: { select: { userId: true } } } } } },
+          module: { select: { course: { select: { slug: true, ...mentorsForAccess } } } },
         },
       },
     },
@@ -112,7 +120,7 @@ export async function answerQuestion(id: string, answer: string, actor: Actor) {
   if (!question) {
     throw ApiError.notFound('Savol topilmadi');
   }
-  if (!canManageCourse(actor, question.lesson.module.course.mentor?.userId)) {
+  if (!canManageCourse(actor, mentorUserIds(question.lesson.module.course))) {
     throw ApiError.forbidden('Bu savol sizning kursingizga tegishli emas');
   }
   const updated = await prisma.lessonQuestion.update({

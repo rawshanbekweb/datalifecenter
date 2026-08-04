@@ -14,10 +14,28 @@ import { isForeignKeyViolation } from '../utils/prismaErrors';
 // formasi rasmni o'chirganda NULL yozishiga tayanadi.
 const PHOTO_FIRST = { photoUrl: { sort: 'asc', nulls: 'last' } } as const;
 
+/**
+ * Mentorning kurslari `CourseMentor` orqali keladi (kursda bir nechta mentor
+ * bo'lishi mumkin). Javobda esa oddiy `courses` massivi turadi — bog'lovchi
+ * jadval mijozga ko'rinmaydi.
+ */
+const courseLinksSelect = {
+  orderBy: [{ isLead: 'desc' }, { order: 'asc' }],
+  select: { isLead: true, course: { select: { id: true, title: true, slug: true } } },
+} satisfies Prisma.Mentor$courseLinksArgs;
+
+// Bog'lovchi qatorlarni tekis kurs ro'yxatiga aylantiradi. Massiv ATAYIN
+// parametr sifatida olinadi — utils/courseMentors.ts dagi `flatMentors`
+// izohiga qarang: "obyektni ol, ichidagini almashtir" ko'rinishida TypeScript
+// kurs tipini chiqara olmay `object`ka yassilaydi.
+function flatCourses<C>(links: { isLead: boolean; course: C }[]): (C & { isLead: boolean })[] {
+  return links.map((link) => ({ ...link.course, isLead: link.isLead }));
+}
+
 // O'z rasmi bo'lmasa jamoa profilidan olinadi (utils/personPhoto.ts).
 // `teamProfile` javobga chiqmaydi — u faqat shu zaxira uchun o'qiladi.
 const publicInclude = {
-  courses: { select: { id: true, title: true, slug: true } },
+  courseLinks: courseLinksSelect,
   teamProfile: { select: { photoUrl: true, focusX: true, focusY: true } },
 } satisfies Prisma.MentorInclude;
 
@@ -31,7 +49,10 @@ export async function listMentors(locale: SupportedLocale) {
     orderBy: [PHOTO_FIRST, { featured: 'desc' }, { order: 'asc' }],
     include: publicInclude,
   });
-  return resolveLocaleDeep(mentors.map(withTeamPhoto), locale);
+  return resolveLocaleDeep(mentors.map((m) => {
+    const { courseLinks, ...rest } = withTeamPhoto(m);
+    return { ...rest, courses: flatCourses(courseLinks) };
+  }), locale);
 }
 
 export async function getMentorById(id: string, locale: SupportedLocale) {
@@ -44,15 +65,17 @@ export async function getMentorById(id: string, locale: SupportedLocale) {
     throw ApiError.notFound('Mentor topilmadi');
   }
 
-  return resolveLocaleDeep(withTeamPhoto(mentor), locale);
+  const { courseLinks, ...rest } = withTeamPhoto(mentor);
+  return resolveLocaleDeep({ ...rest, courses: flatCourses(courseLinks) }, locale);
 }
 
 // Admin tahrirlash paneli uchun — xom {uz,ru,kaa,en} obyektini qaytaradi
 export async function listMentorsAdmin() {
-  return prisma.mentor.findMany({
+  const mentors = await prisma.mentor.findMany({
     orderBy: [{ featured: 'desc' }, { order: 'asc' }],
-    include: { courses: { select: { id: true, title: true, slug: true } } },
+    include: { courseLinks: courseLinksSelect },
   });
+  return mentors.map(({ courseLinks, ...rest }) => ({ ...rest, courses: flatCourses(courseLinks) }));
 }
 
 interface MentorInput {
@@ -108,12 +131,13 @@ export async function updateMentor(id: string, input: Partial<MentorInput>) {
 export async function getMentorMe(userId: string) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
-    include: { courses: { select: { id: true, title: true, slug: true } } },
+    include: { courseLinks: courseLinksSelect },
   });
   if (!mentor) {
     throw mentorNotLinkedError();
   }
-  return mentor;
+  const { courseLinks, ...rest } = mentor;
+  return { ...rest, courses: flatCourses(courseLinks) };
 }
 
 // Mentor o'z profilini tahrirlaydi (faqat ochiq maydonlar — featured/order/userId emas)
@@ -131,9 +155,9 @@ export async function updateMentorMe(
 // Kursning to'liq dasturini (modullar va darslar bilan) oladi:
 // mentor faqat o'ziga biriktirilganini, ADMIN istalganini
 export async function getMentorCourse(actor: Actor, courseId: string) {
-  const where: { id: string; mentorId?: string } = { id: courseId };
+  const where: Prisma.CourseWhereInput = { id: courseId };
   if (actor.role !== 'ADMIN') {
-    where.mentorId = await requireMentorId(actor.userId);
+    where.mentors = { some: { mentorId: await requireMentorId(actor.userId) } };
   }
   const course = await prisma.course.findFirst({
     where,
@@ -152,21 +176,24 @@ export async function getMentorCourse(actor: Actor, courseId: string) {
 
 // MENTOR roli uchun shaxsiy kabinet ma'lumotlari
 export async function getMentorDashboard(userId: string, locale: SupportedLocale) {
-  const mentor = await prisma.mentor.findUnique({
+  const found = await prisma.mentor.findUnique({
     where: { userId },
     include: {
-      courses: {
-        orderBy: { createdAt: 'asc' },
-        include: {
-          _count: { select: { enrollments: true, modules: true } },
+      courseLinks: {
+        orderBy: [{ isLead: 'desc' }, { order: 'asc' }],
+        select: {
+          isLead: true,
+          course: { include: { _count: { select: { enrollments: true, modules: true } } } },
         },
       },
     },
   });
 
-  if (!mentor) {
+  if (!found) {
     throw mentorNotLinkedError();
   }
+  const { courseLinks, ...profile } = found;
+  const mentor = { ...profile, courses: flatCourses(courseLinks) };
 
   const courseIds = mentor.courses.map((c) => c.id);
   const recentEnrollments = courseIds.length
@@ -186,8 +213,17 @@ export async function getMentorDashboard(userId: string, locale: SupportedLocale
     prisma.enrollment.count({ where: { courseId: { in: courseIds }, status: 'ACTIVE' } }),
   ]);
 
+  // Mentor o'z kurslarining qiziqish raqamlarini ham ko'radi: hisoblagichlar
+  // kurs qatorida denormallashtirilgan, ya'ni bu qo'shimcha so'rov emas.
+  const totalViews = mentor.courses.reduce((sum, c) => sum + c.views, 0);
+  const totalLikes = mentor.courses.reduce((sum, c) => sum + c.likesCount, 0);
+
   return resolveLocaleDeep(
-    { mentor, recentEnrollments, stats: { totalStudents, activeStudents, coursesCount: mentor.courses.length } },
+    {
+      mentor,
+      recentEnrollments,
+      stats: { totalStudents, activeStudents, coursesCount: mentor.courses.length, totalViews, totalLikes },
+    },
     locale
   );
 }
@@ -196,14 +232,14 @@ export async function getMentorDashboard(userId: string, locale: SupportedLocale
 export async function getMentorStudents(userId: string, locale: SupportedLocale) {
   const mentor = await prisma.mentor.findUnique({
     where: { userId },
-    select: { id: true, courses: { select: { id: true } } },
+    select: { id: true, courseLinks: { select: { courseId: true } } },
   });
 
   if (!mentor) {
     throw mentorNotLinkedError();
   }
 
-  const courseIds = mentor.courses.map((c) => c.id);
+  const courseIds = mentor.courseLinks.map((link) => link.courseId);
   if (!courseIds.length) return [];
 
   const enrollments = await prisma.enrollment.findMany({
@@ -259,6 +295,18 @@ export async function deleteMentor(id: string) {
   if (!mentor) {
     throw ApiError.notFound('Mentor topilmadi');
   }
+
+  // `CourseMentor` cascade bilan o'chadi, ya'ni baza bu holatni to'smaydi —
+  // mentor kurslardan JIMGINA yo'qolib qolardi (kursning yagona mentori
+  // bo'lsa kurs mentorsiz qolardi). Shuning uchun tekshiruv shu yerda.
+  const attachedCourses = await prisma.courseMentor.count({ where: { mentorId: id } });
+  if (attachedCourses > 0) {
+    throw ApiError.conflict(
+      "Bu mentorga bog'langan kurslar bor, avval uni kurslardan olib tashlang",
+      'MENTOR_HAS_COURSES'
+    );
+  }
+
   try {
     await prisma.mentor.delete({ where: { id } });
   } catch (err) {

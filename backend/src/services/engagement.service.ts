@@ -82,6 +82,53 @@ async function bumpCounter(
   }
 }
 
+/**
+ * Bugungi kun boshi (UTC yarim tuni) — `EngagementDaily.day` uchun kalit.
+ *
+ * UTC ATAYIN: server qaysi mintaqada turishidan qat'i nazar bir xil kun
+ * chegarasi chiqadi. Toshkent uchun bu kun 05:00 da almashadi degani —
+ * kunlik grafikda ko'rinadigan farq emas, lekin mahalliy vaqt ishlatilsa
+ * server ko'chganda tarix ikkiga bo'linib ketardi.
+ */
+function today(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+/**
+ * Kunlik kesimga qo'shadi. Jami hisoblagich bilan BITTA tranzaksiyada
+ * chaqiriladi — aks holda kunlik yig'indi jami raqamdan ajralib ketardi.
+ *
+ * `upsert` emas, `updateMany` + `createMany(skipDuplicates)`: parallel
+ * so'rovlarda upsert noyoblik buzilishi bilan yiqilishi mumkin, Postgres'da
+ * esa xato bergan so'rov butun tranzaksiyani yaroqsiz qiladi (toggleLike
+ * izohiga qarang).
+ */
+async function bumpDaily(
+  tx: Prisma.TransactionClient,
+  target: EngagementTarget,
+  contentId: string,
+  field: 'views' | 'likes',
+  delta: number,
+): Promise<void> {
+  const day = today();
+  const where = { contentType: target, contentId, day };
+  const increment: Prisma.EngagementDailyUpdateManyMutationInput =
+    field === 'views' ? { views: { increment: delta } } : { likes: { increment: delta } };
+
+  const updated = await tx.engagementDaily.updateMany({ where, data: increment });
+  if (updated.count > 0) return;
+
+  const created = await tx.engagementDaily.createMany({
+    data: [{ ...where, views: field === 'views' ? delta : 0, likes: field === 'likes' ? delta : 0 }],
+    skipDuplicates: true,
+  });
+  // Parallel so'rov shu oraliqda qatorni yaratib ulgurdi — endi yangilanadi
+  if (created.count === 0) {
+    await tx.engagementDaily.updateMany({ where, data: increment });
+  }
+}
+
 export interface LikeResult {
   liked: boolean;
   likesCount: number;
@@ -126,6 +173,7 @@ export async function toggleLike(
 
     if (removed.count > 0) {
       const { likesCount } = await bumpCounter(tx, target, contentId, 'likesCount', -1);
+      await bumpDaily(tx, target, contentId, 'likes', -1);
       return { liked: false, likesCount };
     }
 
@@ -145,6 +193,7 @@ export async function toggleLike(
     }
 
     const { likesCount } = await bumpCounter(tx, target, contentId, 'likesCount', 1);
+    await bumpDaily(tx, target, contentId, 'likes', 1);
     return { liked: true, likesCount };
   });
 }
@@ -208,7 +257,9 @@ export async function registerView(
       if (created.count === 0) return null; // yangi yozuv bor — dublikat
     }
 
-    return bumpCounter(tx, target, contentId, 'views', 1);
+    const counters = await bumpCounter(tx, target, contentId, 'views', 1);
+    await bumpDaily(tx, target, contentId, 'views', 1);
+    return counters;
   });
 
   if (!result) {
@@ -299,5 +350,6 @@ export async function purgeEngagement(target: EngagementTarget, contentId: strin
   await prisma.$transaction([
     prisma.contentLike.deleteMany({ where: { contentType: target, contentId } }),
     prisma.contentView.deleteMany({ where: { contentType: target, contentId } }),
+    prisma.engagementDaily.deleteMany({ where: { contentType: target, contentId } }),
   ]);
 }

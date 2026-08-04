@@ -221,9 +221,19 @@ async function main() {
         studentsCount: c.students,
         tags: c.tags,
         published: true,
-        mentorId: mentorsByCourseId.get(c.id),
       },
     });
+
+    // Mentor kursga alohida jadval orqali biriktiriladi (kursda bir nechta
+    // mentor bo'lishi mumkin) — seed birinchisini asosiy qilib qo'yadi
+    const seedMentorId = mentorsByCourseId.get(c.id);
+    if (seedMentorId) {
+      await prisma.courseMentor.upsert({
+        where: { courseId_mentorId: { courseId: course.id, mentorId: seedMentorId } },
+        create: { courseId: course.id, mentorId: seedMentorId, isLead: true, order: 0 },
+        update: { isLead: true, order: 0 },
+      });
+    }
 
     // Seed qayta ishga tushirilganda modullar dublikatlanmasligi uchun —
     // kursda modul bo'lsa, dastur allaqachon yaratilgan deb hisoblaymiz

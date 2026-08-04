@@ -334,7 +334,8 @@
       "offlinePrompt": "Bu kurs offline o'tiladi — yozilish uchun administrator bilan bog'laning.",
       "contactAdmin": "Ma'lumot olish",
       "contactOffline": "Offline uchun bog'lanish",
-      "enrollOnline": "Online yozilish"
+      "enrollOnline": "Online yozilish",
+      "mentors": "Mentorlar"
     },
     "certificate": {
       "title": "Sertifikatni tekshirish",
@@ -625,7 +626,10 @@
       "noEnrollments": "Kurslaringizga hali hech kim yozilmagan.",
       "moduleCount": "{{modules}} modul · {{students}} talaba",
       "published": "Chop etilgan",
-      "draft": "Qoralama"
+      "draft": "Qoralama",
+      "statViews": "Ko'rishlar",
+      "statLikes": "Yoqtirishlar",
+      "leadMentor": "Asosiy mentor"
     },
     "enrollStatus": {
       "PENDING": "Kutilmoqda",
@@ -753,6 +757,7 @@
     "backToSite": "Saytga qaytish",
     "nav": {
       "dashboard": "Boshqaruv paneli",
+      "analytics": "Monitoring",
       "enrollments": "Yozilishlar",
       "subscriptions": "Obunalar",
       "courses": "Kurslar",
@@ -978,8 +983,6 @@
       "fLevel": "Daraja",
       "fPrice": "Narx (UZS, bepul = 0)",
       "fDuration": "Davomiylik (oy)",
-      "fMentor": "Mentor",
-      "mentorNone": "Tanlanmagan",
       "fTags": "Teglar (vergul bilan)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Chop etilgan (saytda ko'rinadi)",
@@ -990,7 +993,11 @@
       "confirmDelete": "Kursni o'chirishni tasdiqlaysizmi?",
       "fFormat": "Format",
       "fLocation": "Manzil (offline)",
-      "viewsTitle": "Ko'rishlar soni"
+      "viewsTitle": "Ko'rishlar soni",
+      "fMentors": "Mentorlar",
+      "leadMentor": "asosiy",
+      "mentorsHint": "Bir nechtasini tanlash mumkin. Birinchi tanlangani asosiy mentor bo'ladi.",
+      "noMentorsYet": "Avval mentor qo'shing."
     },
     "mentors": {
       "title": "Mentorlar",
@@ -1192,6 +1199,28 @@
       "newBtn": "Yangi a'zo",
       "empty": "Hozircha jamoa a'zolari qo'shilmagan.",
       "confirmDelete": "Jamoa a'zosini o'chirishni tasdiqlaysizmi?"
+    },
+    "analytics": {
+      "title": "Monitoring",
+      "sub": "Ko'rishlar, yoqtirishlar va o'sish dinamikasi",
+      "rangeDays": "{{n}} kun",
+      "views": "Ko'rishlar",
+      "likes": "Yoqtirishlar",
+      "newUsers": "Yangi foydalanuvchilar",
+      "enrollments": "Yangi yozilishlar",
+      "vsPrevious": "Oldingi davrda: {{n}}",
+      "deltaNew": "Yangi",
+      "deltaNone": "O'zgarishsiz",
+      "dailyTitle": "Kunlik: {{metric}}",
+      "byTypeTitle": "Bo'limlar bo'yicha",
+      "byTypeSub": "Davr ichidagi ko'rishlar",
+      "topTitle": "Eng ko'p ko'rilgan kontent",
+      "topSub": "Tanlangan davr ichida",
+      "noData": "Bu davrda ma'lumot yo'q.",
+      "typeCourse": "Kurslar",
+      "typePost": "Maqolalar",
+      "typeProject": "Loyihalar",
+      "typeTestimonial": "Sharhlar"
     }
   },
   "engagement": {
