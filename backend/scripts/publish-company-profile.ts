@@ -182,6 +182,58 @@ interface NewCourse {
   mentorNames: string[];
 }
 
+/**
+ * Har bir kursning davomiyligi, narxi va mentorlari.
+ *
+ * DIQQAT — NARX VA DAVOMIYLIK TAXMINIY. Markaz egasi haqiqiy raqamlarni
+ * keyinroq o'zi kiritishini aytdi (2026-08-05), shu paytgacha kurslar
+ * bo'sh turmasligi uchun oraliq qiymatlar qo'yildi. Frontend Development
+ * narxi (1 000 000) — YAGONA haqiqiy raqam, u eski bazadan kelgan va
+ * tegilmaydi. Qolganlarini admin panelidan tuzatish kerak.
+ */
+const COURSE_SETTINGS: Record<
+  string,
+  { durationMonths: number; price: number; level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'; mentorNames: string[]; approxPrice: boolean }
+> = {
+  'kompyuter-savodxonligi': { durationMonths: 2, price: 400_000, level: 'BEGINNER', mentorNames: ['Bazarbaeva Aytgul'], approxPrice: true },
+  'grafik-dizayn': { durationMonths: 4, price: 700_000, level: 'BEGINNER', mentorNames: [], approxPrice: true },
+  'python': { durationMonths: 6, price: 800_000, level: 'BEGINNER', mentorNames: ['Pirimbetov Shaxrux', 'Sipatdinova Nurjamal'], approxPrice: true },
+  'prompt-engineering': { durationMonths: 3, price: 700_000, level: 'BEGINNER', mentorNames: ['Dospanov Abduaziz'], approxPrice: true },
+  'web-application-security': { durationMonths: 6, price: 900_000, level: 'INTERMEDIATE', mentorNames: ['Kayipbaev Ravshan'], approxPrice: true },
+  'frontend-development': { durationMonths: 6, price: 1_000_000, level: 'BEGINNER', mentorNames: ['Doshmanov Madiyar', 'Saparniyazov Ernazar', 'Yangiboyev Jamshid'], approxPrice: false },
+  'backend-development': { durationMonths: 7, price: 900_000, level: 'INTERMEDIATE', mentorNames: ['Yakubbaev Azamat', 'Yangiboyev Jamshid'], approxPrice: true },
+};
+
+/**
+ * Mavjud kurslardagi eski seed matnlari. "Cyber Security" kursi
+ * "Web Application Security" deb qayta nomlandi, lekin tavsifi va teglari
+ * eski qolgan edi — CTF va Forensics veb ilova xavfsizligiga kirmaydi.
+ * Frontend/Backend kurslarida esa faqat o'zbekcha sarlavha bor edi.
+ */
+const COURSE_FIXES: Record<string, { subtitle?: L; description?: L; tags?: string[]; title?: L }> = {
+  'web-application-security': {
+    subtitle: {
+      uz: 'Veb ilovalar xavfsizligi',
+      ru: 'Безопасность веб-приложений',
+      kaa: 'Veb qosımshalar qáwipsizligi',
+      en: 'Web application security',
+    },
+    description: {
+      uz: "Veb ilovalardagi zaifliklarni topish va yopishni o'rganish: OWASP Top 10, XSS va SQL injection, autentifikatsiya va sessiya xatolari, xavfsiz kod yozish hamda test hisobotini tayyorlash.",
+      ru: 'Поиск и устранение уязвимостей веб-приложений: OWASP Top 10, XSS и SQL-инъекции, ошибки аутентификации и сессий, написание безопасного кода и подготовка отчёта по тестированию.',
+      kaa: "Veb qosımshalardaģı ázziliklerdi tabıw hám jabıw: OWASP Top 10, XSS hám SQL injection, autentifikatsiya hám sessiya qátelikleri, qáwipsiz kod jazıw hám test esabatın tayarlaw.",
+      en: 'Finding and fixing vulnerabilities in web applications: the OWASP Top 10, XSS and SQL injection, authentication and session flaws, writing secure code and reporting your findings.',
+    },
+    tags: ['OWASP Top 10', 'XSS', 'SQL Injection', 'Autentifikatsiya', 'Pentest'],
+  },
+  'frontend-development': {
+    title: { uz: 'Frontend Development', ru: 'Frontend-разработка', kaa: 'Frontend Development', en: 'Frontend Development' },
+  },
+  'backend-development': {
+    title: { uz: 'Backend Development', ru: 'Backend-разработка', kaa: 'Backend Development', en: 'Backend Development' },
+  },
+};
+
 const NEW_COURSES: NewCourse[] = [
   {
     title: { uz: 'Python', ru: 'Python', kaa: 'Python', en: 'Python' },
@@ -578,7 +630,7 @@ async function main(): Promise<void> {
   console.log('\nKURSLAR');
   const adminCourses = await getJson<{ id: string; slug: string; title: unknown }[]>('/courses/admin');
 
-  // Mavjud "Cyber Security" kursi haqiqiy nomiga keltiriladi
+  // Eski "Cyber Security" kursi haqiqiy nomiga keltiriladi (slug qayta hosil bo'ladi)
   const cyber = adminCourses.find((c) => c.slug === 'cyber-security');
   if (cyber) {
     await send(
@@ -591,32 +643,15 @@ async function main(): Promise<void> {
           kaa: 'Web Application Security',
           en: 'Web Application Security',
         },
-        mentorIds: [mentorIdByName.get('Kayipbaev Ravshan')].filter(Boolean),
       },
       'Cyber Security kursi qayta nomlanmadi'
     );
     console.log('  qayta nomlandi: Cyber Security → Web Application Security');
   }
 
-  // Mavjud Frontend/Backend kurslariga mentorlar biriktiriladi
-  const attach: Record<string, string[]> = {
-    'frontend-development': ['Doshmanov Madiyar', 'Saparniyazov Ernazar', 'Yangiboyev Jamshid'],
-    'backend-development': ['Yakubbaev Azamat', 'Yangiboyev Jamshid'],
-  };
-  for (const [slug, names] of Object.entries(attach)) {
-    const course = adminCourses.find((c) => c.slug === slug);
-    if (!course) continue;
-    const ids = names.map((n) => mentorIdByName.get(n)).filter(Boolean) as string[];
-    await send('PUT', `/courses/${course.id}`, { mentorIds: ids }, `${slug} mentorlari biriktirilmadi`);
-    console.log(`  mentorlar biriktirildi: ${slug} (${ids.length} ta)`);
-  }
-
+  // Yangi kurslar yaratiladi (mavjudlari tegilmaydi — sozlash quyida)
   for (const c of NEW_COURSES) {
-    const exists = adminCourses.some((x) => String((x.title as { uz?: string })?.uz ?? '') === c.title.uz);
-    if (exists) {
-      console.log(`  o'tkazib yuborildi (bor): ${c.title.uz}`);
-      continue;
-    }
+    if (adminCourses.some((x) => String((x.title as { uz?: string })?.uz ?? '') === c.title.uz)) continue;
     await send(
       'POST',
       '/courses',
@@ -629,17 +664,49 @@ async function main(): Promise<void> {
         bg: c.bg,
         border: c.border,
         tags: c.tags,
-        // Davomiylik va narx hali berilmagan — kurs QORALAMA holatda turadi
         durationMonths: 1,
         price: 0,
         level: 'BEGINNER',
         format: 'OFFLINE',
         published: false,
-        mentorIds: c.mentorNames.map((n) => mentorIdByName.get(n)).filter(Boolean),
       },
       `Kurs "${c.title.uz}" yaratilmadi`
     );
-    console.log(`  yaratildi (QORALAMA — davomiylik/narx kerak): ${c.title.uz}`);
+    console.log(`  yaratildi: ${c.title.uz}`);
+  }
+
+  // Endi HAMMA kurs bir xil yo'ldan sozlanadi: davomiylik, narx, daraja,
+  // mentorlar, eski seed matnlarini tuzatish va chop etish.
+  const allCourses = await getJson<{ id: string; slug: string; title: unknown }[]>('/courses/admin');
+  for (const [slug, cfg] of Object.entries(COURSE_SETTINGS)) {
+    const course = allCourses.find((c) => c.slug === slug);
+    if (!course) {
+      console.log(`  DIQQAT: "${slug}" kursi topilmadi — sozlanmadi`);
+      continue;
+    }
+    const ids = cfg.mentorNames.map((n) => mentorIdByName.get(n)).filter(Boolean) as string[];
+    if (ids.length !== cfg.mentorNames.length) {
+      console.log(`  DIQQAT: "${slug}" uchun ba'zi mentorlar topilmadi`);
+    }
+
+    await send(
+      'PUT',
+      `/courses/${course.id}`,
+      {
+        durationMonths: cfg.durationMonths,
+        price: cfg.price,
+        level: cfg.level,
+        published: true,
+        mentorIds: ids,
+        ...(COURSE_FIXES[slug] ?? {}),
+      },
+      `"${slug}" sozlanmadi`
+    );
+
+    const mark = cfg.approxPrice ? ' (narx TAXMINIY)' : '';
+    console.log(
+      `  ${slug.padEnd(26)} ${cfg.durationMonths} oy · ${cfg.price.toLocaleString('ru-RU')} UZS${mark} · ${ids.length} mentor`
+    );
   }
 
   // -------------------------------------------------- BOSH SAHIFA BO'LIMLARI
