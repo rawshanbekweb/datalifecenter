@@ -2,9 +2,12 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import {
   createContactMessageHandler,
+  deleteContactMessageHandler,
+  deleteContactMessagesHandler,
   listContactMessagesHandler,
   updateContactMessageStatusHandler,
 } from '../controllers/contact.controller';
+import { bulkDeleteSchema } from '../validators/shared/bulkDelete.validator';
 import { env } from '../config/env';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
@@ -37,5 +40,10 @@ const contactLimiter = rateLimit({
 router.post('/', contactLimiter, validateBody(contactMessageSchema), createContactMessageHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listContactMessagesQuerySchema), listContactMessagesHandler);
 router.patch('/:id/status', authenticate, authorize('ADMIN'), validateBody(updateContactMessageStatusSchema), updateContactMessageStatusHandler);
+// Ommaviy o'chirish POST bilan: DELETE so'rovining tanasi (body) hamma
+// proxy va mijozda ishonchli o'tmaydi, ID ro'yxatini esa URL'ga sig'dirib
+// bo'lmaydi
+router.post('/bulk-delete', authenticate, authorize('ADMIN'), validateBody(bulkDeleteSchema), deleteContactMessagesHandler);
+router.delete('/:id', authenticate, authorize('ADMIN'), deleteContactMessageHandler);
 
 export default router;

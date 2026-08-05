@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Mail, Phone } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Mail, Phone, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { listContactMessages, updateContactMessageStatus } from '../../api/contact';
+import {
+  deleteContactMessage,
+  deleteContactMessages,
+  listContactMessages,
+  updateContactMessageStatus,
+} from '../../api/contact';
 import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import BulkActionBar from '../../components/admin/BulkActionBar';
+import { useBulkSelection } from '../../components/admin/useBulkSelection';
+import { useConfirm, useToast } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
 
 type MessageStatus = 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
@@ -49,22 +57,66 @@ export default function AdminMessagesPage(): React.ReactElement {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [total, setTotal]       = useState<number>(0);
   const [filter, setFilter]     = useState<string>('');
+  const [busy, setBusy]         = useState<boolean>(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  const confirm = useConfirm();
+  const toast = useToast();
+  const selection = useBulkSelection(messages.map((m) => m.id));
+
+  // `reload` o'chirishdan keyin ham chaqiriladi, shuning uchun effektdan
+  // ajratilgan. Sahifadagi oxirgi yozuv o'chsa bir sahifa orqaga qaytamiz —
+  // aks holda admin bo'sh ro'yxatga qarab qolardi.
+  const load = useCallback(async (): Promise<void> => {
     setStatus('loading');
-    listContactMessages({ page, limit: PAGE_SIZE, status: filter || undefined })
-      .then((data: MessagesResponse) => {
-        if (!cancelled) {
-          setMessages(data.items);
-          setTotalPages(data.pagination.totalPages);
-          setTotal(data.pagination.total);
-          setStatus('ready');
-        }
-      })
-      .catch(() => { if (!cancelled) setStatus('error'); });
-    return () => { cancelled = true; };
+    try {
+      const data: MessagesResponse = await listContactMessages({ page, limit: PAGE_SIZE, status: filter || undefined });
+      if (data.items.length === 0 && page > 1) {
+        setPage((p) => p - 1);
+        return;
+      }
+      setMessages(data.items);
+      setTotalPages(data.pagination.totalPages);
+      setTotal(data.pagination.total);
+      setStatus('ready');
+    } catch {
+      setStatus('error');
+    }
   }, [page, filter]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const removeOne = async (id: string): Promise<void> => {
+    const ok = await confirm(t('admin.bulk.confirmDeleteOne'), { confirmLabel: t('admin.bulk.deleteOne'), danger: true });
+    if (!ok) return;
+    setBusy(true);
+    try {
+      await deleteContactMessage(id);
+      toast.success(t('admin.bulk.deletedOne'));
+      selection.clear();
+      await load();
+    } catch {
+      toast.error(t('admin.bulk.deleteFailed'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeSelected = async (): Promise<void> => {
+    const ids = selection.selectedIds;
+    const ok = await confirm(t('admin.bulk.confirmDelete', { n: ids.length }), { confirmLabel: t('admin.bulk.deleteSelected'), danger: true });
+    if (!ok) return;
+    setBusy(true);
+    try {
+      const res = await deleteContactMessages(ids);
+      toast.success(t('admin.bulk.deleted', { n: res.deleted }));
+      selection.clear();
+      await load();
+    } catch {
+      toast.error(t('admin.bulk.deleteFailed'));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const changeStatus = async (id: string, newStatus: string): Promise<void> => {
     const prev = messages;
@@ -105,23 +157,43 @@ export default function AdminMessagesPage(): React.ReactElement {
   return (
     <div>
       {header}
+      <BulkActionBar
+        count={selection.count}
+        allSelected={selection.allVisibleSelected}
+        onToggleAll={selection.toggleAllVisible}
+        onDelete={removeSelected}
+        onClear={selection.clear}
+        busy={busy}
+      />
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
       {messages.map((m) => {
         const s = STATUS_LABELS[m.status];
         return (
-          <div key={m.id} className="card" style={{ padding:20 }}>
+          <div key={m.id} className="card"
+            style={{ padding:20, borderColor: selection.isSelected(m.id) ? '#7dd3fc' : undefined }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:10, flexWrap:'wrap' }}>
-              <div>
-                <p style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{m.name}</p>
-                <div style={{ display:'flex', gap:14, flexWrap:'wrap', marginTop:4 }}>
-                  <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Mail size={12}/>{m.email}</span>
-                  {m.phone && <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Phone size={12}/>{m.phone}</span>}
+              <div style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
+                <input type="checkbox" checked={selection.isSelected(m.id)} onChange={() => selection.toggle(m.id)}
+                  style={{ width:16, height:16, marginTop:3, cursor:'pointer', accentColor:'#0ea5e9', flexShrink:0 }} />
+                <div>
+                  <p style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{m.name}</p>
+                  <div style={{ display:'flex', gap:14, flexWrap:'wrap', marginTop:4 }}>
+                    <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Mail size={12}/>{m.email}</span>
+                    {m.phone && <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Phone size={12}/>{m.phone}</span>}
+                  </div>
                 </div>
               </div>
-              <select className="inp" style={{ width:'auto', padding:'6px 10px', fontSize:12, cursor:'pointer', background:s.bg, backgroundImage:'none', borderColor:s.border, color:s.color, fontWeight:700 }}
-                value={m.status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => changeStatus(m.id, e.target.value)}>
-                {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
-              </select>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <select className="inp" style={{ width:'auto', padding:'6px 10px', fontSize:12, cursor:'pointer', background:s.bg, backgroundImage:'none', borderColor:s.border, color:s.color, fontWeight:700 }}
+                  value={m.status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => changeStatus(m.id, e.target.value)}>
+                  {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
+                </select>
+                <button onClick={() => removeOne(m.id)} disabled={busy} title={t('admin.bulk.deleteOne')}
+                  style={{ display:'flex', alignItems:'center', justifyContent:'center', width:32, height:32, borderRadius:8,
+                    background:'#fff', border:'1.5px solid #fecaca', color:'#dc2626', cursor: busy ? 'default' : 'pointer', flexShrink:0 }}>
+                  <Trash2 size={14}/>
+                </button>
+              </div>
             </div>
             {m.subject && <p style={{ fontSize:12, color:'#94a3b8', marginBottom:6 }}>{t('admin.messages.subjectLabel', { subject: m.subject })}</p>}
             <p style={{ fontSize:13, color:'#334155', lineHeight:1.7 }}>{m.message}</p>

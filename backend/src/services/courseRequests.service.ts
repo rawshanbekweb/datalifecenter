@@ -191,3 +191,21 @@ export async function updateCourseRequestAdmin(
 
   return resolveLocaleDeep(request, locale);
 }
+
+export async function deleteCourseRequest(id: string): Promise<void> {
+  const request = await prisma.courseRequest.findUnique({ where: { id } });
+  if (!request) {
+    throw ApiError.notFound("So'rov topilmadi");
+  }
+  await prisma.courseRequest.delete({ where: { id } });
+}
+
+/**
+ * Ommaviy o'chirish — qoidalari shared/bulkDelete.validator.ts da.
+ * Qaytadi: haqiqatda o'chirilgan yozuvlar soni (boshqa admin allaqachon
+ * o'chirgan bo'lsa so'ralganidan kam bo'lishi mumkin).
+ */
+export async function deleteCourseRequests(ids: string[]): Promise<number> {
+  const { count } = await prisma.courseRequest.deleteMany({ where: { id: { in: ids } } });
+  return count;
+}

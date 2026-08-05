@@ -1234,6 +1234,18 @@
       "typePost": "Статьи",
       "typeProject": "Проекты",
       "typeTestimonial": "Отзывы"
+    },
+    "bulk": {
+      "selectAllOnPage": "Выбрать все на странице",
+      "selectedCount": "Выбрано: {{n}}",
+      "deleteSelected": "Удалить выбранные",
+      "clear": "Снять выделение",
+      "confirmDelete": "{{n}} записей будут удалены безвозвратно.",
+      "deleted": "Удалено записей: {{n}}",
+      "deleteOne": "Удалить",
+      "confirmDeleteOne": "Запись будет удалена безвозвратно.",
+      "deletedOne": "Запись удалена",
+      "deleteFailed": "Не удалось удалить"
     }
   },
   "engagement": {

@@ -22,3 +22,13 @@ export const updateContactMessageStatusHandler = asyncHandler(async (req: Reques
   const message = await contactService.updateContactMessageStatus(req.params.id as string, req.body.status);
   sendSuccess(res, message);
 });
+
+export const deleteContactMessageHandler = asyncHandler(async (req: Request, res: Response) => {
+  await contactService.deleteContactMessage(req.params.id as string);
+  sendSuccess(res, { deleted: true });
+});
+
+export const deleteContactMessagesHandler = asyncHandler(async (req: Request, res: Response) => {
+  const deleted = await contactService.deleteContactMessages(req.body.ids);
+  sendSuccess(res, { deleted });
+});

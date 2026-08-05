@@ -2,10 +2,13 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import {
   createCourseRequestHandler,
+  deleteCourseRequestHandler,
+  deleteCourseRequestsHandler,
   listCourseRequestsAdminHandler,
   listMyCourseRequestsHandler,
   updateCourseRequestHandler,
 } from '../controllers/courseRequests.controller';
+import { bulkDeleteSchema } from '../validators/shared/bulkDelete.validator';
 import { env } from '../config/env';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
@@ -38,5 +41,8 @@ router.post('/', requestLimiter, optionalAuth, validateBody(createCourseRequestS
 router.get('/mine', authenticate, listMyCourseRequestsHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listCourseRequestsQuerySchema), listCourseRequestsAdminHandler);
 router.patch('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseRequestSchema), updateCourseRequestHandler);
+// POST bilan: DELETE tanasi (body) hamma proxy va mijozda ishonchli o'tmaydi
+router.post('/bulk-delete', authenticate, authorize('ADMIN'), validateBody(bulkDeleteSchema), deleteCourseRequestsHandler);
+router.delete('/:id', authenticate, authorize('ADMIN'), deleteCourseRequestHandler);
 
 export default router;

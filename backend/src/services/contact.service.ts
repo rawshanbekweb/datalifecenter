@@ -45,3 +45,28 @@ export async function updateContactMessageStatus(id: string, status: MessageStat
   }
   return prisma.contactMessage.update({ where: { id }, data: { status } });
 }
+
+export async function deleteContactMessage(id: string): Promise<void> {
+  const message = await prisma.contactMessage.findUnique({ where: { id } });
+  if (!message) {
+    throw ApiError.notFound('Xabar topilmadi');
+  }
+  await prisma.contactMessage.delete({ where: { id } });
+}
+
+/**
+ * Bir nechta xabarni birdan o'chirish — spam to'lqinini bittalab tozalash
+ * amalda imkonsiz bo'lgani uchun.
+ *
+ * ATAYIN faqat aniq ID'lar bo'yicha ishlaydi: "shu statusdagi hammasini
+ * o'chir" degan variant qulayroq ko'rinadi, lekin bitta noto'g'ri bosishda
+ * haqiqiy murojaatlarni ham olib ketardi va uni qaytarib bo'lmasdi.
+ *
+ * Qaytadi: haqiqatda o'chirilgan yozuvlar soni. U so'ralganidan kam
+ * bo'lishi mumkin (boshqa admin allaqachon o'chirgan bo'lsa) — chaqiruvchi
+ * shuni foydalanuvchiga ko'rsatadi.
+ */
+export async function deleteContactMessages(ids: string[]): Promise<number> {
+  const { count } = await prisma.contactMessage.deleteMany({ where: { id: { in: ids } } });
+  return count;
+}

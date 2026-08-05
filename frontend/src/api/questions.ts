@@ -60,3 +60,8 @@ export function getAllMentorRequests(): Promise<MentorRequest[]> {
 export function updateMentorRequest(id: string, data: { reply?: string; status?: MentorRequest['status'] }): Promise<MentorRequest> {
   return apiFetch(`/mentor-requests/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 }
+
+// Savolni o'chirish — admin yoki shu kursning mentori
+export function deleteQuestion(id: string): Promise<{ deleted: boolean }> {
+  return apiFetch(`/questions/${id}`, { method: 'DELETE' });
+}

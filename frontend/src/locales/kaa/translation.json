@@ -1234,6 +1234,18 @@
       "typePost": "Maqalalar",
       "typeProject": "Joybarlar",
       "typeTestimonial": "Pikirler"
+    },
+    "bulk": {
+      "selectAllOnPage": "Bettegi hámmesin belgilew",
+      "selectedCount": "{{n}} belgilendi",
+      "deleteSelected": "Belgilengenlerdi óshiriw",
+      "clear": "Belgilewdi biykarlaw",
+      "confirmDelete": "{{n}} jazıw pútkilley óshiriledi. Bunı qaytarıp bolmaydı.",
+      "deleted": "{{n}} jazıw óshirildi",
+      "deleteOne": "Óshiriw",
+      "confirmDeleteOne": "Bul jazıw pútkilley óshiriledi. Bunı qaytarıp bolmaydı.",
+      "deletedOne": "Jazıw óshirildi",
+      "deleteFailed": "Óshirip bolmadı"
     }
   },
   "engagement": {

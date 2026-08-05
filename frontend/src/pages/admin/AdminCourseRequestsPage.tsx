@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Inbox, Send, CornerDownRight, Phone, Mail, User as UserIcon } from 'lucide-react';
+import { Inbox, Send, CornerDownRight, Phone, Mail, Trash2, User as UserIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   CourseRequest,
   CourseRequestStatus,
+  deleteCourseRequest,
+  deleteCourseRequests,
   listCourseRequestsAdmin,
   updateCourseRequest,
 } from '../../api/courseRequests';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import CourseFormatBadge from '../../components/courses/CourseFormatBadge';
-import { useToast } from '../../components/common/Feedback';
+import BulkActionBar from '../../components/admin/BulkActionBar';
+import { useBulkSelection } from '../../components/admin/useBulkSelection';
+import { useConfirm, useToast } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
 
 const STATUS_META: Record<CourseRequestStatus, { labelKey: string; color: string; bg: string; border: string }> = {
@@ -36,6 +40,10 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   const [filter, setFilter]     = useState<CourseRequestStatus | 'ALL'>('ALL');
   const [drafts, setDrafts]     = useState<Record<string, string>>({});
   const [busyId, setBusyId]     = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState<boolean>(false);
+
+  const confirm = useConfirm();
+  const selection = useBulkSelection(requests.map((r) => r.id));
 
   const load = useCallback((): void => {
     setStatus('loading');
@@ -45,6 +53,39 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   }, [filter]);
 
   useEffect(load, [load]);
+
+  const removeOne = async (id: string): Promise<void> => {
+    const ok = await confirm(t('admin.bulk.confirmDeleteOne'), { confirmLabel: t('admin.bulk.deleteOne'), danger: true });
+    if (!ok) return;
+    setBusyId(id);
+    try {
+      await deleteCourseRequest(id);
+      toast.success(t('admin.bulk.deletedOne'));
+      selection.clear();
+      load();
+    } catch {
+      toast.error(t('admin.bulk.deleteFailed'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const removeSelected = async (): Promise<void> => {
+    const ids = selection.selectedIds;
+    const ok = await confirm(t('admin.bulk.confirmDelete', { n: ids.length }), { confirmLabel: t('admin.bulk.deleteSelected'), danger: true });
+    if (!ok) return;
+    setBulkBusy(true);
+    try {
+      const res = await deleteCourseRequests(ids);
+      toast.success(t('admin.bulk.deleted', { n: res.deleted }));
+      selection.clear();
+      load();
+    } catch {
+      toast.error(t('admin.bulk.deleteFailed'));
+    } finally {
+      setBulkBusy(false);
+    }
+  };
 
   const apply = (updated: CourseRequest): void =>
     setRequests((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
@@ -96,12 +137,24 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
       )}
 
       {status === 'ready' && requests.length > 0 && (
+        <>
+        <BulkActionBar
+          count={selection.count}
+          allSelected={selection.allVisibleSelected}
+          onToggleAll={selection.toggleAllVisible}
+          onDelete={removeSelected}
+          onClear={selection.clear}
+          busy={bulkBusy}
+        />
         <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
           {requests.map((r) => {
             const meta = STATUS_META[r.status];
             return (
-              <div key={r.id} className="card" style={{ padding:18 }}>
+              <div key={r.id} className="card"
+                style={{ padding:18, borderColor: selection.isSelected(r.id) ? '#7dd3fc' : undefined }}>
                 <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap', marginBottom:10 }}>
+                  <input type="checkbox" checked={selection.isSelected(r.id)} onChange={() => selection.toggle(r.id)}
+                    style={{ width:16, height:16, cursor:'pointer', accentColor:'#0ea5e9', flexShrink:0 }} />
                   <div style={{ flex:1, minWidth:200 }}>
                     <p style={{ fontSize:13.5, fontWeight:800, color:'#0f172a' }}>{r.course.title}</p>
                     <p style={{ fontSize:11.5, color:'#94a3b8' }}>{formatDate(r.createdAt)}</p>
@@ -110,6 +163,11 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
                   <span className="tag" style={{ background:meta.bg, borderColor:meta.border, color:meta.color, fontWeight:700, flexShrink:0 }}>
                     {t(meta.labelKey)}
                   </span>
+                  <button onClick={() => removeOne(r.id)} disabled={busyId === r.id || bulkBusy} title={t('admin.bulk.deleteOne')}
+                    style={{ display:'flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:8,
+                      background:'#fff', border:'1.5px solid #fecaca', color:'#dc2626', cursor:'pointer', flexShrink:0 }}>
+                    <Trash2 size={14}/>
+                  </button>
                 </div>
 
                 <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 18px', fontSize:12.5, color:'#475569', marginBottom:10 }}>
@@ -170,6 +228,7 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
             );
           })}
         </div>
+        </>
       )}
     </div>
   );

@@ -3,6 +3,8 @@ import {
   answerQuestionHandler,
   createMentorRequestHandler,
   createQuestionHandler,
+  deleteQuestionHandler,
+  deleteQuestionsHandler,
   listAllMentorRequestsHandler,
   listLessonQuestionsHandler,
   listMentorQuestionsHandler,
@@ -18,6 +20,7 @@ import {
   createQuestionSchema,
   updateMentorRequestSchema,
 } from '../validators/questions.validator';
+import { bulkDeleteSchema } from '../validators/shared/bulkDelete.validator';
 
 // O'quvchi ↔ mentor: dars ostidagi savol-javob
 export const questionsRouter = Router();
@@ -26,6 +29,10 @@ questionsRouter.post('/', validateBody(createQuestionSchema), createQuestionHand
 questionsRouter.get('/mentor', authorize('MENTOR', 'ADMIN'), listMentorQuestionsHandler);
 questionsRouter.get('/lesson/:lessonId', listLessonQuestionsHandler);
 questionsRouter.patch('/:id/answer', authorize('MENTOR', 'ADMIN'), validateBody(answerQuestionSchema), answerQuestionHandler);
+// Ommaviy o'chirish faqat adminda: mentor uchun har bir ID'ning kurs
+// egaligini alohida tekshirish kerak bo'lardi (sabab servisda yozilgan)
+questionsRouter.post('/bulk-delete', authorize('ADMIN'), validateBody(bulkDeleteSchema), deleteQuestionsHandler);
+questionsRouter.delete('/:id', authorize('MENTOR', 'ADMIN'), deleteQuestionHandler);
 
 // Mentor ↔ admin: rasmiy so'rovlar
 export const mentorRequestsRouter = Router();

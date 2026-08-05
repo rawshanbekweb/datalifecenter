@@ -29,3 +29,15 @@ export function updateContactMessageStatus(id: string | number, status: string):
     body: JSON.stringify({ status }),
   });
 }
+
+export function deleteContactMessage(id: string): Promise<any> {
+  return apiFetch(`/contact/${id}`, { method: 'DELETE' });
+}
+
+// Ommaviy o'chirish POST bilan: DELETE tanasi hamma proxy'da o'tmaydi
+export function deleteContactMessages(ids: string[]): Promise<{ deleted: number }> {
+  return apiFetch('/contact/bulk-delete', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
+  });
+}

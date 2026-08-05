@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
-import { MessageCircleQuestion, Send, CornerDownRight } from 'lucide-react';
+import { MessageCircleQuestion, Send, CornerDownRight, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LessonQuestion, answerQuestion, getMentorQuestions } from '../../api/questions';
+import { LessonQuestion, answerQuestion, deleteQuestion, getMentorQuestions } from '../../api/questions';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import MentorNotLinked from './MentorNotLinked';
-import { useToast } from '../../components/common/Feedback';
+import { useConfirm, useToast } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
 
 // Mentor kurslaridagi o'quvchi savollari — javob berish shu yerdan
 export default function MentorQuestionsPage(): React.ReactElement {
   const { t } = useTranslation();
   const toast = useToast();
+  const confirm = useConfirm();
   const [questions, setQuestions] = useState<LessonQuestion[]>([]);
   const [status, setStatus]       = useState<'loading' | 'ready' | 'not-linked' | 'error'>('loading');
   const [errorMsg, setErrorMsg]   = useState<string>('');
@@ -40,6 +41,24 @@ export default function MentorQuestionsPage(): React.ReactElement {
       setDrafts((prev) => ({ ...prev, [id]: '' }));
     } catch (err: unknown) {
       toast.error((err as Error).message || t('mentor.questions.sendError'));
+    } finally {
+      setSendingId(null);
+    }
+  };
+
+  // Mentor o'z kursidagi o'rinsiz savolni o'zi olib tashlay oladi —
+  // har safar adminni kutish kerak emas. Server ham xuddi shu qoidani
+  // tekshiradi (begona kursga tegib bo'lmaydi).
+  const removeQuestion = async (id: string): Promise<void> => {
+    const ok = await confirm(t('admin.bulk.confirmDeleteOne'), { confirmLabel: t('admin.bulk.deleteOne'), danger: true });
+    if (!ok) return;
+    setSendingId(id);
+    try {
+      await deleteQuestion(id);
+      setQuestions((prev) => prev.filter((q) => q.id !== id));
+      toast.success(t('admin.bulk.deletedOne'));
+    } catch (err: unknown) {
+      toast.error((err as Error).message || t('admin.bulk.deleteFailed'));
     } finally {
       setSendingId(null);
     }
@@ -84,6 +103,11 @@ export default function MentorQuestionsPage(): React.ReactElement {
                   : { background:'#fffbeb', borderColor:'#fde68a', color:'#d97706', fontWeight:700, flexShrink:0 }}>
                   {q.answer ? t('mentor.questions.answered') : t('mentor.questions.awaiting')}
                 </span>
+                <button onClick={() => void removeQuestion(q.id)} disabled={sendingId === q.id} title={t('admin.bulk.deleteOne')}
+                  style={{ display:'flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:8,
+                    background:'#fff', border:'1.5px solid #fecaca', color:'#dc2626', cursor:'pointer', flexShrink:0 }}>
+                  <Trash2 size={14}/>
+                </button>
               </div>
 
               <p style={{ fontSize:14, color:'#334155', lineHeight:1.7, marginBottom:10 }}>{q.body}</p>

@@ -63,3 +63,15 @@ export function updateCourseRequest(
 ): Promise<CourseRequest> {
   return apiFetch(`/course-requests/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 }
+
+export function deleteCourseRequest(id: string): Promise<{ deleted: boolean }> {
+  return apiFetch(`/course-requests/${id}`, { method: 'DELETE' });
+}
+
+// Ommaviy o'chirish POST bilan: DELETE tanasi hamma proxy'da o'tmaydi
+export function deleteCourseRequests(ids: string[]): Promise<{ deleted: number }> {
+  return apiFetch('/course-requests/bulk-delete', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
+  });
+}

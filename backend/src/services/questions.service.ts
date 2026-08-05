@@ -140,3 +140,39 @@ export async function answerQuestion(id: string, answer: string, actor: Actor) {
 
   return updated;
 }
+
+/**
+ * Savolni o'chirish — admin, yoki shu kursning mentori.
+ *
+ * Mentorga ruxsat berilgani ataylab: o'z kursidagi savollarni u
+ * moderatsiya qiladi, har safar adminni kutish kerak emas. Tekshiruv
+ * `answerQuestion` dagi bilan bir xil (`canManageCourse`), ya'ni mentor
+ * begona kursga tegolmaydi.
+ */
+export async function deleteQuestion(id: string, actor: Actor): Promise<void> {
+  const question = await prisma.lessonQuestion.findUnique({
+    where: { id },
+    select: {
+      lesson: { select: { module: { select: { course: { select: { ...mentorsForAccess } } } } } },
+    },
+  });
+  if (!question) {
+    throw ApiError.notFound('Savol topilmadi');
+  }
+  if (!canManageCourse(actor, mentorUserIds(question.lesson.module.course))) {
+    throw ApiError.forbidden('Bu savol sizning kursingizga tegishli emas');
+  }
+  await prisma.lessonQuestion.delete({ where: { id } });
+}
+
+/**
+ * Ommaviy o'chirish — FAQAT admin.
+ *
+ * Mentorga berilmadi, chunki har bir ID uchun alohida kurs egaligini
+ * tekshirish kerak bo'lardi va bitta begona ID ro'yxatga qo'shilib qolsa
+ * u jimgina o'chib ketardi. Bittalab o'chirishda tekshiruv aniq.
+ */
+export async function deleteQuestions(ids: string[]): Promise<number> {
+  const { count } = await prisma.lessonQuestion.deleteMany({ where: { id: { in: ids } } });
+  return count;
+}

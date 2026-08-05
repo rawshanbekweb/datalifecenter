@@ -56,3 +56,13 @@ export const updateCourseRequestHandler = asyncHandler(async (req: Request, res:
   );
   sendSuccess(res, request);
 });
+
+export const deleteCourseRequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  await courseRequestsService.deleteCourseRequest(req.params.id as string);
+  sendSuccess(res, { deleted: true });
+});
+
+export const deleteCourseRequestsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const deleted = await courseRequestsService.deleteCourseRequests(req.body.ids);
+  sendSuccess(res, { deleted });
+});

@@ -1234,6 +1234,18 @@
       "typePost": "Maqolalar",
       "typeProject": "Loyihalar",
       "typeTestimonial": "Sharhlar"
+    },
+    "bulk": {
+      "selectAllOnPage": "Sahifadagi hammasini belgilash",
+      "selectedCount": "{{n}} ta belgilandi",
+      "deleteSelected": "Belgilanganlarni o'chirish",
+      "clear": "Belgilashni bekor qilish",
+      "confirmDelete": "{{n}} ta yozuv butunlay o'chiriladi. Buni qaytarib bo'lmaydi.",
+      "deleted": "{{n}} ta yozuv o'chirildi",
+      "deleteOne": "O'chirish",
+      "confirmDeleteOne": "Bu yozuv butunlay o'chiriladi. Buni qaytarib bo'lmaydi.",
+      "deletedOne": "Yozuv o'chirildi",
+      "deleteFailed": "O'chirib bo'lmadi"
     }
   },
   "engagement": {

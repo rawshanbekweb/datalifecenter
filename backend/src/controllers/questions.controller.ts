@@ -53,3 +53,13 @@ export const updateMentorRequestHandler = asyncHandler(async (req: Request, res:
   const request = await mentorRequestsService.updateRequest(req.params.id as string, req.body);
   sendSuccess(res, request);
 });
+
+export const deleteQuestionHandler = asyncHandler(async (req: Request, res: Response) => {
+  await questionsService.deleteQuestion(req.params.id as string, actorOf(req));
+  sendSuccess(res, { deleted: true });
+});
+
+export const deleteQuestionsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const deleted = await questionsService.deleteQuestions(req.body.ids);
+  sendSuccess(res, { deleted });
+});
