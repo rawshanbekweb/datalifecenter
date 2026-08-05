@@ -18,7 +18,8 @@
     "test": "vitest run",
     "seed:team": "tsx scripts/seed-team.ts",
     "seed:analytics": "tsx scripts/seed-analytics.ts",
-    "publish:blog-news": "tsx scripts/publish-blog-news.ts"
+    "publish:blog-news": "tsx scripts/publish-blog-news.ts",
+    "restore": "tsx scripts/restore-from-json.ts"
   },
   "engines": {
     "node": ">=20"

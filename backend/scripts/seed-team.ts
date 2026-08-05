@@ -3,6 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 import { slugify } from '../src/utils/slugify';
 import { TEAM_MEMBERS } from '../prisma/data/teamMembers';
+import { pgSsl } from '../src/config/dbSsl';
 
 /**
  * Jamoa a'zolarini bazaga qo'shadi — production'da ham xavfsiz.
@@ -27,10 +28,9 @@ import { TEAM_MEMBERS } from '../prisma/data/teamMembers';
  *   npx tsx scripts/seed-team.ts --dry-run
  */
 
-const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...pgSsl(process.env.DATABASE_URL),
 });
 const prisma = new PrismaClient({ adapter });
 
