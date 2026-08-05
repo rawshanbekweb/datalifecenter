@@ -16,13 +16,18 @@ interface ServicesProps {
   settings?: { items?: ServiceItem[] };
 }
 
+// Zaxira ro'yxat — faqat API xatosida ko'rinadi, shuning uchun o'zbekcha qoladi.
+//
+// "Data Analytics" ATAYIN YO'Q: markaz bu xizmatni ko'rsatmaydi (egasining
+// 2026-08-05 dagi ko'rsatmasi) va shu sababdan Digital Solutions ichidagi
+// bir xil nomli xususiyat ham olib tashlangan. Bu ro'yxat admin paneldagi
+// "Xizmatlar" bo'limi bilan bir xil bo'lishi kerak.
 const DEFAULT_SVCS: ServiceItem[] = [
-  { icon:'Globe',      title:'Web Development',    color:'#0ea5e9', desc:'Zamonaviy veb ilovalar. React, Next.js, Node.js bilan enterprise yechimlar.',          feats:['SPA & SSR ilovalar','API integratsiya','SEO optimizatsiya','Performance'] },
-  { icon:'Smartphone', title:'Mobile Applications', color:'#9333ea', desc:'iOS va Android uchun professional ilovalar. Flutter va React Native bilan.',          feats:['Flutter & React Native','Native iOS/Android','App Store deploy','Push notifications'] },
-  { icon:'Palette',    title:'UI/UX Design',        color:'#db2777', desc:"Foydalanuvchilar uchun qulay dizayn. Figma bilan prototipdan mahsulotgacha.",          feats:['User Research','Wireframing','Design Systems','Usability Testing'] },
-  { icon:'Brain',      title:'IT Consulting',       color:'#d97706', desc:"Biznesingiz uchun texnologik strategiya. Expert maslahat xizmatlar.",                   feats:['Tech Strategy','Digital Transform','System Architecture','Code Audit'] },
-  { icon:'Cpu',        title:'Digital Solutions',   color:'#16a34a', desc:"Biznes jarayonlarini avtomatlashtirish. ERP, CRM va maxsus yechimlar.",                feats:['Business Automation','Custom Software','CRM & ERP','Data Analytics'] },
-  { icon:'BarChart3',  title:'Data Analytics',      color:'#0284c7', desc:"Ma'lumotlardan qimmatli bilimlar olish. Dashboard va hisobot tizimlar.",               feats:['BI Dashboards','Real-time Analytics','Predictive Models','Reports'] },
+  { icon:'Globe',      title:'Veb ishlab chiqish',  color:'#0ea5e9', desc:"Zamonaviy veb ilovalar va korporativ saytlar — g'oyadan ishga tushirishgacha.",        feats:['Korporativ saytlar','Veb ilovalar','API integratsiya','SEO va tezlik'] },
+  { icon:'Smartphone', title:'Mobil ilovalar',      color:'#9333ea', desc:'iOS va Android uchun ilovalar — bitta kod bazasidan ikkala platformaga.',              feats:['Android va iOS',"Do'konga joylash",'Push bildirishnomalar'] },
+  { icon:'Palette',    title:'UI/UX dizayn',        color:'#db2777', desc:"Foydalanuvchi uchun qulay interfeys — prototipdan tayyor dizayngacha.",                 feats:['Prototip va maket','Dizayn tizimi','Brend uslubi'] },
+  { icon:'Brain',      title:'IT konsalting',       color:'#d97706', desc:"Qaysi texnologiyani tanlash va qanday qurish kerakligi bo'yicha maslahat.",             feats:['Texnologiya tanlash','Tizim arxitekturasi','Kod auditi'] },
+  { icon:'Cpu',        title:'Dasturiy yechimlar',  color:'#16a34a', desc:'Biznes uchun maxsus dasturlar va startaplar uchun birinchi ishlaydigan mahsulot.',      feats:['Maxsus dasturlar','Startap uchun MVP','Jarayonlarni avtomatlashtirish','CRM va ERP'] },
 ];
 
 export default function Services({ settings }: ServicesProps = {}): React.ReactElement {

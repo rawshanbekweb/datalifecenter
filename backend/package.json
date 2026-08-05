@@ -19,7 +19,8 @@
     "seed:team": "tsx scripts/seed-team.ts",
     "seed:analytics": "tsx scripts/seed-analytics.ts",
     "publish:blog-news": "tsx scripts/publish-blog-news.ts",
-    "restore": "tsx scripts/restore-from-json.ts"
+    "restore": "tsx scripts/restore-from-json.ts",
+    "publish:company": "tsx scripts/publish-company-profile.ts"
   },
   "engines": {
     "node": ">=20"

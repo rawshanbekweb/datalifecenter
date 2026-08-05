@@ -15,13 +15,22 @@ interface WhyUsProps {
   settings?: { items?: FeatureItem[] };
 }
 
+// Zaxira ro'yxat — faqat API xatosida ko'rinadi, shuning uchun o'zbekcha qoladi.
+//
+// FAQAT TEKSHIRILGAN RAQAMLAR: markaz egasi bergan ma'lumot (9 mentor,
+// 3000+ bitiruvchi, 7 yo'nalish, 2019-yil, 11 kishilik jamoa). Ilgari bu
+// yerda o'ylab topilgan qiymatlar turardi — "40+" mentor, "92%" ishga
+// joylashish, "180+" loyiha, "2,500+" hamjamiyat — va ular jonli saytda
+// haqiqiy statistika bo'lib ko'rinardi.
+//
+// "Karera qo'llab-quvvatlash" kartasi ATAYIN YO'Q: markaz bunday xizmatni
+// alohida taklif qilmaydi (egasining 2026-08-05 dagi ko'rsatmasi).
 const DEFAULT_FEATS: FeatureItem[] = [
-  { icon:'GraduationCap', title:"Tajribali Mentorlar",     color:'#0ea5e9', stat:'40+',    desc:"IT sanoatida 5+ yil tajribaga ega mutaxassislar tomonidan o'qiting." },
-  { icon:'Zap',           title:"Amaliy Ta'lim",           color:'#9333ea', stat:'70%',    desc:"Nazariyadan ko'ra amaliyot ustuvor. Real loyihalar va hackathon-lar." },
-  { icon:'Briefcase',     title:"Real Loyihalar",          color:'#16a34a', stat:'180+',   desc:"Ta'lim jarayonida haqiqiy mijozlar uchun loyihalarda ishlaysiz." },
-  { icon:'HeartHandshake',title:"Karera Qo'llab-quvvat",  color:'#d97706', stat:'92%',    desc:"Resume, intervyu tayyorlash va ish topishda to'liq yordam." },
-  { icon:'Trophy',        title:"Sertifikatlar",           color:'#db2777', stat:'3,000+', desc:"Sanoat tomonidan tan olingan. LinkedIn va xalqaro platformalarda tasdiqlangan." },
-  { icon:'Users',         title:"Kuchli Hamjamiyat",       color:'#0284c7', stat:'2,500+', desc:"DATA LIFE bitiruvchilari tarmog'i. Networking va karera imkoniyatlari." },
+  { icon:'GraduationCap', title:"Tajribali mentorlar", color:'#0ea5e9', stat:'9',     desc:"Har bir yo'nalishni o'z sohasida ishlaydigan mentor olib boradi." },
+  { icon:'Trophy',        title:"Bitiruvchilar",       color:'#db2777', stat:'3000+', desc:"Markazni tugatgan o'quvchilar soni." },
+  { icon:'BookOpen',      title:"Yo'nalishlar",        color:'#9333ea', stat:'7',     desc:"Kompyuter savodxonligidan Prompt Engineering va kiberxavfsizlikkacha." },
+  { icon:'Award',         title:"Shu yildan beri",     color:'#16a34a', stat:'2019',  desc:"DATA LIFE 2019-yildan beri uzluksiz ishlaydi." },
+  { icon:'Users',         title:"Jamoa",               color:'#0284c7', stat:'11',    desc:"Mentorlar, rahbariyat va marketing mutaxassislari." },
 ];
 
 export default function WhyUs({ settings }: WhyUsProps = {}): React.ReactElement {
