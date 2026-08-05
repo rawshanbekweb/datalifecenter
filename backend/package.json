@@ -19,6 +19,7 @@
     "seed:team": "tsx scripts/seed-team.ts",
     "seed:analytics": "tsx scripts/seed-analytics.ts",
     "publish:blog-news": "tsx scripts/publish-blog-news.ts",
+    "backup": "tsx scripts/backup-to-json.ts",
     "restore": "tsx scripts/restore-from-json.ts",
     "publish:company": "tsx scripts/publish-company-profile.ts",
     "clean:images": "tsx scripts/clean-orphan-images.ts"
