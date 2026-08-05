@@ -338,7 +338,9 @@
       "contactAdmin": "Ma'lumot olish",
       "contactOffline": "Offline uchun bog'lanish",
       "enrollOnline": "Online yozilish",
-      "mentors": "Mentorlar"
+      "mentors": "Mentorlar",
+      "onlineClosed": "Onlayn guruhga yozilish hozircha yopiq",
+      "offlineClosed": "Offline guruhga qabul hozircha yopiq"
     },
     "certificate": {
       "title": "Sertifikatni tekshirish",
@@ -962,7 +964,9 @@
       "hidden": "Yashirilgan",
       "notPublished": "Nashr qilinmagan",
       "live": "Live",
-      "accountLinked": "Hisob bog'langan"
+      "accountLinked": "Hisob bog'langan",
+      "onlineClosed": "Onlayn yopiq",
+      "offlineClosed": "Offline yopiq"
     },
     "colors": {
       "blue": "Ko'k",
@@ -991,7 +995,6 @@
       "fTags": "Teglar (vergul bilan)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Chop etilgan (saytda ko'rinadi)",
-      "enrollmentOpen": "Yozilish ochiq",
       "enrollmentOpenHint": "Belgi olib tashlansa kurs saytda ko'rinaveradi, lekin \"Tez orada\" deb belgilanadi va yangi o'quvchi yozila olmaydi. Allaqachon yozilganlar darsini davom ettiraveradi.",
       "noMentor": "Mentor yo'q",
       "priceUnit": "{{price}} UZS",
@@ -1004,7 +1007,10 @@
       "fMentors": "Mentorlar",
       "leadMentor": "asosiy",
       "mentorsHint": "Bir nechtasini tanlash mumkin. Birinchi tanlangani asosiy mentor bo'ladi.",
-      "noMentorsYet": "Avval mentor qo'shing."
+      "noMentorsYet": "Avval mentor qo'shing.",
+      "onlineEnrollmentOpen": "Onlayn yozilish ochiq",
+      "offlineEnrollmentOpen": "Offline guruhga qabul ochiq",
+      "enrollmentOpenHintHybrid": "Ikkalasi mustaqil: onlayn guruh to'lsa uni yopib, offline qabulni ochiq qoldirish mumkin. \"Tez orada\" belgisi faqat ikkalasi ham yopilganda chiqadi."
     },
     "mentors": {
       "title": "Mentorlar",

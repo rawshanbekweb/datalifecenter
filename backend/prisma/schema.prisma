@@ -194,14 +194,23 @@ model Course {
   likesCount     Int          @default(0)
   tags           String[]
   published      Boolean      @default(false)
-  // IKKI BAYROQ IKKI XIL NARSA UCHUN — chalkashtirmang:
-  //   published      = kurs saytda umuman KO'RINADIMI (false → hech kim ko'rmaydi)
-  //   enrollmentOpen = ko'rinadi, lekin YOZILISH ochiqmi
+  // BAYROQLAR — chalkashtirmang:
+  //   published              = kurs saytda umuman KO'RINADIMI (false → hech kim ko'rmaydi)
+  //   onlineEnrollmentOpen   = ko'rinadi, ONLAYN yozilish ochiqmi
+  //   offlineEnrollmentOpen  = ko'rinadi, OFFLINE guruhga qabul ochiqmi
+  //
   // Markazning yo'nalishlari doim ro'yxatda tursin (odam nima o'rgatilishini
-  // bilsin), lekin guruh to'lganda yoki hali ochilmaganda "Tez orada" ko'rinsin
-  // va yozilish qabul qilinmasin. Mavjud yozilganlarga ta'sir qilmaydi —
-  // faqat YANGI yozilish/so'rov to'xtaydi.
-  enrollmentOpen Boolean      @default(true)
+  // bilsin), lekin guruh to'lganda yoki hali ochilmaganda "Tez orada" ko'rinsin.
+  //
+  // NEGA IKKITA BAYROQ: HYBRID kursda ikki xil qabul bor va ular BOG'LIQ EMAS —
+  // onlayn guruh to'lib qolgani offline guruh ham yopiq degani emas (va aksincha).
+  // Bitta umumiy bayroq bilan ikkalasini birdan yopishga majbur bo'lardik.
+  // ONLINE kursda faqat birinchisi, OFFLINE kursda faqat ikkinchisi ma'noli
+  // (`format` ga qarab) — ortiqchasi shunchaki e'tiborga olinmaydi.
+  //
+  // Mavjud yozilganlarga ta'sir qilmaydi — faqat YANGI yozilish to'xtaydi.
+  onlineEnrollmentOpen  Boolean @default(true)
+  offlineEnrollmentOpen Boolean @default(true)
   // Kursning mentorlari — CourseMentor izohiga qarang (bittasi "asosiy")
   mentors        CourseMentor[]
   modules        Module[]

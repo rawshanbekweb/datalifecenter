@@ -338,7 +338,9 @@
       "contactAdmin": "Ask for details",
       "contactOffline": "Contact us (offline)",
       "enrollOnline": "Enrol online",
-      "mentors": "Mentors"
+      "mentors": "Mentors",
+      "onlineClosed": "Online enrolment is closed for now",
+      "offlineClosed": "In-person intake is closed for now"
     },
     "certificate": {
       "title": "Verify certificate",
@@ -962,7 +964,9 @@
       "hidden": "Hidden",
       "notPublished": "Not published",
       "live": "Live",
-      "accountLinked": "Account linked"
+      "accountLinked": "Account linked",
+      "onlineClosed": "Online closed",
+      "offlineClosed": "In-person closed"
     },
     "colors": {
       "blue": "Blue",
@@ -991,7 +995,6 @@
       "fTags": "Tags (comma-separated)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Published (visible on site)",
-      "enrollmentOpen": "Enrolment open",
       "enrollmentOpenHint": "Unchecked, the course stays visible on the site but is marked \"Coming soon\" and no new students can enrol. Students already enrolled keep their access.",
       "noMentor": "No mentor",
       "priceUnit": "{{price}} UZS",
@@ -1004,7 +1007,10 @@
       "fMentors": "Mentors",
       "leadMentor": "lead",
       "mentorsHint": "You can pick several. The first one selected becomes the lead mentor.",
-      "noMentorsYet": "Add a mentor first."
+      "noMentorsYet": "Add a mentor first.",
+      "onlineEnrollmentOpen": "Online enrolment open",
+      "offlineEnrollmentOpen": "In-person intake open",
+      "enrollmentOpenHintHybrid": "These two are independent: you can close the online group once it fills and keep the in-person intake open. The \"Coming soon\" label appears only when both are closed."
     },
     "mentors": {
       "title": "Mentors",

@@ -193,11 +193,12 @@ export async function confirmSubscriptionPayment(subscriptionId: string, input: 
 // (progress/sertifikat/jonli-dars/sharh) o'zgarishsiz ishlashda davom etadi.
 export async function provisionCoursesForSubscriber(userId: string): Promise<void> {
   const [courses, existing] = await Promise.all([
-    // enrollmentOpen: yozilish yopiq kursga obuna ham kirish bermaydi —
-    // aks holda "yopiq" bayrog'ini obuna orqali chetlab o'tish mumkin bo'lardi.
+    // Obuna — ONLAYN kirish, shuning uchun onlayn qabuli yopiq kursga obuna
+    // ham kirish bermaydi (aks holda "yopiq" bayrog'ini obuna orqali chetlab
+    // o'tish mumkin bo'lardi). Offline bayrog'i bu yerda ahamiyatsiz.
     // Kurs qayta ochilganda obunachi keyingi kirishida avtomatik oladi
     // (courses.service.ts dagi lazy provisioning).
-    prisma.course.findMany({ where: { published: true, enrollmentOpen: true }, select: { id: true } }),
+    prisma.course.findMany({ where: { published: true, onlineEnrollmentOpen: true }, select: { id: true } }),
     prisma.enrollment.findMany({ where: { userId }, select: { courseId: true } }),
   ]);
   const existingIds = new Set(existing.map((e) => e.courseId));

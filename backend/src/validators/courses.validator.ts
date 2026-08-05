@@ -33,8 +33,10 @@ export const createCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
-  // Yangi kurs odatda darhol qabul qiladi; yopish admin panelidan bir tugma
-  enrollmentOpen: z.boolean().default(true),
+  // Yangi kurs odatda darhol qabul qiladi; yopish admin panelidan bir tugma.
+  // Ikkita alohida bayroq — HYBRID kursda onlayn va offline qabul mustaqil.
+  onlineEnrollmentOpen: z.boolean().default(true),
+  offlineEnrollmentOpen: z.boolean().default(true),
   mentorIds: courseMentorIds,
 });
 
@@ -57,6 +59,7 @@ export const updateCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).optional(),
   published: z.boolean().optional(),
-  enrollmentOpen: z.boolean().optional(),
+  onlineEnrollmentOpen: z.boolean().optional(),
+  offlineEnrollmentOpen: z.boolean().optional(),
   mentorIds: courseMentorIds,
 });

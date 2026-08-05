@@ -9,6 +9,7 @@ import { resolveIcon } from '../utils/iconMap';
 import { formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import { useEngagementItem } from '../hooks/useEngagementItem';
+import { enrollmentState } from '../utils/courseEnrollment';
 import { useContentView } from '../hooks/useContentView';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
@@ -148,8 +149,13 @@ export default function CourseDetailPage(): React.ReactElement {
   const isHybrid = course.format === 'HYBRID';
   // Kurs saytda ko'rinadi, lekin hozircha yangi o'quvchi qabul qilinmaydi.
   // ALLAQACHON yozilganlarga tegmaydi — ular darslarini davom ettiraveradi,
-  // shuning uchun bu bayroq faqat "hali yozilmagan" holatlarni almashtiradi.
-  const enrollmentClosed = course.enrollmentOpen === false;
+  // shuning uchun bu faqat "hali yozilmagan" holatlarni almashtiradi.
+  //
+  // Gibrid kursda ikki yo'l MUSTAQIL: onlayn yopiq bo'lsa ham offline
+  // guruhga yozilish mumkin, shuning uchun butun kartani "Tez orada" bilan
+  // almashtirish faqat IKKALASI ham yopiq bo'lganda to'g'ri bo'ladi.
+  const enrollment_ = enrollmentState(course);
+  const enrollmentClosed = enrollment_.allClosed;
   const notEnrolledYet = enrollStatus !== 'success' && enrollStatus !== 'already';
   const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
 
@@ -403,7 +409,7 @@ export default function CourseDetailPage(): React.ReactElement {
                       : course.isFree ? t('pages.courseDetail.freePrompt') : t('pages.courseDetail.paidPrompt')}
                   </p>
                   {/* Offline guruhga o'zicha yozilib bo'lmaydi — joy va jadval admin bilan kelishiladi */}
-                  {!isOfflineOnly && (
+                  {!isOfflineOnly && enrollment_.onlineOpen && (
                     <button onClick={enroll} disabled={enrollStatus === 'loading'} className="btn-primary"
                       style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: enrollStatus === 'loading' ? 0.7 : 1 }}>
                       {enrollStatus === 'loading'
@@ -411,8 +417,23 @@ export default function CourseDetailPage(): React.ReactElement {
                         : <>{isHybrid ? t('pages.courseDetail.enrollOnline') : t('pages.courseDetail.enroll')} <ArrowRight size={15}/></>}
                     </button>
                   )}
+                  {/* Gibrid kursda bitta yo'l yopilgan bo'lsa, qaysi biri
+                      ekanini aytamiz — aks holda tugma sababsiz yo'qolgandek
+                      ko'rinardi. Ikkinchi yo'l ochiqligicha qolaveradi. */}
+                  {!isOfflineOnly && !enrollment_.onlineOpen && (
+                    <div style={{ display:'flex', alignItems:'center', gap:9, padding:'10px 12px', borderRadius:10, background:'#fffbeb', border:'1px solid #fde68a', marginBottom:10 }}>
+                      <Clock size={15} style={{ color:'#b45309', flexShrink:0 }} />
+                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>{t('pages.courseDetail.onlineClosed')}</p>
+                    </div>
+                  )}
+                  {isHybrid && !enrollment_.offlineOpen && (
+                    <div style={{ display:'flex', alignItems:'center', gap:9, padding:'10px 12px', borderRadius:10, background:'#fffbeb', border:'1px solid #fde68a', marginBottom:10 }}>
+                      <Clock size={15} style={{ color:'#b45309', flexShrink:0 }} />
+                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>{t('pages.courseDetail.offlineClosed')}</p>
+                    </div>
+                  )}
                   <button onClick={() => setRequestFormat(defaultRequestFormat)}
-                    className={isOfflineOnly ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
+                    className={isOfflineOnly || !enrollment_.onlineOpen ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
                     <MessageCircle size={15}/> {isOfflineOnly || isHybrid ? t('pages.courseDetail.contactOffline') : t('pages.courseDetail.contactAdmin')}
                   </button>
                 </>

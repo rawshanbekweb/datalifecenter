@@ -6,6 +6,7 @@ import { Clock, ArrowRight, Star, Eye } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
 import LikeButton from '../common/LikeButton';
 import CourseFormatBadge, { type CourseFormat } from './CourseFormatBadge';
+import { enrollmentState } from '../../utils/courseEnrollment';
 import { useEngagementItem } from '../../hooks/useEngagementItem';
 
 interface CourseModule {
@@ -29,8 +30,9 @@ export interface CourseCardData {
   durationMonths: number;
   studentsCount: number;
   format?: CourseFormat;
-  /** Yozilish ochiqmi. Yopiq bo'lsa kurs ko'rinadi, lekin "Tez orada" deb belgilanadi */
-  enrollmentOpen?: boolean;
+  /** Qabul ochiqmi — onlayn va offline alohida (utils/courseEnrollment.ts) */
+  onlineEnrollmentOpen?: boolean;
+  offlineEnrollmentOpen?: boolean;
   views?: number;
   likesCount?: number;
   [key: string]: unknown;
@@ -46,6 +48,7 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
   const engagement = useEngagementItem('course', String(course.id), { likesCount: course.likesCount, views: course.views });
+  const enrollment = enrollmentState(course);
   // Paketli stats so'rovi kelguncha ro'yxat bilan kelgan qiymat ko'rsatiladi —
   // aks holda raqam avval yo'q bo'lib, keyin "sakrab" paydo bo'lardi
   const views = engagement.views ?? course.views ?? 0;
@@ -60,9 +63,10 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
           <Icon size={22} style={{ color:course.color }} />
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', justifyContent:'flex-end' }}>
-          {/* Yo'nalish ro'yxatda turaveradi, lekin qabul hozircha yopiq.
-              Maydon eski javoblarda yo'q bo'lishi mumkin — !== false. */}
-          {course.enrollmentOpen === false && (
+          {/* Yo'nalish ro'yxatda turaveradi, lekin qabul yopiq. Gibrid kursda
+              bitta yo'l yopilgani yetarli emas — ikkinchisi orqali yozilsa
+              bo'ladi, shuning uchun "Tez orada" faqat hammasi yopilganda. */}
+          {enrollment.allClosed && (
             <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309', fontWeight:700 }}>
               {t('cards.course.comingSoon')}
             </span>

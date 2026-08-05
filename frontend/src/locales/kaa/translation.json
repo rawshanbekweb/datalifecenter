@@ -338,7 +338,9 @@
       "contactAdmin": "Maǵlıwmat alıw",
       "contactOffline": "Offline ushın baylanısıw",
       "enrollOnline": "Online jazılıw",
-      "mentors": "Mentorlar"
+      "mentors": "Mentorlar",
+      "onlineClosed": "Onlayn gruppaǵa jazılıw házirshe jabıq",
+      "offlineClosed": "Offline gruppaǵa qabıl házirshe jabıq"
     },
     "certificate": {
       "title": "Sertifikattı tekseriw",
@@ -962,7 +964,9 @@
       "hidden": "Jasırılǵan",
       "notPublished": "Járiyalanbaǵan",
       "live": "Live",
-      "accountLinked": "Esap baylanısqan"
+      "accountLinked": "Esap baylanısqan",
+      "onlineClosed": "Onlayn jabıq",
+      "offlineClosed": "Offline jabıq"
     },
     "colors": {
       "blue": "Kók",
@@ -991,8 +995,7 @@
       "fTags": "Tegler (útir menen)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Járiyalanǵan (saytta kórinedi)",
-      "enrollmentOpen": "Jazılıw ashıq",
-      "enrollmentOpenHint": "Belgi alıp taslansa, kurs saytta kórinip turadı, biraq \"Tez arada\" dep belgilenedi hám jańa oqıwshı jazıla almaydı. Aldın jazılģanlar sabaģın dawam ettiredi.",
+      "enrollmentOpenHint": "Belgi alıp taslansa, kurs saytta kórinip turadı, biraq \"Tez arada\" dep belgilenedi hám jańa oqıwshı jazıla almaydı. Aldın jazılǵanlar sabaǵın dawam ettiredi.",
       "noMentor": "Mentor joq",
       "priceUnit": "{{price}} UZS",
       "curriculum": "Baǵdarlama",
@@ -1004,7 +1007,10 @@
       "fMentors": "Mentorlar",
       "leadMentor": "tiykarǵı",
       "mentorsHint": "Bir neshewin saylaw múmkin. Birinshi saylanǵanı tiykarǵı mentor boladı.",
-      "noMentorsYet": "Aldın mentor qosıń."
+      "noMentorsYet": "Aldın mentor qosıń.",
+      "onlineEnrollmentOpen": "Onlayn jazılıw ashıq",
+      "offlineEnrollmentOpen": "Offline gruppaǵa qabıl ashıq",
+      "enrollmentOpenHintHybrid": "Ekewi ǵárezsiz: onlayn gruppa tolsa onı jabıp, offline qabıldı ashıq qaldırıw múmkin. \"Tez arada\" belgisi tek ekewi de jabılǵanda shıǵadı."
     },
     "mentors": {
       "title": "Mentorlar",

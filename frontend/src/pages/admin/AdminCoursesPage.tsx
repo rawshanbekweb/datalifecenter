@@ -11,6 +11,7 @@ import { useToast, useConfirm } from '../../components/common/Feedback';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import Loading from '../../components/common/Loading';
+import { enrollmentState } from '../../utils/courseEnrollment';
 
 const ICON_KEYS: string[] = ['Monitor', 'Server', 'Shield', 'Smartphone', 'Database', 'Cloud', 'BookOpen'];
 // daraja nomi umumiy `levels.*` (Stage 2) orqali t() bilan chiqadi
@@ -47,8 +48,9 @@ interface CourseFormState {
   location: LocalizedString;
   tags: string;
   published: boolean;
-  /** Yozilish ochiqmi — `published` dan alohida (backend schema.prisma izohi) */
-  enrollmentOpen: boolean;
+  /** Qabul ochiqmi — `published` dan alohida, onlayn/offline mustaqil */
+  onlineEnrollmentOpen: boolean;
+  offlineEnrollmentOpen: boolean;
   /** Kurs mentorlari — RO'YXAT TARTIBI muhim: birinchisi asosiy mentor */
   mentorIds: string[];
 }
@@ -81,7 +83,8 @@ interface Course {
   location?: LocalizedString | null;
   tags?: string[];
   published: boolean;
-  enrollmentOpen: boolean;
+  onlineEnrollmentOpen: boolean;
+  offlineEnrollmentOpen: boolean;
   mentors?: CourseMentor[];
   isFree?: boolean;
   views?: number;
@@ -91,7 +94,7 @@ interface Course {
 const emptyForm: CourseFormState = {
   title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
   price:0, durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
-  tags:'', published:false, enrollmentOpen:true, mentorIds:[],
+  tags:'', published:false, onlineEnrollmentOpen:true, offlineEnrollmentOpen:true, mentorIds:[],
 };
 
 /**
@@ -185,7 +188,8 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       location: form.format !== 'ONLINE' && form.location.uz.trim() ? form.location : null,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       published: form.published,
-      enrollmentOpen: form.enrollmentOpen,
+      onlineEnrollmentOpen: form.onlineEnrollmentOpen,
+      offlineEnrollmentOpen: form.offlineEnrollmentOpen,
       mentorIds: form.mentorIds,
     };
     try {
@@ -266,15 +270,25 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
         <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.courses.published')}
       </label>
-      {/* Ikkinchi bayroq birinchisidan alohida: kurs saytda TURAVERADI, faqat
-          yozilish yopiladi. Shuning uchun "published" o'chirilgan bo'lsa bu
-          belgining ma'nosi yo'q — kursni baribir hech kim ko'rmaydi. */}
-      <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color: form.published ? '#334155' : '#94a3b8', cursor: form.published ? 'pointer' : 'not-allowed' }}>
-        <input type="checkbox" checked={form.enrollmentOpen} disabled={!form.published} onChange={change('enrollmentOpen')} />
-        {t('admin.courses.enrollmentOpen')}
-      </label>
+      {/* Qabul bayroqlari `published` dan alohida: kurs saytda TURAVERADI,
+          faqat yozilish yopiladi. `published` o'chirilgan bo'lsa bularning
+          ma'nosi yo'q — kursni baribir hech kim ko'rmaydi.
+          Format ONLINE bo'lsa offline belgisi (va aksincha) ko'rsatilmaydi:
+          u hech narsaga ta'sir qilmaydi va faqat chalkashtirardi. */}
+      {(form.format === 'ONLINE' || form.format === 'HYBRID') && (
+        <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color: form.published ? '#334155' : '#94a3b8', cursor: form.published ? 'pointer' : 'not-allowed' }}>
+          <input type="checkbox" checked={form.onlineEnrollmentOpen} disabled={!form.published} onChange={change('onlineEnrollmentOpen')} />
+          {t('admin.courses.onlineEnrollmentOpen')}
+        </label>
+      )}
+      {(form.format === 'OFFLINE' || form.format === 'HYBRID') && (
+        <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color: form.published ? '#334155' : '#94a3b8', cursor: form.published ? 'pointer' : 'not-allowed' }}>
+          <input type="checkbox" checked={form.offlineEnrollmentOpen} disabled={!form.published} onChange={change('offlineEnrollmentOpen')} />
+          {t('admin.courses.offlineEnrollmentOpen')}
+        </label>
+      )}
       <p style={{ margin:'-4px 0 0 24px', fontSize:11.5, color:'#94a3b8', lineHeight:1.5 }}>
-        {t('admin.courses.enrollmentOpenHint')}
+        {form.format === 'HYBRID' ? t('admin.courses.enrollmentOpenHintHybrid') : t('admin.courses.enrollmentOpenHint')}
       </p>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
@@ -313,7 +327,9 @@ export default function AdminCoursesPage(): React.ReactElement {
       location: course.location || emptyLocalizedString(), tags: (course.tags || []).join(', '),
       // Backend mentorlarni asosiysi birinchi bo'ladigan tartibda qaytaradi —
       // shu tartib formada ham saqlanadi
-      published: course.published, enrollmentOpen: course.enrollmentOpen ?? true,
+      published: course.published,
+      onlineEnrollmentOpen: course.onlineEnrollmentOpen ?? true,
+      offlineEnrollmentOpen: course.offlineEnrollmentOpen ?? true,
       mentorIds: (course.mentors || []).map((m) => m.id),
     });
   };
@@ -372,11 +388,23 @@ export default function AdminCoursesPage(): React.ReactElement {
                   {c.published ? t('admin.tags.published') : t('admin.tags.draft')}
                 </span>
                 {/* Faqat nashr qilingan kursda ma'noli — nashr qilinmagani baribir ko'rinmaydi */}
-                {c.published && !c.enrollmentOpen && (
-                  <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309' }}>
-                    {t('admin.tags.enrollmentClosed')}
-                  </span>
-                )}
+                {/* Faqat kurs formatiga TEGISHLI bayroqlar qaraladi — ONLINE
+                    kursda offline bayrog'i yopiq tursa ham hech narsa demaydi */}
+                {c.published && (() => {
+                  const st = enrollmentState({
+                    format: c.format as 'ONLINE' | 'OFFLINE' | 'HYBRID' | undefined,
+                    onlineEnrollmentOpen: c.onlineEnrollmentOpen,
+                    offlineEnrollmentOpen: c.offlineEnrollmentOpen,
+                  });
+                  if (!st.allClosed && !st.partiallyClosed) return null;
+                  return (
+                    <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309' }}>
+                      {st.allClosed
+                        ? t('admin.tags.enrollmentClosed')
+                        : t(st.onlineOpen ? 'admin.tags.offlineClosed' : 'admin.tags.onlineClosed')}
+                    </span>
+                  );
+                })()}
                 <Link to={`/admin/courses/${c.id}/curriculum`} title={t('admin.courses.curriculumTitle')}
                   style={{ display:'flex', alignItems:'center', gap:6, height:32, padding:'0 10px', borderRadius:8, border:'1px solid #bae6fd', background:'#f0f9ff', color:'#0ea5e9', fontSize:12, fontWeight:700, textDecoration:'none' }}>
                   <ListTree size={14}/> {t('admin.courses.curriculum')}
