@@ -50,6 +50,12 @@ npm run dev                   # http://localhost:5173
 
 Seed'dan keyingi demo hisoblar (faqat development):
 
+> **DIQQAT:** bu parollar ochiq repoda turibdi. Jonli bazada ham xuddi shu
+> `admin@datalife.uz` hisobi mavjud — u YARATILGANDAN KEYIN DARHOL boshqa
+> parolga o'tkazilishi shart (kabinet → parolni o'zgartirish). Aks holda
+> administrator huquqi hamma uchun ochiq bo'ladi: bu yerda urinishlar
+> limiti yordam bermaydi, chunki hujumchi parolni topishi shart emas.
+
 | Rol     | Email                    | Parol       |
 |---------|--------------------------|-------------|
 | Admin   | admin@datalife.uz        | Admin123!   |

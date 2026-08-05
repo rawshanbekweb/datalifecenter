@@ -35,7 +35,13 @@ router.get('/:slug/learn', authenticate, getCourseLearnHandler);
 router.get('/:slug/reviews/me', authenticate, getMyReviewHandler);
 router.post('/:slug/reviews', authenticate, validateBody(upsertReviewSchema), upsertReviewHandler);
 router.delete('/:slug/reviews/me', authenticate, deleteMyReviewHandler);
-router.get('/:slug/reviews', listReviewsHandler);
-router.get('/:slug', getCourseHandler);
+// Kurs sahifasi — ro'yxatdan KEYIN eng ko'p ochiladigan joy: mehmon bosh
+// sahifadan kursni bosadi va shu ikki so'rov birga ketadi. Ikkalasi ham
+// hamma uchun bir xil javob qaytaradi (shaxsiy "mening sharhim" alohida
+// `/reviews/me` da, u autentifikatsiya talab qiladi va keshlanmaydi), shuning
+// uchun keshlash xavfsiz. Yangi sharh yozilishi bilan `invalidateCacheOnWrite`
+// keshni tozalaydi — muallif o'z sharhini darhol ko'radi.
+router.get('/:slug/reviews', publicCache(60), listReviewsHandler);
+router.get('/:slug', publicCache(60), getCourseHandler);
 
 export default router;
