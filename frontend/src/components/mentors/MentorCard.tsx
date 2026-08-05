@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { GitBranch, Briefcase, Send } from 'lucide-react';
 import FocusImage from '../common/FocusImage';
@@ -18,6 +19,12 @@ export interface MentorCardData {
   linkedinUrl?: string | null;
   telegramUrl?: string | null;
   courses?: MentorCourse[];
+  /**
+   * Mentorning shaxsiy sahifasi `/team/<slug>` da: Mentor modelida slug yo'q,
+   * u jamoa a'zosi sifatida yashaydi. Bog'lanmagan yoki nashr qilinmagan
+   * bo'lsa `null` keladi va karta bosilmaydigan bo'lib qoladi.
+   */
+  teamSlug?: string | null;
   [key: string]: unknown;
 }
 
@@ -65,7 +72,16 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
   return (
     <m.div initial={{ opacity:0, y:28 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true, margin:'-30px' }}
       transition={{ duration:0.5, delay:(index%3)*0.1 }} className="card"
-      style={{ padding:24, textAlign:'center', background:theme.bg, border:`1.5px solid ${theme.border}` }}>
+      style={{ padding:24, textAlign:'center', background:theme.bg, border:`1.5px solid ${theme.border}`, position:'relative' }}>
+
+      {/* Butun kartani qoplaydigan havola (.person-big-link::after). Kartani
+          <Link> ichiga o'rab bo'lmaydi: ichida ijtimoiy tarmoq <a> lari bor
+          va <a> ichida <a> yaroqsiz HTML. Qoplama esa ular ostida turadi,
+          socials z-index bilan tepada qoladi. */}
+      {mentor.teamSlug && (
+        <Link to={`/team/${mentor.teamSlug}`} className="person-big-link" aria-label={mentor.name}
+          style={{ textDecoration:'none' }} />
+      )}
 
       {showPhoto ? (
         <FocusImage src={mentor.photoUrl!} alt={mentor.name} size={72} radius="circle" focus={mentor}
@@ -88,7 +104,7 @@ export default function MentorCard({ mentor, index = 0 }: MentorCardProps): Reac
       )}
 
       {socials.length > 0 && (
-        <div style={{ display:'flex', gap:8, justifyContent:'center', paddingTop:14, borderTop:`1px solid ${theme.border}` }}>
+        <div style={{ display:'flex', gap:8, justifyContent:'center', paddingTop:14, borderTop:`1px solid ${theme.border}`, position:'relative', zIndex:2 }}>
           {socials.map(({ icon:Icon, href }, i) => (
             <a key={i} href={href} target="_blank" rel="noopener noreferrer"
               style={{ width:32, height:32, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', background:'#fff', border:`1px solid ${theme.border}`, color:theme.color, textDecoration:'none' }}>

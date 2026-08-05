@@ -306,3 +306,51 @@ describe('Jamoa — rol berilganda profil ochilishi', () => {
     expect(profile?.slug).toBe('yangi-xodim');
   });
 });
+
+describe('Mentor kartasi shaxsiy sahifaga bog\'lanishi (teamSlug)', () => {
+  // Mentorning o'z ommaviy sahifasi yo'q — u jamoa a'zosi sifatida
+  // /team/<slug> da yashaydi. Karta o'sha manzilga bog'lanadi.
+
+  it('nashr qilingan jamoa profili bo\'lsa teamSlug qaytadi', async () => {
+    const mentor = await prisma.mentor.create({
+      data: { name: 'Sahifali Mentor', bio: { uz: 'Bio' }, specialty: { uz: 'Backend' } },
+    });
+    await prisma.teamMember.create({
+      data: {
+        slug: 'sahifali-mentor', name: 'Sahifali Mentor', position: { uz: 'Mentor' },
+        bio, department: 'EDUCATION', published: true, mentorId: mentor.id,
+      },
+    });
+
+    const res = await request(app).get(fresh('/api/mentors')).expect(200);
+    const found = res.body.data.find((m: { id: string }) => m.id === mentor.id);
+    expect(found.teamSlug).toBe('sahifali-mentor');
+  });
+
+  it('jamoa profili NASHR QILINMAGAN bo\'lsa teamSlug null — havola 404 ga olib bormasin', async () => {
+    const mentor = await prisma.mentor.create({
+      data: { name: 'Yashirin Sahifa Mentor', bio: { uz: 'Bio' }, specialty: { uz: 'Data' } },
+    });
+    await prisma.teamMember.create({
+      data: {
+        slug: 'yashirin-sahifa-mentor', name: 'Yashirin Sahifa Mentor', position: { uz: 'Mentor' },
+        bio, department: 'DATA', published: false, mentorId: mentor.id,
+      },
+    });
+
+    const res = await request(app).get(fresh('/api/mentors')).expect(200);
+    const found = res.body.data.find((m: { id: string }) => m.id === mentor.id);
+    expect(found.teamSlug).toBeNull();
+    // Slug haqiqatan ham ochilmasligi tekshiriladi
+    await request(app).get('/api/team/yashirin-sahifa-mentor').expect(404);
+  });
+
+  it('jamoa profiliga umuman bog\'lanmagan mentorda teamSlug null', async () => {
+    const mentor = await prisma.mentor.create({
+      data: { name: 'Bog\'lanmagan Mentor', bio: { uz: 'Bio' }, specialty: { uz: 'QA' } },
+    });
+    const res = await request(app).get(fresh('/api/mentors')).expect(200);
+    const found = res.body.data.find((m: { id: string }) => m.id === mentor.id);
+    expect(found.teamSlug).toBeNull();
+  });
+});

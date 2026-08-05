@@ -64,7 +64,10 @@ function BigMentorCard({ mentor, index }: { mentor: MentorCardData; index: numbe
   return (
     <BigPersonCard
       index={index}
-      to="/mentors"
+      // Mentorning shaxsiy sahifasi `/team/<slug>` da (Mentor modelida slug
+      // yo'q — u jamoa a'zosi sifatida yashaydi). Bog'lanmagan mentor uchun
+      // ro'yxatga qaytamiz, aks holda havola 404 ga olib borardi.
+      to={mentor.teamSlug ? `/team/${mentor.teamSlug}` : '/mentors'}
       name={mentor.name}
       subtitle={subtitle}
       accentColor={theme.color}

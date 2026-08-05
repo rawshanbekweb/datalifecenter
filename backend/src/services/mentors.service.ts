@@ -33,15 +33,33 @@ function flatCourses<C>(links: { isLead: boolean; course: C }[]): (C & { isLead:
 }
 
 // O'z rasmi bo'lmasa jamoa profilidan olinadi (utils/personPhoto.ts).
-// `teamProfile` javobga chiqmaydi — u faqat shu zaxira uchun o'qiladi.
+// `teamProfile` javobga XOM holda chiqmaydi — undan faqat rasm va `teamSlug`
+// olinadi.
 const publicInclude = {
   courseLinks: courseLinksSelect,
-  teamProfile: { select: { photoUrl: true, focusX: true, focusY: true } },
+  teamProfile: { select: { photoUrl: true, focusX: true, focusY: true, slug: true, published: true } },
 } satisfies Prisma.MentorInclude;
 
-function withTeamPhoto<T extends PersonPhoto & { teamProfile: PersonPhoto | null }>(mentor: T) {
+/**
+ * Rasmni jamoa profilidan meros qilib oladi va shaxsiy sahifa manzilini
+ * `teamSlug` sifatida qo'shadi.
+ *
+ * NEGA `teamSlug` KERAK: mentorning o'z ommaviy sahifasi yo'q — u jamoa
+ * a'zosi sifatida `/team/<slug>` da yashaydi (Mentor modelida slug yo'q,
+ * TeamMember'da bor). Busiz mentor kartasini bosganda hech qayerga
+ * o'tolmasdik yoki ro'yxatning o'ziga qaytardik.
+ *
+ * `published: false` bo'lsa slug BERILMAYDI: `getTeamMemberBySlug` faqat
+ * nashr qilinganini qaytaradi, ya'ni havola 404 ga olib borardi.
+ */
+function withTeamPhoto<T extends PersonPhoto & {
+  teamProfile: (PersonPhoto & { slug: string; published: boolean }) | null;
+}>(mentor: T) {
   const { teamProfile, ...rest } = inheritPhoto(mentor, mentor.teamProfile);
-  return rest;
+  return {
+    ...rest,
+    teamSlug: teamProfile?.published ? teamProfile.slug : null,
+  };
 }
 
 export async function listMentors(locale: SupportedLocale) {
