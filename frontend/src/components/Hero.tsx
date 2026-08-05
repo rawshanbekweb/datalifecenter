@@ -27,7 +27,8 @@ interface HeroProps {
 const DEFAULT_STATS: StatItem[] = [
   { value: '3000+', label: 'home.hero.fallbackStats.graduates' },
   { value: '7', label: 'home.hero.fallbackStats.courses' },
-  { value: '12', label: 'home.hero.fallbackStats.specialists' },
+  // Jamoa 11 kishi: 9 mentor + direktor + SMM menejer (2026-08-05 holatiga)
+  { value: '11', label: 'home.hero.fallbackStats.specialists' },
   { value: '09:00–18:00', label: 'home.hero.fallbackStats.hours' },
 ];
 
@@ -120,7 +121,11 @@ export default function Hero({ settings }: HeroProps = {}): React.ReactElement {
 
             <m.div initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.38 }}
               style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:44 }}>
-              <a href="#contact"><button className="btn-primary">{t('home.hero.ctaPrimary')} <ArrowRight size={15} /></button></a>
+              {/* Ilgari IKKALA tugma ham #contact ga olib borardi — birinchisi
+                  "O'qishni boshlash" deb tursa-da, odam kurslar ro'yxatini
+                  ko'rmasdan to'g'ri aloqa formasiga tushardi. Endi birinchisi
+                  kurslarga, ikkinchisi aloqaga. */}
+              <a href="#courses"><button className="btn-primary">{t('home.hero.ctaPrimary')} <ArrowRight size={15} /></button></a>
               <a href="#contact"><button className="btn-outline">{t('home.hero.ctaSecondary')}</button></a>
             </m.div>
 

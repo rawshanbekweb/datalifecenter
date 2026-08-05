@@ -139,16 +139,16 @@
   },
   "home": {
     "hero": {
-      "pill": "DATA LIFE IT Center",
-      "tagline": "IT kelajagini bugundan yarating",
-      "description": "Sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz hamda IT yo'nalishlari bo'yicha o'qitamiz. Amaliyotchi mutaxassislar bilan real loyihalarda ishlaymiz.",
-      "ctaPrimary": "O'qishni boshlash",
+      "pill": "Nukus · 2019-yildan beri",
+      "tagline": "O'rgatamiz, chunki o'zimiz ishlab chiqamiz",
+      "description": "DATA LIFE — Nukusdagi IT o'quv markazi va dasturiy ishlanmalar jamoasi. Kompyuter savodxonligidan Prompt Engineering va veb ilovalar xavfsizligigacha yetti yo'nalish; darslarni haftaning qolgan kunlari real loyihalar ustida ishlaydigan mentorlar olib boradi.",
+      "ctaPrimary": "Kurslarni ko'rish",
       "ctaSecondary": "Bog'lanish",
       "fallbackStats": {
         "graduates": "Bitiruvchilar",
         "courses": "Yo'nalishlar",
-        "specialists": "Mutaxassislar",
-        "hours": "Ish Vaqti"
+        "specialists": "Jamoa",
+        "hours": "Ish vaqti"
       }
     },
     "moments": {

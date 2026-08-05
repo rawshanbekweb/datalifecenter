@@ -139,15 +139,15 @@
   },
   "home": {
     "hero": {
-      "pill": "DATA LIFE IT Center",
-      "tagline": "IT keleshegin búginnen jaratıń",
-      "description": "Sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵamız hám IT baǵdarları boyınsha oqıtamız. Ámeliyatshı qániygeler menen real joybarlarda islewmiz.",
-      "ctaPrimary": "Oqıwdı baslaw",
+      "pill": "Nókis · 2019-jıldan berli",
+      "tagline": "Úyretemiz, sebebi ózimiz islep shıǵaramız",
+      "description": "DATA LIFE — Nókistegi IT oqıw orayı hám baǵdarlama islep shıǵıw jámááti. Kompyuter sawatlılıǵınan Prompt Engineering hám veb qosımshalar qáwipsizligine shekem jeti baǵdar; sabaqlardı hápteniń qalǵan kúnleri real joybarlar ústinde isleytuǵın mentorlar alıp baradı.",
+      "ctaPrimary": "Kurslardı kóriw",
       "ctaSecondary": "Baylanısıw",
       "fallbackStats": {
         "graduates": "Pitkeriwshiler",
         "courses": "Baǵdarlar",
-        "specialists": "Qániygeler",
+        "specialists": "Jámáát",
         "hours": "Jumıs waqtı"
       }
     },

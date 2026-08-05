@@ -139,16 +139,16 @@
   },
   "home": {
     "hero": {
-      "pill": "DATA LIFE IT Center",
-      "tagline": "Build your IT future starting today",
-      "description": "We build websites, software and startup solutions, and we teach IT tracks. Real projects, worked on with practising specialists.",
-      "ctaPrimary": "Start learning",
-      "ctaSecondary": "Contact us",
+      "pill": "Nukus · since 2019",
+      "tagline": "We teach what we build",
+      "description": "DATA LIFE is an IT school and a software team in Nukus. Seven tracks, from computer literacy to prompt engineering and web application security — taught by mentors who spend the rest of their week on real client projects.",
+      "ctaPrimary": "See the courses",
+      "ctaSecondary": "Get in touch",
       "fallbackStats": {
         "graduates": "Graduates",
         "courses": "Tracks",
-        "specialists": "Specialists",
-        "hours": "Working Hours"
+        "specialists": "Team",
+        "hours": "Opening hours"
       }
     },
     "moments": {
