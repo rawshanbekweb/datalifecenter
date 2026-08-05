@@ -58,6 +58,7 @@ const TeamDirectoryPage = lazyWithRetry(() => import('./pages/team/TeamDirectory
 
 const AdminLayout = lazyWithRetry(() => import('./layouts/AdminLayout'))
 const AdminDashboardPage = lazyWithRetry(() => import('./pages/admin/AdminDashboardPage'))
+const AdminAnalyticsPage = lazyWithRetry(() => import('./pages/admin/AdminAnalyticsPage'))
 const AdminEnrollmentsPage = lazyWithRetry(() => import('./pages/admin/AdminEnrollmentsPage'))
 const AdminSubscriptionsPage = lazyWithRetry(() => import('./pages/admin/AdminSubscriptionsPage'))
 const AdminUsersPage = lazyWithRetry(() => import('./pages/admin/AdminUsersPage'))
@@ -178,6 +179,7 @@ export function createAppRouter(basename: string) {
     errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: s(<AdminDashboardPage />) },
+      { path: 'analytics', element: s(<AdminAnalyticsPage />) },
       { path: 'enrollments', element: s(<AdminEnrollmentsPage />) },
       { path: 'subscriptions', element: s(<AdminSubscriptionsPage />) },
       { path: 'users', element: s(<AdminUsersPage />) },

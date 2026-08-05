@@ -21,11 +21,11 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import { pgSsl } from '../src/config/dbSsl';
 
-const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...pgSsl(process.env.DATABASE_URL),
 });
 const prisma = new PrismaClient({ adapter });
 

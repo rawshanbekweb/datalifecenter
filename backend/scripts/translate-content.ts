@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import { pgSsl } from '../src/config/dbSsl';
 
 // Seed'dan kelgan o'zbekcha kontentga ru/en tarjimalarini to'ldiradi.
 // Idempotent va xavfsiz: faqat lug'atda bor uz matnlar tarjimalanadi (admin
@@ -11,10 +12,9 @@ import 'dotenv/config';
 //                   DATABASE_URL=<prod url> npm run translate:content
 //                   DRY_RUN=true npm run translate:content
 
-const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...pgSsl(process.env.DATABASE_URL),
 });
 const prisma = new PrismaClient({ adapter });
 

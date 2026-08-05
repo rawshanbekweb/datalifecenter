@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
+import { pgSsl } from '../src/config/dbSsl';
 
 // Bazadagi barcha fayl havolalarini bir joyda ko'rsatadi va ularning haqiqatan
 // ochilishini tekshiradi. Maqsad: Render kabi EPHEMERAL diskda yo'qolgan
@@ -17,10 +18,9 @@ import 'dotenv/config';
 // tegishli manzil berilganda tekshiriladi:
 //   API_URL=https://api.example.com FRONTEND_URL=https://datalife.uz npm run check:uploads
 
-const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...pgSsl(process.env.DATABASE_URL),
 });
 const prisma = new PrismaClient({ adapter });
 

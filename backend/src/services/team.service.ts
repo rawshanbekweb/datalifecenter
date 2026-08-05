@@ -61,7 +61,12 @@ export async function getTeamMemberBySlug(slug: string, locale: SupportedLocale)
           photoUrl: true,
           focusX: true,
           focusY: true,
-          courses: { select: { id: true, title: true, slug: true } },
+          // Kurslar bog'lovchi jadval orqali keladi — kursda bir nechta
+          // mentor bo'lishi mumkin (utils/courseMentors.ts)
+          courseLinks: {
+            orderBy: [{ isLead: 'desc' }, { order: 'asc' }],
+            select: { course: { select: { id: true, title: true, slug: true } } },
+          },
         },
       },
     },
@@ -71,7 +76,16 @@ export async function getTeamMemberBySlug(slug: string, locale: SupportedLocale)
     throw ApiError.notFound('Jamoa a\'zosi topilmadi');
   }
 
-  return resolveLocaleDeep(inheritPhoto(member, member.mentor), locale);
+  // Javobda xodimning mentor profili odatdagi `courses` massivi bilan ko'rinadi
+  const shaped = { ...member, mentor: mentorWithCourses(member.mentor) };
+  return resolveLocaleDeep(inheritPhoto(shaped, shaped.mentor), locale);
+}
+
+/** Mentor profilidagi `courseLinks` ni tekis `courses` ro'yxatiga aylantiradi */
+function mentorWithCourses<C, M extends { courseLinks: { course: C }[] }>(mentor: M | null) {
+  if (!mentor) return null;
+  const { courseLinks, ...profile } = mentor;
+  return { ...profile, courses: courseLinks.map((link) => link.course) };
 }
 
 // Admin tahrirlash paneli uchun — xom {uz,ru,kaa,en} obyektini qaytaradi

@@ -51,7 +51,8 @@ export default function AdminDashboardPage(): React.ReactElement {
     { label:t('admin.dashboard.cardCourses'), value:c.coursesTotal, sub:t('admin.dashboard.cardCoursesSub', { n: c.coursesPublished }), icon:BookOpen, color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', to:'/admin/courses' },
     { label:t('admin.dashboard.cardEnrollments'), value:c.enrollmentsTotal, sub:t('admin.dashboard.cardEnrollmentsSub', { pending: c.enrollmentsPending, active: c.enrollmentsActive }), icon:GraduationCap, color:'#16a34a', bg:'#f0fdf4', border:'#bbf7d0', to:'/admin/enrollments' },
     { label:t('admin.dashboard.cardMessages'), value:c.messagesNew, sub:t('admin.dashboard.cardMessagesSub', { blog: c.blogPostsTotal, mentors: c.mentorsTotal }), icon:Mail, color:'#d97706', bg:'#fffbeb', border:'#fde68a', to:'/admin/messages' },
-    { label:t('admin.dashboard.cardViews'), value:c.viewsTotal, sub:t('admin.dashboard.cardViewsSub', { n: c.likesTotal }), icon:Eye, color:'#0891b2', bg:'#ecfeff', border:'#a5f3fc', to:'/admin/courses' },
+    // Jami raqam kartada, kunlik dinamikasi monitoring sahifasida
+    { label:t('admin.dashboard.cardViews'), value:c.viewsTotal, sub:t('admin.dashboard.cardViewsSub', { n: c.likesTotal }), icon:Eye, color:'#0891b2', bg:'#ecfeff', border:'#a5f3fc', to:'/admin/analytics' },
     { label:t('admin.dashboard.cardCourseRequests'), value:c.courseRequestsNew, sub:t('admin.dashboard.cardCourseRequestsSub'), icon:GraduationCap, color:'#c2410c', bg:'#fff7ed', border:'#fed7aa', to:'/admin/course-requests' },
   ];
 

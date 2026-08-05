@@ -21,6 +21,10 @@ bildirishnomalar, qo'lda to'lov tasdiqlash (chek yuklash) va PDF sertifikatlar b
   jonli sessiyalarga qatnashadi, sertifikat oladi.
 - **Mentor** — o'z kurslari dasturini (modul/dars) boshqaradi, savollarga javob beradi,
   sessiyalar o'tkazadi, talabalar progressini kuzatadi, adminga so'rov yuboradi.
+  Bitta kursni bir nechta mentor birga olib borishi mumkin: ular kursni TENG
+  boshqaradi (dastur, savol-javob, topshiriq, jonli dars), farqi faqat shunda —
+  ro'yxatdagi birinchisi "asosiy" mentor bo'lib, saytda birinchi ko'rinadi va
+  admin kurs nomidan sessiya/topshiriq yaratganda muallif sifatida tanlanadi.
 - **Admin** — hamma narsa: kurslar, foydalanuvchilar, to'lovlarni tasdiqlash,
   mentorlar, blog, hamkorlar, e'lonlar, murojaatlar.
 
@@ -226,4 +230,11 @@ Hamma endpointlar `/api` ostida, javob formati:
 
 Asosiy guruhlar: `/auth`, `/courses`, `/enrollments`, `/mentors`, `/sessions`,
 `/questions`, `/mentor-requests`, `/notifications`, `/announcements`, `/blog`,
-`/partners`, `/contact`, `/users` (admin), `/admin/stats`, `/uploads`, `/progress`.
+`/partners`, `/contact`, `/users` (admin), `/admin/stats`, `/admin/analytics`,
+`/engagement`, `/uploads`, `/progress`.
+
+`/admin/analytics?days=7|30|90` — vaqt bo'yicha monitoring: kunlik ko'rish,
+yoqtirish, yangi foydalanuvchi va yozilishlar, oldingi shuncha kunlik davr bilan
+solishtirilgan holda. Manbasi — `EngagementDaily` jadvali (kunlik yig'indi).
+Yangi bazada u bo'sh bo'ladi; demo raqamlar uchun `npm run seed:analytics`
+(tozalash: `npm run seed:analytics -- --clear`).

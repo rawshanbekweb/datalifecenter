@@ -154,7 +154,8 @@ model Mentor {
   telegramUrl   String?
   order         Int      @default(0)
   featured      Boolean  @default(false)
-  courses       Course[]
+  // Kurslar CourseMentor orqali — bitta kursda bir nechta mentor bo'lishi mumkin
+  courseLinks   CourseMentor[]
   blogPosts     BlogPost[]
   liveSessions  LiveSession[]
   assignments   Assignment[]
@@ -193,8 +194,16 @@ model Course {
   likesCount     Int          @default(0)
   tags           String[]
   published      Boolean      @default(false)
-  mentor         Mentor?      @relation(fields: [mentorId], references: [id])
-  mentorId       String?
+  // IKKI BAYROQ IKKI XIL NARSA UCHUN — chalkashtirmang:
+  //   published      = kurs saytda umuman KO'RINADIMI (false → hech kim ko'rmaydi)
+  //   enrollmentOpen = ko'rinadi, lekin YOZILISH ochiqmi
+  // Markazning yo'nalishlari doim ro'yxatda tursin (odam nima o'rgatilishini
+  // bilsin), lekin guruh to'lganda yoki hali ochilmaganda "Tez orada" ko'rinsin
+  // va yozilish qabul qilinmasin. Mavjud yozilganlarga ta'sir qilmaydi —
+  // faqat YANGI yozilish/so'rov to'xtaydi.
+  enrollmentOpen Boolean      @default(true)
+  // Kursning mentorlari — CourseMentor izohiga qarang (bittasi "asosiy")
+  mentors        CourseMentor[]
   modules        Module[]
   enrollments    Enrollment[]
   liveSessions   LiveSession[]
@@ -204,6 +213,34 @@ model Course {
   requests       CourseRequest[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+}
+
+// Kurs ↔ mentor: bitta kursni bir nechta mentor olib boradi.
+//
+// Ilgari bu `Course.mentorId` — bitta ustun edi. Amalda kurs ko'pincha
+// jamoa bilan o'tiladi (asosiy mentor + yordamchi/amaliyot mentori), va
+// ularning har biri o'z kabinetida shu kursni ko'rishi, savolga javob
+// berishi, topshiriq berishi kerak.
+//
+// `isLead` — kursda ko'pi bilan BITTA mentorga qo'yiladi; buni servis
+// qatlami (setCourseMentors) bitta tranzaksiyada ta'minlaydi, chunki
+// Prisma sxemasi qisman (partial) noyob indeksni ifodalay olmaydi.
+// U ikki joyda ishlaydi: sayt kartasida birinchi ko'rinadi va admin kurs
+// nomidan sessiya/topshiriq yaratganda muallif sifatida shu tanlanadi.
+model CourseMentor {
+  id        String   @id @default(cuid())
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+  mentor    Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorId  String
+  isLead    Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Bitta mentor bitta kursga faqat bir marta biriktiriladi
+  @@unique([courseId, mentorId])
+  // "Mening kurslarim" — mentor kabinetidagi eng ko'p ishlatiladigan so'rov
+  @@index([mentorId])
 }
 
 model CourseReview {
@@ -805,6 +842,33 @@ model ContentView {
 
   @@unique([contentType, contentId, deviceId])
   @@index([contentType, contentId])
+}
+
+// Kunlik kesim: "qachon" savoliga javob beradi.
+//
+// `Course.views` kabi hisoblagichlar faqat JAMI raqamni biladi, `ContentView`
+// esa dublikat to'sish uchun `viewedAt` ni USTIGA yozadi — ya'ni tarix
+// hech qayerda saqlanmasdi va "shu hafta o'sdimi yoki tushdimi" degan
+// savolga javob yo'q edi. Har bir hisoblangan ko'rish/yoqtirish shu yerda
+// ham kunlik yig'indiga qo'shiladi.
+//
+// `likes` MANFIY bo'lishi mumkin: yoqtirish olib tashlangan kun uchun -1
+// yoziladi, ya'ni ustun kunlik SOF o'zgarishni bildiradi.
+//
+// Xom hodisalar (har ko'rish uchun bitta qator) ataylab saqlanmaydi — u
+// cheksiz o'sardi; kunlik yig'indi grafiklar uchun yetarli.
+model EngagementDaily {
+  id          String           @id @default(cuid())
+  contentType EngagementTarget
+  contentId   String
+  // Kun boshi (UTC yarim tuni) — vaqt qismisiz
+  day         DateTime         @db.Date
+  views       Int              @default(0)
+  likes       Int              @default(0)
+
+  @@unique([contentType, contentId, day])
+  // Davr bo'yicha yig'ish (oxirgi 30 kun) — asosiy so'rov shakli
+  @@index([day])
 }
 
 model ContactMessage {

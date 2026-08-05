@@ -34,9 +34,12 @@ interface CourseModule {
 }
 
 interface CourseMentor {
+  id: string;
   name: string;
   specialty?: string;
   bio?: string;
+  /** Kursning asosiy mentori — ro'yxatda birinchi turadi */
+  isLead?: boolean;
 }
 
 type CourseLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -64,7 +67,8 @@ interface CourseDetail {
   /** Offline mashg'ulot manzili */
   location?: string | null;
   modules: CourseModule[];
-  mentor?: CourseMentor | null;
+  /** Kursni olib boradigan mentorlar — asosiysi birinchi */
+  mentors?: CourseMentor[];
   [key: string]: unknown;
 }
 
@@ -142,6 +146,11 @@ export default function CourseDetailPage(): React.ReactElement {
   const courseViews = engagement.views ?? course.views ?? 0;
   const isOfflineOnly = course.format === 'OFFLINE';
   const isHybrid = course.format === 'HYBRID';
+  // Kurs saytda ko'rinadi, lekin hozircha yangi o'quvchi qabul qilinmaydi.
+  // ALLAQACHON yozilganlarga tegmaydi — ular darslarini davom ettiraveradi,
+  // shuning uchun bu bayroq faqat "hali yozilmagan" holatlarni almashtiradi.
+  const enrollmentClosed = course.enrollmentOpen === false;
+  const notEnrolledYet = enrollStatus !== 'success' && enrollStatus !== 'already';
   const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
 
   const enroll = async (): Promise<void> => {
@@ -181,7 +190,10 @@ export default function CourseDetailPage(): React.ReactElement {
           name: course.title,
           description: course.subtitle || course.description,
           provider: { '@type': 'Organization', name: 'DATA LIFE', url: SITE_URL },
-          ...(course.mentor?.name ? { instructor: { '@type': 'Person', name: course.mentor.name } } : {}),
+          // schema.org `instructor` bir nechta bo'lishi mumkin — barcha mentorlar sanaladi
+          ...(course.mentors?.length
+            ? { instructor: course.mentors.map((m) => ({ '@type': 'Person', name: m.name })) }
+            : {}),
           ...(Number(course.rating) > 0 && course.reviewsCount
             ? {
                 aggregateRating: {
@@ -259,16 +271,45 @@ export default function CourseDetailPage(): React.ReactElement {
           </div>
 
           <div>
-            {course.mentor && (
+            {course.mentors && course.mentors.length > 0 && (
               <div className="card" style={{ padding:20, marginBottom:16 }}>
-                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>{t('pages.courseDetail.mentor')}</p>
-                <p style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>{course.mentor.name}</p>
-                <p style={{ fontSize:12, color:course.color, fontWeight:600, marginBottom:8 }}>{course.mentor.specialty}</p>
-                <p style={{ fontSize:12, color:'#64748b', lineHeight:1.7 }}>{course.mentor.bio}</p>
+                <p style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>
+                  {course.mentors.length > 1 ? t('pages.courseDetail.mentors') : t('pages.courseDetail.mentor')}
+                </p>
+                {course.mentors.map((mentor, i) => (
+                  <div key={mentor.id} style={{
+                    // Ajratuvchi chiziq faqat mentorlar ORASIDA — kartaning tepasida emas
+                    marginTop: i === 0 ? 0 : 14, paddingTop: i === 0 ? 0 : 14,
+                    borderTop: i === 0 ? 'none' : '1px solid #f1f5f9',
+                  }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>{mentor.name}</p>
+                    <p style={{ fontSize:12, color:course.color, fontWeight:600, marginBottom:8 }}>{mentor.specialty}</p>
+                    <p style={{ fontSize:12, color:'#64748b', lineHeight:1.7 }}>{mentor.bio}</p>
+                  </div>
+                ))}
               </div>
             )}
             <div className="card" style={{ padding:20 }}>
-              {!user && (
+              {/* Yozilish yopiq: yo'nalish borligi ko'rinib turadi, lekin qabul
+                  hozircha yo'q. Aloqa tugmasi ATAYIN qoldirildi — odam qiziqsa
+                  admin bilan bog'lanib navbatga yozila oladi. */}
+              {enrollmentClosed && notEnrolledYet && (
+                <>
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'12px 14px', borderRadius:12, background:'#fffbeb', border:'1.5px solid #fde68a', marginBottom:14 }}>
+                    <Clock size={18} style={{ color:'#b45309', flexShrink:0, marginTop:1 }} />
+                    <div>
+                      <p style={{ fontSize:13, color:'#b45309', fontWeight:700, marginBottom:3 }}>{t('pages.courseDetail.enrollmentClosed')}</p>
+                      <p style={{ fontSize:12, color:'#a16207', lineHeight:1.6 }}>{t('pages.courseDetail.enrollmentClosedInfo')}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setRequestFormat(defaultRequestFormat)}
+                    className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
+                    <MessageCircle size={15}/> {t('pages.courseDetail.notifyMe')}
+                  </button>
+                </>
+              )}
+
+              {!enrollmentClosed && !user && (
                 <>
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
                     {isOfflineOnly ? t('pages.courseDetail.offlinePrompt') : t('pages.courseDetail.loginPrompt')}
@@ -348,7 +389,7 @@ export default function CourseDetailPage(): React.ReactElement {
                   </Link>
                 </div>
               )}
-              {user && (enrollStatus === 'idle' || enrollStatus === 'loading' || enrollStatus === 'error') && (
+              {!enrollmentClosed && user && (enrollStatus === 'idle' || enrollStatus === 'loading' || enrollStatus === 'error') && (
                 <>
                   {enrollStatus === 'error' && (
                     <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#fef2f2', border:'1.5px solid #fecaca', marginBottom:14 }}>

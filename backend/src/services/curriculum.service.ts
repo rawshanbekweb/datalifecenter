@@ -2,18 +2,20 @@ import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
 import { LocalizedString, toJsonInput } from '../utils/localizedField';
 import { Actor, canManageCourse } from '../utils/mentorAccess';
+import { mentorsForAccess } from '../utils/courseMentors';
 import { deleteUploadByUrl } from './storage.service';
 
 // ADMIN hamma kursni, MENTOR faqat o'ziga biriktirilgan kursni boshqaradi
+// (kursda bir nechta mentor bo'lsa — har biri dasturni tahrirlay oladi)
 async function assertCanManageCourse(courseId: string, actor: Actor) {
   const course = await prisma.course.findUnique({
     where: { id: courseId },
-    select: { id: true, mentor: { select: { userId: true } } },
+    select: { id: true, ...mentorsForAccess },
   });
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
   }
-  if (!canManageCourse(actor, course.mentor?.userId)) {
+  if (!canManageCourse(actor, course.mentors.map((m) => m.mentor.userId))) {
     throw ApiError.forbidden("Bu kurs sizga biriktirilmagan");
   }
 }

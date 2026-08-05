@@ -70,11 +70,18 @@ async function checkHealth() {
     return;
   }
 
-  notes.push(`API ${ms} ms · baza: ${data.database} · xotira: ${data.storage} · uptime: ${data.uptimeSeconds}s`);
+  notes.push(
+    `API ${ms} ms · baza: ${data.database} · xotira: ${data.storage}` +
+      `${data.email ? ` · email: ${data.email}` : ''} · uptime: ${data.uptimeSeconds}s`
+  );
 
   if (data.database !== 'ok') fail('Baza', `holat "${data.database}"`);
   // 'local' = Render'ning ephemeral diski: yuklangan fayllar keyingi deployda yo'qoladi
   if (data.storage === 'local') fail('Fayl xotirasi', "bulut sozlanmagan — yuklangan fayllar deployda yo'qoladi");
+  // Sayt ishlab turadi, lekin parol tiklash va tasdiqlash xatlari jimgina
+  // yuborilmaydi — shuning uchun ogohlantirish (yiqilish emas). Maydon eski
+  // backendda yo'q, shuning uchun undefined tekshiriladi.
+  if (data.email === 'off') warn('Email', "BREVO_API_KEY sozlanmagan — parol tiklash xatlari yuborilmayapti");
   if (ms > 60_000) notes.push('DIQQAT: javob juda sekin — instans uyqudan uyg\'ongan bo\'lishi mumkin');
 }
 

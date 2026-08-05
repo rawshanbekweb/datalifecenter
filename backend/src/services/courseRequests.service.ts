@@ -59,6 +59,11 @@ export async function createCourseRequest(
   if (!course) {
     throw ApiError.notFound('Kurs topilmadi');
   }
+  // DIQQAT: yozilish yopiq bo'lsa ham so'rov QABUL QILINADI va bu ataylab
+  // shunday. Yopiq kurs saytda "Tez orada" bo'lib turadi, qiziqqan odam esa
+  // shu forma orqali navbatga yoziladi — admin uchun bu talab o'lchagichi:
+  // guruh qachon ochilishini shu ro'yxatga qarab hal qiladi. Faqat to'g'ridan
+  // -to'g'ri yozilish (enrollments.service.ts) to'xtatiladi.
   assertFormatAllowed(course.format, input.format);
 
   // Bir odam bir kursga qayta-qayta so'rov yubormasin: hali ko'rib

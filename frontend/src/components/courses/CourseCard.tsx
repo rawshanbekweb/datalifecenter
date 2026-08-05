@@ -29,6 +29,8 @@ export interface CourseCardData {
   durationMonths: number;
   studentsCount: number;
   format?: CourseFormat;
+  /** Yozilish ochiqmi. Yopiq bo'lsa kurs ko'rinadi, lekin "Tez orada" deb belgilanadi */
+  enrollmentOpen?: boolean;
   views?: number;
   likesCount?: number;
   [key: string]: unknown;
@@ -58,6 +60,13 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
           <Icon size={22} style={{ color:course.color }} />
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', justifyContent:'flex-end' }}>
+          {/* Yo'nalish ro'yxatda turaveradi, lekin qabul hozircha yopiq.
+              Maydon eski javoblarda yo'q bo'lishi mumkin — !== false. */}
+          {course.enrollmentOpen === false && (
+            <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309', fontWeight:700 }}>
+              {t('cards.course.comingSoon')}
+            </span>
+          )}
           <CourseFormatBadge format={course.format} />
           {Number(course.rating) > 0 && (
             <div style={{ display:'flex', alignItems:'center', gap:4, background:'#fff', padding:'4px 10px', borderRadius:20, border:'1px solid #e2e8f0' }}>

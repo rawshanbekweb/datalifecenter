@@ -4,12 +4,12 @@ import 'dotenv/config';
 import { hashPassword } from '../src/utils/password';
 import { slugify } from '../src/utils/slugify';
 import { TEAM_MEMBERS } from './data/teamMembers';
+import { pgSsl } from '../src/config/dbSsl';
 
 // Render external Postgres SSL talab qiladi — src/config/prisma.ts dagi mantiq bilan bir xil
-const needsSsl = /\.render\.com/.test(process.env.DATABASE_URL ?? '');
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
+  ...pgSsl(process.env.DATABASE_URL),
 });
 const prisma = new PrismaClient({ adapter });
 
@@ -221,9 +221,19 @@ async function main() {
         studentsCount: c.students,
         tags: c.tags,
         published: true,
-        mentorId: mentorsByCourseId.get(c.id),
       },
     });
+
+    // Mentor kursga alohida jadval orqali biriktiriladi (kursda bir nechta
+    // mentor bo'lishi mumkin) — seed birinchisini asosiy qilib qo'yadi
+    const seedMentorId = mentorsByCourseId.get(c.id);
+    if (seedMentorId) {
+      await prisma.courseMentor.upsert({
+        where: { courseId_mentorId: { courseId: course.id, mentorId: seedMentorId } },
+        create: { courseId: course.id, mentorId: seedMentorId, isLead: true, order: 0 },
+        update: { isLead: true, order: 0 },
+      });
+    }
 
     // Seed qayta ishga tushirilganda modullar dublikatlanmasligi uchun —
     // kursda modul bo'lsa, dastur allaqachon yaratilgan deb hisoblaymiz

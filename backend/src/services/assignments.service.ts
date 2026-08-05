@@ -5,6 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { Actor, canManageCourse } from '../utils/mentorAccess';
 import { audienceRecipientIds, filterEnrolledStudentIds } from '../utils/courseAudience';
+import { isCourseMentor, leadMentorId, mentorsForAccess } from '../utils/courseMentors';
 import { excerpt, notify } from './notifications.service';
 
 const assignmentInclude = {
@@ -55,15 +56,18 @@ export async function createAssignment(input: CreateAssignmentInput, actor: Acto
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  // Topshiriqning muallifi bitta mentor: uni tekshiradigan odam. Admin kurs
+  // nomidan bersa — kursning asosiy mentori muallif bo'ladi.
   let mentorId: string;
   if (actor.role === 'ADMIN') {
-    if (!course.mentorId) {
+    const lead = await leadMentorId(course.id);
+    if (!lead) {
       throw ApiError.conflict('Bu kursga mentor biriktirilmagan', 'COURSE_HAS_NO_MENTOR');
     }
-    mentorId = course.mentorId;
+    mentorId = lead;
   } else {
     const mentor = await getOwnMentor(actor.userId);
-    if (course.mentorId !== mentor.id) {
+    if (!(await isCourseMentor(course.id, mentor.id))) {
       throw ApiError.forbidden('Bu kurs sizga biriktirilmagan');
     }
     mentorId = mentor.id;
@@ -87,10 +91,14 @@ export async function createAssignment(input: CreateAssignmentInput, actor: Acto
   return assignment;
 }
 
-// Mentor: o'z topshiriqlari (javoblar bilan); Admin: hammasi
+// Mentor: o'z KURSLARIDAGI topshiriqlar (javoblar bilan); Admin: hammasi.
+// Kursni birga olib boradigan mentorlar bir-birining topshiriqlarini ko'radi —
+// aks holda ular bir xil vazifani ikki marta berardi.
 export async function listManagedAssignments(actor: Actor, locale: SupportedLocale) {
   const where: Prisma.AssignmentWhereInput =
-    actor.role === 'ADMIN' ? {} : { mentorId: (await getOwnMentor(actor.userId)).id };
+    actor.role === 'ADMIN'
+      ? {}
+      : { course: { mentors: { some: { mentorId: (await getOwnMentor(actor.userId)).id } } } };
 
   const assignments = await prisma.assignment.findMany({
     where,
@@ -115,7 +123,7 @@ async function getOwnedAssignment(id: string, actor: Actor) {
   }
   if (actor.role !== 'ADMIN') {
     const mentor = await getOwnMentor(actor.userId);
-    if (assignment.mentorId !== mentor.id) {
+    if (!(await isCourseMentor(assignment.courseId, mentor.id))) {
       throw ApiError.forbidden('Bu topshiriq sizga tegishli emas');
     }
   }
@@ -242,14 +250,14 @@ export async function reviewSubmission(id: string, input: ReviewInput, actor: Ac
       id: true,
       userId: true,
       assignment: {
-        select: { title: true, course: { select: { title: true, mentor: { select: { userId: true } } } } },
+        select: { title: true, course: { select: { title: true, ...mentorsForAccess } } },
       },
     },
   });
   if (!submission) {
     throw ApiError.notFound('Javob topilmadi');
   }
-  if (!canManageCourse(actor, submission.assignment.course.mentor?.userId)) {
+  if (!canManageCourse(actor, submission.assignment.course.mentors.map((m) => m.mentor.userId))) {
     throw ApiError.forbidden('Bu javob sizning kursingizga tegishli emas');
   }
 

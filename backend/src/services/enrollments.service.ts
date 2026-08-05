@@ -14,6 +14,15 @@ export async function createEnrollment(userId: string, courseId: string, locale:
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  // Kurs ko'rinib turadi, lekin yozilish yopilgan (guruh to'lgan yoki hali
+  // ochilmagan). Mavjud o'quvchilarga ta'sir qilmaydi — faqat yangi yozilish.
+  if (!course.enrollmentOpen) {
+    throw ApiError.conflict(
+      "Bu kursga yozilish hozircha yopiq — tez orada ochiladi",
+      'COURSE_ENROLLMENT_CLOSED'
+    );
+  }
+
   // Offline guruhga o'zicha yozilib bo'lmaydi: joy, jadval va to'lov admin
   // bilan kelishiladi — o'quvchi CourseRequest orqali murojaat qiladi
   if (course.format === 'OFFLINE') {

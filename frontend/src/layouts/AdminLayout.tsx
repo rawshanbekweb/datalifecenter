@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList, Camera,
+  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList, Camera, LineChart,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -21,6 +21,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { labelKey: 'admin.nav.dashboard',      to: '/admin',             icon: LayoutDashboard, end: true },
+  { labelKey: 'admin.nav.analytics',      to: '/admin/analytics',   icon: LineChart },
   { labelKey: 'admin.nav.enrollments',    to: '/admin/enrollments', icon: GraduationCap },
   { labelKey: 'admin.nav.subscriptions',  to: '/admin/subscriptions', icon: Wallet },
   { labelKey: 'admin.nav.courses',        to: '/admin/courses',     icon: BookOpen },

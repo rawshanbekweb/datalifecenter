@@ -55,3 +55,49 @@ export interface TopContentItem {
 export function getAdminStats(): Promise<AdminStats> {
   return apiFetch('/admin/stats');
 }
+
+/** Monitoring uchun ruxsat etilgan davrlar — backend boshqa qiymatni 30 kunga tenglaydi */
+export type AnalyticsDays = 7 | 30 | 90;
+
+export type EngagementTarget = 'BLOG_POST' | 'PROJECT' | 'COURSE' | 'TESTIMONIAL';
+
+export interface AnalyticsPoint {
+  /** YYYY-MM-DD */
+  day: string;
+  views: number;
+  likes: number;
+  users: number;
+  enrollments: number;
+}
+
+export interface AnalyticsTotals {
+  views: number;
+  likes: number;
+  users: number;
+  enrollments: number;
+}
+
+export interface AnalyticsTopItem {
+  id: string;
+  type: EngagementTarget;
+  title: string;
+  /** Loyihalarda alohida sahifa yo'q — slug bo'lmaydi */
+  slug: string | null;
+  views: number;
+  likes: number;
+}
+
+export interface AdminAnalytics {
+  range: { days: number; from: string; to: string };
+  /** Har kun uchun bitta nuqta — hodisasiz kunlar ham nol bilan turadi */
+  series: AnalyticsPoint[];
+  totals: AnalyticsTotals;
+  /** Oldingi shuncha kunlik davr — o'zgarishni hisoblash uchun */
+  previous: AnalyticsTotals;
+  byType: { type: EngagementTarget; views: number; likes: number }[];
+  topContent: AnalyticsTopItem[];
+}
+
+export function getAdminAnalytics(days: AnalyticsDays): Promise<AdminAnalytics> {
+  return apiFetch(`/admin/analytics?days=${days}`);
+}

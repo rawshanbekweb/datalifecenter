@@ -3,6 +3,7 @@ import { prisma } from '../config/prisma';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { storageProvider } from '../services/storage.service';
+import { emailEnabled } from '../services/email.service';
 
 /**
  * Servis sog'lig'i — tashqi monitoring (GitHub Actions, UptimeRobot) shu
@@ -31,6 +32,10 @@ export const healthHandler = asyncHandler(async (_req: Request, res: Response) =
     database,
     // 'local' = ephemeral disk: yuklangan fayllar keyingi deployda yo'qoladi
     storage: storageProvider,
+    // 'off' = BREVO_API_KEY yo'q: parol tiklash va tasdiqlash xatlari jimgina
+    // yuborilmaydi. Bu holat monitoringda ko'rinishi uchun shu yerda turibdi
+    // (storage kabi — faqat provayder nomi, hech qanday kalit yoki manzil emas).
+    email: emailEnabled ? 'brevo' : 'off',
     uptimeSeconds: Math.round(process.uptime()),
   };
 
