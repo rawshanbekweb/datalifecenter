@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { GitBranch, MessageCircle, Briefcase, Camera, Play, Send, ArrowRight, CheckCircle } from 'lucide-react';
 import { sendContactMessage } from '../api/contact';
 import { useHasTeam } from '../hooks/useHasTeam';
+import { useHasPartners } from '../hooks/useHasPartners';
 
 interface SocialItem {
   icon: React.ElementType;
@@ -14,8 +15,9 @@ interface SocialItem {
 interface FooterLink {
   labelKey: string;
   href: string;
-  // Jamoa jadvali bo'sh bo'lsa havola ko'rsatilmaydi (Navbar bilan bir xil qoida)
+  // Tegishli jadval bo'sh bo'lsa havola ko'rsatilmaydi (Navbar bilan bir xil qoida)
   requiresTeam?: boolean;
+  requiresPartners?: boolean;
 }
 
 // Bo'lim kaliti (neytral, tilga bog'liq emas) — sarlavha t('footer.sections.<key>') orqali olinadi
@@ -36,7 +38,7 @@ const LINKS: Record<string, FooterLink[]> = {
     { labelKey: 'links.team', href: '/team', requiresTeam: true },
     { labelKey: 'links.blog', href: '/blog' },
     { labelKey: 'links.projects', href: '/#projects' },
-    { labelKey: 'links.partnership', href: '/partners' },
+    { labelKey: 'links.partnership', href: '/partners', requiresPartners: true },
   ],
 };
 // href bo'sh qoldirilgan ikonkalar butunlay ko'rsatilmaydi — haqiqiy sahifa
@@ -53,6 +55,7 @@ const SOCIALS: SocialItem[] = [
 export default function Footer(): React.ReactElement {
   const { t } = useTranslation();
   const hasTeam = useHasTeam();
+  const hasPartners = useHasPartners();
   // Newsletter obunasi — alohida backend yo'q, shuning uchun mavjud "aloqa xabari"
   // kanalidan foydalanamiz: obuna so'rovi admin "Xabarlar" bo'limiga tushadi (haqiqiy,
   // soxta "muvaffaqiyat" emas). Newsletter jadvali qo'shilsa shu yerni almashtirish kifoya.
@@ -132,7 +135,7 @@ export default function Footer(): React.ReactElement {
             <div key={section}>
               <h4 style={{ fontSize:12, fontWeight:700, color:'#fff', marginBottom:14, textTransform:'uppercase', letterSpacing:'0.08em' }}>{t(`footer.sections.${section}`)}</h4>
               <ul style={{ listStyle:'none', display:'flex', flexDirection:'column', gap:9 }}>
-                {links.filter((l: FooterLink) => !l.requiresTeam || hasTeam).map((l: FooterLink) => (
+                {links.filter((l: FooterLink) => (!l.requiresTeam || hasTeam) && (!l.requiresPartners || hasPartners)).map((l: FooterLink) => (
                   <li key={l.labelKey}>
                     <a href={l.href} style={{ fontSize:13, color:'rgba(255,255,255,0.4)', textDecoration:'none', transition:'color 0.2s' }}
                       onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color='#fff')}

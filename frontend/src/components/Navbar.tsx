@@ -6,6 +6,7 @@ import { Menu, X, LayoutDashboard, LogOut, ShieldCheck, GraduationCap, Users } f
 import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
 import { useHasTeam } from '../hooks/useHasTeam';
+import { useHasPartners } from '../hooks/useHasPartners';
 import NotificationBell from './common/NotificationBell';
 import LanguageSwitcher from './common/LanguageSwitcher';
 import { Z } from '../utils/zLayers';
@@ -15,9 +16,10 @@ interface NavItem {
   labelKey: string;
   to: string;
   end?: boolean;
-  // Jamoa jadvali bo'sh bo'lsa havola umuman ko'rsatilmaydi — mehmon bosib
-  // bo'sh sahifaga tushmasin (`useHasTeam`)
+  // Tegishli jadval bo'sh bo'lsa havola umuman ko'rsatilmaydi — mehmon bosib
+  // bo'sh sahifaga tushmasin (`useHasTeam`, `useHasPartners`)
   requiresTeam?: boolean;
+  requiresPartners?: boolean;
 }
 
 const NAV: NavItem[] = [
@@ -26,7 +28,7 @@ const NAV: NavItem[] = [
   { labelKey: 'nav.courses', to: '/courses' },
   { labelKey: 'nav.mentors', to: '/mentors' },
   { labelKey: 'nav.team', to: '/team', requiresTeam: true },
-  { labelKey: 'nav.partners', to: '/partners' },
+  { labelKey: 'nav.partners', to: '/partners', requiresPartners: true },
   { labelKey: 'nav.blog', to: '/blog' },
   { labelKey: 'nav.contact', to: '/contact' },
 ];
@@ -41,7 +43,11 @@ export default function Navbar(): React.ReactElement {
   const { user, logout }        = useAuth();
   const navigate = useNavigate();
   const hasTeam = useHasTeam();
-  const navItems = useMemo(() => NAV.filter((n) => !n.requiresTeam || hasTeam), [hasTeam]);
+  const hasPartners = useHasPartners();
+  const navItems = useMemo(
+    () => NAV.filter((n) => (!n.requiresTeam || hasTeam) && (!n.requiresPartners || hasPartners)),
+    [hasTeam, hasPartners]
+  );
 
   const handleLogout = async (): Promise<void> => {
     await logout();
