@@ -165,7 +165,9 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     // avtomatik (lazy) kirish beriladi. Obuna faollashganda barcha NASHR qilingan
     // kurslarga bir yo'la provisioning qilinadi (subscriptions.service.ts); bu shoxobcha
     // faqat obunadan KEYIN nashr qilingan kurslar uchun.
-    if (!enrollment && (await hasActiveSubscription(userId))) {
+    // Yozilishi yopiq kursga obuna orqali ham avtomatik kirish berilmaydi
+    // (subscriptions.service.ts dagi provisioning bilan bir xil qoida).
+    if (!enrollment && course.enrollmentOpen && (await hasActiveSubscription(userId))) {
       enrollment = await prisma.enrollment.create({
         data: { userId, courseId: course.id, status: 'ACTIVE', paymentStatus: 'FREE', provider: 'subscription' },
       });
@@ -238,6 +240,8 @@ interface CourseInput {
   location?: LocalizedString | null;
   tags: string[];
   published: boolean;
+  /** Yozilish ochiqmi — kurs ko'rinishidan alohida (schema.prisma izohiga qarang) */
+  enrollmentOpen: boolean;
   /** Kursni olib boradigan mentorlar — birinchisi asosiy (utils/courseMentors.ts) */
   mentorIds?: string[];
 }

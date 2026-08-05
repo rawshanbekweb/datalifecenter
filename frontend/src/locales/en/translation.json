@@ -329,6 +329,9 @@
       "freePrompt": "This course is free — you can start right now.",
       "paidPrompt": "Send a request to enroll in this course.",
       "enroll": "Enroll in course",
+      "enrollmentClosed": "Enrolment is closed for now",
+      "enrollmentClosedInfo": "A new group for this track hasn't opened yet. Leave your details and we'll tell you first when it does.",
+      "notifyMe": "Join the waiting list",
       "reviewsTitle": "Student reviews",
       "reviewsCount": "{{n}} reviews",
       "offlinePrompt": "This course runs offline — contact an administrator to enrol.",
@@ -378,7 +381,8 @@
       "modules": "Modules",
       "months": "{{n}} mo",
       "studentsShort": "{{n}} students",
-      "more": "More"
+      "more": "More",
+      "comingSoon": "Coming soon"
     },
     "blog": {
       "views": "{{n}} views",
@@ -954,6 +958,7 @@
       "featured": "Featured",
       "published": "Published",
       "draft": "Draft",
+      "enrollmentClosed": "Enrolment closed",
       "hidden": "Hidden",
       "notPublished": "Not published",
       "live": "Live",
@@ -986,6 +991,8 @@
       "fTags": "Tags (comma-separated)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Published (visible on site)",
+      "enrollmentOpen": "Enrolment open",
+      "enrollmentOpenHint": "Unchecked, the course stays visible on the site but is marked \"Coming soon\" and no new students can enrol. Students already enrolled keep their access.",
       "noMentor": "No mentor",
       "priceUnit": "{{price}} UZS",
       "curriculum": "Curriculum",

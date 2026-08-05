@@ -47,6 +47,8 @@ interface CourseFormState {
   location: LocalizedString;
   tags: string;
   published: boolean;
+  /** Yozilish ochiqmi — `published` dan alohida (backend schema.prisma izohi) */
+  enrollmentOpen: boolean;
   /** Kurs mentorlari — RO'YXAT TARTIBI muhim: birinchisi asosiy mentor */
   mentorIds: string[];
 }
@@ -79,6 +81,7 @@ interface Course {
   location?: LocalizedString | null;
   tags?: string[];
   published: boolean;
+  enrollmentOpen: boolean;
   mentors?: CourseMentor[];
   isFree?: boolean;
   views?: number;
@@ -88,7 +91,7 @@ interface Course {
 const emptyForm: CourseFormState = {
   title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
   price:0, durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
-  tags:'', published:false, mentorIds:[],
+  tags:'', published:false, enrollmentOpen:true, mentorIds:[],
 };
 
 /**
@@ -182,6 +185,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       location: form.format !== 'ONLINE' && form.location.uz.trim() ? form.location : null,
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       published: form.published,
+      enrollmentOpen: form.enrollmentOpen,
       mentorIds: form.mentorIds,
     };
     try {
@@ -262,6 +266,16 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color:'#334155', cursor:'pointer' }}>
         <input type="checkbox" checked={form.published} onChange={change('published')} /> {t('admin.courses.published')}
       </label>
+      {/* Ikkinchi bayroq birinchisidan alohida: kurs saytda TURAVERADI, faqat
+          yozilish yopiladi. Shuning uchun "published" o'chirilgan bo'lsa bu
+          belgining ma'nosi yo'q — kursni baribir hech kim ko'rmaydi. */}
+      <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:13, color: form.published ? '#334155' : '#94a3b8', cursor: form.published ? 'pointer' : 'not-allowed' }}>
+        <input type="checkbox" checked={form.enrollmentOpen} disabled={!form.published} onChange={change('enrollmentOpen')} />
+        {t('admin.courses.enrollmentOpen')}
+      </label>
+      <p style={{ margin:'-4px 0 0 24px', fontSize:11.5, color:'#94a3b8', lineHeight:1.5 }}>
+        {t('admin.courses.enrollmentOpenHint')}
+      </p>
       <div style={{ display:'flex', gap:10, marginTop:6 }}>
         <button type="submit" disabled={status==='loading'} className="btn-primary" style={{ opacity: status==='loading'?0.7:1 }}>
           {status==='loading' ? t('common.saving') : t('common.save')}
@@ -299,7 +313,8 @@ export default function AdminCoursesPage(): React.ReactElement {
       location: course.location || emptyLocalizedString(), tags: (course.tags || []).join(', '),
       // Backend mentorlarni asosiysi birinchi bo'ladigan tartibda qaytaradi —
       // shu tartib formada ham saqlanadi
-      published: course.published, mentorIds: (course.mentors || []).map((m) => m.id),
+      published: course.published, enrollmentOpen: course.enrollmentOpen ?? true,
+      mentorIds: (course.mentors || []).map((m) => m.id),
     });
   };
 
@@ -356,6 +371,12 @@ export default function AdminCoursesPage(): React.ReactElement {
                 <span className="tag" style={{ background: c.published ? '#f0fdf4' : '#f8fafc', borderColor: c.published ? '#bbf7d0' : '#e2e8f0', color: c.published ? '#16a34a' : '#94a3b8' }}>
                   {c.published ? t('admin.tags.published') : t('admin.tags.draft')}
                 </span>
+                {/* Faqat nashr qilingan kursda ma'noli — nashr qilinmagani baribir ko'rinmaydi */}
+                {c.published && !c.enrollmentOpen && (
+                  <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309' }}>
+                    {t('admin.tags.enrollmentClosed')}
+                  </span>
+                )}
                 <Link to={`/admin/courses/${c.id}/curriculum`} title={t('admin.courses.curriculumTitle')}
                   style={{ display:'flex', alignItems:'center', gap:6, height:32, padding:'0 10px', borderRadius:8, border:'1px solid #bae6fd', background:'#f0f9ff', color:'#0ea5e9', fontSize:12, fontWeight:700, textDecoration:'none' }}>
                   <ListTree size={14}/> {t('admin.courses.curriculum')}

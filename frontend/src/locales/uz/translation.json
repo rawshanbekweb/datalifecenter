@@ -329,6 +329,9 @@
       "freePrompt": "Bu kurs bepul — hoziroq boshlashingiz mumkin.",
       "paidPrompt": "Kursga yozilish uchun so'rov yuboring.",
       "enroll": "Kursga yozilish",
+      "enrollmentClosed": "Yozilish hozircha yopiq",
+      "enrollmentClosedInfo": "Bu yo'nalish bo'yicha yangi guruh hali ochilmagan. Qiziqsangiz, ro'yxatdan o'tib qo'ying — guruh ochilganda birinchi bo'lib xabar beramiz.",
+      "notifyMe": "Navbatga yozilish",
       "reviewsTitle": "Talabalar sharhi",
       "reviewsCount": "{{n}} ta sharh",
       "offlinePrompt": "Bu kurs offline o'tiladi — yozilish uchun administrator bilan bog'laning.",
@@ -378,7 +381,8 @@
       "modules": "Modullar",
       "months": "{{n}} oy",
       "studentsShort": "{{n}} ta",
-      "more": "Ko'proq"
+      "more": "Ko'proq",
+      "comingSoon": "Tez orada"
     },
     "blog": {
       "views": "{{n}} views",
@@ -954,6 +958,7 @@
       "featured": "Tavsiya",
       "published": "Chop etilgan",
       "draft": "Qoralama",
+      "enrollmentClosed": "Yozilish yopiq",
       "hidden": "Yashirilgan",
       "notPublished": "Nashr qilinmagan",
       "live": "Live",
@@ -986,6 +991,8 @@
       "fTags": "Teglar (vergul bilan)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Chop etilgan (saytda ko'rinadi)",
+      "enrollmentOpen": "Yozilish ochiq",
+      "enrollmentOpenHint": "Belgi olib tashlansa kurs saytda ko'rinaveradi, lekin \"Tez orada\" deb belgilanadi va yangi o'quvchi yozila olmaydi. Allaqachon yozilganlar darsini davom ettiraveradi.",
       "noMentor": "Mentor yo'q",
       "priceUnit": "{{price}} UZS",
       "curriculum": "Dastur",

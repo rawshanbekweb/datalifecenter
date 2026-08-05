@@ -329,6 +329,9 @@
       "freePrompt": "Bul kurs biypul — házir-aq baslawıńız múmkin.",
       "paidPrompt": "Kursqa jazılıw ushın soraw jiberiń.",
       "enroll": "Kursqa jazılıw",
+      "enrollmentClosed": "Jazılıw házirshe jabıq",
+      "enrollmentClosedInfo": "Bul baģdar boyınsha jańa gruppa ele ashılmaģan. Qızıqsańız, dizimnen ótip qoyıń — gruppa ashılģanda birinshi bolıp xabar beremiz.",
+      "notifyMe": "Gezekke jazılıw",
       "reviewsTitle": "Studentler pikiri",
       "reviewsCount": "{{n}} pikir",
       "offlinePrompt": "Bul kurs offline ótedi — jazılıw ushın administrator menen baylanısıń.",
@@ -378,7 +381,8 @@
       "modules": "Moduller",
       "months": "{{n}} ay",
       "studentsShort": "{{n}} adam",
-      "more": "Kóbirek"
+      "more": "Kóbirek",
+      "comingSoon": "Tez arada"
     },
     "blog": {
       "views": "{{n}} kóriw",
@@ -954,6 +958,7 @@
       "featured": "Usınıs",
       "published": "Járiyalanǵan",
       "draft": "Qaralama",
+      "enrollmentClosed": "Jazılıw jabıq",
       "hidden": "Jasırılǵan",
       "notPublished": "Járiyalanbaǵan",
       "live": "Live",
@@ -986,6 +991,8 @@
       "fTags": "Tegler (útir menen)",
       "tagsPlaceholder": "React, TypeScript, ...",
       "published": "Járiyalanǵan (saytta kórinedi)",
+      "enrollmentOpen": "Jazılıw ashıq",
+      "enrollmentOpenHint": "Belgi alıp taslansa, kurs saytta kórinip turadı, biraq \"Tez arada\" dep belgilenedi hám jańa oqıwshı jazıla almaydı. Aldın jazılģanlar sabaģın dawam ettiredi.",
       "noMentor": "Mentor joq",
       "priceUnit": "{{price}} UZS",
       "curriculum": "Baǵdarlama",

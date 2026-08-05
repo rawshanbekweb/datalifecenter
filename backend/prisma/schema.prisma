@@ -194,6 +194,14 @@ model Course {
   likesCount     Int          @default(0)
   tags           String[]
   published      Boolean      @default(false)
+  // IKKI BAYROQ IKKI XIL NARSA UCHUN — chalkashtirmang:
+  //   published      = kurs saytda umuman KO'RINADIMI (false → hech kim ko'rmaydi)
+  //   enrollmentOpen = ko'rinadi, lekin YOZILISH ochiqmi
+  // Markazning yo'nalishlari doim ro'yxatda tursin (odam nima o'rgatilishini
+  // bilsin), lekin guruh to'lganda yoki hali ochilmaganda "Tez orada" ko'rinsin
+  // va yozilish qabul qilinmasin. Mavjud yozilganlarga ta'sir qilmaydi —
+  // faqat YANGI yozilish/so'rov to'xtaydi.
+  enrollmentOpen Boolean      @default(true)
   // Kursning mentorlari — CourseMentor izohiga qarang (bittasi "asosiy")
   mentors        CourseMentor[]
   modules        Module[]

@@ -17,7 +17,8 @@
     "clean:demo": "tsx scripts/clean-demo-content.ts",
     "test": "vitest run",
     "seed:team": "tsx scripts/seed-team.ts",
-    "seed:analytics": "tsx scripts/seed-analytics.ts"
+    "seed:analytics": "tsx scripts/seed-analytics.ts",
+    "publish:blog-news": "tsx scripts/publish-blog-news.ts"
   },
   "engines": {
     "node": ">=20"

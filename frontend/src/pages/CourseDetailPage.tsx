@@ -146,6 +146,11 @@ export default function CourseDetailPage(): React.ReactElement {
   const courseViews = engagement.views ?? course.views ?? 0;
   const isOfflineOnly = course.format === 'OFFLINE';
   const isHybrid = course.format === 'HYBRID';
+  // Kurs saytda ko'rinadi, lekin hozircha yangi o'quvchi qabul qilinmaydi.
+  // ALLAQACHON yozilganlarga tegmaydi — ular darslarini davom ettiraveradi,
+  // shuning uchun bu bayroq faqat "hali yozilmagan" holatlarni almashtiradi.
+  const enrollmentClosed = course.enrollmentOpen === false;
+  const notEnrolledYet = enrollStatus !== 'success' && enrollStatus !== 'already';
   const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
 
   const enroll = async (): Promise<void> => {
@@ -285,7 +290,26 @@ export default function CourseDetailPage(): React.ReactElement {
               </div>
             )}
             <div className="card" style={{ padding:20 }}>
-              {!user && (
+              {/* Yozilish yopiq: yo'nalish borligi ko'rinib turadi, lekin qabul
+                  hozircha yo'q. Aloqa tugmasi ATAYIN qoldirildi — odam qiziqsa
+                  admin bilan bog'lanib navbatga yozila oladi. */}
+              {enrollmentClosed && notEnrolledYet && (
+                <>
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'12px 14px', borderRadius:12, background:'#fffbeb', border:'1.5px solid #fde68a', marginBottom:14 }}>
+                    <Clock size={18} style={{ color:'#b45309', flexShrink:0, marginTop:1 }} />
+                    <div>
+                      <p style={{ fontSize:13, color:'#b45309', fontWeight:700, marginBottom:3 }}>{t('pages.courseDetail.enrollmentClosed')}</p>
+                      <p style={{ fontSize:12, color:'#a16207', lineHeight:1.6 }}>{t('pages.courseDetail.enrollmentClosedInfo')}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setRequestFormat(defaultRequestFormat)}
+                    className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>
+                    <MessageCircle size={15}/> {t('pages.courseDetail.notifyMe')}
+                  </button>
+                </>
+              )}
+
+              {!enrollmentClosed && !user && (
                 <>
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
                     {isOfflineOnly ? t('pages.courseDetail.offlinePrompt') : t('pages.courseDetail.loginPrompt')}
@@ -365,7 +389,7 @@ export default function CourseDetailPage(): React.ReactElement {
                   </Link>
                 </div>
               )}
-              {user && (enrollStatus === 'idle' || enrollStatus === 'loading' || enrollStatus === 'error') && (
+              {!enrollmentClosed && user && (enrollStatus === 'idle' || enrollStatus === 'loading' || enrollStatus === 'error') && (
                 <>
                   {enrollStatus === 'error' && (
                     <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px', borderRadius:12, background:'#fef2f2', border:'1.5px solid #fecaca', marginBottom:14 }}>

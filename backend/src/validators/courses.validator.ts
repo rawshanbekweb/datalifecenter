@@ -33,6 +33,8 @@ export const createCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).default([]),
   published: z.boolean().default(false),
+  // Yangi kurs odatda darhol qabul qiladi; yopish admin panelidan bir tugma
+  enrollmentOpen: z.boolean().default(true),
   mentorIds: courseMentorIds,
 });
 
@@ -55,5 +57,6 @@ export const updateCourseSchema = z.object({
   location: localizedStringNullish(),
   tags: z.array(z.string()).optional(),
   published: z.boolean().optional(),
+  enrollmentOpen: z.boolean().optional(),
   mentorIds: courseMentorIds,
 });

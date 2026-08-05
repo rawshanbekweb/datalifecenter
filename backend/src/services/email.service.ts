@@ -9,6 +9,27 @@ const FROM_MATCH = FROM.match(/^(.*)<(.+)>$/);
 const FROM_NAME = (FROM_MATCH?.[1] ?? 'DATA LIFE').trim();
 const FROM_EMAIL = (FROM_MATCH?.[2] ?? FROM).trim();
 
+// NEGA BU OGOHLANTIRISHLAR BOR: email nosozligi eng jim nosozlik turi.
+// Foydalanuvchi "parol tiklash xati kelmayapti" deb shikoyat qilmaguncha
+// hech qayerda bilinmasdi — kalit yo'qligi ham, Brevo xatosi ham.
+// Shuning uchun holat ishga tushishda logga va /api/health ga chiqariladi.
+if (!emailEnabled && env.NODE_ENV === 'production') {
+  console.warn(
+    "[email] BREVO_API_KEY sozlanmagan — parol tiklash, email tasdiqlash va to'lov xabarnomalari YUBORILMAYDI."
+  );
+}
+
+// Jo'natuvchi manzili Brevo'da tasdiqlangan bo'lishi SHART, aks holda har bir
+// so'rov 400 bilan qaytadi. Bundan ham nozigi: @gmail.com kabi begona domendan
+// yuborilgan xat Brevo tomonidan qabul qilinadi-yu, Gmail uni DMARC bo'yicha
+// spamga tashlaydi — jurnalda "delivered" ko'rinadi, lekin odam xatni ko'rmaydi.
+// Shuning uchun o'z domenimizdan boshqa manzil ishlatilsa ogohlantiramiz.
+if (emailEnabled && !/@datalife\.uz$/i.test(FROM_EMAIL)) {
+  console.warn(
+    `[email] EMAIL_FROM = "${FROM_EMAIL}" — o'z domenimiz emas. Bunday xatlar DMARC tekshiruvidan o'tmay spamga tushishi mumkin. Brevo'da datalife.uz domenini tasdiqlab, no-reply@datalife.uz ga o'ting.`
+  );
+}
+
 interface MailInput {
   to: string;
   subject: string;
