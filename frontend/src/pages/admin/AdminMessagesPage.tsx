@@ -80,7 +80,7 @@ export default function AdminMessagesPage(): React.ReactElement {
     <div>
       <AdminPageHeader title={t('admin.messages.title')} sub={total ? t('admin.messages.subCount', { n: total }) : t('admin.messages.sub')} />
       <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
-        <select className="inp" style={{ width:'auto', padding:'7px 12px', fontSize:12.5, cursor:'pointer' }}
+        <select className="inp" style={{ width:'auto', padding:'7px 34px 7px 12px', fontSize:12.5, cursor:'pointer' }}
           value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }}>
           <option value="">{t('admin.messages.allStatuses')}</option>
           {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
@@ -118,7 +118,7 @@ export default function AdminMessagesPage(): React.ReactElement {
                   {m.phone && <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Phone size={12}/>{m.phone}</span>}
                 </div>
               </div>
-              <select className="inp" style={{ width:'auto', padding:'6px 10px', fontSize:12, cursor:'pointer', background:s.bg, borderColor:s.border, color:s.color, fontWeight:700 }}
+              <select className="inp" style={{ width:'auto', padding:'6px 10px', fontSize:12, cursor:'pointer', background:s.bg, backgroundImage:'none', borderColor:s.border, color:s.color, fontWeight:700 }}
                 value={m.status} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => changeStatus(m.id, e.target.value)}>
                 {STATUS_OPTIONS.map((opt) => <option key={opt} value={opt}>{t(STATUS_LABELS[opt].label)}</option>)}
               </select>

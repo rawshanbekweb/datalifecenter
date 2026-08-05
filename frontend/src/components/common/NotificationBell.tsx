@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n/i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { getMyNotifications, markAllNotificationsRead, markNotificationRead, subscribeNotifications, type AppNotification } from '../../api/notifications';
+import { Z } from '../../utils/zLayers';
 
 // SSE asosiy kanal; polling faqat zaxira (SSE uzilib qolgan oraliq uchun)
 const POLL_MS = 180000;
@@ -96,7 +97,7 @@ export default function NotificationBell(): React.ReactElement | null {
       </button>
 
       {open && (
-        <div style={{ position: 'absolute', top: 44, right: 0, width: 340, maxWidth: '90vw', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', zIndex: 200, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 44, right: 0, width: 340, maxWidth: '90vw', background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', zIndex: Z.headerMenu, overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid #f1f5f9' }}>
             <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a' }}>{t('notifications.title')}</p>
             {unreadCount > 0 && (

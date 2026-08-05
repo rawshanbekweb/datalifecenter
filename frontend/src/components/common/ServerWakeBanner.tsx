@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
 import { getServerState, subscribeServerState, type ServerState } from '../../api/serverStatus';
+import { Z } from '../../utils/zLayers';
 
 /**
  * Server (bepul Render rejasida) uxlab qolgan bo'lsa birinchi so'rov yarim
@@ -22,7 +23,7 @@ export default function ServerWakeBanner(): React.ReactElement | null {
       role="status"
       aria-live="polite"
       style={{
-        position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: 9998,
+        position: 'fixed', left: '50%', bottom: 20, transform: 'translateX(-50%)', zIndex: Z.banner,
         display: 'flex', alignItems: 'center', gap: 10, maxWidth: 'calc(100vw - 32px)',
         padding: '10px 16px', borderRadius: 999,
         background: 'rgba(15,23,42,0.92)', color: '#fff',

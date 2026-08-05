@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, m } from 'framer-motion';
 import { AlertTriangle, CheckCircle2, Info, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Z } from '../../utils/zLayers';
 
 // Brauzerning xom alert/confirm/prompt oynalari o'rniga sayt dizayniga mos
 // toast va modal tizimi. Ishlatish:
@@ -91,7 +92,7 @@ function DialogCard({ dialog, onDone }: { dialog: DialogState; onDone: () => voi
   return (
     <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
       onClick={cancel}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: 8000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', zIndex: Z.confirm, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <m.div initial={{ opacity: 0, y: 14, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.98 }} transition={{ duration: 0.18 }}
         onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true"
         style={{ background: '#fff', borderRadius: 16, padding: 22, maxWidth: 420, width: '100%', boxShadow: '0 24px 64px rgba(15,23,42,0.25)' }}>
@@ -185,7 +186,7 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }): R
       {children}
       {createPortal(
         <>
-          <div style={{ position: 'fixed', top: 16, right: 16, left: 16, zIndex: 9000, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, pointerEvents: 'none' }}>
+          <div style={{ position: 'fixed', top: 16, right: 16, left: 16, zIndex: Z.toast, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, pointerEvents: 'none' }}>
             <AnimatePresence>
               {toasts.map((toastItem) => {
                 const s = TOAST_STYLE[toastItem.kind];

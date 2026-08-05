@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CheckCircle, X, AlertCircle, Monitor, MapPin } from 'lucide-react';
 import { createCourseRequest, type CourseRequestFormat } from '../../api/courseRequests';
 import { useAuth } from '../../hooks/useAuth';
+import { Z } from '../../utils/zLayers';
 
 /**
  * "Ma'lumot olish / bog'lanish" formasi.
@@ -71,7 +72,7 @@ export default function CourseRequestModal({
 
   return (
     <div onClick={onClose}
-      style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', zIndex:70, display:'flex', alignItems:'center', justifyContent:'center', padding:20, overflowY:'auto' }}>
+      style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', zIndex:Z.modal, display:'flex', alignItems:'center', justifyContent:'center', padding:20, overflowY:'auto' }}>
       <div onClick={(e) => e.stopPropagation()} className="card"
         style={{ width:'100%', maxWidth:460, padding:24, maxHeight:'90vh', overflowY:'auto' }}>
 

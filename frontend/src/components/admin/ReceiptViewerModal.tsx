@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getReceiptImageUrl } from '../../api/enrollments';
 import { getSubscriptionReceiptImageUrl } from '../../api/subscriptions';
 import Loading from '../common/Loading';
+import { Z } from '../../utils/zLayers';
 
 interface ReceiptViewerModalProps {
   id: string;
@@ -33,7 +34,7 @@ export default function ReceiptViewerModal({ id, kind = 'enrollment', onClose }:
 
   return (
     <div onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', zIndex: Z.modal, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div onClick={(e) => e.stopPropagation()}
         style={{ background: '#fff', borderRadius: 16, padding: 20, maxWidth: 560, width: '100%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>

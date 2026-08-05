@@ -8,6 +8,7 @@ import { roleHome } from '../utils/roleHome';
 import { useHasTeam } from '../hooks/useHasTeam';
 import NotificationBell from './common/NotificationBell';
 import LanguageSwitcher from './common/LanguageSwitcher';
+import { Z } from '../utils/zLayers';
 import React from 'react';
 
 interface NavItem {
@@ -69,7 +70,7 @@ export default function Navbar(): React.ReactElement {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: Z.header,
           padding: scrolled ? '12px 0' : '20px 0',
           background: scrolled ? 'rgba(255,255,255,0.97)' : 'transparent',
           backdropFilter: scrolled ? 'blur(16px)' : 'none',
@@ -145,7 +146,7 @@ export default function Navbar(): React.ReactElement {
       <AnimatePresence>
         {open && (
           <m.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            style={{ position: 'fixed', top: 70, left: 12, right: 12, zIndex: 99, background: '#fff', borderRadius: 20, padding: '16px 20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
+            style={{ position: 'fixed', top: 70, left: 12, right: 12, zIndex: Z.siteMenu, background: '#fff', borderRadius: 20, padding: '16px 20px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', border: '1px solid #e2e8f0' }}>
             {navItems.map((n: NavItem, i: number) => (
               <MotionNavLink key={n.labelKey} to={n.to} end={n.end} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 onClick={() => setOpen(false)}

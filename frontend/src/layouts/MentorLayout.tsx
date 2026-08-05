@@ -8,6 +8,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
+import { Z } from '../utils/zLayers';
 
 interface NavItem {
   labelKey: string;
@@ -98,14 +99,14 @@ export default function MentorLayout(): React.ReactElement {
     <div style={{ minHeight:'100vh', background:'#f1f5f9', display:'flex' }}>
       {/* Desktop sidebar */}
       <aside className="mentor-sidebar"
-        style={{ width:248, background:'#0f172a', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex:40 }}>
+        style={{ width:248, background:'#0f172a', display:'flex', flexDirection:'column', position:'fixed', top:0, bottom:0, left:0, zIndex: Z.sidebar }}>
         {sidebarContent}
       </aside>
 
       {/* Mobile overlay */}
       {menuOpen && (
         <div onClick={() => setMenuOpen(false)}
-          style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.55)', zIndex:49 }}>
+          style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.55)', zIndex: Z.sidebarOverlay }}>
           <aside onClick={(e) => e.stopPropagation()}
             style={{ width:248, height:'100%', background:'#0f172a', display:'flex', flexDirection:'column' }}>
             {sidebarContent}
@@ -114,7 +115,7 @@ export default function MentorLayout(): React.ReactElement {
       )}
 
       <div className="mentor-main" style={{ flex:1, marginLeft:248, display:'flex', flexDirection:'column', minWidth:0 }}>
-        <header style={{ height:60, background:'#fff', borderBottom:'1px solid #e2e8f0', display:'flex', alignItems:'center', gap:14, padding:'0 24px', position:'sticky', top:0, zIndex:30 }}>
+        <header style={{ height:60, background:'#fff', borderBottom:'1px solid #e2e8f0', display:'flex', alignItems:'center', gap:14, padding:'0 24px', position:'sticky', top:0, zIndex: Z.cabinetHeader }}>
           <button className="mentor-menu-btn" onClick={() => setMenuOpen((v) => !v)}
             style={{ display:'none', width:36, height:36, borderRadius:9, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', alignItems:'center', justifyContent:'center', color:'#475569' }}>
             {menuOpen ? <X size={17}/> : <Menu size={17}/>}

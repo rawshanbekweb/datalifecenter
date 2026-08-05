@@ -169,7 +169,7 @@ export default function AdminUsersPage(): React.ReactElement {
                 <span className="tag" style={{ background:r.bg, borderColor:r.border, color:r.color, fontWeight:700, flexShrink:0 }}>{t(r.labelKey)}</span>
                 <select className="inp" value={u.role} disabled={busy || !!isSelf}
                   onChange={(e) => changeRole(u.id, e.target.value)}
-                  style={{ width:130, fontSize:12.5, padding:'8px 10px', flexShrink:0, opacity: busy ? 0.6 : 1 }}>
+                  style={{ width:130, fontSize:12.5, padding:'8px 30px 8px 10px', flexShrink:0, opacity: busy ? 0.6 : 1 }}>
                   <option value="STUDENT">{t('admin.roles.STUDENT')}</option>
                   <option value="MENTOR">{t('admin.roles.MENTOR')}</option>
                   <option value="TEAM">{t('admin.roles.TEAM')}</option>

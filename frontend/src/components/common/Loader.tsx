@@ -16,6 +16,8 @@
  * qoldirardi.
  */
 
+import { Z } from '../../utils/zLayers';
+
 // Harflar bittalab chiqishi uchun massiv sifatida beriladi. Bo'sh joy alohida
 // element bo'lib qoladi — u ham umumiy kechikish ritmini saqlaydi.
 const TITLE = [...'DATA LIFE'];
@@ -49,7 +51,7 @@ export default function Loader(): React.ReactElement {
         @keyframes dl-splash-caret { 50% { opacity: 0; } }
 
         .dl-splash {
-          position: fixed; inset: 0; z-index: 9999;
+          position: fixed; inset: 0; z-index: ${Z.splash};
           background: #fff;
           /* Nozik "data grid" fon — texnologik his beradi, lekin oq saytdan
              ajralib turmaydi, shuning uchun splash yo'qolganda sakrash bo'lmaydi */

@@ -19,6 +19,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Loading from '../common/Loading';
 import { useToast } from '../common/Feedback';
 import FocusImage from '../common/FocusImage';
+import { Z } from '../../utils/zLayers';
 
 /**
  * Talaba, mentor va admin kabinetlaridagi YAGONA yozishma oynasi.
@@ -481,7 +482,7 @@ function ContactPicker({ contacts, search, onSearch, onClose, onStart, allowAdmi
 
   return (
     <div onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', zIndex: Z.modal, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div onClick={(e) => e.stopPropagation()} className="card"
         style={{ width: '100%', maxWidth: 420, maxHeight: '80vh', display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid #f1f5f9' }}>

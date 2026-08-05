@@ -12,6 +12,7 @@ import TemplatePicker from '../../components/admin/TemplatePicker';
 import { SectionTemplate, applyTemplate, pickLocale } from '../../components/admin/siteSettingTemplates';
 import { useConfirm, useToast } from '../../components/common/Feedback';
 import { useLocale } from '../../hooks/useLocale';
+import { Z } from '../../utils/zLayers';
 import { DEFAULT_LOCALE, ENABLED_LOCALES, LOCALE_LABELS, Locale, SUPPORTED_LOCALES } from '../../i18n/config';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import Loading from '../../components/common/Loading';
@@ -199,7 +200,7 @@ function IconField({ label, value, onChange }: { label: string; value: string; o
         <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f9ff', border: '1.5px solid #bae6fd', color: '#0284c7' }}>
           <Icon size={18} />
         </div>
-        <select className="inp" value={value} onChange={(e) => onChange(e.target.value)} style={{ fontSize: 13, padding: '10px 12px' }}>
+        <select className="inp" value={value} onChange={(e) => onChange(e.target.value)} style={{ fontSize: 13, padding: '10px 34px 10px 12px' }}>
           {!ICON_NAMES.includes(value) && <option value={value}>{value}</option>}
           {ICON_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
         </select>
@@ -759,7 +760,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
 
           {/* Formalar uzun — saqlash paneli doim ko'rinib turadi */}
           <div style={{
-            position: 'sticky', bottom: 0, zIndex: 20, marginTop: 16,
+            position: 'sticky', bottom: 0, zIndex: Z.stickyBar, marginTop: 16,
             display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
             padding: '12px 16px', borderRadius: 14,
             background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)',

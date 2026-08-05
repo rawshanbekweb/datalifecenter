@@ -180,6 +180,40 @@ button, input, select, textarea, optgroup {
 .inp::placeholder { color: #94a3b8; }
 .inp:focus { border-color: #0ea5e9; background: #fff; box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }
 
+/* ── Ochiluvchi ro'yxat (select) ──
+   `.inp` matn maydoni uchun yozilgan; select unga qo'shilganda brauzerning
+   O'Z ko'rsatkichi va ichki bo'shliqlari saqlanib qolardi — natijada
+   ro'yxatlar yonidagi input'lardan boshqacha balandlikda turardi, o'q esa
+   chekkaga yopishib qolardi. Shuning uchun standart ko'rinish o'chirilib,
+   o'q SVG bilan chiziladi (data URI — tashqi so'rov yo'q).
+
+   `background-image` ikki qatlam: o'q va tekis fon. `.inp:focus` fonni oq
+   qilgani uchun fokusda ham o'sha tartib takrorlanadi, aks holda o'q
+   yo'qolib qolardi. */
+select.inp {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75 6 6.25l4.5-4.5' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    linear-gradient(#f8fafc, #f8fafc);
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 15px center, 0 0;
+  background-size: 12px 8px, 100% 100%;
+}
+select.inp:hover { border-color: #cbd5e1; }
+select.inp:focus {
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1.5 1.75 6 6.25l4.5-4.5' stroke='%230ea5e9' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    linear-gradient(#fff, #fff);
+}
+/* Ro'yxat ochilganda variantlar brauzer fonida chiqadi — matn rangi
+   meros olinmagani uchun ochiq fonda oq matn bo'lib qolishi mumkin */
+select.inp option { color: #0f172a; background: #fff; }
+/* Tanlanmagan (placeholder) variant kulrang — input'dagi placeholder bilan bir xil */
+select.inp option[value=""] { color: #94a3b8; }
+
 /* ── Divider ── */
 .divider { width: 48px; height: 3px; border-radius: 3px; background: #0ea5e9; margin: 16px 0; }
 

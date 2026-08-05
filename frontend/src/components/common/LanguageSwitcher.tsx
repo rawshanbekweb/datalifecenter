@@ -4,6 +4,7 @@ import { AnimatePresence, m } from 'framer-motion';
 import { Check, ChevronDown, Globe } from 'lucide-react';
 import { ENABLED_LOCALES, LOCALE_ENGLISH_LABELS, LOCALE_LABELS, Locale } from '../../i18n/config';
 import { useLocale } from '../../hooks/useLocale';
+import { Z } from '../../utils/zLayers';
 
 // ENABLED_LOCALES'da bitta til bo'lsa (Stage 0) hech narsa ko'rsatmaydi —
 // yangi til qo'shilishi bilan (config.ts) avtomatik paydo bo'ladi.
@@ -66,7 +67,7 @@ export default function LanguageSwitcher(): React.ReactElement | null {
       <AnimatePresence>
         {open && (
           <>
-            <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 199 }} />
+            <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: Z.headerMenuBackdrop }} />
             <m.div
               ref={menuRef}
               role="menu"
@@ -78,7 +79,7 @@ export default function LanguageSwitcher(): React.ReactElement | null {
               style={{
                 position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: '#fff',
                 border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 12px 34px rgba(15,23,42,0.13)',
-                overflow: 'hidden', minWidth: 190, zIndex: 200, transformOrigin: 'top right',
+                overflow: 'hidden', minWidth: 190, zIndex: Z.headerMenu, transformOrigin: 'top right',
               }}
             >
               <p style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#94a3b8', padding: '9px 14px 6px' }}>
