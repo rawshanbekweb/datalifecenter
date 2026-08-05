@@ -1,53 +1,53 @@
 import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { pgSsl } from '../src/config/dbSsl';
+import { Client } from 'pg';
 
 /**
  * JSON zaxira nusxasidan BO'SH bazaga tiklaydi.
  *
- * NEGA ODDIY "INSERT" EMAS: nusxa 2026-08-03 da, sxemaning ESKI holatida
- * olingan. O'shandan beri ikkita buzuvchi o'zgarish bo'ldi:
- *   1. `Course.mentorId` ustuni olib tashlandi — o'rniga `CourseMentor`
- *      bog'lovchi jadvali (kursda bir nechta mentor bo'lishi mumkin).
- *   2. `Course.enrollmentOpen` qo'shildi (default true).
- * Shuning uchun skript qatorlarni ko'chirishdan oldin ularni YANGI sxemaga
- * moslashtiradi: eski `mentorId` qiymati kursning "asosiy" mentori sifatida
- * CourseMentor'ga yoziladi, mavjud bo'lmagan ustunlar tashlab yuboriladi.
+ * NEGA PRISMA EMAS, XOM SQL: tiklash sxemaning HAR QANDAY versiyasiga
+ * tushishi kerak. Prisma mijozi kod bilan birga generatsiya qilinadi va
+ * faqat ENG YANGI sxemani biladi — nusxa esa eskirok sxemada olingan
+ * bo'lishi mumkin (bizda shunday: nusxada `Course.mentorId` bor, u
+ * keyinchalik `CourseMentor` jadvaliga ko'chirilgan). Bundan tashqari
+ * tiklanayotgan baza deploy qilingan koddan orqada bo'lishi mumkin.
+ * Shuning uchun skript ustunlarni BAZANING O'ZIDAN o'qiydi va nusxa bilan
+ * kesishmasini yozadi:
  *
- * Tartib MUHIM: chet kalitlar buzilmasligi uchun ota jadvallar birinchi.
+ *   - bazada bor, nusxada yo'q  -> ustun default qiymatida qoladi
+ *   - nusxada bor, bazada yo'q  -> o'tkazib yuboriladi va ogohlantiriladi
+ *
+ * Shu tufayli bir xil nusxani ham eski, ham yangi sxemali bazaga tiklash
+ * mumkin. Sxema keyin migratsiya bilan ko'tarilsa, Prisma migratsiyasi
+ * ma'lumotni o'zi ko'chiradi (`course_multi_mentor` shunday qiladi).
+ *
  * ID'lar, sanalar va JSON maydonlar nusxadagidek saqlanadi — havolalar
  * (masalan Enrollment.courseId) ishlab turishi uchun shart.
  *
- * XAVFSIZLIK: skript bo'sh bo'lmagan bazaga yozmaydi. Ustidan yozish uchun
- * ataylab FORCE=true kerak.
+ * HAMMASI YOKI HECH NARSA: bitta tranzaksiya. O'rtada xato chiqsa baza
+ * chala to'ldirilgan holda qolmaydi.
+ *
+ * XAVFSIZLIK: bo'sh bo'lmagan bazaga yozmaydi (FORCE=true kerak).
  *
  * Ishga tushirish:
- *   $env:DATABASE_URL='<yangi baza>'; npm run restore -- "C:\...\nusxa.json"
- *   $env:DRY_RUN='true'; ... (faqat rejani ko'rsatadi)
+ *   $env:DATABASE_URL='<baza>'; npm run restore -- "C:\...\nusxa.json"
+ *   $env:DRY_RUN='true'; ...   (faqat rejani ko'rsatadi)
  */
 
 const DRY_RUN = process.env.DRY_RUN === 'true';
 const FORCE = process.env.FORCE === 'true';
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-  ...pgSsl(process.env.DATABASE_URL),
-});
-const prisma = new PrismaClient({ adapter });
-
-type Row = Record<string, unknown>;
-
 /**
- * Tiklash tartibi — chet kalit bog'liqligi bo'yicha. Ota jadval bolasidan
- * OLDIN turishi shart, aks holda insert FK xatosi bilan yiqiladi.
+ * Tiklash tartibi — chet kalit bog'liqligi bo'yicha: ota jadval bolasidan
+ * OLDIN. Bazada yo'q jadvallar jimgina o'tkazib yuboriladi (sxema versiyasi
+ * har xil bo'lishi mumkin).
  */
 const ORDER = [
   'User',
   'Mentor',
   'Course',
+  'CourseMentor',
   'Module',
   'Lesson',
   'Project',
@@ -57,6 +57,7 @@ const ORDER = [
   'BlogPost',
   'Testimonial',
   'SiteSetting',
+  'Moment',
   'Enrollment',
   'LessonProgress',
   'CourseReview',
@@ -78,62 +79,56 @@ const ORDER = [
   'PasswordResetToken',
   'ContentLike',
   'ContentView',
-] as const;
+  'EngagementDaily',
+];
 
-type TableName = (typeof ORDER)[number];
+type Row = Record<string, unknown>;
 
-/** Sana ko'rinishidagi ISO satrlarni Date'ga o'giradi (Prisma shuni kutadi) */
-const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
-
-/**
- * Model -> massiv maydonlari nomlari, `schema.prisma` faylidan o'qiladi.
- *
- * NEGA KERAK: Postgres'da `text[]` ustuni NULL bo'lishi mumkin va nusxaga
- * ham `null` bo'lib tushgan (masalan `TeamMember.skills`), lekin Prisma
- * skalyar ro'yxatga null qabul qilmaydi — "Argument `skills` is missing"
- * deb yiqiladi. Bunday maydonlar `[]` ga aylantiriladi.
- *
- * NEGA DMMF EMAS: Prisma 7 ning ish paytidagi `Prisma.dmmf` maydon
- * tavsifini qisqartirib beradi — `isList` umuman yo'q (tekshirilgan).
- * Shuning uchun sxema faylining o'zi o'qiladi; yangi massiv ustun
- * qo'shilsa ham qo'lda hech narsa yangilash kerak bo'lmaydi.
- */
-function readListFields(): Map<string, Set<string>> {
-  const schemaPath = path.resolve(__dirname, '../prisma/schema.prisma');
-  const schema = fs.readFileSync(schemaPath, 'utf8');
-  const out = new Map<string, Set<string>>();
-
-  for (const block of schema.matchAll(/^model\s+(\w+)\s*\{([\s\S]*?)^\}/gm)) {
-    const [, model, body] = block;
-    const fields = new Set<string>();
-    for (const line of body.split('\n')) {
-      // "  tags       String[]" ko'rinishi; izoh va bo'sh qatorlar o'tkaziladi
-      const m = line.match(/^\s*(\w+)\s+(\w+)\[\]/);
-      if (m) fields.add(m[1]);
-    }
-    out.set(model, fields);
-  }
-  return out;
+interface ColumnInfo {
+  name: string;
+  isArray: boolean;
+  isJson: boolean;
 }
 
-const LIST_FIELDS = readListFields();
+async function tableColumns(client: Client, table: string): Promise<Map<string, ColumnInfo> | null> {
+  const res = await client.query(
+    `SELECT column_name, data_type
+       FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = $1`,
+    [table]
+  );
+  if (res.rowCount === 0) return null;
 
-function normalizeRow(model: string, row: Row): Row {
-  const lists = LIST_FIELDS.get(model) ?? new Set<string>();
-  const out: Row = {};
-  for (const [k, v] of Object.entries(row)) {
-    if (v === null && lists.has(k)) {
-      out[k] = [];
-    } else {
-      out[k] = typeof v === 'string' && ISO.test(v) ? new Date(v) : v;
-    }
+  const map = new Map<string, ColumnInfo>();
+  for (const r of res.rows) {
+    map.set(r.column_name, {
+      name: r.column_name,
+      // Postgres massiv ustunlari information_schema'da 'ARRAY' bo'lib ko'rinadi
+      isArray: r.data_type === 'ARRAY',
+      isJson: r.data_type === 'json' || r.data_type === 'jsonb',
+    });
   }
-  return out;
+  return map;
+}
+
+/** Qiymatni pg drayveri to'g'ri yuboradigan ko'rinishga keltiradi */
+function toParam(value: unknown, col: ColumnInfo): unknown {
+  if (value === null || value === undefined) {
+    // Massiv ustun NOT NULL bo'lishi mumkin (masalan TeamMember.skills),
+    // nusxada esa null bo'lib tushgan — bo'sh massivga aylantiramiz
+    return col.isArray ? [] : null;
+  }
+  // JSON ustunga obyekt/massiv bersak, pg uni avtomatik JSON.stringify qiladi;
+  // lekin massiv JSON ustunda Postgres massivi deb talqin qilinmasligi uchun
+  // ochiq-oydin satrga o'giramiz
+  if (col.isJson && typeof value === 'object') return JSON.stringify(value);
+  return value;
 }
 
 async function main(): Promise<void> {
   const file = process.argv[2];
   if (!file) throw new Error('Nusxa fayli ko\'rsatilmagan. Masalan: npm run restore -- "C:\\...\\nusxa.json"');
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL berilmagan');
 
   const abs = path.resolve(file);
   const backup = JSON.parse(fs.readFileSync(abs, 'utf8')) as {
@@ -143,107 +138,86 @@ async function main(): Promise<void> {
   };
   const tables = backup.tables ?? {};
 
-  console.log(`Nusxa: ${abs}`);
+  console.log(`Nusxa:        ${abs}`);
   console.log(`Olingan sana: ${backup.exportedAt ?? '(nomalum)'}`);
-  console.log(`Manba baza: ${backup.database ?? '(nomalum)'}\n`);
+  console.log(`Manba baza:   ${backup.database ?? '(nomalum)'}`);
+  console.log(`Nishon baza:  ${process.env.DATABASE_URL.replace(/:[^:@]+@/, ':***@')}\n`);
 
-  // --- Bo'shlik tekshiruvi: mavjud ma'lumot ustidan yozib yubormaslik uchun
-  const userCount = await prisma.user.count();
-  if (userCount > 0 && !FORCE) {
-    throw new Error(
-      `Baza bo'sh emas (${userCount} ta foydalanuvchi bor). Ustidan yozish uchun FORCE=true bering.`
-    );
-  }
+  const client = new Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 30_000 });
+  await client.connect();
 
-  // --- Eski sxemadan yangisiga moslashtirish
-  // Course.mentorId olib tashlangan; qiymati CourseMentor'ga ko'chiriladi
-  const courseMentors: { courseId: string; mentorId: string; isLead: boolean; order: number }[] = [];
-  const mentorIds = new Set((tables.Mentor ?? []).map((m) => String(m.id)));
-
-  for (const course of tables.Course ?? []) {
-    const legacyMentorId = course.mentorId;
-    delete course.mentorId;
-    // enrollmentOpen nusxada yo'q — yangi kurslar ochiq bo'lib tiklanadi
-    if (course.enrollmentOpen === undefined) course.enrollmentOpen = true;
-
-    if (typeof legacyMentorId === 'string' && legacyMentorId) {
-      if (mentorIds.has(legacyMentorId)) {
-        courseMentors.push({ courseId: String(course.id), mentorId: legacyMentorId, isLead: true, order: 0 });
-      } else {
-        // Nusxada mentor qatori yo'q (o'sha paytda o'chirilgan bo'lishi mumkin)
-        console.log(`  DIQQAT: "${course.slug}" kursining mentori (${legacyMentorId}) nusxada yo'q — bog'lanmadi`);
-      }
+  try {
+    // --- Bo'shlik tekshiruvi
+    const users = await client.query('SELECT count(*)::int AS n FROM "User"');
+    if (users.rows[0].n > 0 && !FORCE) {
+      throw new Error(`Baza bo'sh emas (${users.rows[0].n} ta foydalanuvchi). Ustidan yozish uchun FORCE=true bering.`);
     }
-  }
 
-  if (DRY_RUN) {
-    let planned = 0;
-    for (const name of ORDER) {
-      const rows = tables[name] ?? [];
+    const plan: { table: string; rows: Row[]; cols: Map<string, ColumnInfo>; skipped: string[] }[] = [];
+    const missingTables: string[] = [];
+
+    for (const table of ORDER) {
+      const rows = tables[table] ?? [];
       if (rows.length === 0) continue;
-      console.log(`  ${name.padEnd(24)} ${rows.length} ta qator (yozilardi)`);
-      planned += rows.length;
-    }
-    if (courseMentors.length > 0) {
-      console.log(`  ${'CourseMentor'.padEnd(24)} ${courseMentors.length} ta qator (eski mentorId dan)`);
-      planned += courseMentors.length;
-    }
-    console.log(`\nJami: ${planned} ta qator (DRY RUN — hech narsa yozilmadi).`);
-    return;
-  }
 
-  // HAMMASI YOKI HECH NARSA. Tiklash o'rtasida xato chiqsa (masalan bitta
-  // jadvalda kutilmagan maydon), yarim to'ldirilgan baza qolib ketmasligi
-  // kerak — undan keyin skriptni qayta ishga tushirib ham bo'lmaydi, chunki
-  // "baza bo'sh emas" tekshiruvi to'sadi. Shuning uchun bitta tranzaksiya.
-  const counts = await prisma.$transaction(
-    async (tx) => {
-      const written: [string, number][] = [];
-
-      for (const name of ORDER) {
-        const rows = tables[name] ?? [];
-        if (rows.length === 0) continue;
-
-        // @ts-expect-error — jadval nomi ish paytida tanlanadi, Prisma delegatlari statik
-        const delegate = tx[(name.charAt(0).toLowerCase() + name.slice(1)) as TableName];
-        const result = await delegate.createMany({
-          data: rows.map((r) => normalizeRow(name, r)),
-          skipDuplicates: true,
-        });
-        written.push([name, result.count]);
+      const cols = await tableColumns(client, table);
+      if (!cols) {
+        missingTables.push(table);
+        continue;
       }
 
-      if (courseMentors.length > 0) {
-        const res = await tx.courseMentor.createMany({ data: courseMentors, skipDuplicates: true });
-        written.push(['CourseMentor (eski mentorId dan)', res.count]);
+      // Nusxada bor, lekin bazada yo'q ustunlar (sxema oldinga ketgan)
+      const skipped = [...new Set(rows.flatMap((r) => Object.keys(r)))].filter((k) => !cols.has(k));
+      plan.push({ table, rows, cols, skipped });
+    }
+
+    // Nusxada bor, lekin ORDER ro'yxatiga kirmagan jadvallar — jimgina
+    // yo'qotib qo'ymaslik uchun ochiq aytiladi
+    const known = new Set(ORDER);
+    const unlisted = Object.keys(tables).filter((t) => !known.has(t) && (tables[t] ?? []).length > 0);
+
+    for (const { table, rows, skipped } of plan) {
+      console.log(`  ${table.padEnd(24)} ${String(rows.length).padStart(4)} ta qator` +
+        (skipped.length > 0 ? `   (bazada yo'q ustunlar o'tkazildi: ${skipped.join(', ')})` : ''));
+    }
+    if (missingTables.length > 0) console.log(`\n  Bazada bunday jadval yo'q, o'tkazildi: ${missingTables.join(', ')}`);
+    if (unlisted.length > 0) console.log(`  DIQQAT — ro'yxatda yo'q jadvallar TIKLANMADI: ${unlisted.join(', ')}`);
+
+    if (DRY_RUN) {
+      console.log(`\nJami: ${plan.reduce((n, p) => n + p.rows.length, 0)} ta qator (DRY RUN — hech narsa yozilmadi).`);
+      return;
+    }
+
+    await client.query('BEGIN');
+    let total = 0;
+
+    for (const { table, rows, cols } of plan) {
+      for (const row of rows) {
+        const names = Object.keys(row).filter((k) => cols.has(k));
+        const values = names.map((n) => toParam(row[n], cols.get(n)!));
+        const placeholders = names.map((_, i) => `$${i + 1}`).join(', ');
+        const quoted = names.map((n) => `"${n}"`).join(', ');
+
+        await client.query(
+          `INSERT INTO "${table}" (${quoted}) VALUES (${placeholders}) ON CONFLICT DO NOTHING`,
+          values
+        );
+        total += 1;
       }
+      console.log(`  ${table.padEnd(24)} yozildi`);
+    }
 
-      return written;
-    },
-    // Katta nusxada standart 5 soniya yetmaydi
-    { timeout: 120_000, maxWait: 20_000 }
-  );
-
-  let total = 0;
-  for (const [name, count] of counts) {
-    console.log(`  ${name.padEnd(24)} ${count} ta qator`);
-    total += count;
+    await client.query('COMMIT');
+    console.log(`\nJami: ${total} ta qator tiklandi.`);
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    await client.end().catch(() => {});
   }
-
-  // Nusxada bor, lekin tiklanmagan jadvallar bo'lsa — jimgina o'tkazib
-  // yubormaymiz, aks holda ma'lumot yo'qolgani bilinmay qolardi
-  const known = new Set<string>(ORDER);
-  const unknown = Object.keys(tables).filter((t) => !known.has(t) && (tables[t] ?? []).length > 0);
-  if (unknown.length > 0) {
-    console.log(`\nDIQQAT — bu jadvallar tiklanmadi (ro'yxatda yo'q): ${unknown.join(', ')}`);
-  }
-
-  console.log(`\nJami: ${total} ta qator tiklandi.`);
 }
 
-main()
-  .catch((err) => {
-    console.error(`\nXATO: ${err instanceof Error ? err.message : err}`);
-    process.exitCode = 1;
-  })
-  .finally(() => prisma.$disconnect());
+main().catch((err) => {
+  console.error(`\nXATO: ${err instanceof Error ? err.message : err}`);
+  process.exitCode = 1;
+});
