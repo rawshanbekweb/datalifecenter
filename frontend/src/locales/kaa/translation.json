@@ -341,7 +341,17 @@
       "enrollOnline": "Online jazılıw",
       "mentors": "Mentorlar",
       "onlineClosed": "Onlayn gruppaǵa jazılıw házirshe jabıq",
-      "offlineClosed": "Offline gruppaǵa qabıl házirshe jabıq"
+      "offlineClosed": "Offline gruppaǵa qabıl házirshe jabıq",
+      "onlineFull": "Onlayn gruppada orınlar tolǵan",
+      "offlineFull": "Offline gruppada orınlar tolǵan",
+      "seatsFull": "Orınlar tolǵan",
+      "seatsFullInfo": "Gruppa toldı. Soraw qaldırıń — keyingi gruppa ashılǵanda birinshi bolıp xabar beremiz.",
+      "seatsLeft": "Gruppada {{n}} orın qaldı",
+      "requestEnroll": "Jazılıwǵa soraw qaldırıw",
+      "requestOnline": "Onlayn gruppaǵa soraw",
+      "requestPrompt": "Jazılıw ushın soraw qaldırıń — administrator siz benen baylanısıp, orındı tastıyıqlaydı.",
+      "priceOnline": "Onlayn:",
+      "priceOffline": "Offline:"
     },
     "certificate": {
       "title": "Sertifikattı tekseriw",
@@ -385,7 +395,9 @@
       "months": "{{n}} ay",
       "studentsShort": "{{n}} adam",
       "more": "Kóbirek",
-      "comingSoon": "Tez arada"
+      "comingSoon": "Tez arada",
+      "seatsFull": "Orınlar tolǵan",
+      "seatsLeft": "{{n}} orın qaldı"
     },
     "blog": {
       "views": "{{n}} kóriw",
@@ -993,7 +1005,13 @@
       "newBtn": "Jańa kurs",
       "fSubtitle": "Subtitr",
       "fLevel": "Dáreje",
-      "fPrice": "Baha (UZS, biypul = 0)",
+      "fPrice": "Onlayn bahası (UZS, biypul = 0)",
+      "fOfflinePrice": "Offline bahası (UZS)",
+      "offlinePricePlaceholder": "Bos = onlayn bahası",
+      "fOnlineSeats": "Onlayn gruppadaǵı orın",
+      "fOfflineSeats": "Offline gruppadaǵı orın",
+      "seatsPlaceholder": "Mısalı: 6",
+      "seatsHint": "Gruppada bir waqıtta neshe student oqıy aladı. Bos qaldırılsa sheklew bolmaydı. Orın tolǵanda saytta \"Orınlar tolǵan\" shıǵadı hám jazılıw toqtaydı, biraq gezekke jazılıw sorawı qabıl etile beredi. Kurstı tamamlaǵan student orındı bosatadı.",
       "fDuration": "Dawamlılıǵı (ay)",
       "fTags": "Tegler (útir menen)",
       "tagsPlaceholder": "React, TypeScript, ...",
@@ -1201,6 +1219,9 @@
       "yourReply": "Sizdiń juwabıńız",
       "replyPlaceholder": "Juwap jazıń — oqıwshınıń xabarlarına túsedi",
       "replyNotePlaceholder": "Pikir jazıń (miymanǵa xabar barmaydı)",
+      "enroll": "Kursqa qosıw",
+      "enrolled": "Student kursqa qosıldı",
+      "enrollNeedsAccount": "Aldın student saytta dizimnen ótiwi kerek",
       "sendReply": "Jiberiw",
       "status": {
         "NEW": "Jańa",

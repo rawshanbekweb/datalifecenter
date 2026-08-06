@@ -4,6 +4,7 @@ import { env } from '../config/env';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
+import { assertSeatAvailable } from './courseSeats.service';
 import { notify, notifyAdmins } from './notifications.service';
 import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail } from './email.service';
 import { deleteUploadByUrl } from './storage.service';
@@ -23,6 +24,17 @@ export async function createEnrollment(userId: string, courseId: string, locale:
     );
   }
 
+  // PULLIK kursga o'quvchi o'zi yozilib qo'ya olmaydi: to'lov saytda qabul
+  // qilinmaydi (markazda naqd/karta orqali), shuning uchun yozilish CourseRequest
+  // orqali adminga tushadi va joyni admin beradi (enrollFromRequest).
+  // BEPUL kursda bu to'siq ma'nosiz — o'quvchi joy bo'lsa o'zi boshlayveradi.
+  if (!course.isFree) {
+    throw ApiError.conflict(
+      'Bu kursga yozilish uchun so‘rov qoldiring — administrator siz bilan bog‘lanadi',
+      'ENROLLMENT_VIA_REQUEST'
+    );
+  }
+
   // Bu yo'l faqat ONLAYN qabul — offline tomoni ochiq bo'lsa ham to'xtaydi
   // (offline'ga CourseRequest orqali yoziladi, u alohida bayroqqa bo'ysunadi).
   if (!course.onlineEnrollmentOpen) {
@@ -38,6 +50,8 @@ export async function createEnrollment(userId: string, courseId: string, locale:
   if (existing) {
     throw ApiError.conflict("Siz bu kursga allaqachon yozilgansiz", 'ALREADY_ENROLLED');
   }
+
+  await assertSeatAvailable(course, 'ONLINE');
 
   const [enrollment] = await prisma.$transaction([
     prisma.enrollment.create({

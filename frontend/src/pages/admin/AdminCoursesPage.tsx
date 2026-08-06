@@ -42,6 +42,11 @@ interface CourseFormState {
   iconKey: string;
   preset: number;
   price: number;
+  /** Bo'sh satr = "alohida narx yo'q" (onlayn narx ishlatiladi) */
+  offlinePrice: string;
+  /** Bo'sh satr = cheklov yo'q. Raqam — guruhdagi joylar soni */
+  onlineSeats: string;
+  offlineSeats: string;
   durationMonths: number;
   level: string;
   format: string;
@@ -77,6 +82,9 @@ interface Course {
   bg: string;
   border: string;
   price: number | string;
+  offlinePrice?: number | string | null;
+  onlineSeats?: number | null;
+  offlineSeats?: number | null;
   durationMonths: number;
   level: string;
   format?: string;
@@ -91,9 +99,18 @@ interface Course {
   likesCount?: number;
 }
 
+/** Bo'sh maydon → null ("cheklov/alohida narx yo'q"), aks holda son */
+function numberOrNull(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 const emptyForm: CourseFormState = {
   title: emptyLocalizedString(), subtitle: emptyLocalizedString(), description: emptyLocalizedString(), iconKey:'BookOpen', preset:0,
-  price:0, durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
+  price:0, offlinePrice:'', onlineSeats:'', offlineSeats:'',
+  durationMonths:1, level:'BEGINNER', format:'ONLINE', location: emptyLocalizedString(),
   tags:'', published:false, onlineEnrollmentOpen:true, offlineEnrollmentOpen:true, mentorIds:[],
 };
 
@@ -180,6 +197,13 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       iconKey: form.iconKey,
       color: preset.color, bg: preset.bg, border: preset.border,
       price: Number(form.price) || 0,
+      // Bo'sh maydon = null: "alohida narx/cheklov yo'q". 0 yuborilsa bepul
+      // yoki "joy yo'q" degan boshqa ma'no chiqib ketardi.
+      // Formatga tegishli bo'lmagan qiymat ham tozalanadi (ONLINE kursda
+      // offline narxi/joyi bazada osilib qolmasin).
+      offlinePrice: form.format !== 'ONLINE' ? numberOrNull(form.offlinePrice) : null,
+      onlineSeats: form.format !== 'OFFLINE' ? numberOrNull(form.onlineSeats) : null,
+      offlineSeats: form.format !== 'ONLINE' ? numberOrNull(form.offlineSeats) : null,
       durationMonths: Number(form.durationMonths) || 1,
       level: form.level,
       format: form.format,
@@ -238,16 +262,46 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           </select>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fPrice')}</label>
           <input className="inp" type="number" min="0" value={form.price} onChange={change('price')} />
         </div>
+        {/* Offline narx faqat offline/gibrid kursda so'raladi. Bo'sh qoldirilsa
+            offline uchun ham onlayn narx ko'rsatiladi. */}
+        {form.format !== 'ONLINE' && (
+          <div>
+            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fOfflinePrice')}</label>
+            <input className="inp" type="number" min="0" value={form.offlinePrice} onChange={change('offlinePrice')}
+              placeholder={t('admin.courses.offlinePricePlaceholder')} />
+          </div>
+        )}
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fDuration')}</label>
           <input className="inp" type="number" min="1" value={form.durationMonths} onChange={change('durationMonths')} required />
         </div>
       </div>
+
+      {/* GURUH SIG'IMI — bir vaqtda nechta o'quvchi o'qiydi. Bo'sh = cheklov yo'q.
+          Joy tugaganda saytda "Joylar tugadi" chiqadi va yozilish to'xtaydi,
+          lekin so'rov (navbat) qabul qilinaveradi. */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+        {(form.format === 'ONLINE' || form.format === 'HYBRID') && (
+          <div>
+            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fOnlineSeats')}</label>
+            <input className="inp" type="number" min="1" value={form.onlineSeats} onChange={change('onlineSeats')}
+              placeholder={t('admin.courses.seatsPlaceholder')} />
+          </div>
+        )}
+        {(form.format === 'OFFLINE' || form.format === 'HYBRID') && (
+          <div>
+            <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fOfflineSeats')}</label>
+            <input className="inp" type="number" min="1" value={form.offlineSeats} onChange={change('offlineSeats')}
+              placeholder={t('admin.courses.seatsPlaceholder')} />
+          </div>
+        )}
+      </div>
+      <p style={{ margin:'-6px 0 0 0', fontSize:11.5, color:'#94a3b8', lineHeight:1.5 }}>{t('admin.courses.seatsHint')}</p>
       <MentorPicker mentors={mentors} selected={form.mentorIds}
         onChange={(next) => setForm((f) => ({ ...f, mentorIds: next }))} />
       <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:12 }}>
@@ -323,6 +377,9 @@ export default function AdminCoursesPage(): React.ReactElement {
     setEditing({
       id: course.id, title: course.title, subtitle: course.subtitle || emptyLocalizedString(), description: course.description,
       iconKey: course.iconKey, preset: presetIdx === -1 ? 0 : presetIdx, price: Number(course.price) || 0,
+      offlinePrice: course.offlinePrice != null ? String(course.offlinePrice) : '',
+      onlineSeats: course.onlineSeats != null ? String(course.onlineSeats) : '',
+      offlineSeats: course.offlineSeats != null ? String(course.offlineSeats) : '',
       durationMonths: course.durationMonths, level: course.level, format: course.format || 'ONLINE',
       location: course.location || emptyLocalizedString(), tags: (course.tags || []).join(', '),
       // Backend mentorlarni asosiysi birinchi bo'ladigan tartibda qaytaradi —

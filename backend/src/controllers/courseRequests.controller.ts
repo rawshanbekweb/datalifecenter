@@ -57,6 +57,11 @@ export const updateCourseRequestHandler = asyncHandler(async (req: Request, res:
   sendSuccess(res, request);
 });
 
+export const enrollFromRequestHandler = asyncHandler(async (req: Request, res: Response) => {
+  const request = await courseRequestsService.enrollFromRequest(req.params.id as string, req.locale);
+  sendSuccess(res, request);
+});
+
 export const deleteCourseRequestHandler = asyncHandler(async (req: Request, res: Response) => {
   await courseRequestsService.deleteCourseRequest(req.params.id as string);
   sendSuccess(res, { deleted: true });

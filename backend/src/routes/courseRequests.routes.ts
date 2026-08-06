@@ -4,6 +4,7 @@ import {
   createCourseRequestHandler,
   deleteCourseRequestHandler,
   deleteCourseRequestsHandler,
+  enrollFromRequestHandler,
   listCourseRequestsAdminHandler,
   listMyCourseRequestsHandler,
   updateCourseRequestHandler,
@@ -41,6 +42,8 @@ router.post('/', requestLimiter, optionalAuth, validateBody(createCourseRequestS
 router.get('/mine', authenticate, listMyCourseRequestsHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listCourseRequestsQuerySchema), listCourseRequestsAdminHandler);
 router.patch('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseRequestSchema), updateCourseRequestHandler);
+// So'rovni tasdiqlab o'quvchini kursga qo'shish (joy tekshiruvi bilan)
+router.post('/:id/enroll', authenticate, authorize('ADMIN'), enrollFromRequestHandler);
 // POST bilan: DELETE tanasi (body) hamma proxy va mijozda ishonchli o'tmaydi
 router.post('/bulk-delete', authenticate, authorize('ADMIN'), validateBody(bulkDeleteSchema), deleteCourseRequestsHandler);
 router.delete('/:id', authenticate, authorize('ADMIN'), deleteCourseRequestHandler);

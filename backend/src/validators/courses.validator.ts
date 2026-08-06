@@ -23,7 +23,10 @@ export const createCourseSchema = z.object({
   color: z.string().default('#0ea5e9'),
   bg: z.string().default('#f0f9ff'),
   border: z.string().default('#bae6fd'),
+  // `price` — onlayn narx, `offlinePrice` — markazda o'qish narxi.
+  // Bo'sh qoldirilsa offline uchun ham onlayn narx ko'rsatiladi.
   price: z.coerce.number().min(0).default(0),
+  offlinePrice: z.coerce.number().min(0).nullish(),
   currency: z.string().default('UZS'),
   durationMonths: z.coerce.number().int().min(1),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).default('BEGINNER'),
@@ -37,6 +40,10 @@ export const createCourseSchema = z.object({
   // Ikkita alohida bayroq — HYBRID kursda onlayn va offline qabul mustaqil.
   onlineEnrollmentOpen: z.boolean().default(true),
   offlineEnrollmentOpen: z.boolean().default(true),
+  // Guruhdagi joylar soni (5-6 kishilik guruh). Bo'sh = cheklov yo'q.
+  // 1 dan kichik son ma'nosiz — "yopiq" uchun yozilish bayrog'i bor.
+  onlineSeats: z.coerce.number().int().min(1).max(1000).nullish(),
+  offlineSeats: z.coerce.number().int().min(1).max(1000).nullish(),
   mentorIds: courseMentorIds,
 });
 
@@ -52,6 +59,7 @@ export const updateCourseSchema = z.object({
   bg: z.string().optional(),
   border: z.string().optional(),
   price: z.coerce.number().min(0).optional(),
+  offlinePrice: z.coerce.number().min(0).nullish(),
   currency: z.string().optional(),
   durationMonths: z.coerce.number().int().min(1).optional(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
@@ -61,5 +69,7 @@ export const updateCourseSchema = z.object({
   published: z.boolean().optional(),
   onlineEnrollmentOpen: z.boolean().optional(),
   offlineEnrollmentOpen: z.boolean().optional(),
+  onlineSeats: z.coerce.number().int().min(1).max(1000).nullish(),
+  offlineSeats: z.coerce.number().int().min(1).max(1000).nullish(),
   mentorIds: courseMentorIds,
 });

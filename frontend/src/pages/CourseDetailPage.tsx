@@ -9,7 +9,7 @@ import { resolveIcon } from '../utils/iconMap';
 import { formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import { useEngagementItem } from '../hooks/useEngagementItem';
-import { enrollmentState } from '../utils/courseEnrollment';
+import { enrollmentState, type SeatInfo } from '../utils/courseEnrollment';
 import { useContentView } from '../hooks/useContentView';
 import ComingSoon from '../components/common/ComingSoon';
 import LikeButton from '../components/common/LikeButton';
@@ -58,9 +58,13 @@ interface CourseDetail {
   rating?: number | string;
   reviewsCount?: number;
   level: CourseLevel;
+  /** Onlayn o'qish narxi; offline uchun alohida narx bo'lishi mumkin */
   price: number | string;
+  offlinePrice?: number | string | null;
   currency: string;
   isFree: boolean;
+  /** Guruhdagi joylar — backend hisoblaydi (courseSeats.service.ts) */
+  seats?: { online?: SeatInfo | null; offline?: SeatInfo | null } | null;
   durationMonths: number;
   studentsCount: number;
   views?: number;
@@ -158,6 +162,27 @@ export default function CourseDetailPage(): React.ReactElement {
   const enrollmentClosed = enrollment_.allClosed;
   const notEnrolledYet = enrollStatus !== 'success' && enrollStatus !== 'already';
   const defaultRequestFormat: 'ONLINE' | 'OFFLINE' = isOfflineOnly || isHybrid ? 'OFFLINE' : 'ONLINE';
+  // PULLIK kursga o'quvchi o'zi yozilib qo'ya olmaydi — to'lov markazda qabul
+  // qilinadi, shuning uchun yozilish so'rov bo'lib adminga tushadi va joyni
+  // admin beradi (backend ham shunday: enrollments.service.ts ENROLLMENT_VIA_REQUEST).
+  // Bepul kursda bu to'siq ma'nosiz — joy bo'lsa o'quvchi o'zi boshlayveradi.
+  const selfEnrollAllowed = course.isFree === true;
+  // offlinePrice qo'yilmagan bo'lsa offline uchun ham onlayn narx amal qiladi
+  const onlinePrice = Number(course.price ?? 0);
+  const offlinePrice = course.offlinePrice != null ? Number(course.offlinePrice) : onlinePrice;
+  const showBothPrices = !course.isFree && isHybrid && offlinePrice !== onlinePrice;
+
+  // Qolgan joy — ochiq turgan yo'lniki (gibridda onlayn birinchi o'rinda).
+  // Cheklanmagan guruhda umuman ko'rsatilmaydi.
+  const seatsLeft = enrollment_.onlineOpen
+    ? enrollment_.onlineSeatsLeft
+    : enrollment_.offlineOpen ? enrollment_.offlineSeatsLeft : null;
+  const seatsNotice = seatsLeft === null ? null : (
+    <div style={{ display:'flex', alignItems:'center', gap:8, padding:'9px 12px', borderRadius:10, background:'#f0fdf4', border:'1px solid #bbf7d0', marginBottom:12 }}>
+      <Users size={14} style={{ color:'#15803d', flexShrink:0 }} />
+      <p style={{ fontSize:12.5, color:'#15803d', fontWeight:700 }}>{t('pages.courseDetail.seatsLeft', { n: seatsLeft })}</p>
+    </div>
+  );
 
   const enroll = async (): Promise<void> => {
     setEnrollStatus('loading');
@@ -248,8 +273,19 @@ export default function CourseDetailPage(): React.ReactElement {
               </span>
             )}
             <LikeButton liked={engagement.liked} count={engagement.likesCount} onToggle={engagement.toggle} size="md" color={course.color} />
+            {/* Onlayn va offline narxlari har xil bo'lishi mumkin. Gibrid kursda
+                ikkalasi ham ko'rsatiladi — odam qaysi yo'lni tanlashini narxga
+                qarab hal qiladi; bitta formatli kursda faqat o'ziniki. */}
             <span style={{ marginLeft:'auto', fontSize:14, fontWeight:800, color: course.isFree ? '#16a34a' : '#0f172a' }}>
-              {course.isFree ? t('common.free') : `${formatNumber(Number(course.price))} ${course.currency}`}
+              {course.isFree ? t('common.free') : showBothPrices ? (
+                <>
+                  <span style={{ color:'#64748b', fontWeight:700, fontSize:12 }}>{t('pages.courseDetail.priceOnline')} </span>
+                  {formatNumber(onlinePrice)} {course.currency}
+                  <span style={{ color:'#cbd5e1', margin:'0 6px' }}>·</span>
+                  <span style={{ color:'#64748b', fontWeight:700, fontSize:12 }}>{t('pages.courseDetail.priceOffline')} </span>
+                  {formatNumber(offlinePrice)} {course.currency}
+                </>
+              ) : `${formatNumber(isOfflineOnly ? offlinePrice : onlinePrice)} ${course.currency}`}
             </span>
           </div>
         </m.div>
@@ -304,8 +340,12 @@ export default function CourseDetailPage(): React.ReactElement {
                   <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'12px 14px', borderRadius:12, background:'#fffbeb', border:'1.5px solid #fde68a', marginBottom:14 }}>
                     <Clock size={18} style={{ color:'#b45309', flexShrink:0, marginTop:1 }} />
                     <div>
-                      <p style={{ fontSize:13, color:'#b45309', fontWeight:700, marginBottom:3 }}>{t('pages.courseDetail.enrollmentClosed')}</p>
-                      <p style={{ fontSize:12, color:'#a16207', lineHeight:1.6 }}>{t('pages.courseDetail.enrollmentClosedInfo')}</p>
+                      <p style={{ fontSize:13, color:'#b45309', fontWeight:700, marginBottom:3 }}>
+                        {enrollment_.allFull ? t('pages.courseDetail.seatsFull') : t('pages.courseDetail.enrollmentClosed')}
+                      </p>
+                      <p style={{ fontSize:12, color:'#a16207', lineHeight:1.6 }}>
+                        {enrollment_.allFull ? t('pages.courseDetail.seatsFullInfo') : t('pages.courseDetail.enrollmentClosedInfo')}
+                      </p>
                     </div>
                   </div>
                   <button onClick={() => setRequestFormat(defaultRequestFormat)}
@@ -318,10 +358,15 @@ export default function CourseDetailPage(): React.ReactElement {
               {!enrollmentClosed && !user && (
                 <>
                   <p style={{ fontSize:13, color:'#64748b', marginBottom:14, lineHeight:1.7 }}>
-                    {isOfflineOnly ? t('pages.courseDetail.offlinePrompt') : t('pages.courseDetail.loginPrompt')}
+                    {isOfflineOnly
+                      ? t('pages.courseDetail.offlinePrompt')
+                      : selfEnrollAllowed ? t('pages.courseDetail.loginPrompt') : t('pages.courseDetail.requestPrompt')}
                   </p>
-                  {/* Offline kursda yozilish admin orqali — login talab qilinmaydi */}
-                  {!isOfflineOnly && (
+                  {seatsNotice}
+                  {/* Offline kursda ham, pullik kursda ham yozilish admin orqali —
+                      so'rov formasi login talab qilmaydi, shuning uchun mehmonni
+                      faqat bepul kursda login sahifasiga yuboramiz */}
+                  {!isOfflineOnly && selfEnrollAllowed && (
                     <Link to="/login" state={{ from: `/courses/${slug}` }}>
                       <button className="btn-primary" style={{ width:'100%', justifyContent:'center', marginBottom:10 }}>
                         {t('pages.courseDetail.loginAndEnroll')} <ArrowRight size={15}/>
@@ -329,8 +374,8 @@ export default function CourseDetailPage(): React.ReactElement {
                     </Link>
                   )}
                   <button onClick={() => setRequestFormat(defaultRequestFormat)}
-                    className={isOfflineOnly ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
-                    <MessageCircle size={15}/> {t('pages.courseDetail.contactAdmin')}
+                    className={isOfflineOnly || !selfEnrollAllowed ? 'btn-primary' : 'btn-outline'} style={{ width:'100%', justifyContent:'center' }}>
+                    <MessageCircle size={15}/> {selfEnrollAllowed ? t('pages.courseDetail.contactAdmin') : t('pages.courseDetail.requestEnroll')}
                   </button>
                 </>
               )}
@@ -408,13 +453,21 @@ export default function CourseDetailPage(): React.ReactElement {
                       ? t('pages.courseDetail.offlinePrompt')
                       : course.isFree ? t('pages.courseDetail.freePrompt') : t('pages.courseDetail.paidPrompt')}
                   </p>
+                  {seatsNotice}
                   {/* Offline guruhga o'zicha yozilib bo'lmaydi — joy va jadval admin bilan kelishiladi */}
-                  {!isOfflineOnly && enrollment_.onlineOpen && (
+                  {!isOfflineOnly && enrollment_.onlineOpen && selfEnrollAllowed && (
                     <button onClick={enroll} disabled={enrollStatus === 'loading'} className="btn-primary"
                       style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: enrollStatus === 'loading' ? 0.7 : 1 }}>
                       {enrollStatus === 'loading'
                         ? t('common.sending')
                         : <>{isHybrid ? t('pages.courseDetail.enrollOnline') : t('pages.courseDetail.enroll')} <ArrowRight size={15}/></>}
+                    </button>
+                  )}
+                  {/* Pullik kursda "yozilish" = adminga so'rov: to'lov va joy u orqali */}
+                  {!isOfflineOnly && enrollment_.onlineOpen && !selfEnrollAllowed && (
+                    <button onClick={() => setRequestFormat('ONLINE')} className="btn-primary"
+                      style={{ width:'100%', justifyContent:'center', marginBottom:10 }}>
+                      {isHybrid ? t('pages.courseDetail.requestOnline') : t('pages.courseDetail.requestEnroll')} <ArrowRight size={15}/>
                     </button>
                   )}
                   {/* Gibrid kursda bitta yo'l yopilgan bo'lsa, qaysi biri
@@ -423,13 +476,17 @@ export default function CourseDetailPage(): React.ReactElement {
                   {!isOfflineOnly && !enrollment_.onlineOpen && (
                     <div style={{ display:'flex', alignItems:'center', gap:9, padding:'10px 12px', borderRadius:10, background:'#fffbeb', border:'1px solid #fde68a', marginBottom:10 }}>
                       <Clock size={15} style={{ color:'#b45309', flexShrink:0 }} />
-                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>{t('pages.courseDetail.onlineClosed')}</p>
+                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>
+                        {enrollment_.onlineFull ? t('pages.courseDetail.onlineFull') : t('pages.courseDetail.onlineClosed')}
+                      </p>
                     </div>
                   )}
                   {isHybrid && !enrollment_.offlineOpen && (
                     <div style={{ display:'flex', alignItems:'center', gap:9, padding:'10px 12px', borderRadius:10, background:'#fffbeb', border:'1px solid #fde68a', marginBottom:10 }}>
                       <Clock size={15} style={{ color:'#b45309', flexShrink:0 }} />
-                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>{t('pages.courseDetail.offlineClosed')}</p>
+                      <p style={{ fontSize:12.5, color:'#b45309', fontWeight:600 }}>
+                        {enrollment_.offlineFull ? t('pages.courseDetail.offlineFull') : t('pages.courseDetail.offlineClosed')}
+                      </p>
                     </div>
                   )}
                   <button onClick={() => setRequestFormat(defaultRequestFormat)}

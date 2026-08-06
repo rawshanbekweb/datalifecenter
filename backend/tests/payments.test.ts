@@ -33,10 +33,14 @@ async function createPendingEnrollment(): Promise<string> {
     .post('/api/courses')
     .send({ title: { uz: `To'lov testi ${Date.now()}-${Math.random()}` }, description: { uz: "To'lov shlyuzi testi uchun kurs" }, durationMonths: 1, price: PRICE, published: true })
     .expect(201);
-  const enrollment = await student.post('/api/enrollments').send({ courseId: course.body.data.id }).expect(201);
-  expect(enrollment.body.data.status).toBe('PENDING');
-  expect(enrollment.body.data.paymentStatus).toBe('UNPAID');
-  return enrollment.body.data.id;
+  // Pullik kursga o'quvchi endi O'ZI yozila olmaydi (yozilish admin orqali —
+  // enrollments.service.ts). Bu yerda sinaladigan narsa to'lov shlyuzi
+  // protokoli, shuning uchun to'lov kutayotgan yozilish to'g'ridan-to'g'ri
+  // yaratiladi.
+  const enrollment = await prisma.enrollment.create({
+    data: { userId: studentId, courseId: course.body.data.id, status: 'PENDING', paymentStatus: 'UNPAID' },
+  });
+  return enrollment.id;
 }
 
 beforeAll(async () => {

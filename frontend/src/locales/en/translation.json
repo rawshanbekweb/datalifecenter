@@ -341,7 +341,17 @@
       "enrollOnline": "Enrol online",
       "mentors": "Mentors",
       "onlineClosed": "Online enrolment is closed for now",
-      "offlineClosed": "In-person intake is closed for now"
+      "offlineClosed": "In-person intake is closed for now",
+      "onlineFull": "The online group is full",
+      "offlineFull": "The in-person group is full",
+      "seatsFull": "Group is full",
+      "seatsFullInfo": "This group is full. Leave a request and we will tell you first when the next one opens.",
+      "seatsLeft": "{{n}} seats left in the group",
+      "requestEnroll": "Request a place",
+      "requestOnline": "Request an online place",
+      "requestPrompt": "Leave a request — an administrator will contact you and confirm your place.",
+      "priceOnline": "Online:",
+      "priceOffline": "In person:"
     },
     "certificate": {
       "title": "Verify certificate",
@@ -385,7 +395,9 @@
       "months": "{{n}} mo",
       "studentsShort": "{{n}} students",
       "more": "More",
-      "comingSoon": "Coming soon"
+      "comingSoon": "Coming soon",
+      "seatsFull": "Group is full",
+      "seatsLeft": "{{n}} seats left"
     },
     "blog": {
       "views": "{{n}} views",
@@ -993,7 +1005,13 @@
       "newBtn": "New course",
       "fSubtitle": "Subtitle",
       "fLevel": "Level",
-      "fPrice": "Price (UZS, free = 0)",
+      "fPrice": "Online price (UZS, free = 0)",
+      "fOfflinePrice": "In-person price (UZS)",
+      "offlinePricePlaceholder": "Empty = online price",
+      "fOnlineSeats": "Seats in the online group",
+      "fOfflineSeats": "Seats in the in-person group",
+      "seatsPlaceholder": "For example: 6",
+      "seatsHint": "How many students can study in the group at the same time. Leave empty for no limit. When seats run out the site shows \"Group is full\" and enrolment stops, but waiting-list requests are still accepted. A student who completes the course frees their seat.",
       "fDuration": "Duration (months)",
       "fTags": "Tags (comma-separated)",
       "tagsPlaceholder": "React, TypeScript, ...",
@@ -1201,6 +1219,9 @@
       "yourReply": "Your reply",
       "replyPlaceholder": "Write a reply — it lands in the student’s messages",
       "replyNotePlaceholder": "Write a note (no message is sent to a guest)",
+      "enroll": "Add to course",
+      "enrolled": "Student added to the course",
+      "enrollNeedsAccount": "The student needs to register on the site first",
       "sendReply": "Send",
       "status": {
         "NEW": "New",

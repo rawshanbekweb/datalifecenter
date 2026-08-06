@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Inbox, Send, CornerDownRight, Phone, Mail, Trash2, User as UserIcon } from 'lucide-react';
+import { Inbox, Send, CornerDownRight, Phone, Mail, Trash2, User as UserIcon, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   CourseRequest,
   CourseRequestStatus,
   deleteCourseRequest,
   deleteCourseRequests,
+  enrollFromRequest,
   listCourseRequestsAdmin,
   updateCourseRequest,
 } from '../../api/courseRequests';
@@ -96,6 +97,19 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
     try {
       apply(await updateCourseRequest(id, data));
       if (data.reply) setDrafts((prev) => ({ ...prev, [id]: '' }));
+    } catch (err: unknown) {
+      toast.error((err as Error).message || t('common.error'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const enroll = async (id: string): Promise<void> => {
+    setBusyId(id);
+    try {
+      const updated = await enrollFromRequest(id);
+      setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
+      toast.success(t('admin.courseRequests.enrolled'));
     } catch (err: unknown) {
       toast.error((err as Error).message || t('common.error'));
     } finally {
@@ -214,8 +228,20 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
                   </button>
                 </div>
 
-                <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
-                  {(['CONTACTED', 'ENROLLED', 'REJECTED'] as CourseRequestStatus[])
+                <div style={{ display:'flex', gap:7, flexWrap:'wrap', alignItems:'center' }}>
+                  {/* "Kursga qo'shish" — ENROLLED holatiga O'TKAZADIGAN YAGONA yo'l:
+                      u joyni tekshiradi va onlayn kursda Enrollment ochadi.
+                      Qo'lda status qo'yish bunday qilmasdi, shuning uchun ENROLLED
+                      quyidagi oddiy status tugmalari ro'yxatidan olib tashlangan. */}
+                  {r.status !== 'ENROLLED' && (
+                    <button onClick={() => void enroll(r.id)} disabled={busyId === r.id || !r.userId}
+                      title={r.userId ? undefined : t('admin.courseRequests.enrollNeedsAccount')}
+                      className="btn-primary"
+                      style={{ fontSize:11.5, padding:'6px 13px', opacity: busyId === r.id || !r.userId ? 0.55 : 1 }}>
+                      <UserPlus size={13}/> {t('admin.courseRequests.enroll')}
+                    </button>
+                  )}
+                  {(['CONTACTED', 'REJECTED'] as CourseRequestStatus[])
                     .filter((next) => next !== r.status)
                     .map((next) => (
                       <button key={next} onClick={() => void patch(r.id, { status: next })} disabled={busyId === r.id}
@@ -223,6 +249,9 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
                         {t(STATUS_META[next].labelKey)}
                       </button>
                     ))}
+                  {!r.userId && r.status !== 'ENROLLED' && (
+                    <span style={{ fontSize:11.5, color:'#94a3b8' }}>{t('admin.courseRequests.enrollNeedsAccount')}</span>
+                  )}
                 </div>
               </div>
             );

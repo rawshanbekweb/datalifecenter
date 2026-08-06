@@ -64,6 +64,15 @@ export function updateCourseRequest(
   return apiFetch(`/course-requests/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 }
 
+/**
+ * So'rovni tasdiqlab, o'quvchini kursga qo'shadi (joy tekshiruvi bilan).
+ * Onlayn kursda darhol Enrollment ochiladi; offline'da so'rov ENROLLED
+ * bo'ladi va shu offline guruhdagi band joyni bildiradi.
+ */
+export function enrollFromRequest(id: string): Promise<CourseRequest> {
+  return apiFetch(`/course-requests/${id}/enroll`, { method: 'POST' });
+}
+
 export function deleteCourseRequest(id: string): Promise<{ deleted: boolean }> {
   return apiFetch(`/course-requests/${id}`, { method: 'DELETE' });
 }

@@ -177,7 +177,12 @@ model Course {
   color          String
   bg             String
   border         String
+  // NARX — ikki xil: `price` ONLAYN o'qish narxi, `offlinePrice` esa markazda
+  // (offline guruhda) o'qish narxi. offlinePrice null bo'lsa offline uchun ham
+  // `price` ko'rsatiladi. ONLINE kursda ikkinchisi, OFFLINE kursda birinchisi
+  // shunchaki e'tiborga olinmaydi — `format` ga qarab.
   price          Decimal?
+  offlinePrice   Decimal?
   isFree         Boolean      @default(true)
   currency       String       @default("UZS")
   durationMonths Int
@@ -211,6 +216,20 @@ model Course {
   // Mavjud yozilganlarga ta'sir qilmaydi — faqat YANGI yozilish to'xtaydi.
   onlineEnrollmentOpen  Boolean @default(true)
   offlineEnrollmentOpen Boolean @default(true)
+  // GURUH SIG'IMI — bir vaqtda nechta o'quvchi o'qiy oladi (5-6 kishilik guruh).
+  // null = cheklov yo'q (eski kurslar shunday qoladi).
+  //
+  // Onlayn va offline ALOHIDA hisoblanadi, xuddi yuqoridagi bayroqlar kabi:
+  // onlayn guruh to'lgani offline guruh ham to'ldi degani emas.
+  //
+  // BAND JOY QANDAY SANALADI:
+  //   onlayn  — PENDING yoki ACTIVE holatidagi Enrollment
+  //   offline — ENROLLED holatidagi CourseRequest (offline'da Enrollment
+  //             yaratilmaydi, yozilish admin bilan kelishiladi)
+  // COMPLETED o'quvchi joyni BO'SHATADI — chegara "bir vaqtda o'qiydiganlar"
+  // uchun, kursni umr bo'yi tamomlaganlar uchun emas.
+  onlineSeats   Int?
+  offlineSeats  Int?
   // Kursning mentorlari — CourseMentor izohiga qarang (bittasi "asosiy")
   mentors        CourseMentor[]
   modules        Module[]

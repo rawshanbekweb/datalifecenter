@@ -341,7 +341,17 @@
       "enrollOnline": "Online yozilish",
       "mentors": "Mentorlar",
       "onlineClosed": "Onlayn guruhga yozilish hozircha yopiq",
-      "offlineClosed": "Offline guruhga qabul hozircha yopiq"
+      "offlineClosed": "Offline guruhga qabul hozircha yopiq",
+      "onlineFull": "Onlayn guruhda joylar tugadi",
+      "offlineFull": "Offline guruhda joylar tugadi",
+      "seatsFull": "Joylar tugadi",
+      "seatsFullInfo": "Guruh to'ldi. So'rov qoldiring — keyingi guruh ochilganda birinchi bo'lib xabar beramiz.",
+      "seatsLeft": "Guruhda {{n}} joy qoldi",
+      "requestEnroll": "Yozilishga so'rov qoldirish",
+      "requestOnline": "Onlayn guruhga so'rov",
+      "requestPrompt": "Yozilish uchun so'rov qoldiring — administrator siz bilan bog'lanadi va joyni tasdiqlaydi.",
+      "priceOnline": "Onlayn:",
+      "priceOffline": "Offline:"
     },
     "certificate": {
       "title": "Sertifikatni tekshirish",
@@ -385,7 +395,9 @@
       "months": "{{n}} oy",
       "studentsShort": "{{n}} ta",
       "more": "Ko'proq",
-      "comingSoon": "Tez orada"
+      "comingSoon": "Tez orada",
+      "seatsFull": "Joylar tugadi",
+      "seatsLeft": "{{n}} joy qoldi"
     },
     "blog": {
       "views": "{{n}} views",
@@ -993,7 +1005,13 @@
       "newBtn": "Yangi kurs",
       "fSubtitle": "Subtitr",
       "fLevel": "Daraja",
-      "fPrice": "Narx (UZS, bepul = 0)",
+      "fPrice": "Onlayn narx (UZS, bepul = 0)",
+      "fOfflinePrice": "Offline narx (UZS)",
+      "offlinePricePlaceholder": "Bo'sh = onlayn narx",
+      "fOnlineSeats": "Onlayn guruhda joy",
+      "fOfflineSeats": "Offline guruhda joy",
+      "seatsPlaceholder": "Masalan: 6",
+      "seatsHint": "Guruhda bir vaqtda nechta o'quvchi o'qiy oladi. Bo'sh qoldirilsa cheklov bo'lmaydi. Joy tugaganda saytda \"Joylar tugadi\" chiqadi va yozilish to'xtaydi, lekin navbatga yozilish so'rovi qabul qilinaveradi. Kursni tugatgan o'quvchi joyni bo'shatadi.",
       "fDuration": "Davomiylik (oy)",
       "fTags": "Teglar (vergul bilan)",
       "tagsPlaceholder": "React, TypeScript, ...",
@@ -1202,6 +1220,9 @@
       "replyPlaceholder": "Javob yozing — o'quvchining xabarlariga tushadi",
       "replyNotePlaceholder": "Izoh yozing (mehmonga xabar bormaydi)",
       "sendReply": "Yuborish",
+      "enroll": "Kursga qo'shish",
+      "enrolled": "O'quvchi kursga qo'shildi",
+      "enrollNeedsAccount": "Avval o'quvchi saytda ro'yxatdan o'tishi kerak",
       "status": {
         "NEW": "Yangi",
         "CONTACTED": "Bog'lanildi",

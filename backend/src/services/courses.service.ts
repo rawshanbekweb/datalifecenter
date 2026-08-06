@@ -7,6 +7,7 @@ import { LocalizedString, resolveLocaleDeep, toJsonInput } from '../utils/locali
 import { slugify } from '../utils/slugify';
 import { signVideoUrls } from './storage.service';
 import { hasActiveSubscription } from './subscriptions.service';
+import { getCourseSeats, getSeatsForCourses } from './courseSeats.service';
 import { purgeEngagement } from './engagement.service';
 import { flatMentors, mentorsBrief, mentorsFull, setCourseMentors } from '../utils/courseMentors';
 
@@ -44,8 +45,14 @@ export async function listCourses(filters: ListCoursesFilters, locale: Supported
     prisma.course.count({ where }),
   ]);
 
+  // Joylar bitta paketli so'rovda — kurs boshiga alohida COUNT yuborilmaydi
+  const seats = await getSeatsForCourses(items);
+
   return {
-    items: resolveLocaleDeep(items.map((c) => ({ ...c, mentors: flatMentors(c.mentors) })), locale),
+    items: resolveLocaleDeep(
+      items.map((c) => ({ ...c, mentors: flatMentors(c.mentors), seats: seats.get(c.id) })),
+      locale
+    ),
     pagination: { page: filters.page, limit: filters.limit, total, totalPages: Math.ceil(total / filters.limit) },
   };
 }
@@ -76,6 +83,7 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
     {
       ...course,
       mentors: flatMentors(course.mentors),
+      seats: await getCourseSeats(course),
       modules: course.modules.map((mod) => ({
         ...mod,
         lessons: mod.lessons.map((lesson) => ({
@@ -233,7 +241,9 @@ interface CourseInput {
   color: string;
   bg: string;
   border: string;
+  /** Onlayn o'qish narxi. Offline narxi alohida — schema.prisma izohiga qarang */
   price: number;
+  offlinePrice?: number | null;
   currency: string;
   durationMonths: number;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
@@ -244,6 +254,9 @@ interface CourseInput {
   /** Onlayn/offline qabul ochiqmi — kurs ko'rinishidan alohida (schema.prisma izohiga qarang) */
   onlineEnrollmentOpen: boolean;
   offlineEnrollmentOpen: boolean;
+  /** Guruhdagi joylar soni; null = cheklov yo'q (courseSeats.service.ts) */
+  onlineSeats?: number | null;
+  offlineSeats?: number | null;
   /** Kursni olib boradigan mentorlar — birinchisi asosiy (utils/courseMentors.ts) */
   mentorIds?: string[];
 }

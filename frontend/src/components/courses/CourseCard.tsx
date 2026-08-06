@@ -6,7 +6,7 @@ import { Clock, ArrowRight, Star, Eye } from 'lucide-react';
 import { resolveIcon } from '../../utils/iconMap';
 import LikeButton from '../common/LikeButton';
 import CourseFormatBadge, { type CourseFormat } from './CourseFormatBadge';
-import { enrollmentState } from '../../utils/courseEnrollment';
+import { enrollmentState, type SeatInfo } from '../../utils/courseEnrollment';
 import { useEngagementItem } from '../../hooks/useEngagementItem';
 
 interface CourseModule {
@@ -33,6 +33,8 @@ export interface CourseCardData {
   /** Qabul ochiqmi — onlayn va offline alohida (utils/courseEnrollment.ts) */
   onlineEnrollmentOpen?: boolean;
   offlineEnrollmentOpen?: boolean;
+  /** Guruhdagi joylar — backend hisoblaydi (courseSeats.service.ts) */
+  seats?: { online?: SeatInfo | null; offline?: SeatInfo | null } | null;
   views?: number;
   likesCount?: number;
   [key: string]: unknown;
@@ -43,12 +45,24 @@ interface CourseCardProps {
   index?: number;
 }
 
+function smallerSeatsLeft(a: number | null, b: number | null): number | null {
+  if (a === null) return b;
+  if (b === null) return a;
+  return Math.min(a, b);
+}
+
 export default function CourseCard({ course, index = 0 }: CourseCardProps): React.ReactElement {
   const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
   const Icon = resolveIcon(course.iconKey);
   const engagement = useEngagementItem('course', String(course.id), { likesCount: course.likesCount, views: course.views });
   const enrollment = enrollmentState(course);
+  // Kartada bitta raqam ko'rsatiladi: ochiq turgan yo'lning qolgan joyi.
+  // Gibrid kursda ikkalasi ham ochiq bo'lsa — kamrog'i (tezroq to'ladigani).
+  const seatsLeft = smallerSeatsLeft(
+    enrollment.onlineOpen ? enrollment.onlineSeatsLeft : null,
+    enrollment.offlineOpen ? enrollment.offlineSeatsLeft : null,
+  );
   // Paketli stats so'rovi kelguncha ro'yxat bilan kelgan qiymat ko'rsatiladi —
   // aks holda raqam avval yo'q bo'lib, keyin "sakrab" paydo bo'lardi
   const views = engagement.views ?? course.views ?? 0;
@@ -68,7 +82,15 @@ export default function CourseCard({ course, index = 0 }: CourseCardProps): Reac
               bo'ladi, shuning uchun "Tez orada" faqat hammasi yopilganda. */}
           {enrollment.allClosed && (
             <span className="tag" style={{ background:'#fffbeb', borderColor:'#fde68a', color:'#b45309', fontWeight:700 }}>
-              {t('cards.course.comingSoon')}
+              {/* Joy tugagani "tez orada"dan boshqa gap: guruh bor, lekin to'lgan */}
+              {enrollment.allFull ? t('cards.course.seatsFull') : t('cards.course.comingSoon')}
+            </span>
+          )}
+          {/* Oxirgi joylar — shoshilishga arziydigan aniq raqam. Cheklanmagan
+              guruhda yoki joy ko'p bo'lganda ko'rsatilmaydi (shovqin bo'lardi). */}
+          {!enrollment.allClosed && seatsLeft !== null && seatsLeft <= 3 && (
+            <span className="tag" style={{ background:'#f0fdf4', borderColor:'#bbf7d0', color:'#15803d', fontWeight:700 }}>
+              {t('cards.course.seatsLeft', { n: seatsLeft })}
             </span>
           )}
           <CourseFormatBadge format={course.format} />

@@ -8,11 +8,13 @@ let courseId: string;
 let courseSlug: string;
 let lessonIds: string[] = [];
 let enrollmentId: string;
+let studentId: string;
 
 beforeAll(async () => {
   await resetDb();
   await createUser('admin@test.uz', 'ADMIN');
-  await createUser('student@test.uz', 'STUDENT');
+  const studentUser = await createUser('student@test.uz', 'STUDENT');
+  studentId = studentUser.id;
   admin = await loginAgent('admin@test.uz');
   student = await loginAgent('student@test.uz');
 
@@ -39,16 +41,30 @@ afterAll(async () => {
 });
 
 describe("Enrollment oqimi: yozilish → chek → tasdiqlash → progress → sertifikat", () => {
-  it("student pullik kursga yoziladi — PENDING/UNPAID bo'ladi", async () => {
-    const res = await student.post('/api/enrollments').send({ courseId }).expect(201);
-    enrollmentId = res.body.data.id;
-    expect(res.body.data.status).toBe('PENDING');
-    expect(res.body.data.paymentStatus).toBe('UNPAID');
+  it("pullik kursga o'quvchi o'zi yozila olmaydi — so'rov admin orqali (409)", async () => {
+    const res = await student.post('/api/enrollments').send({ courseId }).expect(409);
+    expect(res.body.error.code).toBe('ENROLLMENT_VIA_REQUEST');
+
+    // Quyidagi zanjir (chek → tasdiqlash → progress → sertifikat) mavjud, to'lov
+    // kutayotgan yozilishdan boshlanadi — uni admin yaratgandek to'g'ridan-to'g'ri qo'yamiz
+    const created = await prisma.enrollment.create({
+      data: { userId: studentId, courseId, status: 'PENDING', paymentStatus: 'UNPAID' },
+    });
+    enrollmentId = created.id;
   });
 
-  it('qayta yozilish 409', async () => {
-    const res = await student.post('/api/enrollments').send({ courseId }).expect(409);
-    expect(res.body.error.code).toBe('ALREADY_ENROLLED');
+  it("bepul kursga o'quvchi o'zi yoziladi, ikkinchi urinish 409 ALREADY_ENROLLED", async () => {
+    const free = await admin
+      .post('/api/courses')
+      .send({ title: { uz: `Bepul kurs ${Date.now()}` }, description: { uz: 'Bepul yozilish testi' }, durationMonths: 1, price: 0, published: true })
+      .expect(201);
+
+    const first = await student.post('/api/enrollments').send({ courseId: free.body.data.id }).expect(201);
+    expect(first.body.data.status).toBe('ACTIVE');
+    expect(first.body.data.paymentStatus).toBe('FREE');
+
+    const second = await student.post('/api/enrollments').send({ courseId: free.body.data.id }).expect(409);
+    expect(second.body.error.code).toBe('ALREADY_ENROLLED');
   });
 
   it("PENDING holatda learn yopiq (403)", async () => {

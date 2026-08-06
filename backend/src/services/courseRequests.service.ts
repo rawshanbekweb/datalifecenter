@@ -4,8 +4,9 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { Actor } from '../utils/mentorAccess';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
-import { excerpt, notifyAdmins } from './notifications.service';
+import { excerpt, notify, notifyAdmins } from './notifications.service';
 import { sendAdminMessageTo } from './messages.service';
+import { assertSeatAvailable, seatFormatFor } from './courseSeats.service';
 
 /**
  * Kursga qiziqqan odamning administratsiyaga murojaati.
@@ -190,6 +191,93 @@ export async function updateCourseRequestAdmin(
   }
 
   return resolveLocaleDeep(request, locale);
+}
+
+/**
+ * Admin so'rovni tasdiqlab, o'quvchini kursga QO'SHADI — "yozilish admin
+ * orqali" oqimining oxirgi bo'g'ini.
+ *
+ * ONLAYN: Enrollment yaratiladi (ACTIVE) — o'quvchi darhol darslarni ko'radi.
+ * To'lov markazda qabul qilingani uchun paymentStatus darrov PAID (bepul kursda
+ * FREE): saytda hech kim pul o'tkazmaydi, admin tugmani bosgani = to'lov bo'lgani.
+ *
+ * OFFLINE: Enrollment yaratilmaydi (darslar markazda o'tadi) — so'rovning
+ * ENROLLED holati o'zi offline guruhdagi band joyni bildiradi.
+ *
+ * Idempotent: allaqachon ENROLLED so'rov qayta ishlanmaydi, aks holda offline
+ * joylar har bosishda qaytadan sanalardi.
+ */
+export async function enrollFromRequest(id: string, locale: SupportedLocale) {
+  const request = await prisma.courseRequest.findUnique({
+    where: { id },
+    include: {
+      course: {
+        select: { id: true, title: true, slug: true, format: true, isFree: true, price: true, onlineSeats: true, offlineSeats: true },
+      },
+    },
+  });
+  if (!request) {
+    throw ApiError.notFound('So‘rov topilmadi');
+  }
+  if (request.status === 'ENROLLED') {
+    const current = await prisma.courseRequest.findUniqueOrThrow({ where: { id }, include: requestInclude });
+    return resolveLocaleDeep(current, locale);
+  }
+  // Mehmon so'rovida biriktiriladigan hisob yo'q — admin avval o'quvchini
+  // ro'yxatdan o'tkazishi kerak (telefon orqali bog'lanib).
+  if (!request.userId) {
+    throw ApiError.badRequest(
+      'Bu so‘rov hisobsiz yuborilgan — avval o‘quvchi ro‘yxatdan o‘tishi kerak',
+      'REQUEST_HAS_NO_ACCOUNT'
+    );
+  }
+
+  const seatFormat = seatFormatFor(request.course.format, request.format);
+
+  if (seatFormat === 'ONLINE') {
+    const existing = await prisma.enrollment.findUnique({
+      where: { userId_courseId: { userId: request.userId, courseId: request.courseId } },
+    });
+    if (!existing) {
+      await assertSeatAvailable(request.course, 'ONLINE');
+      await prisma.$transaction([
+        prisma.enrollment.create({
+          data: {
+            userId: request.userId,
+            courseId: request.courseId,
+            status: 'ACTIVE',
+            paymentStatus: request.course.isFree ? 'FREE' : 'PAID',
+            provider: 'admin',
+            providerRef: `request_${request.id}`,
+            amountPaid: request.course.isFree ? null : request.course.price,
+          },
+        }),
+        prisma.course.update({ where: { id: request.courseId }, data: { studentsCount: { increment: 1 } } }),
+      ]);
+    } else if (existing.status !== 'ACTIVE' && existing.status !== 'COMPLETED') {
+      await prisma.enrollment.update({ where: { id: existing.id }, data: { status: 'ACTIVE' } });
+    }
+  } else {
+    await assertSeatAvailable(request.course, 'OFFLINE');
+  }
+
+  const updated = await prisma.courseRequest.update({
+    where: { id },
+    data: { status: 'ENROLLED' },
+    include: requestInclude,
+  });
+
+  await notify(request.userId, {
+    type: 'ENROLLMENT_ACTIVATED',
+    title: `Kursga qabul qilindingiz: ${toUzText(request.course.title)}`,
+    body:
+      seatFormat === 'ONLINE'
+        ? 'Kurs kabinetingizda ochildi — darslarni boshlashingiz mumkin.'
+        : 'Offline guruhga yozildingiz — jadval bo‘yicha administrator bog‘lanadi.',
+    link: seatFormat === 'ONLINE' ? `/learn/${request.course.slug}` : '/student',
+  });
+
+  return resolveLocaleDeep(updated, locale);
 }
 
 export async function deleteCourseRequest(id: string): Promise<void> {

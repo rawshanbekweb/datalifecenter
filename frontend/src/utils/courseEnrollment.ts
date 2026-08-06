@@ -12,13 +12,28 @@ import type { CourseFormat } from '../components/courses/CourseFormatBadge';
  * ham yopilganda ko'rsatiladi. ONLINE/OFFLINE kursda esa faqat o'ziga
  * tegishli bayroq qaraladi.
  *
+ * Yo'l IKKI SABABDAN yopiq bo'lishi mumkin: admin qabulni yopgan (bayroq)
+ * yoki guruhdagi joylar tugagan (seats). Ikkalasi ham yozilishni to'xtatadi,
+ * lekin odamga boshqacha aytiladi — shuning uchun `*Full` alohida qaytadi.
+ *
  * Maydonlar eski javoblarda bo'lmasligi mumkin — `!== false` bilan
  * tekshiriladi, ya'ni noma'lum holat "ochiq" deb qabul qilinadi.
  */
+export interface SeatInfo {
+  /** Jami joy; null = cheklanmagan */
+  total: number | null;
+  taken: number;
+  /** Qolgan joy; null = cheklanmagan */
+  left: number | null;
+  full: boolean;
+}
+
 export interface CourseEnrollmentFlags {
   format?: CourseFormat | null;
   onlineEnrollmentOpen?: boolean;
   offlineEnrollmentOpen?: boolean;
+  /** Guruh sig'imi — backend hisoblab beradi (courseSeats.service.ts) */
+  seats?: { online?: SeatInfo | null; offline?: SeatInfo | null } | null;
 }
 
 export interface EnrollmentState {
@@ -30,12 +45,22 @@ export interface EnrollmentState {
   allClosed: boolean;
   /** Faqat bitta yo'l yopilgan (gibrid kursda "onlayn tez orada" kabi izoh uchun) */
   partiallyClosed: boolean;
+  /** Yo'l aynan JOY TUGAGANI uchun yopilganmi ("Tez orada" emas, "Joylar tugadi") */
+  onlineFull: boolean;
+  offlineFull: boolean;
+  /** Barcha tegishli yo'llar to'lgan — kartadagi yorliqni tanlash uchun */
+  allFull: boolean;
+  /** Qolgan joy soni; null = cheklanmagan yoki noma'lum */
+  onlineSeatsLeft: number | null;
+  offlineSeatsLeft: number | null;
 }
 
 export function enrollmentState(course: CourseEnrollmentFlags): EnrollmentState {
   const format = course.format ?? 'ONLINE';
-  const online = course.onlineEnrollmentOpen !== false;
-  const offline = course.offlineEnrollmentOpen !== false;
+  const onlineFull = course.seats?.online?.full === true;
+  const offlineFull = course.seats?.offline?.full === true;
+  const online = course.onlineEnrollmentOpen !== false && !onlineFull;
+  const offline = course.offlineEnrollmentOpen !== false && !offlineFull;
 
   // Formatga tegishli bo'lmagan bayroq e'tiborga olinmaydi: ONLINE kursda
   // offline bayrog'i yopiq tursa ham u hech narsaga ta'sir qilmasligi kerak.
@@ -43,11 +68,17 @@ export function enrollmentState(course: CourseEnrollmentFlags): EnrollmentState 
   const offlineOpen = format === 'ONLINE' ? false : offline;
 
   const relevant = format === 'HYBRID' ? [online, offline] : format === 'ONLINE' ? [online] : [offline];
+  const relevantFull = format === 'HYBRID' ? [onlineFull, offlineFull] : format === 'ONLINE' ? [onlineFull] : [offlineFull];
 
   return {
     onlineOpen,
     offlineOpen,
     allClosed: relevant.every((open) => !open),
     partiallyClosed: relevant.some((open) => !open) && relevant.some((open) => open),
+    onlineFull: format !== 'OFFLINE' && onlineFull,
+    offlineFull: format !== 'ONLINE' && offlineFull,
+    allFull: relevantFull.every(Boolean),
+    onlineSeatsLeft: course.seats?.online?.left ?? null,
+    offlineSeatsLeft: course.seats?.offline?.left ?? null,
   };
 }
