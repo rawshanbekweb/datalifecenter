@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ENABLED_LOCALES, LOCALE_ENGLISH_LABELS, Locale, DEFAULT_LOCALE } from '../../i18n/config';
+import { ENABLED_LOCALES, LOCALE_ENGLISH_LABELS, Locale, CONTENT_BASE_LOCALE } from '../../i18n/config';
 import { LocalizedString } from '../../types/locale';
 
 interface LocalizedFieldProps {
@@ -17,6 +17,11 @@ interface LocalizedFieldProps {
 // ishlatiladi — ENABLED_LOCALES bo'yicha til-tab beradi. Stage 0'da faqat bitta
 // (UZ) til yoqilgani uchun tab qatori butunlay yashiriladi va oddiy inputdek ko'rinadi;
 // yangi til ENABLED_LOCALES'ga qo'shilishi bilan bu yerda hech narsa o'zgartirish shart emas.
+//
+// DIQQAT: bu yerda CONTENT_BASE_LOCALE (uz) ishlatiladi, DEFAULT_LOCALE emas.
+// Sayt interfeysi qoraqalpoqchada ochilsa ham, bazadagi kontentning majburiy
+// tayanch tili uz bo'lib qoladi (backend validatori shuni talab qiladi va slug
+// title.uz dan yasaladi) — sabab i18n/config.ts izohida.
 export default function LocalizedField({
   label,
   value,
@@ -27,9 +32,9 @@ export default function LocalizedField({
   rows = 3,
 }: LocalizedFieldProps): React.ReactElement {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<Locale>(DEFAULT_LOCALE);
+  const [tab, setTab] = useState<Locale>(CONTENT_BASE_LOCALE);
   const current = value?.[tab] ?? '';
-  const base = value?.[DEFAULT_LOCALE] ?? '';
+  const base = value?.[CONTENT_BASE_LOCALE] ?? '';
   const showTabs = ENABLED_LOCALES.length > 1;
 
   const setTabValue = (v: string): void => {
@@ -72,7 +77,7 @@ export default function LocalizedField({
                     }}
                   >
                     {loc.toUpperCase()}
-                    {missing && loc !== DEFAULT_LOCALE && (
+                    {missing && loc !== CONTENT_BASE_LOCALE && (
                       <span aria-hidden style={{ width: 5, height: 5, borderRadius: '50%', background: '#f59e0b', flexShrink: 0 }} />
                     )}
                   </button>
@@ -88,7 +93,7 @@ export default function LocalizedField({
           lang={tab === 'kaa' ? 'uz' : tab}
           value={current}
           onChange={(e) => setTabValue(e.target.value)}
-          required={required && tab === DEFAULT_LOCALE}
+          required={required && tab === CONTENT_BASE_LOCALE}
           rows={rows}
           style={{ resize: 'none' }}
           placeholder={placeholder}
@@ -99,11 +104,11 @@ export default function LocalizedField({
           lang={tab === 'kaa' ? 'uz' : tab}
           value={current}
           onChange={(e) => setTabValue(e.target.value)}
-          required={required && tab === DEFAULT_LOCALE}
+          required={required && tab === CONTENT_BASE_LOCALE}
           placeholder={placeholder}
         />
       )}
-      {tab !== DEFAULT_LOCALE && !current && (
+      {tab !== CONTENT_BASE_LOCALE && !current && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
           <p style={{ fontSize: 11, color: '#94a3b8' }}>{t('admin.localizedField.untranslated')}</p>
           {base && (

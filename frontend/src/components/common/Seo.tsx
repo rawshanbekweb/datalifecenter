@@ -55,7 +55,8 @@ export default function Seo({ title, description, image, type = 'website', noInd
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Har til uchun muqobil manzil — Google qaysi tildagi versiyani kimga
-          ko'rsatishni shundan biladi. x-default asosiy (o'zbekcha) versiya.
+          ko'rsatishni shundan biladi. x-default = prefikssiz manzil, ya'ni
+          DEFAULT_LOCALE dagi (hozir qoraqalpoqcha) versiya.
           DIQQAT: bu yerda LOCALE_BCP47 ISHLATILMAYDI — unda kaa uchun 'uz-UZ'
           turadi (Intl'da qoraqalpoqcha yo'qligi uchun ataylab), va o'sha qiymat
           hreflang'ga tushsa ikki xil manzil bitta til deb e'lon qilinib,

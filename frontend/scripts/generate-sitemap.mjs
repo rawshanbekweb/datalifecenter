@@ -19,7 +19,10 @@ const SITE = (process.env.VITE_SITE_URL || 'https://datalife.uz').replace(/\/$/,
 const API = (process.env.VITE_API_URL || 'https://datalife.onrender.com/api').replace(/\/$/, '');
 
 const LOCALES = ['uz', 'ru', 'kaa', 'en'];
-const DEFAULT_LOCALE = 'uz';
+// Saytning asosiy tili — prefikssiz manzil shu tilda (frontend/src/i18n/config.ts
+// dagi DEFAULT_LOCALE bilan BIR XIL bo'lishi shart, aks holda sitemap yolg'on
+// manzillarni e'lon qiladi)
+const DEFAULT_LOCALE = 'kaa';
 
 // changefreq/priority — qidiruv tizimlari uchun maslahat, majburiyat emas
 const STATIC_ROUTES = [

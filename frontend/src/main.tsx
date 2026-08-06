@@ -9,7 +9,7 @@ import ServerWakeBanner from './components/common/ServerWakeBanner'
 import { AuthProvider } from './context/AuthContext'
 import EngagementProvider from './context/EngagementProvider'
 import { LocaleProvider } from './context/LocaleContext'
-import { detectLocale } from './i18n/locale'
+import { canonicalizeDefaultLocalePath, detectLocale } from './i18n/locale'
 import { initI18n } from './i18n/i18n'
 
 // VITE_SENTRY_DSN berilgan bo'lsa frontend xatolari Sentry'ga yuboriladi.
@@ -26,6 +26,9 @@ if (import.meta.env.VITE_SENTRY_DSN) {
   })
 }
 
+// Eski /kaa/... havolalari (asosiy til prefiksli edi) prefikssiz shaklga
+// keltiriladi — router yaratilishidan OLDIN, aks holda basename mos kelmasdi
+canonicalizeDefaultLocalePath()
 const { locale, basename } = detectLocale()
 // SEO va screen-reader'lar uchun hujjat tili URL'dagi localega mos bo'lishi kerak
 document.documentElement.lang = locale
