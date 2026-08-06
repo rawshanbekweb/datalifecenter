@@ -8,19 +8,36 @@ const SUBSCRIPTION_DAYS = 30;
 const DEFAULT_SUBSCRIPTION_PRICE = 99000;
 const DEFAULT_SUBSCRIPTION_CURRENCY = 'UZS';
 
-// Narx admin panelidan (SiteSetting "subscription_plan" bo'limi) o'qiladi —
-// yangi model shart emas, mavjud umumiy JSON-ombor qayta ishlatiladi.
-export async function getSubscriptionPlan(): Promise<{ price: number; currency: string }> {
+// Narx va bo'limning ochiq-yopiqligi admin panelidan (SiteSetting
+// "subscription_plan" bo'limi) o'qiladi — yangi model shart emas, mavjud umumiy
+// JSON-ombor qayta ishlatiladi.
+export async function getSubscriptionPlan(): Promise<{ price: number; currency: string; enabled: boolean }> {
   const setting = await prisma.siteSetting.findUnique({ where: { section: 'subscription_plan' } });
-  const data = setting?.data as { price?: number; currency?: string } | undefined;
+  const data = setting?.data as { price?: number; currency?: string; enabled?: boolean } | undefined;
   return {
     price: data?.price ?? DEFAULT_SUBSCRIPTION_PRICE,
     currency: data?.currency ?? DEFAULT_SUBSCRIPTION_CURRENCY,
+    // Sozlama yo'q = yopiq. Bo'lim ochilishi uchun admin aniq belgilashi kerak.
+    enabled: data?.enabled === true,
   };
 }
 
 export async function getSubscriptionPrice(): Promise<number> {
   return (await getSubscriptionPlan()).price;
+}
+
+// Obuna yopiq bo'lganda talaba tomonidagi har qanday yangi harakat bloklanadi
+// (yaratish, chek yuborish, shlyuz orqali to'lash). Adminning mavjud obunalarni
+// ko'rish/tasdiqlash imkoni saqlanib qoladi va faol obuna kirishni ochib
+// turaveradi — bo'lim yopilishi hech kimning kirishini tortib olmasin.
+export async function assertSubscriptionsEnabled(): Promise<void> {
+  const { enabled } = await getSubscriptionPlan();
+  if (!enabled) {
+    throw ApiError.forbidden(
+      "Obuna bo'limi hozircha yopiq — kursga kirishni administrator ochadi",
+      'SUBSCRIPTIONS_DISABLED'
+    );
+  }
 }
 
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
@@ -32,6 +49,8 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
 }
 
 export async function createSubscription(userId: string) {
+  await assertSubscriptionsEnabled();
+
   const existing = await prisma.subscription.findFirst({
     where: {
       userId,
@@ -236,6 +255,8 @@ export async function cancelSubscriptionPayment(subscriptionId: string) {
 }
 
 export async function submitSubscriptionReceipt(userId: string, subscriptionId: string, receiptUrl: string) {
+  await assertSubscriptionsEnabled();
+
   const subscription = await prisma.subscription.findUnique({ where: { id: subscriptionId } });
   if (!subscription || subscription.userId !== userId) {
     throw ApiError.notFound('Obuna topilmadi');

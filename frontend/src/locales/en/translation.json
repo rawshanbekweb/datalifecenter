@@ -4,6 +4,7 @@
     "serverWaking": "The server is waking up, please wait...",
     "save": "Save",
     "saving": "Saving...",
+    "saved": "Saved",
     "sending": "Sending...",
     "cancel": "Cancel",
     "edit": "Edit",
@@ -322,8 +323,8 @@
       "loginAndEnroll": "Log in and enroll",
       "enrolledSuccess": "You have successfully enrolled!",
       "startLessons": "Start lessons",
-      "pendingInfo": "Your request has been received — your enrollment activates after payment. You can pay on the course card in your dashboard.",
-      "goPay": "Go to payment",
+      "pendingInfo": "Your request has been received — your enrollment activates once an administrator confirms the payment. Payment is handled at the training centre; no online transfer is needed.",
+      "goPay": "Go to dashboard",
       "alreadyEnrolled": "You are already enrolled in this course.",
       "continueLessons": "Continue lessons",
       "freePrompt": "This course is free — you can start right now.",
@@ -460,16 +461,13 @@
   },
   "payment": {
     "amount": "Payment amount:",
-    "card": "Card number:",
-    "note": "Include your full name in the payment note, then upload a photo of the receipt here.",
     "online": "Pay online (faster):",
     "redirecting": "Redirecting...",
     "payClick": "Pay with Click",
     "payPayme": "Pay with Payme",
-    "orManual": "...or transfer manually and upload the receipt below:",
-    "receiptLabel": "Payment receipt (image)",
-    "sendReceipt": "Submit receipt",
-    "sendErrorRetry": "Failed to send. Please try again."
+    "adminOnlyTitle": "Payment is handled by an administrator",
+    "adminOnlyText": "You pay at the training centre. Once an administrator confirms the payment, the course opens in your dashboard automatically — no online transfer needed.",
+    "contactAdmin": "Message the administrator"
   },
   "student": {
     "dashboard": {
@@ -497,9 +495,10 @@
       "leaveReview": "Leave a review",
       "resubmit": "Resubmit",
       "pay": "Pay",
+      "paymentInfo": "Payment details",
       "receiptSent": "Receipt sent — the course opens once an administrator confirms it.",
       "rejectedPrefix": "Payment rejected",
-      "rejectedSuffix": "Please upload a valid receipt again.",
+      "rejectedSuffix": "Please contact an administrator for details.",
       "rating": "Rating",
       "reviewPlaceholder": "Share your thoughts about the course...",
       "saveReview": "Save review",
@@ -537,7 +536,9 @@
       "perMonth": "/ month",
       "fullAccess": "Full access to all courses — no limits.",
       "starting": "Starting...",
-      "subscribe": "Subscribe"
+      "subscribe": "Subscribe",
+      "disabledTitle": "Subscriptions are closed for now",
+      "disabledText": "Course access is currently granted by an administrator — subscription payments are not accepted. Message the administrator if you have questions."
     },
     "learn": {
       "forbiddenTitle": "Access restricted",
@@ -927,6 +928,8 @@
       "searchPlaceholder": "Student...",
       "empty": "No subscriptions found.",
       "planPrice": "Monthly subscription price",
+      "enabledLabel": "Subscriptions enabled",
+      "enabledHint": "When off, students see no \"Subscription\" section and cannot create a new one — an administrator grants course access from \"Enrollments\" instead. Existing subscriptions and their history stay untouched.",
       "expiresLabel": "Expires: {{date}}",
       "viewReceipt": "View receipt",
       "approvePayment": "Approve payment",

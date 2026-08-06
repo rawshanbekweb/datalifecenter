@@ -91,6 +91,10 @@ export const contactSchema = z.object({
 });
 
 export const subscriptionPlanSchema = z.object({
+  // Obuna bo'limining yagona kaliti. Sozlama umuman yo'q bo'lsa ham bo'lim
+  // YOPIQ hisoblanadi (default false) — hozircha to'lov admin orqali
+  // rasmiylashtiriladi, talaba saytda pul o'tkazmaydi.
+  enabled: z.boolean().default(false),
   price: z.coerce.number().min(0, 'Narx manfiy bo\'lmasin'),
   currency: z.string().min(1, 'Valyuta kerak').max(10),
 });

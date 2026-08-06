@@ -43,11 +43,11 @@ interface FormState {
 type ContactStatus = 'idle' | 'loading' | 'success' | 'error';
 
 const DEFAULT_CONTACT: Required<ContactSettings> = {
-  phone: '+998 99 208 11 77',
+  phone: '+998 91 383 68 08',
   telegram: '@datalifecentre',
   email: 'info@datalife.uz',
-  address: "Nukus, Qoraqalpog'iston Respublikasi, O'zbekiston",
-  addressSub: 'FJ67+2WX',
+  address: "Ayimxan Shamuratova ko'chasi, Nukus",
+  addressSub: 'IT Park, 11-qavat',
   hours: [
     { day: 'Dushanba — Juma', time: '09:00 — 18:00', closed: false },
     { day: 'Shanba', time: '09:00 — 18:00', closed: false },

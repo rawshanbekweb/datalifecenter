@@ -6,6 +6,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUnreadMessages } from '../hooks/useUnreadMessages';
+import { useSubscriptionsEnabled } from '../hooks/useSubscriptionsEnabled';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 import { Z } from '../utils/zLayers';
@@ -18,6 +19,8 @@ interface NavItem {
   end?: boolean;
   /** O'qilmagan xabarlar soni shu bo'limda ko'rsatiladi */
   badge?: boolean;
+  /** Obuna bo'limi yopiq bo'lsa havola umuman ko'rsatilmaydi ([[useSubscriptionsEnabled]]) */
+  requiresSubscriptions?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -25,7 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: 'cabinet.nav.sessions',      to: '/student/sessions',     icon: Video },
   { labelKey: 'cabinet.nav.assignments',   to: '/student/assignments',  icon: ClipboardList },
   { labelKey: 'cabinet.nav.messages',      to: '/student/messages',     icon: MessagesSquare, badge: true },
-  { labelKey: 'cabinet.nav.subscription',  to: '/student/subscription', icon: Wallet },
+  { labelKey: 'cabinet.nav.subscription',  to: '/student/subscription', icon: Wallet, requiresSubscriptions: true },
   { labelKey: 'cabinet.nav.certificates',  to: '/student/certificates', icon: Award },
   { labelKey: 'cabinet.nav.profile',       to: '/student/profile',      icon: UserRound },
 ];
@@ -34,6 +37,8 @@ const NAV_ITEMS: NavItem[] = [
 export default function StudentLayout(): React.ReactElement {
   const { t } = useTranslation();
   const unreadMessages = useUnreadMessages();
+  const subscriptionsEnabled = useSubscriptionsEnabled();
+  const navItems = NAV_ITEMS.filter((item) => !item.requiresSubscriptions || subscriptionsEnabled === true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -59,7 +64,7 @@ export default function StudentLayout(): React.ReactElement {
       </Link>
 
       <nav style={{ padding:'14px 12px', display:'flex', flexDirection:'column', gap:2, flex:1, overflowY:'auto' }}>
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink key={item.to} to={item.to} end={item.end} onClick={() => setMenuOpen(false)}

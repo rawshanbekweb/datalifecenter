@@ -119,11 +119,11 @@ const SITE_SETTINGS: { section: string; data: unknown }[] = [
   {
     section: 'contact',
     data: {
-      phone: '+998 99 208 11 77',
+      phone: '+998 91 383 68 08',
       telegram: '@datalife_uz',
       email: 'info@datalife.uz',
-      address: "Qoraqolpog'iston, Nukus",
-      addressSub: { uz: "Amir Temur ko'chasi, 108" },
+      address: "Ayimxan Shamuratova ko'chasi, Nukus",
+      addressSub: { uz: 'IT Park, 11-qavat' },
       hours: [
         { day: { uz: 'Dushanba — Juma' }, time: '09:00 — 19:00', closed: false },
         { day: { uz: 'Shanba' }, time: '09:00 — 19:00', closed: false },

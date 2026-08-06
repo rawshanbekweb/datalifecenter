@@ -38,9 +38,14 @@ const STATUS_FILTERS: { value: string; labelKey: string }[] = [
   { value: 'CANCELLED', labelKey: 'admin.subStatus.CANCELLED' },
 ];
 
+// Obuna bo'limining kaliti shu yerda. O'chirilgan holatda talaba kabinetida
+// "Obuna" havolasi ko'rinmaydi va backend yangi obuna yaratishni 403 bilan
+// rad etadi (subscriptions.service.ts). Ro'yxat va tarix esa shu sahifada
+// qolaveradi — bo'limni istalgan payt qayta yoqish uchun kodga qaytish shart emas.
 function PlanPriceCard(): React.ReactElement {
   const { t } = useTranslation();
   const toast = useToast();
+  const [enabled, setEnabled] = useState<boolean>(false);
   const [price, setPrice] = useState<string>('');
   const [currency, setCurrency] = useState<string>('UZS');
   const [status, setStatus] = useState<'loading' | 'ready' | 'saving'>('loading');
@@ -48,7 +53,8 @@ function PlanPriceCard(): React.ReactElement {
   useEffect(() => {
     getSiteSettings()
       .then((settings) => {
-        const data = settings.subscription_plan as { price?: number; currency?: string } | undefined;
+        const data = settings.subscription_plan as { price?: number; currency?: string; enabled?: boolean } | undefined;
+        setEnabled(data?.enabled === true);
         setPrice(String(data?.price ?? 99000));
         setCurrency(data?.currency ?? 'UZS');
         setStatus('ready');
@@ -59,7 +65,8 @@ function PlanPriceCard(): React.ReactElement {
   const save = async () => {
     setStatus('saving');
     try {
-      await updateSiteSettingSection('subscription_plan', { price: Number(price), currency });
+      await updateSiteSettingSection('subscription_plan', { enabled, price: Number(price), currency });
+      toast.success(t('common.saved'));
     } catch (err: unknown) {
       toast.error((err as Error).message || t('common.error'));
     } finally {
@@ -68,18 +75,26 @@ function PlanPriceCard(): React.ReactElement {
   };
 
   return (
-    <div className="card" style={{ padding: 16, marginBottom: 18, display: 'flex', alignItems: 'flex-end', gap: 10, flexWrap: 'wrap' }}>
-      <div>
-        <p style={{ fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>{t('admin.subscriptions.planPrice')}</p>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input className="inp" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} style={{ width: 140 }} />
-          <input className="inp" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: 80 }} />
+    <div className="card" style={{ padding: 16, marginBottom: 18 }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 9, cursor: 'pointer', marginBottom: 6 }}>
+        <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0f172a' }}>{t('admin.subscriptions.enabledLabel')}</span>
+      </label>
+      <p style={{ fontSize: 12, color: '#64748b', marginBottom: 14, maxWidth: 620 }}>{t('admin.subscriptions.enabledHint')}</p>
+
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, flexWrap: 'wrap' }}>
+        <div>
+          <p style={{ fontSize: 11.5, fontWeight: 700, color: '#64748b', marginBottom: 6 }}>{t('admin.subscriptions.planPrice')}</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input className="inp" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} disabled={!enabled} style={{ width: 140, opacity: enabled ? 1 : 0.55 }} />
+            <input className="inp" value={currency} onChange={(e) => setCurrency(e.target.value)} disabled={!enabled} style={{ width: 80, opacity: enabled ? 1 : 0.55 }} />
+          </div>
         </div>
+        <button onClick={save} disabled={status === 'loading' || status === 'saving'} className="btn-primary"
+          style={{ fontSize: 12.5, padding: '9px 16px', opacity: status === 'saving' ? 0.6 : 1 }}>
+          {status === 'saving' ? t('common.saving') : t('common.save')}
+        </button>
       </div>
-      <button onClick={save} disabled={status === 'loading' || status === 'saving'} className="btn-primary"
-        style={{ fontSize: 12.5, padding: '9px 16px', opacity: status === 'saving' ? 0.6 : 1 }}>
-        {status === 'saving' ? t('common.saving') : t('common.save')}
-      </button>
     </div>
   );
 }

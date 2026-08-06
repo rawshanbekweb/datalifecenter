@@ -3,16 +3,13 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { downloadCertificate, getMyEnrollments, mockPayEnrollment, submitReceipt } from '../api/enrollments';
+import { downloadCertificate, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { getMyCourseReview, submitCourseReview } from '../api/reviews';
-import { getPaymentConfig, createCheckout, PaymentConfig } from '../api/payments';
 import { resolveIcon } from '../utils/iconMap';
 import { formatDate, formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
 import MyCourseRequestsPanel from '../components/courses/MyCourseRequestsPanel';
-import FileUpload from '../components/common/FileUpload';
-import { PAYMENT_INFO } from '../config/payment';
 import Loading from '../components/common/Loading';
 
 interface CourseInfo {
@@ -56,18 +53,13 @@ const STATUS_LABELS: Record<string, StatusLabel> = {
 interface EnrollmentRowProps {
   enrollment: Enrollment;
   onPaid: (paid: Enrollment) => void;
-  paymentConfig: PaymentConfig;
 }
 
-function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps): React.ReactElement {
+function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactElement {
   const { t } = useTranslation();
   const [payStatus, setPayStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [payOpen, setPayOpen]     = useState<boolean>(false);
-  const [receiptUrl, setReceiptUrl] = useState<string>('');
-  const [receiptState, setReceiptState] = useState<'idle' | 'sending' | 'error'>('idle');
   const [certState, setCertState] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [gatewayLoading, setGatewayLoading] = useState<'click' | 'payme' | ''>('');
-  const [gatewayError, setGatewayError] = useState<string>('');
   const Icon = resolveIcon(enrollment.course.iconKey);
   const s = STATUS_LABELS[enrollment.status];
 
@@ -82,30 +74,6 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
       onPaid(paid);
     } catch {
       setPayStatus('error');
-    }
-  };
-
-  const payWithGateway = async (provider: 'click' | 'payme') => {
-    setGatewayLoading(provider);
-    setGatewayError('');
-    try {
-      const { url } = await createCheckout({ kind: 'enrollment', enrollmentId: enrollment.id }, provider);
-      window.location.href = url;
-    } catch (err: unknown) {
-      setGatewayError((err as Error).message || t('common.error'));
-      setGatewayLoading('');
-    }
-  };
-
-  const sendReceipt = async () => {
-    if (!receiptUrl.trim()) return;
-    setReceiptState('sending');
-    try {
-      const updated = await submitReceipt(enrollment.id, receiptUrl.trim());
-      setPayOpen(false);
-      onPaid(updated);
-    } catch {
-      setReceiptState('error');
     }
   };
 
@@ -199,9 +167,9 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
         </button>
       )}
       {awaitingPayment && (
-        <button onClick={() => setPayOpen((v) => !v)} className="btn-primary"
+        <button onClick={() => setPayOpen((v) => !v)} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
-          <CreditCard size={13} /> {paymentRejected ? t('student.dashboard.resubmit') : t('student.dashboard.pay')}
+          <CreditCard size={13} /> {t('student.dashboard.paymentInfo')}
         </button>
       )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
@@ -235,51 +203,30 @@ function EnrollmentRow({ enrollment, onPaid, paymentConfig }: EnrollmentRowProps
       </div>
     )}
 
+    {/* To'lov saytda qabul qilinmaydi: talaba markazda naqd/karta orqali to'laydi,
+        administrator esa /admin/enrollments dan tasdiqlaydi va kurs shunda ochiladi.
+        Shu sababli bu yerda karta raqami ham, chek yuklash ham yo'q — faqat summa
+        va adminga yo'l ko'rsatiladi. */}
     {awaitingPayment && payOpen && (
       <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
-        <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>
+        <p style={{ fontSize: 13.5, fontWeight: 800, color: '#0f172a', marginBottom: 12 }}>
           {t('payment.amount')}{' '}
           <span style={{ color: enrollment.course.color }}>
             {enrollment.course.price ? `${formatNumber(Number(enrollment.course.price))} ${enrollment.course.currency || 'UZS'}` : '—'}
           </span>
         </p>
-        <p style={{ fontSize: 12.5, color: '#475569', marginBottom: 2 }}>
-          {t('payment.card')} <b style={{ color: '#0f172a', letterSpacing: 0.5 }}>{PAYMENT_INFO.cardNumber}</b> ({PAYMENT_INFO.cardOwner})
-        </p>
-        <p style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>{t('payment.note')}</p>
-
-        {(paymentConfig.click || paymentConfig.payme) && (
-          <div style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #f1f5f9' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 8 }}>{t('payment.online')}</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {paymentConfig.click && (
-                <button onClick={() => payWithGateway('click')} disabled={gatewayLoading !== ''} className="btn-primary"
-                  style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
-                  <Wallet size={14} /> {gatewayLoading === 'click' ? t('payment.redirecting') : t('payment.payClick')}
-                </button>
-              )}
-              {paymentConfig.payme && (
-                <button onClick={() => payWithGateway('payme')} disabled={gatewayLoading !== ''} className="btn-primary"
-                  style={{ fontSize: 12.5, padding: '9px 16px', opacity: gatewayLoading !== '' ? 0.6 : 1 }}>
-                  <Wallet size={14} /> {gatewayLoading === 'payme' ? t('payment.redirecting') : t('payment.payPayme')}
-                </button>
-              )}
-            </div>
-            {gatewayError && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 8 }}>{gatewayError}</p>}
-            <p style={{ fontSize: 11.5, color: '#94a3b8', marginTop: 10 }}>{t('payment.orManual')}</p>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: 12 }}>
+          <Wallet size={15} style={{ color: '#0ea5e9', flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <p style={{ fontSize: 12.5, fontWeight: 700, color: '#0f172a', marginBottom: 3 }}>{t('payment.adminOnlyTitle')}</p>
+            <p style={{ fontSize: 12.5, color: '#475569' }}>{t('payment.adminOnlyText')}</p>
           </div>
-        )}
-
-        <FileUpload value={receiptUrl} onChange={setReceiptUrl} kind="image" label={t('payment.receiptLabel')} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
-          <button onClick={sendReceipt} disabled={!receiptUrl.trim() || receiptState === 'sending'} className="btn-primary"
-            style={{ fontSize: 12.5, padding: '9px 16px', opacity: !receiptUrl.trim() || receiptState === 'sending' ? 0.6 : 1 }}>
-            {receiptState === 'sending' ? t('common.sending') : t('payment.sendReceipt')}
-          </button>
-          {receiptState === 'error' && (
-            <span style={{ fontSize: 12, color: '#dc2626' }}>{t('payment.sendErrorRetry')}</span>
-          )}
         </div>
+        <Link to="/student/messages" style={{ textDecoration: 'none' }}>
+          <button className="btn-outline" style={{ fontSize: 12.5, padding: '9px 16px' }}>
+            <MessageSquare size={14} /> {t('payment.contactAdmin')}
+          </button>
+        </Link>
       </div>
     )}
 
@@ -317,7 +264,6 @@ export default function DashboardPage(): React.ReactElement {
   const { user } = useAuth();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [status, setStatus]           = useState<'loading' | 'ready' | 'error'>('loading');
-  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ click: false, payme: false });
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -325,9 +271,6 @@ export default function DashboardPage(): React.ReactElement {
     getMyEnrollments()
       .then((data: Enrollment[]) => { if (!cancelled) { setEnrollments(data); setStatus('ready'); } })
       .catch(() => { if (!cancelled) setStatus('error'); });
-    getPaymentConfig()
-      .then((cfg) => { if (!cancelled) setPaymentConfig(cfg); })
-      .catch(() => {});
     return () => { cancelled = true; };
   }, []);
 
@@ -412,7 +355,7 @@ export default function DashboardPage(): React.ReactElement {
         {status === 'ready' && enrollments.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {enrollments.map((e) => (
-              <EnrollmentRow key={e.id} enrollment={e} paymentConfig={paymentConfig}
+              <EnrollmentRow key={e.id} enrollment={e}
                 onPaid={(paid) => setEnrollments((prev) => prev.map((x) => x.id === paid.id ? { ...x, ...paid, progress: paid.progress ?? x.progress } : x))} />
             ))}
           </div>

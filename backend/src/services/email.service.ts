@@ -149,12 +149,14 @@ export async function sendPaymentRejectedEmail(
   await sendMail({
     to,
     subject: `DATA LIFE — to'lov rad etildi: ${courseTitle}`,
-    text: `Salom, ${name}!\n\n"${courseTitle}" kursi uchun yuborgan to'lov chekingiz rad etildi.\nSabab: ${reason}\n\nIltimos, to'g'ri chekni qayta yuklang.`,
+    // To'lov saytda qabul qilinmaydi, shuning uchun "chekni qayta yuklang" deb
+    // aytilmaydi — talaba administrator bilan bog'lanishi kerak.
+    text: `Salom, ${name}!\n\n"${courseTitle}" kursi uchun to'lov tasdiqlanmadi.\nSabab: ${reason}\n\nAniqlashtirish uchun administrator bilan bog'laning.`,
     html: layout(
       "To'lov rad etildi",
-      `<p style="font-size:14px;color:#475569">Salom, <b>${name}</b>! <b>"${courseTitle}"</b> kursi uchun yuborgan to'lov chekingiz rad etildi.</p>
+      `<p style="font-size:14px;color:#475569">Salom, <b>${name}</b>! <b>"${courseTitle}"</b> kursi uchun to'lov tasdiqlanmadi.</p>
        <p style="font-size:14px;color:#0f172a;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 16px"><b>Sabab:</b> ${reason}</p>
-       <p style="font-size:13px;color:#64748b">Iltimos, to'g'ri to'lov chekini shaxsiy kabinetingizdan qayta yuklang.</p>`
+       <p style="font-size:13px;color:#64748b">Aniqlashtirish uchun administrator bilan bog'laning — kurs to'lovi o'quv markazida rasmiylashtiriladi.</p>`
     ),
   });
 }

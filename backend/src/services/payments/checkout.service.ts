@@ -4,7 +4,7 @@ import { ApiError } from '../../utils/ApiError';
 import { clickEnabled, buildClickCheckoutUrl } from './click.service';
 import { paymeEnabled, buildPaymeCheckoutUrl } from './payme.service';
 import { encodeOrderId } from './order';
-import { getSubscriptionPrice } from '../subscriptions.service';
+import { assertSubscriptionsEnabled, getSubscriptionPrice } from '../subscriptions.service';
 
 export function getPaymentConfig() {
   return { click: clickEnabled, payme: paymeEnabled };
@@ -36,6 +36,7 @@ export async function createCheckout(userId: string, target: CheckoutTarget, pro
     amount = Number(enrollment.course.price ?? 0);
     returnPath = '/dashboard?payment=return';
   } else {
+    await assertSubscriptionsEnabled();
     const subscription = await prisma.subscription.findUnique({ where: { id: target.subscriptionId } });
     if (!subscription || subscription.userId !== userId) {
       throw ApiError.notFound('Obuna topilmadi');

@@ -4,6 +4,7 @@
     "serverWaking": "Server oyanıp atır, azǵana kútiń...",
     "save": "Saqlaw",
     "saving": "Saqlanıp atır...",
+    "saved": "Saqlandı",
     "sending": "Jiberilip atır...",
     "cancel": "Biykar etiw",
     "edit": "Ózgertiw",
@@ -322,8 +323,8 @@
       "loginAndEnroll": "Kiriw hám jazılıw",
       "enrolledSuccess": "Tabıslı jazıldıńız!",
       "startLessons": "Sabaqlardı baslaw",
-      "pendingInfo": "Sorawıńız qabıl etildi — jazılıwıńız tólemnen keyin aktivlesedi. Tólemdi jeke kabinetińizdegi kurs kartasında ámelge asırıń.",
-      "goPay": "Tólemge ótiw",
+      "pendingInfo": "Sorawıńız qabıl etildi — jazılıwıńız administrator tólemdi tastıyıqlaǵannan keyin aktivlesedi. Tólem oqıw orayında rásmiylestiriledi, saytta pul ótkeriw shárt emes.",
+      "goPay": "Kabinetke ótiw",
       "alreadyEnrolled": "Siz bul kursqa álleqashan jazılǵansız.",
       "continueLessons": "Sabaqlardı dawam ettiriw",
       "freePrompt": "Bul kurs biypul — házir-aq baslawıńız múmkin.",
@@ -460,16 +461,13 @@
   },
   "payment": {
     "amount": "Tólem summası:",
-    "card": "Karta nomeri:",
-    "note": "Tólem izahına atı-familiyańızdı jazıń, keyin chek súwretin usı jerge júkleń.",
     "online": "Onlayn tólew (tezirek):",
     "redirecting": "Baǵdarlanıp atır...",
     "payClick": "Click arqalı tólew",
     "payPayme": "Payme arqalı tólew",
-    "orManual": "...yamasa qolda ótkerip, chekti tómende júkleń:",
-    "receiptLabel": "Tólem chegi (súwret)",
-    "sendReceipt": "Chekti jiberiw",
-    "sendErrorRetry": "Jiberiwde qátelik. Qayta urınıp kóriń."
+    "adminOnlyTitle": "Tólem administrator arqalı rásmiylestiriledi",
+    "adminOnlyText": "Tólemdi oqıw orayında ámelge asırasız. Administrator tólemdi tastıyıqlaǵannan keyin kurs kabinetińizde avtomat ashıladı — saytta pul ótkeriw shárt emes.",
+    "contactAdmin": "Adminge jazıw"
   },
   "student": {
     "dashboard": {
@@ -497,9 +495,10 @@
       "leaveReview": "Pikir qaldırıw",
       "resubmit": "Qayta jiberiw",
       "pay": "Tólew",
+      "paymentInfo": "Tólem haqqında",
       "receiptSent": "Chek jiberildi — administrator tastıyıqlawı menen kurs ashıladı.",
       "rejectedPrefix": "Tólem qabıl etilmedi",
-      "rejectedSuffix": "Ótinish, durıs chekti qayta júkleń.",
+      "rejectedSuffix": "Anıqlastırıw ushın administrator menen baylanısıń.",
       "rating": "Reyting",
       "reviewPlaceholder": "Kurs haqqında pikirińizdi jazıń...",
       "saveReview": "Pikirdi saqlaw",
@@ -537,7 +536,9 @@
       "perMonth": "/ ay",
       "fullAccess": "Barlıq kurslarǵa tolıq kiriw — sheklewsiz.",
       "starting": "Baslanıp atır...",
-      "subscribe": "Jazılıw"
+      "subscribe": "Jazılıw",
+      "disabledTitle": "Jazılım bólimi házirshe jabıq",
+      "disabledText": "Házirshe kurslarǵa kiriwdi administrator ashadı — jazılım tólemi qabıl etilmeydi. Sorawıńız bolsa, adminge jazıń."
     },
     "learn": {
       "forbiddenTitle": "Kiriw jabıq",
@@ -927,6 +928,8 @@
       "searchPlaceholder": "Student...",
       "empty": "Obunalar tabılmadı.",
       "planPrice": "Aylıq obuna bahası",
+      "enabledLabel": "Jazılım bólimi qosılǵan",
+      "enabledHint": "Óshirilgende studenttiń kabinetinde \"Jazılım\" bólimi kórinbeydi hám jańa jazılım jaratıp bolmaydı — kursqa kiriwdi administrator \"Jazılıwlar\" bóliminen ashadı. Bar jazılımlar dizimi hám aktiv jazılımlar sonday qaladı.",
       "expiresLabel": "Múddeti: {{date}}",
       "viewReceipt": "Chekti kóriw",
       "approvePayment": "Tólemdi tastıyıqlaw",

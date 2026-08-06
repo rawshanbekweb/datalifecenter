@@ -14,8 +14,20 @@ async function publishCourse(title: string): Promise<string> {
   return res.body.data.id;
 }
 
+// Obuna bo'limi standart holatda YOPIQ (subscription_plan.enabled = false) —
+// hozircha to'lov admin orqali rasmiylashtiriladi. Testlar uni ataylab yoqadi.
+async function setSubscriptionsEnabled(enabled: boolean): Promise<void> {
+  const data = { enabled, price: 99000, currency: 'UZS' };
+  await prisma.siteSetting.upsert({
+    where: { section: 'subscription_plan' },
+    update: { data },
+    create: { section: 'subscription_plan', data },
+  });
+}
+
 beforeAll(async () => {
   await resetDb();
+  await setSubscriptionsEnabled(true);
   await createUser('admin@test.uz', 'ADMIN');
   const studentUser = await createUser('student@test.uz', 'STUDENT');
   studentId = studentUser.id;
@@ -136,5 +148,25 @@ describe('Click/Payme orqali obuna to\'lovi', () => {
     const subscription = await prisma.subscription.findUnique({ where: { id: subscriptionId } });
     expect(subscription?.status).toBe('ACTIVE');
     expect(subscription?.provider).toBe('payme');
+  });
+});
+
+describe("Obuna bo'limi yopilganda", () => {
+  it('talaba yangi obuna yarata olmaydi (403 SUBSCRIPTIONS_DISABLED)', async () => {
+    await setSubscriptionsEnabled(false);
+    const freshStudent = await createUser(`disabled-${Date.now()}@test.uz`, 'STUDENT');
+    const freshAgent = await loginAgent(freshStudent.email);
+
+    const res = await freshAgent.post('/api/subscriptions').expect(403);
+    expect(res.body.error.code).toBe('SUBSCRIPTIONS_DISABLED');
+  });
+
+  it('faol obuna kirishni ochib turaveradi — bo\'lim yopilishi kirishni tortib olmaydi', async () => {
+    const course = await publishCourse('Yopiq bo\'lim - faol obuna');
+    const slug = (await prisma.course.findUniqueOrThrow({ where: { id: course } })).slug;
+
+    // Birinchi describe'dagi student obunasi hali faol
+    const res = await student.get(`/api/courses/${slug}/learn`).expect(200);
+    expect(res.body.data.enrollment.provider).toBe('subscription');
   });
 });

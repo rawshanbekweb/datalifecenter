@@ -4,6 +4,7 @@
     "serverWaking": "Server uyg'onmoqda, biroz kuting...",
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
+    "saved": "Saqlandi",
     "sending": "Yuborilmoqda...",
     "cancel": "Bekor qilish",
     "edit": "Tahrirlash",
@@ -322,8 +323,8 @@
       "loginAndEnroll": "Kirish va yozilish",
       "enrolledSuccess": "Muvaffaqiyatli yozildingiz!",
       "startLessons": "Darslarni boshlash",
-      "pendingInfo": "So'rovingiz qabul qilindi — yozilishingiz to'lovdan so'ng faollashadi. To'lovni shaxsiy kabinetingizdagi kurs kartasida amalga oshiring.",
-      "goPay": "To'lovga o'tish",
+      "pendingInfo": "So'rovingiz qabul qilindi — yozilishingiz administrator to'lovni tasdiqlagach faollashadi. To'lov o'quv markazida rasmiylashtiriladi, saytda pul o'tkazish shart emas.",
+      "goPay": "Kabinetga o'tish",
       "alreadyEnrolled": "Siz bu kursga allaqachon yozilgansiz.",
       "continueLessons": "Darslarni davom ettirish",
       "freePrompt": "Bu kurs bepul — hoziroq boshlashingiz mumkin.",
@@ -460,16 +461,13 @@
   },
   "payment": {
     "amount": "To'lov summasi:",
-    "card": "Karta raqami:",
-    "note": "To'lov izohiga ism-familiyangizni yozing, keyin chek rasmini shu yerga yuklang.",
     "online": "Onlayn to'lash (tezroq):",
     "redirecting": "Yo'naltirilmoqda...",
     "payClick": "Click orqali to'lash",
     "payPayme": "Payme orqali to'lash",
-    "orManual": "...yoki qo'lda o'tkazib, chekni pastda yuklang:",
-    "receiptLabel": "To'lov cheki (rasm)",
-    "sendReceipt": "Chekni yuborish",
-    "sendErrorRetry": "Yuborishda xatolik. Qayta urinib ko'ring."
+    "adminOnlyTitle": "To'lov administrator orqali rasmiylashtiriladi",
+    "adminOnlyText": "To'lovni o'quv markazida amalga oshirasiz. Administrator to'lovni tasdiqlagach, kurs kabinetingizda avtomatik ochiladi — saytda pul o'tkazish shart emas.",
+    "contactAdmin": "Adminga yozish"
   },
   "student": {
     "dashboard": {
@@ -497,9 +495,10 @@
       "leaveReview": "Sharh qoldirish",
       "resubmit": "Qayta yuborish",
       "pay": "To'lov qilish",
+      "paymentInfo": "To'lov haqida",
       "receiptSent": "Chek yuborildi — administrator tasdiqlashi bilan kurs ochiladi.",
       "rejectedPrefix": "To'lov rad etildi",
-      "rejectedSuffix": "Iltimos, to'g'ri chekni qayta yuklang.",
+      "rejectedSuffix": "Aniqlashtirish uchun administrator bilan bog'laning.",
       "rating": "Reyting",
       "reviewPlaceholder": "Kurs haqida fikringizni yozing...",
       "saveReview": "Sharhni saqlash",
@@ -537,7 +536,9 @@
       "perMonth": "/ oy",
       "fullAccess": "Barcha kurslarga to'liq kirish — cheklovsiz.",
       "starting": "Boshlanmoqda...",
-      "subscribe": "Obuna bo'lish"
+      "subscribe": "Obuna bo'lish",
+      "disabledTitle": "Obuna bo'limi hozircha yopiq",
+      "disabledText": "Hozircha kurslarga kirish administrator orqali ochiladi — obuna to'lovi qabul qilinmaydi. Savolingiz bo'lsa, adminga yozing."
     },
     "learn": {
       "forbiddenTitle": "Kirish yopiq",
@@ -927,6 +928,8 @@
       "searchPlaceholder": "Talaba...",
       "empty": "Obunalar topilmadi.",
       "planPrice": "Oylik obuna narxi",
+      "enabledLabel": "Obuna bo'limi yoqilgan",
+      "enabledHint": "O'chirilganda talaba kabinetida \"Obuna\" bo'limi ko'rinmaydi va yangi obuna yaratib bo'lmaydi — kursga kirishni administrator \"Yozilishlar\" bo'limidan ochadi. Mavjud obunalar ro'yxati va faol obunalar shu holicha qoladi.",
       "expiresLabel": "Muddati: {{date}}",
       "viewReceipt": "Chekni ko'rish",
       "approvePayment": "To'lovni tasdiqlash",
