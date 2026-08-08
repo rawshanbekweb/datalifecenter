@@ -8,6 +8,8 @@ export interface AdminUser {
   role: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
   isBlocked: boolean;
   avatarUrl?: string | null; focusX?: number; focusY?: number;
+  // null bo'lsa email tasdiqlanmagan — soxta ro'yxatdan o'tishning asosiy belgisi
+  emailVerifiedAt?: string | null;
   createdAt: string;
   _count: { enrollments: number };
 }
@@ -20,6 +22,8 @@ export interface UsersListResult {
 export interface ListUsersParams {
   role?: string;
   search?: string;
+  // Berilmasa hammasi; false — faqat emaili tasdiqlanmaganlar
+  verified?: boolean;
   page?: number;
   limit?: number;
 }

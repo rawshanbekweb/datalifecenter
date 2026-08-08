@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { imageFocusFields } from './shared/imageFocus.validator';
+import { personName } from './shared/personName.validator';
+import { optionalPhone } from './shared/phone.validator';
 
 export const registerSchema = z.object({
-  name: z.string().min(2, 'Ism kamida 2 ta belgidan iborat bo\'lishi kerak'),
+  name: personName,
   email: z.email('Email noto\'g\'ri'),
   password: z.string().min(6, 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak'),
-  phone: z.string().optional(),
+  phone: optionalPhone,
 });
 
 export const loginSchema = z.object({
@@ -15,8 +17,8 @@ export const loginSchema = z.object({
 
 export const updateProfileSchema = z
   .object({
-    name: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak").optional(),
-    phone: z.string().nullish().or(z.literal('').transform(() => null)),
+    name: personName.optional(),
+    phone: optionalPhone,
     avatarUrl: z.string().url("Rasm URL noto'g'ri").nullish().or(z.literal('').transform(() => null)),
     ...imageFocusFields,
   })

@@ -13,6 +13,9 @@ const userSelect = {
   role: true,
   isBlocked: true,
   avatarUrl: true, focusX: true, focusY: true,
+  // Admin ro'yxatida "tasdiqlanmagan" belgisini ko'rsatish uchun — soxta
+  // ro'yxatdan o'tishlar deyarli har doim tasdiqlanmagan bo'lib qoladi
+  emailVerifiedAt: true,
   createdAt: true,
   _count: { select: { enrollments: true } },
 } satisfies Prisma.UserSelect;
@@ -20,6 +23,8 @@ const userSelect = {
 interface ListUsersFilters {
   role?: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
   search?: string;
+  // undefined — hammasi; false — faqat emaili tasdiqlanmaganlar; true — tasdiqlanganlar
+  verified?: boolean;
   page: number;
   limit: number;
 }
@@ -27,6 +32,7 @@ interface ListUsersFilters {
 export async function listUsers(filters: ListUsersFilters) {
   const where: Prisma.UserWhereInput = {
     ...(filters.role ? { role: filters.role } : {}),
+    ...(filters.verified === undefined ? {} : { emailVerifiedAt: filters.verified ? { not: null } : null }),
     ...(filters.search
       ? {
           OR: [

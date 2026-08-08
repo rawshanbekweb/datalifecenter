@@ -969,7 +969,11 @@
       "blockTitle": "Bloklaw",
       "unblockTitle": "Bloktan shıǵarıw",
       "deleteTitle": "Óshiriw",
-      "filterTeam": "Komanda"
+      "filterTeam": "Komanda",
+      "filterUnverified": "Tastıyıqlanbaǵan",
+      "filterUnverifiedTitle": "Tek email'i tastıyıqlanbaǵan paydalanıwshılar",
+      "unverified": "Email tastıyıqlanbaǵan",
+      "unverifiedTitle": "Bu paydalanıwshı email'in tastıyıqlamaǵan"
     },
     "tags": {
       "featured": "Usınıs",

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Search, Ban, LockOpen, KeyRound, Trash2, Copy, X } from 'lucide-react';
+import { Search, Ban, LockOpen, KeyRound, Trash2, Copy, X, MailWarning } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { listUsers, updateUserRole, setUserBlocked, deleteUser, resetUserPassword, AdminUser } from '../../api/users';
 import { formatDate } from '../../utils/format';
@@ -35,13 +35,21 @@ export default function AdminUsersPage(): React.ReactElement {
   const [search, setSearch] = useState<string>('');
   const [query, setQuery]   = useState<string>('');
   const [busyId, setBusyId] = useState<string>('');
+  // Emaili tasdiqlanmaganlar filtri — soxta ro'yxatdan o'tishlarni bir joyda
+  // ko'rib chiqish uchun. Rol filtri bilan birga ishlaydi.
+  const [unverifiedOnly, setUnverifiedOnly] = useState<boolean>(false);
 
   const load = useCallback((): void => {
     setStatus('loading');
-    listUsers({ role: filter || undefined, search: query || undefined, limit: 50 })
+    listUsers({
+      role: filter || undefined,
+      search: query || undefined,
+      verified: unverifiedOnly ? false : undefined,
+      limit: 50,
+    })
       .then((res) => { setItems(res.items); setTotal(res.pagination.total); setStatus('ready'); })
       .catch(() => setStatus('error'));
-  }, [filter, query]);
+  }, [filter, query, unverifiedOnly]);
 
   useEffect(load, [load]);
 
@@ -125,6 +133,16 @@ export default function AdminUsersPage(): React.ReactElement {
               {t(f.labelKey)}
             </button>
           ))}
+          <button onClick={() => setUnverifiedOnly((v) => !v)} title={t('admin.users.filterUnverifiedTitle')}
+            style={{
+              display:'flex', alignItems:'center', gap:6,
+              padding:'8px 14px', borderRadius:10, fontSize:12.5, fontWeight:700, cursor:'pointer',
+              border: unverifiedOnly ? '1.5px solid #d97706' : '1.5px solid #e2e8f0',
+              background: unverifiedOnly ? '#fffbeb' : '#fff',
+              color: unverifiedOnly ? '#d97706' : '#64748b',
+            }}>
+            <MailWarning size={13} /> {t('admin.users.filterUnverified')}
+          </button>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); setQuery(search); }}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
@@ -161,6 +179,12 @@ export default function AdminUsersPage(): React.ReactElement {
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>
                     {u.name}{isSelf ? t('admin.users.self') : ''}
                     {u.isBlocked && <span className="tag" style={{ marginLeft:8, background:'#fef2f2', borderColor:'#fecaca', color:'#dc2626', fontWeight:700, fontSize:10.5 }}>{t('admin.users.blocked')}</span>}
+                    {!u.emailVerifiedAt && (
+                      <span className="tag" title={t('admin.users.unverifiedTitle')}
+                        style={{ marginLeft:8, background:'#fffbeb', borderColor:'#fde68a', color:'#d97706', fontWeight:700, fontSize:10.5 }}>
+                        {t('admin.users.unverified')}
+                      </span>
+                    )}
                   </p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>{u.email}{u.phone ? ` · ${u.phone}` : ''}</p>
                 </div>

@@ -969,7 +969,11 @@
       "blockTitle": "Bloklash",
       "unblockTitle": "Blokdan chiqarish",
       "deleteTitle": "O'chirish",
-      "filterTeam": "Jamoa"
+      "filterTeam": "Jamoa",
+      "filterUnverified": "Tasdiqlanmagan",
+      "filterUnverifiedTitle": "Faqat emaili tasdiqlanmagan foydalanuvchilar",
+      "unverified": "Email tasdiqlanmagan",
+      "unverifiedTitle": "Bu foydalanuvchi emailini tasdiqlamagan"
     },
     "tags": {
       "featured": "Tavsiya",

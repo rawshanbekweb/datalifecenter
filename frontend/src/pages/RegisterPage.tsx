@@ -60,7 +60,10 @@ export default function RegisterPage(): React.ReactElement {
             )}
             <div>
               <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('auth.register.nameLabel')}</label>
-              <input className="inp" name="name" value={form.name} onChange={change} required placeholder={t('auth.register.nameLabel')} />
+              {/* maxLength/minLength server qoidasi bilan bir xil (60 belgi, kamida 2) —
+                  brauzer xatoni so'rov yuborilmasdan aytadi */}
+              <input className="inp" name="name" value={form.name} onChange={change} required
+                minLength={2} maxLength={60} placeholder={t('auth.register.nameLabel')} />
             </div>
             <div>
               <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>Email</label>

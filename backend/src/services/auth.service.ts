@@ -11,7 +11,7 @@ interface RegisterInput {
   name: string;
   email: string;
   password: string;
-  phone?: string;
+  phone?: string | null;
 }
 
 interface LoginInput {
@@ -68,10 +68,29 @@ async function issueVerificationEmail(userId: string, email: string, name: strin
   await sendVerificationEmail(email, name, verifyUrl);
 }
 
+/**
+ * Bitta telefon raqamiga ruxsat etilgan hisob soni. Bir oila bir raqamdan
+ * foydalanishi mumkin (ota-ona + farzand), shuning uchun 1 emas — lekin bir
+ * raqam bilan o'nlab hisob ochilishi soxta ro'yxatdan o'tishning aniq belgisi.
+ */
+const MAX_ACCOUNTS_PER_PHONE = 3;
+
 export async function register(input: RegisterInput) {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
   if (existing) {
     throw ApiError.conflict('Bu email allaqachon ro\'yxatdan o\'tgan', 'EMAIL_TAKEN');
+  }
+
+  // Telefon validator'da normallashgan holga keltirilgan, shuning uchun oddiy
+  // tenglik bilan sanash yetarli ("+998 88 …" va "998 88 …" bir xil satr)
+  if (input.phone) {
+    const samePhone = await prisma.user.count({ where: { phone: input.phone } });
+    if (samePhone >= MAX_ACCOUNTS_PER_PHONE) {
+      throw ApiError.conflict(
+        "Bu telefon raqami bilan hisob ochish chegarasi tugagan. Administratorga murojaat qiling.",
+        'PHONE_LIMIT'
+      );
+    }
   }
 
   const passwordHash = await hashPassword(input.password);

@@ -87,6 +87,58 @@ describe('Auth', () => {
     expect(res.body.error.code).toBe('EMAIL_TAKEN');
   });
 
+  // Register formasiga skaner payloadlari ("admin' OR '1'='1") va 100 xonali
+  // raqamli "ism"lar bilan o'nlab soxta hisob ochilgan — quyidagi uch test shu
+  // yo'lni yopiq holda saqlaydi
+  it("soxta ism bilan register 400 qaytaradi", async () => {
+    const badNames = ["admin' OR '1'='1", '9585858952825522952952', '<script>alert(1)</script>', 'A'.repeat(61)];
+    for (const name of badNames) {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ name, email: `soxta-${badNames.indexOf(name)}@test.uz`, password: 'Passw0rd!' })
+        .expect(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    }
+    expect(await prisma.user.count({ where: { email: { startsWith: 'soxta-' } } })).toBe(0);
+  });
+
+  it("haqiqiy ism o'tadi va bo'sh joylar tozalanadi", async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: "  Oʻtkir-Alisher   Gʻaniev  ", email: 'utkir@test.uz', password: 'Passw0rd!', phone: '+998 90 123 45 67' })
+      .expect(201);
+    expect(res.body.data.user.name).toBe("Oʻtkir-Alisher Gʻaniev");
+    // Telefon bir ko'rinishga keltiriladi — cheklovni sanash uchun shart
+    expect(res.body.data.user.phone).toBe('+998901234567');
+  });
+
+  it('bitta telefon raqamiga 3 tadan ko\'p hisob ochilmaydi', async () => {
+    const phone = '+998 88 356 21 02';
+    for (let i = 1; i <= 2; i++) {
+      await request(app)
+        .post('/api/auth/register')
+        .send({ name: `Telefon Egasi`, email: `telefon${i}@test.uz`, password: 'Passw0rd!', phone })
+        .expect(201);
+    }
+    // Uchinchisi — chegara (3) hali to'lmagan, o'tadi
+    await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Telefon Egasi', email: 'telefon3@test.uz', password: 'Passw0rd!', phone: '+998883562102' })
+      .expect(201);
+    // To'rtinchisi rad etiladi — hatto bo'sh joylar bilan boshqacha yozilsa ham
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Telefon Egasi', email: 'telefon4@test.uz', password: 'Passw0rd!', phone: '998-88-356-21-02' })
+      .expect(409);
+    expect(res.body.error.code).toBe('PHONE_LIMIT');
+  });
+
+  it("profil tahririda faqat ism yuborilsa telefon o'chib ketmaydi", async () => {
+    const agent = await loginAgent('utkir@test.uz');
+    const res = await agent.patch('/api/auth/me').send({ name: 'Oʻtkir Gʻaniev' }).expect(200);
+    expect(res.body.data.phone).toBe('+998901234567');
+  });
+
   it("noto'g'ri parol bilan login 401", async () => {
     const res = await request(app)
       .post('/api/auth/login')

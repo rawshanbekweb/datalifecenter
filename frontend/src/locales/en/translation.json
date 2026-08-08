@@ -969,7 +969,11 @@
       "blockTitle": "Block",
       "unblockTitle": "Unblock",
       "deleteTitle": "Delete",
-      "filterTeam": "Team"
+      "filterTeam": "Team",
+      "filterUnverified": "Unverified",
+      "filterUnverifiedTitle": "Only users with an unverified email",
+      "unverified": "Email unverified",
+      "unverifiedTitle": "This user has not verified their email"
     },
     "tags": {
       "featured": "Featured",

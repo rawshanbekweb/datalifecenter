@@ -969,7 +969,11 @@
       "blockTitle": "Заблокировать",
       "unblockTitle": "Разблокировать",
       "deleteTitle": "Удалить",
-      "filterTeam": "Команда"
+      "filterTeam": "Команда",
+      "filterUnverified": "Не подтверждён",
+      "filterUnverifiedTitle": "Только пользователи с неподтверждённым email",
+      "unverified": "Email не подтверждён",
+      "unverifiedTitle": "Этот пользователь не подтвердил email"
     },
     "tags": {
       "featured": "Рекомендуем",

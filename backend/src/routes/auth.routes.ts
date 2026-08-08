@@ -53,13 +53,18 @@ const authLimiter = rateLimit({
 
 /**
  * Ro'yxatdan o'tish — bu yerda muvaffaqiyatli so'rovlarni ham sanaymiz, aks
- * holda bitta IP'dan cheksiz soxta akkaunt yaratish mumkin bo'lardi. Limit
- * ochilish kunidagi haqiqiy oqimni (bitta Wi-Fi'dan ommaviy ro'yxatdan o'tish)
- * ko'tara oladigan darajada keng olingan.
+ * holda bitta IP'dan cheksiz soxta akkaunt yaratish mumkin bo'lardi.
+ *
+ * Limit avval 60 edi (bitta Wi-Fi'dan ommaviy ro'yxatdan o'tishni ko'zlab), lekin
+ * shu keng oraliqdan foydalanib bir IP'dan o'nlab soxta hisob ochilgan. Endi 10:
+ * haqiqiy yolg'iz foydalanuvchiga bu yetib ortadi. EHTIYOT BO'LING — tadbir yoki
+ * ochiq dars kuni bitta xonadan 10 dan ko'p odam ro'yxatdan o'tsa, 11-chisi
+ * "juda ko'p urinish" oladi; bunday kunlarda bu qiymatni vaqtincha oshirib
+ * qo'yish kerak.
  */
 const registerLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 60,
+  limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',

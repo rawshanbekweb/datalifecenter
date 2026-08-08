@@ -8,6 +8,7 @@ export const listUsersHandler = asyncHandler(async (req: Request, res: Response)
   const filters = req.validatedQuery as {
     role?: 'STUDENT' | 'MENTOR' | 'TEAM' | 'ADMIN';
     search?: string;
+    verified?: boolean;
     page: number;
     limit: number;
   };
