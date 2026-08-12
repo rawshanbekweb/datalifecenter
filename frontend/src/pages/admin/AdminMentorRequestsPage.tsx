@@ -81,7 +81,7 @@ export default function AdminMentorRequestsPage(): React.ReactElement {
           {requests.map((r) => {
             const meta = STATUS_META[r.status];
             return (
-              <div key={r.id} className="card" style={{ padding:18 }}>
+              <div key={r.id} className="card admin-card">
                 <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap', marginBottom:8 }}>
                   <div style={{ width:30, height:30, borderRadius:'50%', background:'#9333ea', color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:800, flexShrink:0 }}>
                     {(r.mentor?.name || 'M').charAt(0).toUpperCase()}

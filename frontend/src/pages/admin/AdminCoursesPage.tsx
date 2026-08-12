@@ -425,8 +425,8 @@ export default function AdminCoursesPage(): React.ReactElement {
           {courses.map((c) => {
             const Icon = resolveIcon(c.iconKey);
             return (
-              <div key={c.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:40, height:40, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center', background:c.bg, border:`1.5px solid ${c.border}`, flexShrink:0 }}>
+              <div key={c.id} className="card admin-row">
+                <div style={{ width:34, height:34, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center', background:c.bg, border:`1.5px solid ${c.border}`, flexShrink:0 }}>
                   <Icon size={18} style={{ color:c.color }} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>

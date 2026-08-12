@@ -209,8 +209,8 @@ export default function AdminBlogPage(): React.ReactElement {
           {posts.map((p) => {
             const Icon = resolveIcon(p.iconKey);
             return (
-              <div key={p.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:40, height:40, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center', background:p.bg, border:`1.5px solid ${p.border}`, flexShrink:0 }}>
+              <div key={p.id} className="card admin-row">
+                <div style={{ width:34, height:34, borderRadius:11, display:'flex', alignItems:'center', justifyContent:'center', background:p.bg, border:`1.5px solid ${p.border}`, flexShrink:0 }}>
                   <Icon size={18} style={{ color:p.color }} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>

@@ -296,8 +296,8 @@ export default function AdminTeamPage(): React.ReactElement {
             const meta = departmentMeta(mem.department);
             const DeptIcon = meta.icon;
             return (
-              <div key={mem.id} className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: meta.bg, border: `1.5px solid ${meta.border}`, flexShrink: 0, fontSize: 13, fontWeight: 800, color: meta.color }}>
+              <div key={mem.id} className="card admin-row">
+                <div style={{ width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: meta.bg, border: `1.5px solid ${meta.border}`, flexShrink: 0, fontSize: 13, fontWeight: 800, color: meta.color }}>
                   {initials(mem.name)}
                 </div>
                 <div style={{ flex: 1, minWidth: 160 }}>

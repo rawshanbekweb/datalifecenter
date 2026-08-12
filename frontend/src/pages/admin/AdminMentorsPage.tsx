@@ -201,8 +201,8 @@ export default function AdminMentorsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {mentors.map((m) => (
-            <div key={m.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontSize:13, fontWeight:800, color:'#0ea5e9' }}>
+            <div key={m.id} className="card admin-row">
+              <div style={{ width:34, height:34, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontSize:13, fontWeight:800, color:'#0ea5e9' }}>
                 {initials(m.name)}
               </div>
               <div style={{ flex:1, minWidth:0 }}>

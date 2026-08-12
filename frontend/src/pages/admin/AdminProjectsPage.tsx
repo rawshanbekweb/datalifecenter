@@ -199,7 +199,7 @@ export default function AdminProjectsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {projects.map((p) => (
-            <div key={p.id} className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div key={p.id} className="card admin-row">
               <img src={p.screenshotUrl} alt={p.title.uz} style={{ width: 64, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{p.title.uz}</p>

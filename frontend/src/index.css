@@ -65,6 +65,48 @@ button, input, select, textarea, optgroup {
   border-radius: 16px;
 }
 
+/**
+ * Kabinet ro'yxatining bitta qatori.
+ *
+ * `.card` bilan birga qo'yiladi va uni ma'lumot qatoriga moslaydi. `.card`
+ * o'zi SAYT uchun mo'ljallangan: yumshoq 20px burchak, keng padding va
+ * ustiga borilganda 5px yuqoriga sakrash — bitta-ikkita katta karta uchun
+ * chiroyli effekt.
+ *
+ * Ro'yxatda esa ellikta qator bo'ladi va o'sha effektlar zararga aylanadi:
+ * sichqoncha yurgizilganda qatorlar birin-ketin sakraydi, katta soya
+ * qo'shnisining ustiga tushadi, keng padding esa bir ekranga sig'adigan
+ * yozuvlar sonini ikki barobar kamaytiradi.
+ *
+ * Shuning uchun bu yerda qator tinch turadi va ustiga borilganda faqat
+ * chegarasi quyuqlashadi — qaysi qatordaligingiz bilinadi, xolos.
+ */
+.admin-row,
+.admin-card {
+  border-radius: 14px;
+  transition: border-color 0.15s;
+}
+.admin-row:hover,
+.admin-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Bir qatorga sig'adigan yozuv */
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 11px 14px;
+}
+
+/* Ichida bir nechta qator bo'lgan yozuv (sharh matni, murojaat tanasi) */
+.admin-card {
+  padding: 14px;
+}
+
 /* ── Buttons ── */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;

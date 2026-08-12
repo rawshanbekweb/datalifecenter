@@ -124,7 +124,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {items.map((a) => (
-            <div key={a.id} className="card" style={{ padding:16, display:'flex', alignItems:'flex-start', gap:14 }}>
+            <div key={a.id} className="card admin-row" style={{ alignItems:'flex-start' }}>
               <div className="icon-box" style={{ flexShrink:0 }}><Megaphone size={16} style={{ color:'#0ea5e9' }} /></div>
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a', marginBottom:2 }}>{a.title}</p>

@@ -150,8 +150,8 @@ export default function AdminPartnersPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {partners.map((p) => (
-            <div key={p.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0 }}>
+            <div key={p.id} className="card admin-row">
+              <div style={{ width:34, height:34, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0 }}>
                 <Building2 size={18} style={{ color:'#0ea5e9' }} />
               </div>
               <div style={{ flex:1, minWidth:0 }}>
