@@ -799,6 +799,18 @@
       "courseRequests": "Kurs sorawları",
       "team": "Komanda"
     },
+    "navGroups": {
+      "learning": "Oqıtıw",
+      "people": "Adamlar",
+      "content": "Kontent",
+      "communication": "Baylanıs"
+    },
+    "quickJump": {
+      "title": "Bólimge tez ótiw",
+      "button": "Izlew",
+      "placeholder": "Bólim atın jazıń...",
+      "empty": "Hesh nárse tabılmadı"
+    },
     "common": {
       "all": "Barlıǵı",
       "prev": "Aldıńǵı",

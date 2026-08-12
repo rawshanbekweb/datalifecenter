@@ -799,6 +799,18 @@
       "courseRequests": "Kurs so'rovlari",
       "team": "Jamoa"
     },
+    "navGroups": {
+      "learning": "Taʼlim",
+      "people": "Odamlar",
+      "content": "Kontent",
+      "communication": "Muloqot"
+    },
+    "quickJump": {
+      "title": "Boʻlimga tez oʻtish",
+      "button": "Qidirish",
+      "placeholder": "Boʻlim nomini yozing...",
+      "empty": "Hech narsa topilmadi"
+    },
     "common": {
       "all": "Barchasi",
       "prev": "Oldingi",

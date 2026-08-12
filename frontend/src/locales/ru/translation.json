@@ -799,6 +799,18 @@
       "courseRequests": "Заявки на курсы",
       "team": "Команда"
     },
+    "navGroups": {
+      "learning": "Обучение",
+      "people": "Люди",
+      "content": "Контент",
+      "communication": "Общение"
+    },
+    "quickJump": {
+      "title": "Быстрый переход",
+      "button": "Поиск",
+      "placeholder": "Введите название раздела...",
+      "empty": "Ничего не найдено"
+    },
     "common": {
       "all": "Все",
       "prev": "Назад",

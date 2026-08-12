@@ -799,6 +799,18 @@
       "courseRequests": "Course requests",
       "team": "Team"
     },
+    "navGroups": {
+      "learning": "Learning",
+      "people": "People",
+      "content": "Content",
+      "communication": "Communication"
+    },
+    "quickJump": {
+      "title": "Jump to section",
+      "button": "Search",
+      "placeholder": "Type a section name...",
+      "empty": "Nothing found"
+    },
     "common": {
       "all": "All",
       "prev": "Previous",
