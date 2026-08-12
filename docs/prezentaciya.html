@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="kaa">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DATA LIFE IT Center — prezentaciya</title>
+<style>*{margin:0}</style>
+</head>
+<body>
+
+<style>
+  :root{
+    --font-display:'Outfit','Segoe UI Variable Display','Segoe UI Variable',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'JetBrains Mono','Cascadia Mono',ui-monospace,SFMono-Regular,Consolas,monospace;
+
+    --bg:#F2F6FA;
+    --surface:#FFFFFF;
+    --surface-2:#E7EFF7;
+    --ink:#0B1A2A;
+    --ink-2:#3D5670;
+    --ink-3:#71889F;
+    --line:#D2E0EC;
+    --line-soft:#E4EDF5;
+    --dot:rgba(11,26,42,.10);
+    --glow:.10;
+    --shadow:0 1px 2px rgba(11,26,42,.05),0 8px 24px rgba(11,26,42,.06);
+
+    --h:#0EA5E9;
+    --h-ink:#0369A1;
+    --h-chip:rgba(14,165,233,.12);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#070F18;
+      --surface:#0E1A27;
+      --surface-2:#152537;
+      --ink:#E9F2F9;
+      --ink-2:#A8C0D4;
+      --ink-3:#6F89A2;
+      --line:#1D3145;
+      --line-soft:#152537;
+      --dot:rgba(233,242,249,.09);
+      --glow:.16;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+      --h-ink:#7DD3FC;
+      --h-chip:rgba(14,165,233,.18);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#070F18;
+    --surface:#0E1A27;
+    --surface-2:#152537;
+    --ink:#E9F2F9;
+    --ink-2:#A8C0D4;
+    --ink-3:#6F89A2;
+    --line:#1D3145;
+    --line-soft:#152537;
+    --dot:rgba(233,242,249,.09);
+    --glow:.16;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    --h-ink:#7DD3FC;
+    --h-chip:rgba(14,165,233,.18);
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-display);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .deck{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    /* In a narrow panel a 16:9 box gets too short for the denser slides, so the
+       stage stops shrinking here and turns squarer instead. */
+    min-height:620px;
+    overflow:hidden;
+    container-type:size;
+    background:var(--bg);
+  }
+  .deck:fullscreen{aspect-ratio:auto;width:100vw;height:100vh}
+  /* Opened directly as a file (not embedded), the stage can safely fill the
+     window — there is no frame measuring our height, so 100vh is not circular. */
+  html.standalone .deck{aspect-ratio:auto;height:100vh;min-height:0}
+  html.standalone,html.standalone body{height:100%;overflow:hidden}
+
+  @media (max-width:760px){
+    .deck{aspect-ratio:auto;height:620px}
+  }
+
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    padding:clamp(18px,3.2cqw,56px) clamp(18px,4.6cqw,88px) clamp(48px,7cqh,72px);
+    opacity:0;visibility:hidden;
+    transform:translateY(14px);
+    transition:opacity .42s ease,transform .42s ease,visibility .42s;
+    background:
+      radial-gradient(80% 70% at 88% 6%, color-mix(in oklab, var(--h) calc(var(--glow)*100%), transparent), transparent 62%),
+      radial-gradient(circle, var(--dot) 1px, transparent 1px) 0 0/30px 30px,
+      var(--bg);
+  }
+  /* Without JS the first slide still shows, so the page is never blank. */
+  .deck:not(.js) .slide:first-of-type,
+  .slide.is-active{opacity:1;visibility:visible;transform:none}
+
+  .slide[data-hue="sky"]   {--h:#0EA5E9;--h-ink:#0369A1;--h-chip:rgba(14,165,233,.12)}
+  .slide[data-hue="violet"]{--h:#A855F7;--h-ink:#7E22CE;--h-chip:rgba(168,85,247,.12)}
+  .slide[data-hue="green"] {--h:#22C55E;--h-ink:#15803D;--h-chip:rgba(34,197,94,.13)}
+  .slide[data-hue="amber"] {--h:#F59E0B;--h-ink:#B45309;--h-chip:rgba(245,158,11,.15)}
+  .slide[data-hue="pink"]  {--h:#EC4899;--h-ink:#BE185D;--h-chip:rgba(236,72,153,.12)}
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .slide[data-hue="sky"]   {--h-ink:#7DD3FC}
+    :root:not([data-theme="light"]) .slide[data-hue="violet"]{--h-ink:#D8B4FE}
+    :root:not([data-theme="light"]) .slide[data-hue="green"] {--h-ink:#86EFAC}
+    :root:not([data-theme="light"]) .slide[data-hue="amber"] {--h-ink:#FCD34D}
+    :root:not([data-theme="light"]) .slide[data-hue="pink"]  {--h-ink:#F9A8D4}
+  }
+  :root[data-theme="dark"] .slide[data-hue="sky"]   {--h-ink:#7DD3FC}
+  :root[data-theme="dark"] .slide[data-hue="violet"]{--h-ink:#D8B4FE}
+  :root[data-theme="dark"] .slide[data-hue="green"] {--h-ink:#86EFAC}
+  :root[data-theme="dark"] .slide[data-hue="amber"] {--h-ink:#FCD34D}
+  :root[data-theme="dark"] .slide[data-hue="pink"]  {--h-ink:#F9A8D4}
+
+  /* ---------- slide chrome ---------- */
+  .top{
+    display:flex;align-items:center;justify-content:space-between;gap:18px;
+    padding-bottom:clamp(10px,2.4cqh,26px);
+    border-bottom:1px solid var(--line-soft);
+    flex:none;
+  }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:clamp(.62rem,.85cqw,.76rem);
+    letter-spacing:.2em;
+    color:var(--h-ink);
+    display:inline-flex;align-items:center;gap:.7em;
+  }
+  .eyebrow::before{
+    content:"";width:22px;height:2px;background:var(--h);border-radius:2px;flex:none;
+  }
+  .counter{
+    font-family:var(--font-mono);
+    font-size:clamp(.62rem,.85cqw,.76rem);
+    letter-spacing:.14em;
+    color:var(--ink-3);
+    font-variant-numeric:tabular-nums;
+  }
+  .counter b{color:var(--ink);font-weight:600}
+
+  .body{
+    flex:1;min-height:0;
+    display:flex;flex-direction:column;
+    justify-content:center;
+    gap:clamp(12px,2.6cqh,30px);
+    padding-top:clamp(12px,2.6cqh,30px);
+    /* A slide never scrolls — content is sized to fit the stage instead. */
+    overflow:hidden;
+  }
+
+  /* ---------- type ---------- */
+  h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.025em;line-height:1.08;font-weight:800}
+  h1{font-size:clamp(2.1rem,5.4cqw,4.4rem);letter-spacing:-.04em}
+  h2{font-size:clamp(1.5rem,3.4cqw,2.85rem)}
+  h3{font-size:clamp(.94rem,1.32cqw,1.14rem);line-height:1.25;letter-spacing:-.012em;font-weight:700}
+  p{margin:0}
+  .lead{
+    font-size:clamp(.94rem,1.46cqw,1.28rem);
+    color:var(--ink-2);
+    max-width:64ch;line-height:1.5;
+  }
+  .note{
+    font-family:var(--font-mono);
+    font-size:clamp(.64rem,.86cqw,.78rem);
+    color:var(--ink-3);line-height:1.6;max-width:80ch;
+  }
+  .hd{display:flex;flex-direction:column;gap:clamp(6px,1.5cqh,16px)}
+
+  /* ---------- title slide ---------- */
+  .slide--title .body{justify-content:center;gap:clamp(14px,3.2cqh,38px)}
+  .term{
+    font-family:var(--font-mono);
+    font-size:clamp(.74rem,1.05cqw,.95rem);
+    color:var(--h-ink);
+    display:flex;align-items:center;gap:.55em;
+  }
+  .term .caret{
+    display:inline-block;width:.55em;height:1.1em;background:var(--h);
+    transform:translateY(.16em);
+    animation:blink 1.15s step-end infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .wordmark{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .34em}
+  .wordmark span{display:inline-block}
+  .wordmark .lite{font-weight:300;color:var(--ink-2);letter-spacing:-.03em}
+  .tagline{
+    font-size:clamp(1rem,1.95cqw,1.7rem);
+    font-weight:600;color:var(--ink);letter-spacing:-.02em;
+    max-width:26ch;line-height:1.25;text-wrap:balance;
+  }
+  .rule{height:3px;width:clamp(70px,9.5cqw,140px);background:var(--h);border-radius:3px}
+  .title-foot{
+    display:flex;flex-wrap:wrap;gap:clamp(12px,2.5cqw,40px);
+    font-family:var(--font-mono);font-size:clamp(.64rem,.86cqw,.8rem);
+    color:var(--ink-3);letter-spacing:.08em;
+  }
+  .title-foot b{color:var(--ink-2);font-weight:500}
+
+  /* ---------- seamless strips ----------
+     Divider lines come from a box-shadow on each cell rather than a gap showing
+     the container colour, so a part-filled last row leaves no grey block. */
+  .seam{
+    display:grid;gap:0;flex:none;
+    background:var(--surface);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .seam > *{box-shadow:1px 0 0 var(--line),0 1px 0 var(--line)}
+
+  .stats{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+  .stat{padding:clamp(9px,2cqh,20px) clamp(11px,1.4cqw,20px);display:flex;flex-direction:column;gap:2px}
+  .stat .num{
+    font-family:var(--font-mono);font-weight:600;
+    font-size:clamp(1.2rem,2.5cqw,2.1rem);
+    color:var(--h-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1;
+  }
+  .stat .lbl{font-size:clamp(.7rem,.93cqw,.86rem);color:var(--ink-3);line-height:1.3}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;gap:clamp(8px,1.35cqw,18px);flex:none}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .g5{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:clamp(10px,2cqh,20px) clamp(12px,1.5cqw,22px);
+    display:flex;flex-direction:column;gap:clamp(4px,1cqh,9px);
+    box-shadow:var(--shadow);
+  }
+  .card p{font-size:clamp(.78rem,1cqw,.95rem);color:var(--ink-2);line-height:1.5}
+  .card--flag{border-top:3px solid var(--h)}
+  .card .big{
+    font-family:var(--font-mono);font-size:clamp(1.3rem,2.7cqw,2.2rem);
+    color:var(--h-ink);letter-spacing:-.03em;line-height:1.05;
+  }
+
+  .kicker{
+    font-family:var(--font-mono);font-size:clamp(.58rem,.79cqw,.7rem);
+    letter-spacing:.18em;color:var(--h-ink);
+  }
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+  .chip{
+    font-family:var(--font-mono);font-size:clamp(.56rem,.77cqw,.68rem);
+    letter-spacing:.04em;
+    padding:3px 8px;border-radius:5px;
+    background:var(--h-chip);color:var(--h-ink);
+    white-space:nowrap;
+  }
+
+  /* ---------- numbered steps ---------- */
+  .steps{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+  .step{padding:clamp(9px,2cqh,20px) clamp(11px,1.4cqw,20px);display:flex;flex-direction:column;gap:6px}
+  .step .n{
+    font-family:var(--font-mono);font-size:clamp(.68rem,.93cqw,.84rem);
+    color:var(--h-ink);letter-spacing:.1em;font-variant-numeric:tabular-nums;
+  }
+  .step p{font-size:clamp(.76rem,.98cqw,.92rem);color:var(--ink-2);line-height:1.5}
+
+  /* ---------- table ---------- */
+  .tw{flex:none;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:560px}
+  thead th{
+    font-family:var(--font-mono);font-weight:500;
+    font-size:clamp(.6rem,.8cqw,.72rem);letter-spacing:.16em;
+    color:var(--ink-3);text-align:left;
+    padding:10px clamp(11px,1.3cqw,20px);
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:clamp(3px,1cqh,11px) clamp(11px,1.3cqw,20px);
+    border-bottom:1px solid var(--line-soft);
+    font-size:clamp(.74rem,.94cqw,.92rem);
+    color:var(--ink-2);vertical-align:middle;line-height:1.35;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  td.name{color:var(--ink);font-weight:600}
+  td.name small{display:block;font-weight:400;color:var(--ink-3);font-size:.85em;letter-spacing:0;line-height:1.3}
+  td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+  .lvl{
+    font-family:var(--font-mono);font-size:clamp(.56rem,.77cqw,.68rem);
+    padding:3px 8px;border-radius:5px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap;
+  }
+
+  /* ---------- people ---------- */
+  .people{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .person{padding:clamp(8px,1.7cqh,16px) clamp(11px,1.4cqw,20px);display:flex;align-items:center;gap:12px}
+  .mono-badge{
+    font-family:var(--font-mono);font-weight:600;
+    font-size:clamp(.68rem,.93cqw,.85rem);
+    width:2.35em;height:2.35em;flex:none;
+    display:grid;place-items:center;border-radius:8px;
+    background:var(--h-chip);color:var(--h-ink);letter-spacing:.02em;
+  }
+  .person .who{display:flex;flex-direction:column;min-width:0}
+  .person .nm{font-weight:650;font-size:clamp(.81rem,1.03cqw,.97rem);letter-spacing:-.01em;line-height:1.25}
+  .person .sp{font-size:clamp(.68rem,.88cqw,.82rem);color:var(--ink-3);line-height:1.3}
+
+  /* ---------- bullets inside cards ---------- */
+  .list{display:flex;flex-direction:column;gap:5px;margin:0;padding:0;list-style:none}
+  .list li{
+    font-size:clamp(.75rem,.98cqw,.91rem);color:var(--ink-2);line-height:1.45;
+    padding-left:15px;position:relative;
+  }
+  .list li::before{
+    content:"";position:absolute;left:0;top:.58em;
+    width:6px;height:6px;border-radius:2px;background:var(--h);opacity:.75;
+  }
+
+  /* ---------- callout band ---------- */
+  .band{
+    border-left:3px solid var(--h);
+    background:var(--surface);
+    border-radius:0 10px 10px 0;
+    padding:clamp(9px,1.8cqh,17px) clamp(12px,1.6cqw,22px);
+    font-size:clamp(.8rem,1.03cqw,1rem);
+    color:var(--ink-2);line-height:1.5;
+  }
+  .band b{color:var(--ink);font-weight:650}
+
+  /* ---------- contact ---------- */
+  .contact{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .crow{padding:clamp(10px,2.2cqh,22px) clamp(12px,1.5cqw,22px);display:flex;flex-direction:column;gap:3px}
+  .crow .k{font-family:var(--font-mono);font-size:clamp(.58rem,.79cqw,.7rem);letter-spacing:.16em;color:var(--ink-3)}
+  .crow .v{font-size:clamp(.9rem,1.32cqw,1.15rem);font-weight:650;letter-spacing:-.015em;word-break:break-word}
+  .crow .v a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--h)}
+  .crow .v a:hover{color:var(--h-ink)}
+  .crow .s{font-size:clamp(.71rem,.9cqw,.84rem);color:var(--ink-3)}
+
+  /* ---------- deck controls (inside the stage, never position:fixed) ---------- */
+  .rail{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line-soft);z-index:20}
+  .rail__fill{height:100%;background:var(--h);width:0;transition:width .42s ease}
+
+  .nav{
+    position:absolute;bottom:clamp(9px,2.2cqh,22px);right:clamp(14px,2.8cqw,40px);
+    display:flex;align-items:center;gap:8px;z-index:21;
+  }
+  .nav button{
+    width:34px;height:34px;border-radius:8px;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink-2);
+    display:grid;place-items:center;cursor:pointer;
+    font-family:var(--font-mono);font-size:.95rem;line-height:1;
+    box-shadow:var(--shadow);
+    transition:color .18s,border-color .18s,transform .18s;
+  }
+  .nav button:hover:not(:disabled){color:var(--h-ink);border-color:var(--h);transform:translateY(-1px)}
+  .nav button:disabled{opacity:.38;cursor:default}
+  .nav button:focus-visible,.dots button:focus-visible{outline:2px solid var(--h);outline-offset:2px}
+
+  .dots{
+    position:absolute;bottom:clamp(9px,2.2cqh,22px);left:clamp(14px,2.8cqw,40px);
+    display:flex;gap:5px;z-index:21;flex-wrap:wrap;max-width:50%;
+  }
+  .dots button{
+    width:20px;height:5px;border-radius:3px;border:0;padding:0;cursor:pointer;
+    background:var(--line);transition:background .2s,transform .2s;
+  }
+  .dots button:hover{transform:scaleY(1.6)}
+  .dots button[aria-current="true"]{background:var(--h)}
+
+  .hint{
+    position:absolute;bottom:clamp(9px,2.2cqh,22px);left:50%;transform:translateX(-50%);
+    font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;color:var(--ink-3);
+    z-index:21;transition:opacity .5s;pointer-events:none;white-space:nowrap;
+  }
+  .hint.gone{opacity:0}
+
+  @media (max-width:900px){
+    .dots,.hint{display:none}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+
+  /* ---------- print → PDF: one slide per page ---------- */
+  @page{size:A4 landscape;margin:10mm}
+  @media print{
+    /* Without this the browser drops the accent rules, chips and hue bars. */
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff}
+    /* Repeat the standalone selector here: it is more specific than a bare
+       .deck, so without this the on-screen 100vh stage wins and prints 1 page. */
+    html.standalone,html.standalone body{height:auto;overflow:visible}
+    .deck,html.standalone .deck{aspect-ratio:auto;height:auto;min-height:0;overflow:visible}
+    .rail,.nav,.dots,.hint{display:none !important}
+    .slide{
+      position:relative;inset:auto;
+      opacity:1 !important;visibility:visible !important;transform:none !important;
+      height:180mm;page-break-after:always;break-after:page;
+      padding:8mm 10mm;
+      background:#fff;
+    }
+    .slide:last-child{page-break-after:auto;break-after:auto}
+    .card,.tw,.seam{box-shadow:none}
+    .seam > *{box-shadow:1px 0 0 var(--line),0 1px 0 var(--line)}
+    .body{overflow:visible}
+  }
+</style>
+
+<div class="deck" id="deck">
+
+  <!-- 01 -->
+  <section class="slide slide--title" data-hue="sky" data-eyebrow="Prezentaciya">
+    <div class="top">
+      <span class="eyebrow">Nókis · 2019-jıldan berli</span>
+      <span class="counter"></span>
+    </div>
+    <div class="body">
+      <p class="term">&gt; data_life --start<span class="caret"></span></p>
+      <h1 class="wordmark"><span>DATA</span><span class="lite">LIFE</span></h1>
+      <div class="rule"></div>
+      <p class="tagline">Úyretemiz, sebebi ózimiz islep shıǵaramız.</p>
+      <p class="lead">IT oqıw orayı hám baǵdarlama islep shıǵarıw jámááti. Jeti baǵdar boyınsha oqıtamız hám buyırtpashılar ushın real ónimler islep shıǵaramız.</p>
+      <div class="title-foot">
+        <span>datalife.uz</span>
+        <span><b>+998 91 383 68 08</b></span>
+        <span>Nókis, IT Park</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="slide" data-hue="sky" data-eyebrow="Biz haqqımızda">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Nókisten shıqqan IT kompaniya</h2>
+        <p class="lead">DATA LIFE — 2019-jılı Nókiste shólkemlestirilgen IT kompaniya hám oqıw orayı. Buyırtpashılar ushın sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵaramız. Sonıń menen birge jeti baǵdar boyınsha oqıtamız — islep shıǵarıwdaǵı tájiriybemiz tuwrıdan-tuwrı sabaqlarǵa ótedi.</p>
+      </div>
+      <div class="seam stats">
+        <div class="stat"><span class="num">2019</span><span class="lbl">Usı jıldan berli isleymiz</span></div>
+        <div class="stat"><span class="num">3000+</span><span class="lbl">Pitkeriwshiler</span></div>
+        <div class="stat"><span class="num">7</span><span class="lbl">Oqıw baǵdarı</span></div>
+        <div class="stat"><span class="num">9</span><span class="lbl">Ámeliyatshı mentor</span></div>
+        <div class="stat"><span class="num">11</span><span class="lbl">Jámáát aǵzası</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="slide" data-hue="violet" data-eyebrow="Ne isleymiz">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Eki baǵdardaǵı bir jámáát</h2>
+        <p class="lead">Bir jámáát eki isti qatar alıp baradı — sonıń ushın sabaqlar teoriyada qalmaydı.</p>
+      </div>
+      <div class="grid g2">
+        <div class="card card--flag">
+          <span class="kicker">Bilimlendiriw</span>
+          <h3>Oqıw orayı</h3>
+          <ul class="list">
+            <li>Jeti baǵdar boyınsha tolıq kurslar</li>
+            <li>Óz tarawında isleytuǵın mentorlar</li>
+            <li>Online hám offline formatta sabaq</li>
+            <li>Sheklengen orınlı kishi gruppalar</li>
+            <li>Juwmaqlawshı sertifikat</li>
+          </ul>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Islep shıǵarıw</span>
+          <h3>Buyırtpashılar ushın</h3>
+          <ul class="list">
+            <li>Sayt hám veb qosımshalar</li>
+            <li>Android hám iOS ushın mobil qosımshalar</li>
+            <li>UI/UX dizayn hám brend uslubı</li>
+            <li>IT konsalting hám kod auditi</li>
+            <li>Arnawlı programmalar, startap ushın MVP</li>
+          </ul>
+        </div>
+      </div>
+      <p class="band"><b>Baylanısı usında:</b> sabaqlardı real joybarlar ústinde isleytuǵın mentorlar alıp baradı, al studentler oqıw dawamında haqıyqıy máselelerdi sheshedi.</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="slide" data-hue="sky" data-eyebrow="Kurslar">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Jeti baǵdar</h2>
+        <p class="lead">Kompyuter sawatlılıǵınan kiberqáwipsizlikke shekem.</p>
+      </div>
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>Baǵdar</th><th>Múddet</th><th>Daraja</th><th>Baha, UZS</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="name">Frontend Development<small>React &amp; TypeScript</small></td><td class="num">6 ay</td><td><span class="lvl">Baslanǵısh</span></td><td class="num">800 000</td></tr>
+            <tr><td class="name">Backend Development<small>Node.js &amp; APIs</small></td><td class="num">5 ay</td><td><span class="lvl">Orta</span></td><td class="num">800 000</td></tr>
+            <tr><td class="name">Web Application Security<small>Veb qosımshalar qáwipsizligi</small></td><td class="num">6 ay</td><td><span class="lvl">Orta</span></td><td class="num">1 000 000</td></tr>
+            <tr><td class="name">Python<small>Proqrammalastırıw tiykarları hám ámeliyat</small></td><td class="num">6 ay</td><td><span class="lvl">Baslanǵısh</span></td><td class="num">800 000</td></tr>
+            <tr><td class="name">Prompt Engineering<small>Jasalma intellekt penen islew</small></td><td class="num">2 ay</td><td><span class="lvl">Baslanǵısh</span></td><td class="num">800 000</td></tr>
+            <tr><td class="name">Grafik dizayn<small>Vizual dizayn hám brending</small></td><td class="num">2 ay</td><td><span class="lvl">Baslanǵısh</span></td><td class="num">800 000</td></tr>
+            <tr><td class="name">Kompyuter sawatqanlıǵı<small>Noldan baslawshılar ushın</small></td><td class="num">2 ay</td><td><span class="lvl">Baslanǵısh</span></td><td class="num">600 000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Barlıq baǵdarlar online hám offline ótedi. Baha hám tólem tártibi — administratordan.</p>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section class="slide" data-hue="amber" data-eyebrow="Oqıw tártibi">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Qalay oqıymız</h2>
+        <p class="lead">Format, gruppa hám tólem máselesi baslanıwdan-aq anıq — jasırın shárt joq.</p>
+      </div>
+      <div class="grid g4">
+        <div class="card card--flag">
+          <span class="kicker">Format</span>
+          <h3>Online + Offline</h3>
+          <p>Hár bir baǵdar eki formatta da ótedi. Ózińizge qolaylısın tańlaysız, kerek bolsa formattı almastırıwıńız múmkin.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Gruppa</span>
+          <h3>Orın sanı sheklengen</h3>
+          <p>Gruppadaǵı orın sanı aldın belgilenedi. Orınlar tolǵanda jazılıw toqtaydı hám gezekke jazılıw ashıladı — jańa gruppa ashılǵanda birinshi bolıp xabar beremiz.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Tólem</span>
+          <h3>Orayda rásmiylestiriledi</h3>
+          <p>Saytta pul ótkeriw shárt emes. Administrator tólemdi tastıyıqlaǵannan keyin kurs jeke kabinetińizde avtomat ashıladı.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Materiallar</span>
+          <h3>Hámmesi bir jerde</h3>
+          <p>Hár bir sabaqtıń videosı, teoriyası hám tapsırması jeke kabinette saqlanadı — qálegen waqıtta qaytıp kóresiz.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section class="slide" data-hue="violet" data-eyebrow="Mentorlar">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Sabaqtı ámeliyatshılar alıp baradı</h2>
+        <p class="lead">Hár bir baǵdardı sol tarawda haqıyqattan islep atırǵan qániyge oqıtadı.</p>
+      </div>
+      <div class="seam people">
+        <div class="person"><span class="mono-badge">YJ</span><span class="who"><span class="nm">Yangiboyev Jamshid</span><span class="sp">Frontend hám Backend mentori</span></span></div>
+        <div class="person"><span class="mono-badge">YA</span><span class="who"><span class="nm">Yakubbaev Azamat</span><span class="sp">Backend mentori</span></span></div>
+        <div class="person"><span class="mono-badge">DM</span><span class="who"><span class="nm">Doshmanov Madiyar</span><span class="sp">Frontend mentori</span></span></div>
+        <div class="person"><span class="mono-badge">KR</span><span class="who"><span class="nm">Kayipbaev Ravshan</span><span class="sp">Web Application Security mentori</span></span></div>
+        <div class="person"><span class="mono-badge">SE</span><span class="who"><span class="nm">Saparniyazov Ernazar</span><span class="sp">Web Application Security mentori</span></span></div>
+        <div class="person"><span class="mono-badge">SN</span><span class="who"><span class="nm">Sipatdinova Nurjamal</span><span class="sp">Python mentori</span></span></div>
+        <div class="person"><span class="mono-badge">PSh</span><span class="who"><span class="nm">Pirimbetov Shaxrux</span><span class="sp">Python mentori</span></span></div>
+        <div class="person"><span class="mono-badge">DA</span><span class="who"><span class="nm">Dospanov Abduaziz</span><span class="sp">Prompt Engineering mentori</span></span></div>
+        <div class="person"><span class="mono-badge">BA</span><span class="who"><span class="nm">Bazarbaeva Aytgul</span><span class="sp">Kompyuter sawatlılıǵı mentori</span></span></div>
+      </div>
+      <p class="note">Bir baǵdardı bir neshe mentor birge alıp barıwı múmkin — olar kurstı teń basqaradı.</p>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section class="slide" data-hue="green" data-eyebrow="Studenttiń jolı">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Sorawdan sertifikatqa shekem</h2>
+        <p class="lead">Altı basqısh — hár biri saytta hám jeke kabinette kórinip turadı.</p>
+      </div>
+      <div class="seam steps">
+        <div class="step"><span class="n">01 — Soraw</span><h3>Kursqa jazılıw</h3><p>Saytta baǵdardı tańlap soraw qaldırasız yamasa dizimnen ótesiz.</p></div>
+        <div class="step"><span class="n">02 — Tastıyıqlaw</span><h3>Administrator rásmiylestiredi</h3><p>Tólem orayda rásmiylestiriledi, jazılıwıńız aktivlesedi.</p></div>
+        <div class="step"><span class="n">03 — Sabaqlar</span><h3>Baǵdarlama boyınsha oqıw</h3><p>Sabaqlardı jeke kabinette ótesiz, progressińiz avtomat esaplanadı.</p></div>
+        <div class="step"><span class="n">04 — Tapsırmalar</span><h3>Mentor pikiri menen</h3><p>Mentor tapsırma beredi, juwabıńızdı tekseredi, baha hám pikir jazadı.</p></div>
+        <div class="step"><span class="n">05 — Janlı sabaq</span><h3>Sorawlarǵa juwap</h3><p>Janlı sabaqlar saytdıń ózinde ótedi, sorawlardı sabaq astında qaldırasız.</p></div>
+        <div class="step"><span class="n">06 — Sertifikat</span><h3>Juwmaqlawshı hújjet</h3><p>Barlıq sabaq tamamlanǵanda sertifikat beriledi — onı hár kim ashıq tekserip kóre aladı.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="slide" data-hue="sky" data-eyebrow="Platforma">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Úsh kabinet, bir sistema</h2>
+        <p class="lead">Hár kim tek ózine kerekli nárseni kóredi — student, mentor hám administrator ushın ayırım kabinet.</p>
+      </div>
+      <div class="grid g3">
+        <div class="card card--flag">
+          <span class="kicker">Student</span>
+          <h3>Jeke kabinet</h3>
+          <ul class="list">
+            <li>Kurslarım hám progress</li>
+            <li>Sabaqlar, video hám materiallar</li>
+            <li>Tapsırmalarım hám bahalar</li>
+            <li>Janlı sabaqlar</li>
+            <li>Soraw-juwap</li>
+            <li>Sertifikatlar</li>
+          </ul>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Mentor</span>
+          <h3>Mentor kabineti</h3>
+          <ul class="list">
+            <li>Kurs baǵdarlaması — modul hám sabaqlar</li>
+            <li>Studentler hám olardıń progressi</li>
+            <li>Tapsırma beriw hám bahalaw</li>
+            <li>Janlı sabaq shólkemlestiriw</li>
+            <li>Soraw-juwap</li>
+            <li>Admin menen baylanıs</li>
+          </ul>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">Administrator</span>
+          <h3>Admin panel</h3>
+          <ul class="list">
+            <li>Jazılıwlar hám tólemler</li>
+            <li>Paydalanıwshılar hám rolleri</li>
+            <li>Kurslar, mentorlar, komanda</li>
+            <li>Blog, joybarlar, sheriklar</li>
+            <li>Daǵazalar hám xabarlar</li>
+            <li>Sayt sazlawları, monitoring</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section class="slide" data-hue="violet" data-eyebrow="Imkoniyatlar">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Platforma ne isley aladı</h2>
+        <p class="lead">Barlıǵı saytdıń ózinde — bóten programma ornatıw kerek emes.</p>
+      </div>
+      <div class="grid g3">
+        <div class="card"><span class="kicker">Janlı sabaq</span><h3>Saytdıń ózinde</h3><p>Bólme sabaq baslanıwınan 10 minut aldın ashıladı, ekrandı bólisiw isleydi. Mentor sabaqtı kimge arnalǵanın tańlaydı.</p></div>
+        <div class="card"><span class="kicker">Tapsırmalar</span><h3>Baha hám pikir</h3><p>Juwaptı matn, silteme yamasa skrinshot penen jiberesiz. Mentor qabıl etedi yamasa qayta tapsırıwǵa qaytaradı.</p></div>
+        <div class="card"><span class="kicker">Soraw-juwap</span><h3>Sabaq astında</h3><p>Túsinbegen jerińizdi sol sabaqtıń ózinde sorap qalasız — juwap kelgende bildiriw aladı.</p></div>
+        <div class="card"><span class="kicker">Bildiriwler</span><h3>Real waqıtta</h3><p>Jańa tapsırma, janlı sabaq, tólem jaǵdayı hám daǵazalar — hámmesi qońıraw belgisinde.</p></div>
+        <div class="card"><span class="kicker">Progress</span><h3>Kórinetuǵın nátiyje</h3><p>Aktiv hám tamamlanǵan kurslar, ótilgen sabaqlar hám ulıwma progress payız menen kórsetiledi.</p></div>
+        <div class="card"><span class="kicker">Sertifikat</span><h3>Ashıq tekseriledi</h3><p>PDF sertifikattaǵı silteme arqalı jumıs beriwshi onıń haqıyqıylıǵın ózi tekserip kóre aladı.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" data-hue="pink" data-eyebrow="Xızmetler">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Buyırtpashılar ushın xızmetler</h2>
+        <p class="lead">Oydan iske túsiriwge shekem — bir jámáát penen.</p>
+      </div>
+      <div class="grid g5">
+        <div class="card card--flag">
+          <h3>Veb islep shıǵarıw</h3>
+          <p>Zamanagóy veb qosımshalar hám korporativ saytlar.</p>
+          <div class="chips"><span class="chip">Korporativ saytlar</span><span class="chip">API integratsiya</span><span class="chip">SEO hám tezlik</span></div>
+        </div>
+        <div class="card card--flag">
+          <h3>Mobil qosımshalar</h3>
+          <p>iOS hám Android ushın — bir kod bazasınan eki platformaǵa.</p>
+          <div class="chips"><span class="chip">Android hám iOS</span><span class="chip">Dúkanǵa jaylastırıw</span><span class="chip">Push xabarlamalar</span></div>
+        </div>
+        <div class="card card--flag">
+          <h3>UI/UX dizayn</h3>
+          <p>Paydalanıwshı ushın qolaylı interfeys — prototipten tayın dizaynǵa shekem.</p>
+          <div class="chips"><span class="chip">Prototip hám maket</span><span class="chip">Dizayn sisteması</span><span class="chip">Brend uslubı</span></div>
+        </div>
+        <div class="card card--flag">
+          <h3>IT konsalting</h3>
+          <p>Qaysı texnologiyanı tańlaw hám qalay qurıw kerekligi boyınsha máslahát.</p>
+          <div class="chips"><span class="chip">Texnologiya tańlaw</span><span class="chip">Sistema arxitekturası</span><span class="chip">Kod auditi</span></div>
+        </div>
+        <div class="card card--flag">
+          <h3>Programmalıq sheshimler</h3>
+          <p>Biznes ushın arnawlı programmalar hám startaplar ushın birinshi isleytuǵın ónim.</p>
+          <div class="chips"><span class="chip">Startap ushın MVP</span><span class="chip">Avtomatlastırıw</span><span class="chip">CRM hám ERP</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" data-hue="green" data-eyebrow="Ne ushın biz">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Ne ushın DATA LIFE</h2>
+        <p class="lead">Bes nárse bizdi ajıratıp turadı — hámmesin tekserip kóriwge boladı.</p>
+      </div>
+      <div class="grid g5">
+        <div class="card card--flag"><span class="kicker">Mentorlar</span><p class="big">9</p><p><b>Tájiriybeli mentorlar.</b> Hár bir baǵdardı óz tarawında isleytuǵın mentor alıp baradı.</p></div>
+        <div class="card card--flag"><span class="kicker">Nátiyje</span><p class="big">3000+</p><p><b>Pitkeriwshiler.</b> Oraydı pitkergen oqıwshılardıń ulıwma sanı.</p></div>
+        <div class="card card--flag"><span class="kicker">Kólem</span><p class="big">7</p><p><b>Baǵdarlar.</b> Kompyuter sawatlılıǵınan Prompt Engineering hám kiberqáwipsizlikke shekem.</p></div>
+        <div class="card card--flag"><span class="kicker">Tájiriybe</span><p class="big">2019</p><p><b>Usı jıldan berli.</b> DATA LIFE 2019-jıldan berli úzliksiz isleydi.</p></div>
+        <div class="card card--flag"><span class="kicker">Jámáát</span><p class="big">11</p><p><b>Komanda.</b> Mentorlar, basshılıq hám marketing qánigeleri.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" data-hue="sky" data-eyebrow="Texnologiya">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Platforma ózimizdiń qolımızda</h2>
+        <p class="lead">datalife.uz — tayın shablon emes, ózimiz islep shıqqan sistema. Sonıń ushın hár qanday ózgeris tez kirgiziledi.</p>
+      </div>
+      <div class="grid g3">
+        <div class="card"><span class="kicker">Stack</span><h3>Zamanagóy tiykar</h3><p>React 19 hám TypeScript, Node.js hám PostgreSQL. Bulut xotirada saqlanatuǵın fayllar.</p></div>
+        <div class="card"><span class="kicker">Qáwipsizlik</span><h3>Hár rolge óz huqıqı</h3><p>Parol ózgergende barlıq eski sessiyalar biykar boladı; kurs videoları waqıtsha imzolanǵan silteme arqalı ashıladı.</p></div>
+        <div class="card"><span class="kicker">Sapa</span><h3>118 avtomat test</h3><p>Hár bir ózgeris jaylastırılıwdan aldın avtomat tekseriwden ótedi.</p></div>
+        <div class="card"><span class="kicker">Tiller</span><h3>Tórt tilde</h3><p>Qaraqalpaqsha, ózbekshe, rusha hám inglisshe — sayt tolıq awdarılǵan.</p></div>
+        <div class="card"><span class="kicker">Turaqlılıq</span><h3>Avtomat baqlaw</h3><p>Sayttıń hám maǵlıwmatlar bazasınıń jumısı úzliksiz baqlanadı, nasazlıq bolsa xabar keledi.</p></div>
+        <div class="card"><span class="kicker">Ashıqlıq</span><h3>Jasırın nárse joq</h3><p>Sertifikat, kurs pikirleri hám statistika ashıq — hár kim tekserip kóre aladı.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide" data-hue="amber" data-eyebrow="Sheriklik">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Birge islesiw usınısı</h2>
+        <p class="lead">Sherikliktiń tórt túri — qaysısı sizge say bolsa, sol jerden baslaymız.</p>
+      </div>
+      <div class="grid g4">
+        <div class="card card--flag">
+          <span class="kicker">01</span><h3>Korporativ oqıtıw</h3>
+          <p>Kompaniyańızdıń xızmetkerleri ushın ayırım gruppa. Baǵdarlamanı sizdiń wazıypalarıńızǵa iykemleymiz.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">02</span><h3>Bilim ordaları menen</h3>
+          <p>Studentler ushın ámeliyat hám stajirovka, birge ótkeriletuǵın shınıǵıw programmaları.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">03</span><h3>Buyırtpa boyınsha islep shıǵarıw</h3>
+          <p>Sayt, mobil qosımsha, CRM/ERP yamasa startap ushın birinshi isleytuǵın ónim.</p>
+        </div>
+        <div class="card card--flag">
+          <span class="kicker">04</span><h3>Sayttaǵı sheriklik</h3>
+          <p>Sheriklerimiz datalife.uz saytında logotipi hám siltemesi menen kórsetiledi.</p>
+        </div>
+      </div>
+      <p class="band"><b>Birinshi máslahát biypul.</b> Wazıypańızdı aytıń — kólemin, múddetin hám bahasın anıqlap beremiz.</p>
+    </div>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide" data-hue="sky" data-eyebrow="Baylanıs">
+    <div class="top"><span class="eyebrow"></span><span class="counter"></span></div>
+    <div class="body">
+      <div class="hd">
+        <h2>Baylanısıp turayıq</h2>
+        <p class="lead">Sorawıńız bar ma? 24 saat ishinde juwap beremiz.</p>
+      </div>
+      <div class="seam contact">
+        <div class="crow"><span class="k">Telefon</span><span class="v"><a href="tel:+998913836808">+998 91 383 68 08</a></span><span class="s">Dúyshembi — Shembi, 09:00 — 18:00</span></div>
+        <div class="crow"><span class="k">Telegram</span><span class="v"><a href="https://t.me/datalifecentre">@datalifecentre</a></span><span class="s">Tez juwap</span></div>
+        <div class="crow"><span class="k">Email</span><span class="v"><a href="mailto:info@datalife.uz">info@datalife.uz</a></span><span class="s">24 saat ishinde juwap</span></div>
+        <div class="crow"><span class="k">Sayt</span><span class="v"><a href="https://datalife.uz">datalife.uz</a></span><span class="s">Kurslar, mentorlar hám jeke kabinet</span></div>
+        <div class="crow"><span class="k">Mánzil</span><span class="v">Ayımxan Shamuratova kóshesi, Nókis</span><span class="s">IT Park</span></div>
+        <div class="crow"><span class="k">Instagram</span><span class="v"><a href="https://instagram.com/data_life_centre">data_life_centre</a></span><span class="s">Oraydaǵı kúnler hám jańalıqlar</span></div>
+      </div>
+      <p class="band"><b>Rahmet!</b> DATA LIFE — Nókiste úyretemiz hám islep shıǵaramız.</p>
+    </div>
+  </section>
+
+  <div class="rail"><div class="rail__fill" id="railFill"></div></div>
+  <div class="dots" id="dots" role="tablist" aria-label="Slaydlar"></div>
+  <p class="hint" id="hint">← → yamasa bosluq</p>
+  <div class="nav">
+    <button id="full" type="button" aria-label="Tolıq ekran" title="Tolıq ekran">&#9974;</button>
+    <button id="prev" type="button" aria-label="Aldınǵı slayd">&#8592;</button>
+    <button id="next" type="button" aria-label="Keyingi slayd">&#8594;</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var deck   = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var total  = slides.length;
+  var i      = 0;
+  var fill   = document.getElementById('railFill');
+  var dots   = document.getElementById('dots');
+  var prevBtn= document.getElementById('prev');
+  var nextBtn= document.getElementById('next');
+  var fullBtn= document.getElementById('full');
+  var hint   = document.getElementById('hint');
+
+  deck.classList.add('js');
+  try { if (window.self === window.top) document.documentElement.classList.add('standalone'); } catch (e) {}
+
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+
+  slides.forEach(function(s, idx){
+    var eb = s.querySelector('.eyebrow');
+    if (eb && !eb.textContent.trim() && s.dataset.eyebrow) eb.textContent = s.dataset.eyebrow;
+    var c = s.querySelector('.counter');
+    if (c) c.innerHTML = '<b>' + pad(idx + 1) + '</b> / ' + pad(total);
+
+    var d = document.createElement('button');
+    d.type = 'button';
+    d.setAttribute('role', 'tab');
+    d.setAttribute('aria-label', (idx + 1) + '-slayd: ' + (s.dataset.eyebrow || ''));
+    d.addEventListener('click', function(){ go(idx); });
+    dots.appendChild(d);
+  });
+
+  function go(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, idx){
+      s.classList.toggle('is-active', idx === i);
+      s.setAttribute('aria-hidden', idx === i ? 'false' : 'true');
+    });
+    Array.prototype.forEach.call(dots.children, function(d, idx){
+      d.setAttribute('aria-current', idx === i ? 'true' : 'false');
+    });
+    fill.style.width = ((i + 1) / total * 100) + '%';
+    fill.style.background = getComputedStyle(slides[i]).getPropertyValue('--h');
+    prevBtn.disabled = (i === 0);
+    nextBtn.disabled = (i === total - 1);
+    if (i > 0 && hint) hint.classList.add('gone');
+  }
+
+  prevBtn.addEventListener('click', function(){ go(i - 1); });
+  nextBtn.addEventListener('click', function(){ go(i + 1); });
+
+  fullBtn.addEventListener('click', function(){
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (deck.requestFullscreen) deck.requestFullscreen().catch(function(){});
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  var x0 = null;
+  deck.addEventListener('touchstart', function(e){ x0 = e.changedTouches[0].clientX; }, {passive:true});
+  deck.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 55) go(dx < 0 ? i + 1 : i - 1);
+    x0 = null;
+  }, {passive:true});
+
+  go(0);
+})();
+</script>
+
+</body>
+</html>
