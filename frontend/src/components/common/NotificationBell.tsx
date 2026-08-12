@@ -4,7 +4,7 @@ import { Bell, CheckCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n/i18n';
 import { useAuth } from '../../hooks/useAuth';
-import { getMyNotifications, markAllNotificationsRead, markNotificationRead, subscribeNotifications, type AppNotification } from '../../api/notifications';
+import { getMyNotifications, getUnreadNotificationsCount, markAllNotificationsRead, markNotificationRead, subscribeNotifications, type AppNotification } from '../../api/notifications';
 import { Z } from '../../utils/zLayers';
 
 // SSE asosiy kanal; polling faqat zaxira (SSE uzilib qolgan oraliq uchun)
@@ -30,8 +30,23 @@ export default function NotificationBell(): React.ReactElement | null {
   const [open, setOpen] = useState<boolean>(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
-  const load = (): void => {
+  // Ro'yxat ochiq turgan-turmaganini effekt ichidan bilish uchun — `open`
+  // holatiga bog'lansak SSE ulanishi har ochib-yopishda uzilib qayta ulanardi
+  const openRef = useRef<boolean>(false);
+  openRef.current = open;
+
+  const loadList = (): void => {
     getMyNotifications().then((res) => { setItems(res.items); setUnreadCount(res.unreadCount); }).catch(() => {});
+  };
+
+  // Yopiq qo'ng'iroqqa yozuvlarning matni kerak emas — faqat raqam so'raladi;
+  // ro'yxat esa ochilgan payt (va ochiq turganda) yuklanadi
+  const load = (): void => {
+    if (openRef.current) {
+      loadList();
+      return;
+    }
+    getUnreadNotificationsCount().then((res) => setUnreadCount(res.unreadCount)).catch(() => {});
   };
 
   // user.id ga bog'lanadi — profil tahriri (user obyekti yangi referens oladi)
@@ -86,7 +101,7 @@ export default function NotificationBell(): React.ReactElement | null {
 
   return (
     <div ref={boxRef} style={{ position: 'relative' }}>
-      <button onClick={() => setOpen((v) => !v)} title={t('notifications.title')}
+      <button onClick={() => { const next = !open; setOpen(next); if (next) loadList(); }} title={t('notifications.title')}
         style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 36, height: 36, borderRadius: 10, background: '#f1f5f9', border: '1.5px solid #e2e8f0', color: '#475569', cursor: 'pointer' }}>
         <Bell size={16} />
         {unreadCount > 0 && (

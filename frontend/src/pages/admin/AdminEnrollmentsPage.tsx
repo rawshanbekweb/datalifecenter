@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listEnrollmentsAdmin, updateEnrollmentAdmin } from '../../api/enrollments';
 import { formatDate, formatNumber } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import Pagination from '../../components/admin/Pagination';
 import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 import Loading from '../../components/common/Loading';
@@ -55,15 +56,24 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
   const [query, setQuery]           = useState<string>('');
   const [busyId, setBusyId]         = useState<string>('');
   const [viewingReceiptId, setViewingReceiptId] = useState<string>('');
+  const [page, setPage]             = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const load = useCallback((): void => {
     setStatus('loading');
-    listEnrollmentsAdmin({ status: filter || undefined, search: query || undefined, limit: 50 })
-      .then((res: { items: AdminEnrollment[] }) => { setItems(res.items); setStatus('ready'); })
+    listEnrollmentsAdmin({ status: filter || undefined, search: query || undefined, page, limit: 50 })
+      .then((res: { items: AdminEnrollment[]; pagination?: { totalPages: number } }) => {
+        setItems(res.items);
+        setTotalPages(res.pagination?.totalPages ?? 1);
+        setStatus('ready');
+      })
       .catch(() => setStatus('error'));
-  }, [filter, query]);
+  }, [filter, query, page]);
 
   useEffect(load, [load]);
+
+  // Filtr almashganda birinchi sahifaga qaytamiz
+  const applyFilter = (apply: () => void): void => { apply(); setPage(1); };
 
   const act = async (id: string, data: { status?: string; paymentStatus?: string; rejectionReason?: string }): Promise<void> => {
     setBusyId(id);
@@ -90,7 +100,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
       <div style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:18 }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {STATUS_FILTERS.map((f) => (
-            <button key={f.value} onClick={() => setFilter(f.value)}
+            <button key={f.value} onClick={() => applyFilter(() => setFilter(f.value))}
               style={{
                 padding:'8px 14px', borderRadius:10, fontSize:12.5, fontWeight:700, cursor:'pointer',
                 border: filter === f.value ? '1.5px solid #0ea5e9' : '1.5px solid #e2e8f0',
@@ -101,7 +111,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
             </button>
           ))}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); setQuery(search); }}
+        <form onSubmit={(e) => { e.preventDefault(); applyFilter(() => setQuery(search)); }}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
@@ -190,6 +200,8 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
           })}
         </div>
       )}
+
+      {status === 'ready' && <Pagination page={page} totalPages={totalPages} onChange={setPage} />}
 
       {viewingReceiptId && (
         <ReceiptViewerModal id={viewingReceiptId} kind="enrollment" onClose={() => setViewingReceiptId('')} />

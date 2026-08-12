@@ -94,6 +94,19 @@ export async function listMine(userId: string) {
   return { items, unreadCount };
 }
 
+/**
+ * Faqat o'qilmaganlar soni.
+ *
+ * Qo'ng'iroq ro'yxati YOPIQ turganda (deyarli har doim) mijozga shu raqamdan
+ * boshqa hech narsa kerak emas. Ilgari o'sha holatda ham 30 ta yozuvning
+ * matni bilan birga tortilardi — har foydalanuvchi uchun bir necha daqiqada
+ * bir marta, bekorga. Bu esa `@@index([userId, readAt])` bo'yicha bitta sanoq.
+ */
+export async function unreadCount(userId: string) {
+  const count = await prisma.notification.count({ where: { userId, readAt: null } });
+  return { unreadCount: count };
+}
+
 export async function markRead(userId: string, id: string) {
   await prisma.notification.updateMany({
     where: { id, userId, readAt: null },

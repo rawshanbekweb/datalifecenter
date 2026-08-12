@@ -91,7 +91,7 @@ export default function Mentors(): React.ReactElement | null {
 
   useEffect(() => {
     let cancelled = false;
-    listMentors()
+    listMentors({ limit: PREVIEW_COUNT })
       .then((data: MentorCardData[]) => { if (!cancelled) { setMentors(data); setStatus('ready'); } })
       .catch(() => { if (!cancelled) setStatus('error'); });
     return () => { cancelled = true; };

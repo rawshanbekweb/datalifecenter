@@ -30,17 +30,38 @@ export default function CoursesPage(): React.ReactElement {
   const [isFree, setIsFree] = useState<string>('');
   const [courses, setCourses] = useState<CourseCardData[]>([]);
   const [status, setStatus]   = useState<Status>('loading');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  // Yozilayotgan matn darhol emas, tinchigach so'rovga aylanadi
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
+    const timer = setTimeout(() => setSearchTerm(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  /**
+   * Ro'yxatni yuklaydi.
+   *
+   * Ilgari har bosilgan harfda butun grid o'chib, o'rniga aylanma chiqardi —
+   * qidiruv "titrab" ko'rinardi. Endi to'liq yuklanish belgisi faqat BIRINCHI
+   * marta chiqadi, keyingi so'rovlarda esa eski natijalar joyida turadi va
+   * shunchaki xiralashadi. Daraja/narx tanlovi ham kutmasdan darhol ketadi —
+   * kechikish faqat matn kiritishga tegishli.
+   */
+  useEffect(() => {
     let cancelled = false;
-    setStatus('loading');
-    const timer = setTimeout(() => {
-      listCourses({ search, level, isFree, limit: 50 })
-        .then(({ items }: { items: CourseCardData[] }) => { if (!cancelled) { setCourses(items); setStatus('ready'); } })
-        .catch(() => { if (!cancelled) setStatus('error'); });
-    }, 300);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [search, level, isFree]);
+    setRefreshing(true);
+    listCourses({ search: searchTerm, level, isFree, limit: 50 })
+      .then(({ items }: { items: CourseCardData[] }) => {
+        if (!cancelled) { setCourses(items); setStatus('ready'); }
+      })
+      .catch(() => {
+        // Natijalar allaqachon ko'rinib turgan bo'lsa ularni o'chirmaymiz
+        if (!cancelled) setStatus((prev) => (prev === 'ready' ? prev : 'error'));
+      })
+      .finally(() => { if (!cancelled) setRefreshing(false); });
+    return () => { cancelled = true; };
+  }, [searchTerm, level, isFree]);
 
   return (
     <section className="section-light" style={{ padding:'160px 0 104px' }}>
@@ -67,7 +88,7 @@ export default function CoursesPage(): React.ReactElement {
           <p style={{ textAlign:'center', color:'#94a3b8', fontSize:14 }}>{t('pages.courses.empty')}</p>
         )}
         {status === 'ready' && courses.length > 0 && (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }} className="courses-grid">
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20, opacity: refreshing ? 0.55 : 1, transition:'opacity 0.2s' }} className="courses-grid">
             {courses.map((c, i) => <CourseCard key={c.id} course={c} index={i} />)}
           </div>
         )}

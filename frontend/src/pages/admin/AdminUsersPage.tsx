@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { listUsers, updateUserRole, setUserBlocked, deleteUser, resetUserPassword, AdminUser } from '../../api/users';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import Pagination from '../../components/admin/Pagination';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
@@ -30,6 +31,8 @@ export default function AdminUsersPage(): React.ReactElement {
   const { user: me } = useAuth();
   const [items, setItems]   = useState<AdminUser[]>([]);
   const [total, setTotal]   = useState<number>(0);
+  const [page, setPage]     = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter] = useState<string>('');
   const [search, setSearch] = useState<string>('');
@@ -45,13 +48,23 @@ export default function AdminUsersPage(): React.ReactElement {
       role: filter || undefined,
       search: query || undefined,
       verified: unverifiedOnly ? false : undefined,
+      page,
       limit: 50,
     })
-      .then((res) => { setItems(res.items); setTotal(res.pagination.total); setStatus('ready'); })
+      .then((res) => {
+        setItems(res.items);
+        setTotal(res.pagination.total);
+        setTotalPages(res.pagination.totalPages);
+        setStatus('ready');
+      })
       .catch(() => setStatus('error'));
-  }, [filter, query, unverifiedOnly]);
+  }, [filter, query, unverifiedOnly, page]);
 
   useEffect(load, [load]);
+
+  // Filtr yoki qidiruv o'zgarganda birinchi sahifaga qaytamiz — aks holda
+  // 3-sahifada turib filtr almashtirilsa bo'sh ro'yxat chiqardi
+  const applyFilter = (apply: () => void): void => { apply(); setPage(1); };
 
   const [resetInfo, setResetInfo] = useState<{ name: string; email: string; password: string } | null>(null);
 
@@ -123,7 +136,7 @@ export default function AdminUsersPage(): React.ReactElement {
       <div style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:18 }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {ROLE_FILTERS.map((f) => (
-            <button key={f.value} onClick={() => setFilter(f.value)}
+            <button key={f.value} onClick={() => applyFilter(() => setFilter(f.value))}
               style={{
                 padding:'8px 14px', borderRadius:10, fontSize:12.5, fontWeight:700, cursor:'pointer',
                 border: filter === f.value ? '1.5px solid #0ea5e9' : '1.5px solid #e2e8f0',
@@ -133,7 +146,7 @@ export default function AdminUsersPage(): React.ReactElement {
               {t(f.labelKey)}
             </button>
           ))}
-          <button onClick={() => setUnverifiedOnly((v) => !v)} title={t('admin.users.filterUnverifiedTitle')}
+          <button onClick={() => applyFilter(() => setUnverifiedOnly((v) => !v))} title={t('admin.users.filterUnverifiedTitle')}
             style={{
               display:'flex', alignItems:'center', gap:6,
               padding:'8px 14px', borderRadius:10, fontSize:12.5, fontWeight:700, cursor:'pointer',
@@ -144,7 +157,7 @@ export default function AdminUsersPage(): React.ReactElement {
             <MailWarning size={13} /> {t('admin.users.filterUnverified')}
           </button>
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); setQuery(search); }}
+        <form onSubmit={(e) => { e.preventDefault(); applyFilter(() => setQuery(search)); }}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
@@ -220,6 +233,8 @@ export default function AdminUsersPage(): React.ReactElement {
           })}
         </div>
       )}
+
+      {status === 'ready' && <Pagination page={page} totalPages={totalPages} onChange={setPage} />}
     </div>
   );
 }

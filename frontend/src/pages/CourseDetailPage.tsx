@@ -131,7 +131,10 @@ export default function CourseDetailPage(): React.ReactElement {
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [user, slug]);
+    // user obyekti emas, user.id: profil tahrirlanganda yangi referens
+    // hosil bo'lib, ro'yxat bekorga qayta so'ralardi
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, slug]);
 
   if (status === 'loading') {
     return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;

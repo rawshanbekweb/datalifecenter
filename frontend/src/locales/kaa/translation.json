@@ -564,7 +564,10 @@
       "noContent": "Bul sabaq ushın kontent ele qosılmaǵan.",
       "lessonDone": "Sabaq tamamlanǵan",
       "unmark": "Belgini alıp taslaw",
-      "markDone": "Sabaqtı tamamladım"
+      "markDone": "Sabaqtı tamamladım",
+      "prev": "Aldıńǵı",
+      "next": "Keyingi sabaq",
+      "lessonsList": "Sabaqlar dizimi"
     },
     "sessions": {
       "titleStart": "Janlı",

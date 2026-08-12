@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Radio, Video } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LiveSession, getSession } from '../api/sessions';
+import { subscribeNotifications } from '../api/notifications';
 import { useAuth } from '../hooks/useAuth';
 import { SESSION_STATUS_META, formatSessionTime } from '../components/sessions/sessionMeta';
 import Loading from '../components/common/Loading';
@@ -23,6 +24,14 @@ function isEmbeddableJitsi(url: string): boolean {
 // Jitsi panelida ko'rinadigan tugmalar — `desktop` ekran ulashish (mentor
 // noutbuk ekranini translyatsiya qilishi) uchun ochiq turishi shart
 const JITSI_TOOLBAR = ['microphone', 'camera', 'desktop', 'tileview', 'raisehand', 'fullscreen', 'chat', 'settings', 'hangup'];
+
+// Xona boshlanishiga shuncha vaqt qolganda ochiladi
+const ROOM_OPENS_BEFORE_MS = 10 * 60_000;
+
+// SSE uzilib qolgan holat uchun zaxira so'rov oralig'i. Asosiy signal —
+// bildirishnoma oqimi (mentor efirni boshlaganda auditoriyaga xabar ketadi),
+// shuning uchun bu yerda tez-tez so'rov yuborishning hojati yo'q.
+const FALLBACK_POLL_MS = 180_000;
 
 // Jitsi URL'iga foydalanuvchi ismi, "kutish sahifasi"ni o'chirish, "ilovada
 // ochish" bezovtasini o'chirish va to'g'ri toolbar sozlamasini qo'shadi —
@@ -45,6 +54,9 @@ export default function LiveSessionPage(): React.ReactElement {
   const [session, setSession] = useState<LiveSession | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  // Kutish oynasini qachon yopishni hisoblash uchun — taymer va yangilanishlar
+  // shu qiymatni surib turadi
+  const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
     let cancelled = false;
@@ -59,15 +71,43 @@ export default function LiveSessionPage(): React.ReactElement {
     return () => { cancelled = true; };
   }, [id, t]);
 
-  // Rejalashtirilgan sessiya mentor tomonidan boshlanishi (yoki vaqti o'tib
-  // yakunlanishi) ni kutayotganda sahifa o'zi yangilanib turadi
+  // Sessiya holati o'zgarishini kutamiz: mentor efirni boshlashi, bekor
+  // qilishi yoki yakunlashi.
+  //
+  // Ilgari bu yerda har 60 soniyada so'rov ketardi va effekt `session`
+  // obyektiga bog'langani uchun har javobdan keyin taymer o'chib qayta
+  // ochilardi. Endi asosiy signal — SSE bildirishnomasi (holat o'zgarganda
+  // auditoriyaga xabar yuboriladi), so'rov esa faqat zaxira; fon tabda
+  // umuman yuborilmaydi.
+  const sessionStatus = session?.status;
+  useEffect(() => {
+    if (sessionStatus !== 'SCHEDULED' && sessionStatus !== 'LIVE') return;
+
+    const refresh = (): void => {
+      if (document.visibilityState !== 'visible') return;
+      setNow(Date.now());
+      getSession(id!).then(setSession).catch(() => {});
+    };
+
+    const unsubscribe = subscribeNotifications(refresh);
+    const timer = setInterval(refresh, FALLBACK_POLL_MS);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      unsubscribe();
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [id, sessionStatus]);
+
+  // Kutish kartasi xona ochiladigan lahzada o'zi yo'qoladi — foydalanuvchi
+  // sahifani qo'lda yangilashi shart emas
   useEffect(() => {
     if (!session || session.status !== 'SCHEDULED') return;
-    const timer = setInterval(() => {
-      getSession(id!).then(setSession).catch(() => {});
-    }, 60_000);
-    return () => clearInterval(timer);
-  }, [id, session]);
+    const delay = new Date(session.startsAt).getTime() - ROOM_OPENS_BEFORE_MS - Date.now();
+    if (delay <= 0) return;
+    const timer = setTimeout(() => setNow(Date.now()), delay + 500);
+    return () => clearTimeout(timer);
+  }, [session]);
 
   const embeddable = useMemo(
     () => (session ? isEmbeddableJitsi(session.meetingUrl) : false),
@@ -96,7 +136,7 @@ export default function LiveSessionPage(): React.ReactElement {
   const isLive = session.status === 'LIVE';
   const canJoin = session.status === 'LIVE' || session.status === 'SCHEDULED';
   // Boshlanishiga 10 daqiqadan ko'p vaqt bo'lsa — bo'sh xonaga kiritmay, kutish kartasi ko'rsatiladi
-  const isEarly = session.status === 'SCHEDULED' && Date.now() < new Date(session.startsAt).getTime() - 10 * 60_000;
+  const isEarly = session.status === 'SCHEDULED' && now < new Date(session.startsAt).getTime() - ROOM_OPENS_BEFORE_MS;
 
   return (
     <section style={{ padding: '110px 0 40px', minHeight: '100vh', background: '#0f172a' }}>

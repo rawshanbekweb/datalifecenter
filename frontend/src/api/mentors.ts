@@ -4,8 +4,10 @@ export interface MentorData {
   [key: string]: unknown;
 }
 
-export function listMentors(): Promise<any> {
-  return apiFetch('/mentors');
+// `limit` — bosh sahifadagi qisqa ro'yxat uchun; /mentors sahifasi
+// chegarasiz chaqiradi va hammasini oladi
+export function listMentors(params: { limit?: number } = {}): Promise<any> {
+  return apiFetch(`/mentors${params.limit ? `?limit=${params.limit}` : ''}`);
 }
 
 // Admin tahrirlash paneli — xom (barcha til) ma'lumot qaytaradi

@@ -9,9 +9,10 @@ interface ProgressSummary {
 }
 
 async function getEnrolledLessonContext(userId: string, lessonId: string) {
+  // Faqat kurs identifikatori kerak — darsning matni/videosi o'qilmaydi
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
-    include: { module: { select: { courseId: true } } },
+    select: { id: true, module: { select: { courseId: true } } },
   });
   if (!lesson) {
     throw ApiError.notFound('Dars topilmadi');
@@ -27,7 +28,18 @@ async function getEnrolledLessonContext(userId: string, lessonId: string) {
   return { lesson, enrollment, courseId: lesson.module.courseId };
 }
 
-async function buildSummary(userId: string, courseId: string, enrollmentId: string): Promise<ProgressSummary> {
+/**
+ * Yozilishning joriy holatini qaytaradi.
+ *
+ * `enrollment` chaqiruvchidan OBYEKT sifatida olinadi, id emas: uni
+ * `getEnrolledLessonContext` allaqachon o'qib bo'lgan, bu yerda qayta o'qish
+ * har bir "yakunladim" bosishiga bitta ortiqcha so'rov qo'shardi.
+ */
+async function buildSummary(
+  userId: string,
+  courseId: string,
+  enrollment: { id: string; status: string }
+): Promise<ProgressSummary> {
   const [totalLessons, completedLessons] = await Promise.all([
     prisma.lesson.count({ where: { module: { courseId } } }),
     prisma.lessonProgress.count({ where: { userId, lesson: { module: { courseId } } } }),
@@ -35,18 +47,17 @@ async function buildSummary(userId: string, courseId: string, enrollmentId: stri
 
   // Hamma dars tugagan bo'lsa kurs avtomatik yakunlanadi, aks holda faolga qaytadi
   const shouldComplete = totalLessons > 0 && completedLessons >= totalLessons;
-  const enrollment = await prisma.enrollment.findUnique({ where: { id: enrollmentId } });
-  let status = enrollment?.status ?? 'ACTIVE';
+  let status = enrollment.status;
 
   if (shouldComplete && status === 'ACTIVE') {
     await prisma.enrollment.update({
-      where: { id: enrollmentId },
+      where: { id: enrollment.id },
       data: { status: 'COMPLETED', completedAt: new Date() },
     });
     status = 'COMPLETED';
   } else if (!shouldComplete && status === 'COMPLETED') {
     await prisma.enrollment.update({
-      where: { id: enrollmentId },
+      where: { id: enrollment.id },
       data: { status: 'ACTIVE', completedAt: null },
     });
     status = 'ACTIVE';
@@ -64,7 +75,7 @@ export async function completeLesson(userId: string, lessonId: string): Promise<
     update: {},
   });
 
-  return buildSummary(userId, courseId, enrollment.id);
+  return buildSummary(userId, courseId, enrollment);
 }
 
 export async function uncompleteLesson(userId: string, lessonId: string): Promise<ProgressSummary> {
@@ -72,5 +83,5 @@ export async function uncompleteLesson(userId: string, lessonId: string): Promis
 
   await prisma.lessonProgress.deleteMany({ where: { userId, lessonId } });
 
-  return buildSummary(userId, courseId, enrollment.id);
+  return buildSummary(userId, courseId, enrollment);
 }

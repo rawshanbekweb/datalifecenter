@@ -10,6 +10,7 @@ import {
 import { formatDateTime } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import BulkActionBar from '../../components/admin/BulkActionBar';
+import Pagination from '../../components/admin/Pagination';
 import { useBulkSelection } from '../../components/admin/useBulkSelection';
 import { useConfirm, useToast } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
@@ -203,15 +204,7 @@ export default function AdminMessagesPage(): React.ReactElement {
       })}
       </div>
 
-      {totalPages > 1 && (
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:20 }}>
-          <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page <= 1 ? 0.5 : 1 }}
-            disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t('admin.common.prev')}</button>
-          <span style={{ fontSize:13, color:'#64748b', fontWeight:600 }}>{page} / {totalPages}</span>
-          <button className="btn-outline" style={{ fontSize:12.5, padding:'7px 14px', opacity: page >= totalPages ? 0.5 : 1 }}
-            disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t('admin.common.next')}</button>
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 }

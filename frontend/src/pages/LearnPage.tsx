@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, PlayCircle, FileText, HelpCircle, ClipboardList, ChevronDown, ChevronRight, Clock, CheckCircle, Trophy } from 'lucide-react';
+import { ArrowLeft, PlayCircle, FileText, HelpCircle, ClipboardList, ChevronDown, ChevronLeft, ChevronRight, Clock, CheckCircle, List, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getCourseLearn } from '../api/courses';
 import { completeLesson, uncompleteLesson } from '../api/progress';
 import ComingSoon from '../components/common/ComingSoon';
 import { useToast } from '../components/common/Feedback';
+import LessonContent from '../components/common/LessonContent';
 import LessonVideo from '../components/common/LessonVideo';
 import LessonQA from '../components/questions/LessonQA';
 import Loading from '../components/common/Loading';
@@ -58,6 +59,10 @@ export default function LearnPage(): React.ReactElement {
   const [hasEnrollment, setHasEnrollment] = useState<boolean>(false);
   const [courseCompleted, setCourseCompleted] = useState<boolean>(false);
   const [marking, setMarking]         = useState<boolean>(false);
+  // Telefonda dars ro'yxati yopiq turadi (aks holda kontentgacha butun
+  // dasturni aylantirib o'tishga to'g'ri kelardi)
+  const [navOpen, setNavOpen]         = useState<boolean>(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,14 +100,31 @@ export default function LearnPage(): React.ReactElement {
     return () => { cancelled = true; };
   }, [slug]);
 
-  const activeLesson = useMemo((): LearnLesson | null => {
-    if (!course) return null;
-    for (const mod of course.modules) {
-      const found = mod.lessons.find((l) => l.id === activeLessonId);
-      if (found) return found;
+  // Modullar bo'ylab tekislangan dars ketma-ketligi — "oldingi/keyingi" va
+  // "N / M" hisoblagichi shu ro'yxatga tayanadi
+  const flatLessons = useMemo(
+    (): { lesson: LearnLesson; moduleId: string }[] =>
+      course ? course.modules.flatMap((m) => m.lessons.map((lesson) => ({ lesson, moduleId: m.id }))) : [],
+    [course]
+  );
+
+  const activeIndex = flatLessons.findIndex((x) => x.lesson.id === activeLessonId);
+  const activeLesson = activeIndex >= 0 ? flatLessons[activeIndex].lesson : null;
+
+  // Darsni almashtiradi: kerakli modulni ochadi, telefonda ro'yxatni yopib
+  // kontentga qaytaradi (aks holda foydalanuvchi ro'yxatda qolib ketardi)
+  const goToLesson = (index: number): void => {
+    const target = flatLessons[index];
+    if (!target) return;
+    setActiveLessonId(target.lesson.id);
+    setOpenModules((prev) => ({ ...prev, [target.moduleId]: true }));
+    setNavOpen(false);
+    if (window.innerWidth <= 900) {
+      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    return null;
-  }, [course, activeLessonId]);
+  };
+
+  const goToLessonId = (id: string): void => goToLesson(flatLessons.findIndex((x) => x.lesson.id === id));
 
   if (status === 'loading') {
     return <section style={{ padding:'200px 24px 80px' }}><Loading page /></section>;
@@ -130,22 +152,41 @@ export default function LearnPage(): React.ReactElement {
   const progressPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const isActiveCompleted = activeLesson ? completedIds.includes(activeLesson.id) : false;
 
-  const toggleComplete = async (): Promise<void> => {
-    if (!activeLesson || marking) return;
+  // Belgi darhol o'zgaradi (optimistik) — tarmoq javobini kutib turish
+  // darsdan darsga o'tishni sekinlashtirardi. Xato bo'lsa belgi qaytariladi.
+  const setCompleted = async (lessonId: string, completed: boolean, advance: boolean): Promise<void> => {
+    if (marking) return;
     setMarking(true);
+    setCompletedIds((prev) => (completed ? [...prev, lessonId] : prev.filter((id) => id !== lessonId)));
+
+    const from = flatLessons.findIndex((x) => x.lesson.id === lessonId);
+    if (advance && from >= 0 && from < flatLessons.length - 1) {
+      goToLesson(from + 1);
+    }
+
     try {
-      const summary = isActiveCompleted
-        ? await uncompleteLesson(activeLesson.id)
-        : await completeLesson(activeLesson.id);
-      setCompletedIds((prev) =>
-        isActiveCompleted ? prev.filter((id) => id !== activeLesson.id) : [...prev, activeLesson.id]
-      );
+      const summary = completed ? await completeLesson(lessonId) : await uncompleteLesson(lessonId);
       setCourseCompleted(summary.courseCompleted);
     } catch (err: unknown) {
+      setCompletedIds((prev) => (completed ? prev.filter((id) => id !== lessonId) : [...prev, lessonId]));
       toast.error((err as Error).message || t('common.error'));
     } finally {
       setMarking(false);
     }
+  };
+
+  // Tugmani bosish: yakunlagach o'zi keyingi darsga o'tadi, belgini olib
+  // tashlaganda esa joyida qoladi
+  const toggleComplete = (): void => {
+    if (!activeLesson) return;
+    void setCompleted(activeLesson.id, !isActiveCompleted, !isActiveCompleted);
+  };
+
+  // Video oxirigacha ko'rildi — darsni o'zi yakunlangan deb belgilaydi, lekin
+  // keyingi darsga o'tkazmaydi (video tugashi bilan sahifa sakrashi bezovta qiladi)
+  const handleVideoEnded = (): void => {
+    if (!activeLesson || !hasEnrollment || isActiveCompleted) return;
+    void setCompleted(activeLesson.id, true, false);
   };
 
   return (
@@ -188,9 +229,22 @@ export default function LearnPage(): React.ReactElement {
         )}
 
         {course.modules.length > 0 && (
+          <>
+          {/* Telefonda ro'yxatni ochadigan tugma — kompyuterda CSS bilan yashiriladi */}
+          <button type="button" className="learn-nav-toggle" onClick={() => setNavOpen((v) => !v)}
+            style={{ alignItems:'center', gap:8, width:'100%', padding:'11px 14px', marginBottom:12, borderRadius:12, background:'#fff', border:'1.5px solid #e2e8f0', cursor:'pointer', fontSize:13, fontWeight:700, color:'#0f172a' }}>
+            <List size={15} style={{ color:course.color, flexShrink:0 }}/>
+            <span style={{ flex:1, textAlign:'left' }}>{t('student.learn.lessonsList')}</span>
+            {activeIndex >= 0 && (
+              <span style={{ fontSize:12, fontWeight:700, color:'#94a3b8' }}>{activeIndex + 1} / {flatLessons.length}</span>
+            )}
+            {navOpen ? <ChevronDown size={14} style={{ color:'#94a3b8' }}/> : <ChevronRight size={14} style={{ color:'#94a3b8' }}/>}
+          </button>
+
           <div className="learn-grid" style={{ display:'grid', gridTemplateColumns:'320px 1fr', gap:20, alignItems:'start' }}>
-            {/* Dars ro'yxati */}
-            <div className="card" style={{ padding:12, position:'sticky', top:100 }}>
+            {/* Dars ro'yxati — uzun dasturda o'z ichida aylanadi, sahifani cho'zmaydi */}
+            <div className="card learn-nav" data-open={navOpen ? 'true' : 'false'}
+              style={{ padding:12, position:'sticky', top:100, maxHeight:'calc(100vh - 130px)', overflowY:'auto' }}>
               {course.modules.map((mod, mi) => {
                 const open = !!openModules[mod.id];
                 return (
@@ -209,7 +263,7 @@ export default function LearnPage(): React.ReactElement {
                       const active = lesson.id === activeLessonId;
                       const done = completedIds.includes(lesson.id);
                       return (
-                        <button key={lesson.id} onClick={() => setActiveLessonId(lesson.id)}
+                        <button key={lesson.id} onClick={() => goToLessonId(lesson.id)}
                           style={{
                             display:'flex', alignItems:'center', gap:9, width:'100%', padding:'9px 10px 9px 30px',
                             borderRadius:10, border:'none', cursor:'pointer', textAlign:'left',
@@ -229,7 +283,7 @@ export default function LearnPage(): React.ReactElement {
             </div>
 
             {/* Dars kontenti */}
-            <div className="card" style={{ padding:24, minHeight:400 }}>
+            <div className="card" ref={contentRef} style={{ padding:24, minHeight:400, scrollMarginTop:100 }}>
               {!activeLesson && <p style={{ color:'#94a3b8', fontSize:14 }}>{t('student.learn.selectLesson')}</p>}
               {activeLesson && (
                 <div>
@@ -239,7 +293,7 @@ export default function LearnPage(): React.ReactElement {
                   </p>
 
                   {activeLesson.contentType === 'VIDEO' && activeLesson.videoUrl && (
-                    <LessonVideo url={activeLesson.videoUrl} title={activeLesson.title} />
+                    <LessonVideo url={activeLesson.videoUrl} title={activeLesson.title} onEnded={handleVideoEnded} />
                   )}
                   {activeLesson.contentType === 'VIDEO' && !activeLesson.videoUrl && (
                     <div style={{ padding:'40px 20px', borderRadius:14, background:'#f8fafc', border:'1.5px dashed #cbd5e1', textAlign:'center', marginBottom:18 }}>
@@ -249,7 +303,7 @@ export default function LearnPage(): React.ReactElement {
                   )}
 
                   {activeLesson.content && (
-                    <div style={{ fontSize:14, color:'#334155', lineHeight:1.9, whiteSpace:'pre-wrap' }}>{activeLesson.content}</div>
+                    <LessonContent text={activeLesson.content} />
                   )}
                   {!activeLesson.content && activeLesson.contentType !== 'VIDEO' && (
                     <p style={{ fontSize:13, color:'#94a3b8' }}>{t('student.learn.noContent')}</p>
@@ -276,14 +330,42 @@ export default function LearnPage(): React.ReactElement {
                     </div>
                   )}
 
+                  {/* Oldingi/keyingi — ilgari har safar yon ro'yxatdan qidirishga to'g'ri kelardi */}
+                  {flatLessons.length > 1 && (
+                    <div style={{ marginTop:16, display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                      <button type="button" className="btn-outline" disabled={activeIndex <= 0}
+                        onClick={() => goToLesson(activeIndex - 1)}
+                        style={{ fontSize:12.5, padding:'9px 14px', opacity: activeIndex <= 0 ? 0.45 : 1 }}>
+                        <ChevronLeft size={14}/> {t('student.learn.prev')}
+                      </button>
+                      <span style={{ fontSize:12, color:'#94a3b8', fontFamily:'var(--font-mono)' }}>
+                        {activeIndex + 1} / {flatLessons.length}
+                      </span>
+                      <button type="button" className="btn-outline" disabled={activeIndex < 0 || activeIndex >= flatLessons.length - 1}
+                        onClick={() => goToLesson(activeIndex + 1)}
+                        style={{ marginLeft:'auto', fontSize:12.5, padding:'9px 14px', opacity: activeIndex >= flatLessons.length - 1 ? 0.45 : 1 }}>
+                        {t('student.learn.next')} <ChevronRight size={14}/>
+                      </button>
+                    </div>
+                  )}
+
                   {hasEnrollment && <LessonQA lessonId={activeLesson.id} accentColor={course.color} />}
                 </div>
               )}
             </div>
           </div>
+          </>
         )}
       </div>
-      <style>{`@media(max-width:900px){.learn-grid{grid-template-columns:1fr!important}.learn-grid>.card:first-child{position:static!important}}`}</style>
+      <style>{`
+        .learn-nav-toggle{display:none}
+        @media(max-width:900px){
+          .learn-grid{grid-template-columns:1fr!important}
+          .learn-nav{position:static!important;max-height:none!important;overflow:visible!important}
+          .learn-nav[data-open="false"]{display:none}
+          .learn-nav-toggle{display:flex}
+        }
+      `}</style>
     </section>
   );
 }

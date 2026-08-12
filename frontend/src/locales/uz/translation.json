@@ -564,7 +564,10 @@
       "noContent": "Bu dars uchun kontent hali qo'shilmagan.",
       "lessonDone": "Dars yakunlangan",
       "unmark": "Belgini olib tashlash",
-      "markDone": "Darsni yakunladim"
+      "markDone": "Darsni yakunladim",
+      "prev": "Oldingi",
+      "next": "Keyingi dars",
+      "lessonsList": "Darslar ro'yxati"
     },
     "sessions": {
       "titleStart": "Jonli",

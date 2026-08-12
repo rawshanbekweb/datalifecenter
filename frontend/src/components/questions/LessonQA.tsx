@@ -10,21 +10,34 @@ interface LessonQAProps {
   accentColor: string;
 }
 
+/**
+ * Ko'rilgan darslarning savollari sessiya davomida eslab qolinadi.
+ *
+ * O'quvchi darslar orasida oldinga-orqaga yurganda har safar so'rov ketib,
+ * blok "yuklanmoqda"ga tushib qolardi. Endi kesh darhol ko'rsatiladi, so'rov
+ * esa fonda ketib ro'yxatni yangilaydi.
+ */
+const questionsCache = new Map<string, LessonQuestion[]>();
+
 // Dars ostidagi o'quvchi ↔ mentor savol-javob bloki
 export default function LessonQA({ lessonId, accentColor }: LessonQAProps): React.ReactElement {
   const { t } = useTranslation();
-  const [questions, setQuestions] = useState<LessonQuestion[]>([]);
-  const [loaded, setLoaded]   = useState<boolean>(false);
+  const [questions, setQuestions] = useState<LessonQuestion[]>(() => questionsCache.get(lessonId) ?? []);
+  const [loaded, setLoaded]   = useState<boolean>(() => questionsCache.has(lessonId));
   const [body, setBody]       = useState<string>('');
   const [sending, setSending] = useState<boolean>(false);
   const [error, setError]     = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
-    setLoaded(false);
-    setQuestions([]);
+    const cached = questionsCache.get(lessonId);
+    setQuestions(cached ?? []);
+    setLoaded(cached !== undefined);
     getLessonQuestions(lessonId)
-      .then((data) => { if (!cancelled) { setQuestions(data); setLoaded(true); } })
+      .then((data) => {
+        questionsCache.set(lessonId, data);
+        if (!cancelled) { setQuestions(data); setLoaded(true); }
+      })
       .catch(() => { if (!cancelled) setLoaded(true); });
     return () => { cancelled = true; };
   }, [lessonId]);
@@ -36,7 +49,11 @@ export default function LessonQA({ lessonId, accentColor }: LessonQAProps): Reac
     setError('');
     try {
       const created = await askQuestion(lessonId, body.trim());
-      setQuestions((prev) => [created, ...prev]);
+      setQuestions((prev) => {
+        const next = [created, ...prev];
+        questionsCache.set(lessonId, next);
+        return next;
+      });
       setBody('');
     } catch (err: unknown) {
       setError((err as Error).message || t('qa.sendError'));

@@ -564,7 +564,10 @@
       "noContent": "Content for this lesson has not been added yet.",
       "lessonDone": "Lesson completed",
       "unmark": "Remove the mark",
-      "markDone": "Mark lesson as done"
+      "markDone": "Mark lesson as done",
+      "prev": "Previous",
+      "next": "Next lesson",
+      "lessonsList": "Lesson list"
     },
     "sessions": {
       "titleStart": "Live",

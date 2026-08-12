@@ -48,7 +48,21 @@ function parseVideo(url: string): ParsedVideo | null {
 
 const FRAME: React.CSSProperties = { borderRadius: 14, overflow: 'hidden', background: '#0f172a', marginBottom: 18 };
 
-export default function LessonVideo({ url, title }: { url: string; title: string }): React.ReactElement | null {
+interface LessonVideoProps {
+  url: string;
+  title: string;
+  /**
+   * Video oxirigacha ko'rilganda chaqiriladi.
+   *
+   * Faqat saytga yuklangan fayllar uchun ishlaydi: YouTube/Vimeo iframe'i
+   * ichida nima bo'layotganini tashqaridan bilib bo'lmaydi (buning uchun
+   * ularning JS API'sini yuklash kerak — bu esa "facade" bilan yutilgan
+   * tezlikni qaytarib berardi).
+   */
+  onEnded?: () => void;
+}
+
+export default function LessonVideo({ url, title, onEnded }: LessonVideoProps): React.ReactElement | null {
   const [playing, setPlaying] = useState(false);
   const v = parseVideo(url);
   if (!v) return null;
@@ -56,7 +70,7 @@ export default function LessonVideo({ url, title }: { url: string; title: string
   if (v.kind === 'file') {
     return (
       <div style={FRAME}>
-        <video src={v.embed} controls controlsList="nodownload" playsInline
+        <video src={v.embed} controls controlsList="nodownload" playsInline onEnded={onEnded}
           style={{ display: 'block', width: '100%', maxHeight: 480 }} />
       </div>
     );

@@ -62,10 +62,19 @@ function withTeamPhoto<T extends PersonPhoto & {
   };
 }
 
-export async function listMentors(locale: SupportedLocale) {
+/**
+ * Ommaviy mentorlar ro'yxati.
+ *
+ * `limit` — bosh sahifa uchun: u faqat bir nechta kartani ko'rsatadi, lekin
+ * ilgari BARCHA mentorni (bio, mansab va biriktirilgan kurslari bilan,
+ * to'rt tilda tekislangan holda) yuklab olardi. /mentors sahifasi esa
+ * chegarasiz chaqiradi va hammasini oladi.
+ */
+export async function listMentors(locale: SupportedLocale, limit?: number) {
   const mentors = await prisma.mentor.findMany({
     orderBy: [PHOTO_FIRST, { featured: 'desc' }, { order: 'asc' }],
     include: publicInclude,
+    ...(limit ? { take: limit } : {}),
   });
   return resolveLocaleDeep(mentors.map((m) => {
     const { courseLinks, ...rest } = withTeamPhoto(m);

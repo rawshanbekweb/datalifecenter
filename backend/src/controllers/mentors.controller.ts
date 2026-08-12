@@ -38,7 +38,10 @@ export const mentorStudentsHandler = asyncHandler(async (req: Request, res: Resp
 });
 
 export const listMentorsHandler = asyncHandler(async (req: Request, res: Response) => {
-  const mentors = await mentorsService.listMentors(req.locale);
+  // Noto'g'ri yoki haddan tashqari katta qiymat e'tiborga olinmaydi
+  const raw = Number(req.query.limit);
+  const limit = Number.isInteger(raw) && raw > 0 && raw <= 100 ? raw : undefined;
+  const mentors = await mentorsService.listMentors(req.locale, limit);
   sendSuccess(res, mentors);
 });
 

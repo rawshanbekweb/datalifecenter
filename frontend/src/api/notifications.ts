@@ -36,6 +36,11 @@ export function getMyNotifications(): Promise<{ items: AppNotification[]; unread
   return apiFetch('/notifications');
 }
 
+// Qo'ng'iroq yopiq turganda faqat shu so'raladi — ro'yxatning o'zi emas
+export function getUnreadNotificationsCount(): Promise<{ unreadCount: number }> {
+  return apiFetch('/notifications/unread-count');
+}
+
 export function markNotificationRead(id: string): Promise<{ read: boolean }> {
   return apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
 }
