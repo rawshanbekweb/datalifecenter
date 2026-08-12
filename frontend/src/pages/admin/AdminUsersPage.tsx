@@ -6,6 +6,7 @@ import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Pagination from '../../components/admin/Pagination';
 import { useAuth } from '../../hooks/useAuth';
+import { useDebounced } from '../../hooks/useDebounced';
 import { useToast, useConfirm } from '../../components/common/Feedback';
 import Loading from '../../components/common/Loading';
 
@@ -36,7 +37,8 @@ export default function AdminUsersPage(): React.ReactElement {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter] = useState<string>('');
   const [search, setSearch] = useState<string>('');
-  const [query, setQuery]   = useState<string>('');
+  // Qidiruv jonli: "Qidirish" tugmasini bosish shart emas
+  const query = useDebounced(search);
   const [busyId, setBusyId] = useState<string>('');
   // Emaili tasdiqlanmaganlar filtri — soxta ro'yxatdan o'tishlarni bir joyda
   // ko'rib chiqish uchun. Rol filtri bilan birga ishlaydi.
@@ -157,14 +159,17 @@ export default function AdminUsersPage(): React.ReactElement {
             <MailWarning size={13} /> {t('admin.users.filterUnverified')}
           </button>
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); applyFilter(() => setQuery(search)); }}
+        {/* Enter bosilsa sahifa qayta yuklanmasin — qidiruv o'zi jonli ishlaydi */}
+        <form onSubmit={(e) => e.preventDefault()}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
-            <input className="inp" value={search} onChange={(e) => setSearch(e.target.value)}
+            {/* Sahifa YOZISH bilan darhol birinchisiga qaytadi (kechikishni
+                kutmasdan) — aks holda 3-sahifada turib qidirilganda avval eski
+                sahifa uchun keraksiz so'rov ketardi */}
+            <input className="inp" value={search} onChange={(e) => applyFilter(() => setSearch(e.target.value))}
               placeholder={t('admin.users.searchPlaceholder')} style={{ paddingLeft:34, width:220 }} />
           </div>
-          <button type="submit" className="btn-outline" style={{ fontSize:13 }}>{t('admin.common.search')}</button>
         </form>
       </div>
 
@@ -184,8 +189,8 @@ export default function AdminUsersPage(): React.ReactElement {
             const isSelf = me?.id === u.id;
             const busy = busyId === u.id;
             return (
-              <div key={u.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap', opacity: u.isBlocked ? 0.75 : 1 }}>
-                <div style={{ width:40, height:40, borderRadius:'50%', background:r.bg, border:`1.5px solid ${r.border}`, color:r.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, fontWeight:800, flexShrink:0 }}>
+              <div key={u.id} className="card admin-row" style={{ opacity: u.isBlocked ? 0.75 : 1 }}>
+                <div style={{ width:34, height:34, borderRadius:'50%', background:r.bg, border:`1.5px solid ${r.border}`, color:r.color, display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, fontWeight:800, flexShrink:0 }}>
                   {u.name.charAt(0).toUpperCase()}
                 </div>
                 <div style={{ flex:'1 1 200px', minWidth:0 }}>

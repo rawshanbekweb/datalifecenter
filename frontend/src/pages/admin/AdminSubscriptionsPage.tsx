@@ -5,9 +5,11 @@ import { listSubscriptionsAdmin, updateSubscriptionAdmin } from '../../api/subsc
 import { getSiteSettings, updateSiteSettingSection } from '../../api/siteSettings';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import Pagination from '../../components/admin/Pagination';
 import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 import Loading from '../../components/common/Loading';
+import { useDebounced } from '../../hooks/useDebounced';
 
 interface AdminSubscription {
   id: string;
@@ -107,18 +109,33 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter] = useState<string>('');
   const [search, setSearch] = useState<string>('');
-  const [query, setQuery]   = useState<string>('');
+  // Qidiruv jonli: "Qidirish" tugmasini bosish shart emas
+  const query = useDebounced(search);
   const [busyId, setBusyId] = useState<string>('');
   const [viewingReceiptId, setViewingReceiptId] = useState<string>('');
+  const [page, setPage]     = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
+  /**
+   * Backend bu ro'yxatni ALLAQACHON sahifalab qaytarardi (page/totalPages),
+   * lekin bu yerda `page` yuborilmasdi va `Pagination` chizilmasdi — ya'ni
+   * ellikinchidan keyingi obunalarni admin umuman ko'ra olmasdi.
+   */
   const load = useCallback((): void => {
     setStatus('loading');
-    listSubscriptionsAdmin({ status: filter || undefined, search: query || undefined, limit: 50 })
-      .then((res: { items: AdminSubscription[] }) => { setItems(res.items); setStatus('ready'); })
+    listSubscriptionsAdmin({ status: filter || undefined, search: query || undefined, page, limit: 50 })
+      .then((res: { items: AdminSubscription[]; pagination?: { totalPages: number } }) => {
+        setItems(res.items);
+        setTotalPages(res.pagination?.totalPages ?? 1);
+        setStatus('ready');
+      })
       .catch(() => setStatus('error'));
-  }, [filter, query]);
+  }, [filter, query, page]);
 
   useEffect(load, [load]);
+
+  // Filtr yoki qidiruv o'zgarganda birinchi sahifaga qaytamiz
+  const applyFilter = (apply: () => void): void => { apply(); setPage(1); };
 
   const act = async (id: string, data: { status: 'ACTIVE' | 'REJECTED' | 'CANCELLED'; rejectionReason?: string }): Promise<void> => {
     setBusyId(id);
@@ -147,7 +164,7 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
       <div style={{ display:'flex', gap:10, flexWrap:'wrap', marginBottom:18 }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {STATUS_FILTERS.map((f) => (
-            <button key={f.value} onClick={() => setFilter(f.value)}
+            <button key={f.value} onClick={() => applyFilter(() => setFilter(f.value))}
               style={{
                 padding:'8px 14px', borderRadius:10, fontSize:12.5, fontWeight:700, cursor:'pointer',
                 border: filter === f.value ? '1.5px solid #0ea5e9' : '1.5px solid #e2e8f0',
@@ -158,14 +175,14 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
             </button>
           ))}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); setQuery(search); }}
+        {/* Enter bosilsa sahifa qayta yuklanmasin — qidiruv o'zi jonli ishlaydi */}
+        <form onSubmit={(e) => e.preventDefault()}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
-            <input className="inp" value={search} onChange={(e) => setSearch(e.target.value)}
+            <input className="inp" value={search} onChange={(e) => applyFilter(() => setSearch(e.target.value))}
               placeholder={t('admin.subscriptions.searchPlaceholder')} style={{ paddingLeft:34, width:220 }} />
           </div>
-          <button type="submit" className="btn-outline" style={{ fontSize:13 }}>{t('admin.common.search')}</button>
         </form>
       </div>
 
@@ -184,7 +201,7 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
             const meta = STATUS_META[s.status];
             const busy = busyId === s.id;
             return (
-              <div key={s.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
+              <div key={s.id} className="card admin-row">
                 <div style={{ flex:'1 1 200px', minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{s.user.name}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>{s.user.email}</p>
@@ -221,6 +238,8 @@ export default function AdminSubscriptionsPage(): React.ReactElement {
           })}
         </div>
       )}
+
+      {status === 'ready' && <Pagination page={page} totalPages={totalPages} onChange={setPage} />}
 
       {viewingReceiptId && (
         <ReceiptViewerModal id={viewingReceiptId} kind="subscription" onClose={() => setViewingReceiptId('')} />
