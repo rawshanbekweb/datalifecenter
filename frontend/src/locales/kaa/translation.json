@@ -170,6 +170,10 @@
       "headingAccent": "IT bilimlendiriw",
       "para1": "— 2019-jılı shólkemlestirilgen IT kompaniya. Buyırtpashılar ushın sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵamız.",
       "para2": "Sonıń menen birge 7 baǵdar boyınsha oqıtamız — islep shıǵarıwdaǵı tájiriybemiz tuwrıdan-tuwrı sabaqlarǵa ótedi.",
+      "team": {
+        "title": "Bizdiń jámáát",
+        "all": "Jámáát penen tanısıń"
+      },
       "fallback": {
         "graduates": "Pitkeriwshiler",
         "directions": "Baǵdarlar",

@@ -3,6 +3,8 @@ import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { CheckCircle } from 'lucide-react';
 import { resolveIcon } from '../utils/iconMap';
+import AboutTeamCard from './home/AboutTeamCard';
+import { useTeam } from '../hooks/useTeam';
 
 interface RawStatItem {
   icon: string;
@@ -11,21 +13,9 @@ interface RawStatItem {
   color: string;
 }
 
-interface SkillItem {
-  label: string;
-  pct: number;
-}
-
-interface SatisfactionItem {
-  value: string;
-  label: string;
-}
-
 interface AboutSettings {
   stats?: RawStatItem[];
   features?: string[];
-  skills?: SkillItem[];
-  satisfaction?: SatisfactionItem[];
 }
 
 interface AboutProps {
@@ -54,21 +44,19 @@ const DEFAULT_FEATURE_KEYS: string[] = [
   'home.about.fallback.feat3', 'home.about.fallback.feat4',
 ];
 
-// Ko'nikma foizi va "mamnunlik/ishga joylashish" ko'rsatkichlari uchun
-// ZAXIRA YO'Q: ularning har qanday qiymati o'ylab topilgan bo'lardi.
-// Admin panel orqali kiritilsagina ko'rsatiladi.
-
 export default function About({ settings }: AboutProps = {}): React.ReactElement {
   const { t } = useTranslation();
   const STATS = settings?.stats?.length
     ? settings.stats
     : DEFAULT_STATS.map((s) => ({ ...s, label: t(s.label) }));
   const FEATURES = settings?.features?.length ? settings.features : DEFAULT_FEATURE_KEYS.map((k) => t(k));
-  const SKILLS = settings?.skills ?? [];
-  const SATISFACTION = settings?.satisfaction ?? [];
-  // Ikkalasi ham bo'sh bo'lsa o'ng ustundagi karta faqat logotipdan iborat
-  // bo'lib, buzuq element taassurotini berardi — butunlay ko'rsatilmaydi.
-  const showSkillCard = SKILLS.length > 0 || SATISFACTION.length > 0;
+
+  // O'ng ustun — jamoaning yuzlari (AboutTeamCard izohiga qarang).
+  // Bazada hali a'zo bo'lmasa yoki so'rov yiqilsa karta butunlay
+  // ko'rsatilmaydi va chap ustun markazga chiqadi: yarim bo'sh grid buzuq
+  // element taassurotini berardi.
+  const team = useTeam();
+  const showTeamCard = team.length > 0;
   return (
     <section id="about" className="section-gray" style={{ padding: '104px 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
@@ -82,7 +70,7 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
         </m.div>
 
         {/* Two columns */}
-        <div style={{ display:'grid', gridTemplateColumns: showSkillCard ? '1fr 1fr' : '1fr', gap:56, alignItems:'center', marginBottom:64, maxWidth: showSkillCard ? undefined : 760, marginInline: showSkillCard ? undefined : 'auto' }} className="about-grid">
+        <div style={{ display:'grid', gridTemplateColumns: showTeamCard ? '1fr 1fr' : '1fr', gap:56, alignItems:'center', marginBottom:64, maxWidth: showTeamCard ? undefined : 760, marginInline: showTeamCard ? undefined : 'auto' }} className="about-grid">
 
           {/* Left */}
           <m.div initial={{ opacity:0, x:-24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
@@ -105,48 +93,11 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
             </div>
           </m.div>
 
-          {/* Right — Skills card. Faqat admin ma'lumot kiritgan bo'lsa. */}
-          {showSkillCard && (
-          <m.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
-            <div className="card" style={{ padding:28, boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                {/* 96px variant — bu yerda logo 42px chiqadi, to'liq o'lchamli
-                    logotype.png esa 305 KB va faqat og:image / apple-touch-icon
-                    uchun kerak. Ilgari bosh sahifa o'sha 305 KB'ni shu kichkina
-                    avatar uchun yuklab olardi. */}
-                <img src="/assets/logotype-96.png" alt="DATA LIFE IT Center" width={42} height={42}
-                  loading="lazy" decoding="async"
-                  style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
-                <div>
-                  <p style={{ fontWeight:700, color:'#0f172a' }}>DATA LIFE</p>
-                  <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'var(--font-mono)' }}>IT Center</p>
-                </div>
-              </div>
-
-              {SKILLS.map((s: SkillItem, i: number) => (
-                <div key={s.label} style={{ marginBottom:16 }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                    <span style={{ fontSize:13, color:'#334155', fontWeight:500 }}>{s.label}</span>
-                    <span style={{ fontSize:12, color:'#0ea5e9', fontFamily:'var(--font-mono)', fontWeight:700 }}>{s.pct}%</span>
-                  </div>
-                  <div className="progress-track">
-                    <m.div className="progress-fill"
-                      initial={{ width:0 }} whileInView={{ width:`${s.pct}%` }} viewport={{ once:true }}
-                      transition={{ duration:1.1, delay:0.2 + i*0.12, ease:'easeOut' }} />
-                  </div>
-                </div>
-              ))}
-
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:20, paddingTop:20, borderTop:'1px solid #f1f5f9' }}>
-                {SATISFACTION.map((sf: SatisfactionItem) => (
-                  <div key={sf.label} style={{ textAlign:'center', padding:'14px 0', background:'#f8fafc', borderRadius:12, border:'1px solid #e2e8f0' }}>
-                    <p style={{ fontSize:22, fontWeight:800, color:'#0ea5e9' }}>{sf.value}</p>
-                    <p style={{ fontSize:11, color:'#94a3b8', marginTop:3 }}>{sf.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </m.div>
+          {/* O'ng — jamoaning yuzlari. Bazada a'zo bo'lmasa ko'rsatilmaydi. */}
+          {showTeamCard && (
+            <m.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
+              <AboutTeamCard members={team} />
+            </m.div>
           )}
         </div>
 

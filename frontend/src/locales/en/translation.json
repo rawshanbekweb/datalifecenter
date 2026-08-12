@@ -170,6 +170,10 @@
       "headingAccent": "IT education",
       "para1": "— an IT company founded in 2019. We build websites, software and startup solutions for our clients.",
       "para2": "Alongside that we teach seven tracks — our production experience feeds straight into the classroom.",
+      "team": {
+        "title": "Our team",
+        "all": "Meet the team"
+      },
       "fallback": {
         "graduates": "Graduates",
         "directions": "Tracks",

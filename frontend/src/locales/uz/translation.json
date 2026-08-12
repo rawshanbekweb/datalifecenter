@@ -170,6 +170,10 @@
       "headingAccent": "IT ta'lim",
       "para1": "— 2019-yilda tashkil etilgan IT kompaniya. Buyurtmachilar uchun sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz.",
       "para2": "Shu bilan birga 7 ta yo'nalish bo'yicha o'qitamiz — ishlab chiqarishdagi tajribamiz to'g'ridan-to'g'ri darslarga o'tadi.",
+      "team": {
+        "title": "Bizning jamoa",
+        "all": "Jamoa bilan tanishing"
+      },
       "fallback": {
         "graduates": "Bitiruvchilar",
         "directions": "Yo'nalishlar",
