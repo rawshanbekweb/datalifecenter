@@ -110,7 +110,13 @@ export default function About({ settings }: AboutProps = {}): React.ReactElement
           <m.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="card" style={{ padding:28, boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24 }}>
-                <img src="/assets/logotype.png" alt="DATA LIFE IT Center" style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
+                {/* 96px variant — bu yerda logo 42px chiqadi, to'liq o'lchamli
+                    logotype.png esa 305 KB va faqat og:image / apple-touch-icon
+                    uchun kerak. Ilgari bosh sahifa o'sha 305 KB'ni shu kichkina
+                    avatar uchun yuklab olardi. */}
+                <img src="/assets/logotype-96.png" alt="DATA LIFE IT Center" width={42} height={42}
+                  loading="lazy" decoding="async"
+                  style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover' }} />
                 <div>
                   <p style={{ fontWeight:700, color:'#0f172a' }}>DATA LIFE</p>
                   <p style={{ fontSize:11, color:'#0ea5e9', fontFamily:'var(--font-mono)' }}>IT Center</p>

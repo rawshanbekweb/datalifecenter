@@ -505,6 +505,39 @@ function ContactForm({ data, onChange }: { data: ContactData; onChange: (d: Cont
 
 // ── Sahifa ───────────────────────────────────────────────────────────────────
 
+/**
+ * Bo'lim bo'yicha hisoblarning KESHI.
+ *
+ * `sections` har bosilgan harfda yangi obyekt bo'ladi, LEKIN ichidagi beshta
+ * bo'limdan faqat bittasining referensi almashadi — `setSections` qolganini
+ * spread bilan joyida qoldiradi. Shuning uchun natijani bo'lim obyektining
+ * referensi bo'yicha keshlash mumkin.
+ *
+ * Ilgari `dirty` har bosishda 10 ta `JSON.stringify` (5 bo'lim × joriy holat va
+ * baseline), `missingByTab` esa 5 bo'limning butun matn daraxtini qayta
+ * yurardi. Endi ikkalasi ham faqat O'ZGARGAN bo'limni hisoblaydi, qolgani
+ * keshdan keladi. WeakMap tanlandi: eski holat obyektlari keshda ushlanib
+ * qolmaydi, xotira o'sib ketmaydi.
+ */
+const jsonCache = new WeakMap<object, string>();
+function sectionJson(section: object): string {
+  const hit = jsonCache.get(section);
+  if (hit !== undefined) return hit;
+  const json = JSON.stringify(section);
+  jsonCache.set(section, json);
+  return json;
+}
+
+const missingCache = new WeakMap<object, number>();
+function sectionMissing(key: SectionKey, s: Sections): number {
+  const section = s[key] as object;
+  const hit = missingCache.get(section);
+  if (hit !== undefined) return hit;
+  const count = countEmptyBase(collectLocalized(key, s));
+  missingCache.set(section, count);
+  return count;
+}
+
 /** Bo'limdagi barcha ko'p tilli matnlarni tekis ro'yxatga yig'adi. */
 function collectLocalized(key: SectionKey, s: Sections): (LocalizedString | undefined)[] {
   switch (key) {
@@ -557,7 +590,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
   }, [t]);
 
   const dirty = useMemo<SectionKey[]>(
-    () => SECTION_KEYS.filter((k) => JSON.stringify(sections[k]) !== JSON.stringify(baseline[k])),
+    () => SECTION_KEYS.filter((k) => sectionJson(sections[k]) !== sectionJson(baseline[k])),
     [sections, baseline],
   );
 
@@ -571,7 +604,7 @@ export default function AdminSiteSettingsPage(): React.ReactElement {
 
   const missingByTab = useMemo(() => {
     const out = {} as Record<SectionKey, number>;
-    for (const k of SECTION_KEYS) out[k] = countEmptyBase(collectLocalized(k, sections));
+    for (const k of SECTION_KEYS) out[k] = sectionMissing(k, sections);
     return out;
   }, [sections]);
 
