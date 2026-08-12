@@ -141,6 +141,22 @@ describe("Enrollment oqimi: yozilish → chek → tasdiqlash → progress → se
     expect(res.body.data.enrollmentStatus).toBe('ACTIVE');
   });
 
+  it("GET /enrollments/me — progress har kursga ALOHIDA hisoblanadi", async () => {
+    // Bu payt talabada ikkita yozilish bor: 2 darsli pullik kurs (1 tasi
+    // yuqorida bekor qilingan, ya'ni 1/2) va darssiz bepul kurs (0/0).
+    // Sanoq paketli ikki so'rovdan yig'ilgani uchun asosiy xavf — bir kursning
+    // natijasi ikkinchisiga o'tib ketishi; shuni qo'riqlaymiz.
+    const res = await student.get('/api/enrollments/me').expect(200);
+    const items = res.body.data as { courseId: string; progress: { totalLessons: number; completedLessons: number } }[];
+    expect(items).toHaveLength(2);
+
+    const paid = items.find((e) => e.courseId === courseId);
+    expect(paid?.progress).toEqual({ totalLessons: 2, completedLessons: 1 });
+
+    const free = items.find((e) => e.courseId !== courseId);
+    expect(free?.progress).toEqual({ totalLessons: 0, completedLessons: 0 });
+  });
+
   it("mock-pay production'dan tashqarida ham test rejimida ishlaydi, CSRF yomon origin'ni bloklaydi", async () => {
     // CSRF: ruxsatsiz Origin bilan holat o'zgartiruvchi so'rov 403
     const res = await request(app)

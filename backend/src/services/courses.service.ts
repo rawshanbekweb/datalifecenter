@@ -64,7 +64,29 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
       ...mentorsFull,
       modules: {
         orderBy: { order: 'asc' },
-        include: { lessons: { orderBy: { order: 'asc' } } },
+        include: {
+          lessons: {
+            orderBy: { order: 'asc' },
+            /**
+             * `content` ATAYIN ro'yxatda yo'q.
+             *
+             * Quyida ko'rinadiki, matn javobga faqat bepul ko'rish uchun ochiq
+             * darslarda tushadi — qolganlariniki baribir `null`ga aylanardi.
+             * Ilgari esa kursdagi HAMMA darsning to'rt tilli matni bazadan
+             * tortilib, tarmoqdan o'tkazilib, keyin tashlab yuborilardi.
+             *
+             * Bu shunchaki ortiqcha yuk emas: ochiq kurs sahifasi javobi
+             * publicCache'da saqlanadi, u yerda esa 512 KB chegara bor. Matni
+             * boy uzun kurs o'sha chegaradan oshib ketsa, sahifa umuman
+             * keshlanmay qolardi — ya'ni eng og'ir kurs eng ko'p DB so'rovini
+             * keltirib chiqarardi.
+             */
+            select: {
+              id: true, moduleId: true, title: true, order: true,
+              contentType: true, videoUrl: true, durationMinutes: true, isFreePreview: true,
+            },
+          },
+        },
       },
     },
   });
@@ -73,23 +95,32 @@ export async function getCourseBySlug(slug: string, locale: SupportedLocale) {
     throw ApiError.notFound('Kurs topilmadi');
   }
 
-  // Faqat bepul ko'rish uchun ochiq darslar imzolanadi; qolganlariga null beriladi,
-  // shuning uchun imzolash ro'yxatiga ham kirmaydi.
-  const signed = await signVideoUrlMap(course.modules, (lesson) =>
-    lesson.isFreePreview ? lesson.videoUrl : null
-  );
+  const [signed, previewContent, seats] = await Promise.all([
+    // Faqat bepul ko'rish uchun ochiq darslar imzolanadi; qolganlariga null
+    // beriladi, shuning uchun imzolash ro'yxatiga ham kirmaydi.
+    signVideoUrlMap(course.modules, (lesson) => (lesson.isFreePreview ? lesson.videoUrl : null)),
+    // Matn — faqat ochiq darslar uchun, tor alohida so'rovda
+    prisma.lesson
+      .findMany({
+        where: { module: { courseId: course.id }, isFreePreview: true },
+        select: { id: true, content: true },
+      })
+      .then((rows) => new Map(rows.map((l) => [l.id, l.content]))),
+    // Ilgari joylar imzolashdan KEYIN, ketma-ket so'ralardi
+    getCourseSeats(course),
+  ]);
 
   return resolveLocaleDeep(
     {
       ...course,
       mentors: flatMentors(course.mentors),
-      seats: await getCourseSeats(course),
+      seats,
       modules: course.modules.map((mod) => ({
         ...mod,
         lessons: mod.lessons.map((lesson) => ({
           ...lesson,
           videoUrl: signed.get(lesson.id) ?? null,
-          content: lesson.isFreePreview ? lesson.content : null,
+          content: previewContent.get(lesson.id) ?? null,
         })),
       })),
     },
@@ -163,6 +194,20 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     throw ApiError.notFound('Kurs topilmadi');
   }
 
+  /**
+   * Obuna holati bitta so'rov davomida o'zgarmaydi — bir marta o'qib qo'yamiz.
+   *
+   * Quyida ikkita shoxobcha shu javobga muhtoj va OBUNACHI yangi nashr
+   * qilingan kursni ochganda IKKALASI ham ishga tushadi: birinchisi kirish
+   * beradi, ikkinchisi o'sha yaratilgan yozuvni tekshiradi. Ilgari bu ikkita
+   * bir xil so'rov demak edi.
+   */
+  let subscriptionActive: boolean | null = null;
+  const isSubscriptionActive = async (): Promise<boolean> => {
+    if (subscriptionActive === null) subscriptionActive = await hasActiveSubscription(userId);
+    return subscriptionActive;
+  };
+
   let enrollment = null;
   if (role !== 'ADMIN') {
     enrollment = await prisma.enrollment.findUnique({
@@ -176,7 +221,7 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     // Onlayn yozilishi yopiq kursga obuna orqali ham avtomatik kirish
     // berilmaydi (obuna — onlayn kirish, offline bayroqqa bog'liq emas;
     // subscriptions.service.ts dagi provisioning bilan bir xil qoida).
-    if (!enrollment && course.onlineEnrollmentOpen && (await hasActiveSubscription(userId))) {
+    if (!enrollment && course.onlineEnrollmentOpen && (await isSubscriptionActive())) {
       enrollment = await prisma.enrollment.create({
         data: { userId, courseId: course.id, status: 'ACTIVE', paymentStatus: 'FREE', provider: 'subscription' },
       });
@@ -194,17 +239,20 @@ export async function getCourseForLearning(slug: string, userId: string, role: s
     // Obuna orqali berilgan (hali "yakunlanmagan") kirish — obuna muddati tugagan bo'lsa
     // yopiladi. Tugatilgan kurslar doim ochiq qoladi (allaqachon topshirilgan narsa
     // qaytarib olinmaydi).
-    if (enrollment.provider === 'subscription' && enrollment.status !== 'COMPLETED' && !(await hasActiveSubscription(userId))) {
+    if (enrollment.provider === 'subscription' && enrollment.status !== 'COMPLETED' && !(await isSubscriptionActive())) {
       throw ApiError.forbidden('Obuna muddati tugagan — davom etish uchun yangilang', 'SUBSCRIPTION_EXPIRED');
     }
   }
 
-  const progress = await prisma.lessonProgress.findMany({
-    where: { userId, lesson: { module: { courseId: course.id } } },
-    select: { lessonId: true },
-  });
-
-  const signed = await signVideoUrlMap(course.modules, (lesson) => lesson.videoUrl);
+  // Videolarni imzolash TARMOQ so'rovi (Supabase), progress esa bazadan —
+  // ular bir-biriga bog'liq emas, shuning uchun ketma-ket emas, parallel
+  const [progress, signed] = await Promise.all([
+    prisma.lessonProgress.findMany({
+      where: { userId, lesson: { module: { courseId: course.id } } },
+      select: { lessonId: true },
+    }),
+    signVideoUrlMap(course.modules, (lesson) => lesson.videoUrl),
+  ]);
 
   const signedCourse = resolveLocaleDeep(
     {

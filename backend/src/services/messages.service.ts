@@ -117,6 +117,34 @@ async function ensureAdminParticipation(userId: string): Promise<void> {
   });
 }
 
+/**
+ * O'sha to'ldirish, lekin FON so'rovlari uchun chegaralangan.
+ *
+ * Yuqoridagi so'rov "ishtirokchisi men bo'lmagan ADMIN suhbatlari" ni
+ * qidiradi — bu anti-join, ya'ni javob deyarli har doim BO'SH bo'lsa ham
+ * butun kanallar ro'yxatidan o'tadi. Holbuki bo'shliq faqat admin tayinlanganda
+ * (yoki blokdan chiqarilganda) paydo bo'ladi: yangi kanal ochilganda
+ * `openAdminConversation` hamma amaldagi adminni o'zi qo'shib qo'yadi.
+ *
+ * O'qilmaganlar hisobi esa HAR SSE hodisasida va har uch daqiqada so'raladi —
+ * ya'ni bu qidiruv panelda o'tirgan admin uchun bir necha soniyada bir marta
+ * takrorlanardi. Endi u daqiqada bir martadan tez yurmaydi.
+ *
+ * Kelishuv: endigina tayinlangan admin eski murojaatlarning o'qilmagan
+ * belgisini bir daqiqagacha kechroq ko'radi. Xabarlar RO'YXATI (o'sha
+ * murojaatlarning o'zi) chegaralanmagan yo'ldan o'tadi, shuning uchun sahifani
+ * ochganda hammasi darhol joyida bo'ladi.
+ */
+const ADMIN_BACKFILL_TTL_MS = 60_000;
+const adminBackfillAt = new Map<string, number>();
+
+async function ensureAdminParticipationThrottled(userId: string): Promise<void> {
+  const last = adminBackfillAt.get(userId) ?? 0;
+  if (Date.now() - last < ADMIN_BACKFILL_TTL_MS) return;
+  adminBackfillAt.set(userId, Date.now());
+  await ensureAdminParticipation(userId);
+}
+
 /** Suhbatni topadi va `actor` unga kira olishini tekshiradi. */
 async function loadAccessibleConversation(conversationId: string, actor: Actor) {
   const conversation = await prisma.conversation.findUnique({
@@ -157,8 +185,12 @@ interface UnreadRow {
  * Har suhbat uchun alohida `count()` yuborilsa ro'yxatning har ochilishi
  * o'nlab so'rovga aylanardi; bu yerda shart har bir ishtirokchining O'Z
  * `lastReadAt` qiymatiga bog'liq, shuning uchun `groupBy` yetmaydi.
+ *
+ * `conversationId` berilsa hisob FAQAT o'sha suhbat bilan cheklanadi — bitta
+ * yozishma ochilganda qolgan hamma suhbatning xabarlarini sanashning hojati
+ * yo'q (`getConversation` aynan shundan foydalanadi).
  */
-async function unreadCountsByConversation(userId: string): Promise<Map<string, number>> {
+async function unreadCountsByConversation(userId: string, conversationId?: string): Promise<Map<string, number>> {
   const rows = await prisma.$queryRaw<UnreadRow[]>`
     SELECT m."conversationId" AS "conversationId", COUNT(*)::int AS "count"
     FROM "Message" m
@@ -166,13 +198,15 @@ async function unreadCountsByConversation(userId: string): Promise<Map<string, n
       ON p."conversationId" = m."conversationId" AND p."userId" = ${userId}
     WHERE m."senderId" <> ${userId}
       AND (p."lastReadAt" IS NULL OR m."createdAt" > p."lastReadAt")
+      AND (${conversationId ?? null}::text IS NULL OR m."conversationId" = ${conversationId ?? null})
     GROUP BY m."conversationId"
   `;
   return new Map(rows.map((r) => [r.conversationId, Number(r.count)]));
 }
 
 export async function getUnreadCount(actor: Actor): Promise<{ unreadCount: number }> {
-  if (actor.role === 'ADMIN') await ensureAdminParticipation(actor.userId);
+  // Fon so'rovi — chegaralangan variant (sabab funksiya izohida)
+  if (actor.role === 'ADMIN') await ensureAdminParticipationThrottled(actor.userId);
   const counts = await unreadCountsByConversation(actor.userId);
   let total = 0;
   for (const value of counts.values()) total += value;
@@ -259,7 +293,7 @@ export async function getConversation(
   const hasMore = messages.length > MESSAGES_PAGE_SIZE;
   if (hasMore) messages.pop();
 
-  const unread = await unreadCountsByConversation(actor.userId);
+  const unread = await unreadCountsByConversation(actor.userId, conversationId);
   const summary = summarize(
     { ...conversation, messages: messages.slice(0, 1) },
     actor,

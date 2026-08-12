@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, afterAll, describe, expect, it } from 'vitest';
 import { prisma, resetDb, createUser, loginAgent } from './helpers';
 
 // Rollar aro yozishma: kim kimga yoza olishi va o'qilmagan hisobi
@@ -52,18 +52,36 @@ describe('Kim kimga yoza oladi', () => {
       .expect(201);
 
     expect(res.body.data.kind).toBe('DIRECT');
-    expect(res.body.data.messages).toHaveLength(1);
     expect(res.body.data.otherUser.id).toBe(mentorUserId);
+    // Yuborilgan xabarning O'ZI tekshiriladi (xabarlar eskidan yangiga beriladi).
+    // Ilgari bu yerda "suhbatda bitta xabar bor" deyilardi — ya'ni test shu
+    // juftlikka undan oldin hech kim yozmaganiga bog'lanib qolgandi.
+    expect(res.body.data.messages.at(-1).body).toBe('Salom, savolim bor edi');
   });
 
   it("bir juftlik uchun ikkinchi suhbat OCHILMAYDI — o'sha yozishma davom etadi", async () => {
+    const first = await enrolledAgent
+      .post('/api/messages/conversations')
+      .send({ recipientId: mentorUserId, body: 'Birinchi savol' })
+      .expect(201);
+
     const again = await enrolledAgent
       .post('/api/messages/conversations')
       .send({ recipientId: mentorUserId, body: 'Yana bir savol' })
       .expect(201);
 
-    expect(again.body.data.messages).toHaveLength(2);
-    const count = await prisma.conversation.count({ where: { kind: 'DIRECT' } });
+    // Asosiy da'vo: yangi suhbat ochilmadi, AYNAN o'sha yozishma davom etdi.
+    // Ilgari bu xabarlar sonini sanash orqali bilvosita tekshirilardi va
+    // shuning uchun oldingi testning xabariga bog'lanib qolgandi.
+    expect(again.body.data.id).toBe(first.body.data.id);
+    expect(again.body.data.messages.at(-1).body).toBe('Yana bir savol');
+
+    // Hisob AYNAN shu talabaning yozishmalari bilan cheklanadi — bazadagi
+    // barcha DIRECT suhbatlar sanalsa, "admin hamkasbiga yozadi" testi
+    // ikkinchi DIRECT suhbat ochgani uchun tartib o'zgarganda yiqilardi.
+    const count = await prisma.conversation.count({
+      where: { kind: 'DIRECT', participants: { some: { userId: enrolledUserId } } },
+    });
     expect(count).toBe(1);
   });
 
@@ -157,6 +175,22 @@ describe('Bildirishnomalar', () => {
 });
 
 describe("O'qilmagan xabarlar", () => {
+  /**
+   * Har bir test "hammasi o'qilgan" nuqtasidan boshlanadi.
+   *
+   * Ilgari bu blokdagi testlar bir-birining qoldiq holatiga tayanardi: biri
+   * o'qilmagan xabar qoldirsa, keyingisining kutilgan raqami siljib ketardi.
+   * Eng yomoni — yiqilgani o'zgartirilgan test EMAS, undan KEYINGISI bo'lardi,
+   * ya'ni xato ko'rsatgan joy sabab bo'lgan joydan boshqa edi.
+   *
+   * Barcha ishtirokchini "o'qidi" deb belgilash yetarli va arzon: shundan
+   * keyin har test o'zi kerakli o'qilmagan holatni yaratadi va ANIQ raqamni
+   * tekshiradi — "noldan katta" kabi mo'ljalsiz shartlar o'rniga.
+   */
+  beforeEach(async () => {
+    await prisma.conversationParticipant.updateMany({ data: { lastReadAt: new Date() } });
+  });
+
   it("qabul qiluvchida o'qilmagan hisoblanadi, o'qilgach nolga tushadi", async () => {
     await enrolledAgent
       .post('/api/messages/conversations')
@@ -164,25 +198,51 @@ describe("O'qilmagan xabarlar", () => {
       .expect(201);
 
     const before = await mentorAgent.get('/api/messages/unread-count').expect(200);
-    expect(before.body.data.unreadCount).toBeGreaterThan(0);
+    expect(before.body.data.unreadCount).toBe(1);
 
+    // Suhbat KINDI bo'yicha topiladi — ilgari ro'yxatning birinchi yozuvi
+    // olinardi va bu tartibga (lastMessageAt) bilinmasdan bog'lanib qolgandi
     const list = await mentorAgent.get('/api/messages/conversations').expect(200);
-    const conversationId = list.body.data[0].id;
-    await mentorAgent.patch(`/api/messages/conversations/${conversationId}/read`).expect(200);
+    const direct = list.body.data.find((c: { kind: string }) => c.kind === 'DIRECT');
+    await mentorAgent.patch(`/api/messages/conversations/${direct.id}/read`).expect(200);
 
     const after = await mentorAgent.get('/api/messages/unread-count').expect(200);
     expect(after.body.data.unreadCount).toBe(0);
   });
 
+  it("bitta suhbat ochilganda o'qilmagan soni FAQAT o'sha suhbatniki bo'ladi", async () => {
+    // Ikki xil suhbat: mentor bilan yozishma va administratsiya kanali.
+    // Suhbat sahifasi hisobni bitta suhbat bo'yicha cheklab so'raydi —
+    // xavf shundaki, cheklov tushib qolsa boshqa yozishmalarning o'qilmagan
+    // xabarlari ham shu suhbatning belgisiga qo'shilib ketardi.
+    await enrolledAgent.post('/api/messages/conversations').send({ recipientId: mentorUserId, body: 'Mentorga' }).expect(201);
+    await enrolledAgent.post('/api/messages/conversations').send({ toAdmin: true, body: 'Adminga' }).expect(201);
+
+    const list = await enrolledAgent.get('/api/messages/conversations').expect(200);
+    const mentorConv = list.body.data.find((c: { kind: string }) => c.kind === 'DIRECT');
+    expect(mentorConv).toBeDefined();
+
+    // Mentor talabaga javob yozadi — o'qilmagan faqat SHU suhbatda paydo bo'ladi
+    await mentorAgent
+      .post(`/api/messages/conversations/${mentorConv.id}/messages`)
+      .send({ body: 'Mentor javobi' })
+      .expect(201);
+
+    const thread = await enrolledAgent.get(`/api/messages/conversations/${mentorConv.id}`).expect(200);
+    expect(thread.body.data.unreadCount).toBe(1);
+  });
+
   it("o'z yuborgan xabari o'qilmaganga sanalmaydi", async () => {
-    const before = await enrolledAgent.get('/api/messages/unread-count').expect(200);
     await enrolledAgent
       .post('/api/messages/conversations')
       .send({ recipientId: mentorUserId, body: "O'z xabarim" })
       .expect(201);
 
+    // beforeEach hammasini o'qilgan qilib qo'ygani uchun kutilgan qiymat aniq
+    // NOL: ilgari bu yerda testdan oldingi qoldiq hisob bilan solishtirilardi,
+    // ya'ni ikkalasi ham noto'g'ri bo'lsa test baribir o'tib ketaverardi.
     const after = await enrolledAgent.get('/api/messages/unread-count').expect(200);
-    expect(after.body.data.unreadCount).toBe(before.body.data.unreadCount);
+    expect(after.body.data.unreadCount).toBe(0);
   });
 
   it('begona odam suhbatni ocha olmaydi', async () => {

@@ -74,6 +74,33 @@ describe('Kurs CRUD', () => {
     expect(lesson.body.data.order).toBe(1);
   });
 
+  it("ochiq kurs sahifasi dars matnini FAQAT bepul ko'rish darslarida beradi", async () => {
+    const mod = await admin.post('/api/modules').send({ courseId, title: { uz: 'Matn testi moduli' } }).expect(201);
+    const moduleId = mod.body.data.id;
+
+    const open = await admin
+      .post(`/api/modules/${moduleId}/lessons`)
+      .send({ title: { uz: 'Ochiq dars' }, contentType: 'TEXT', content: { uz: 'Ochiq matn' }, isFreePreview: true })
+      .expect(201);
+    const locked = await admin
+      .post(`/api/modules/${moduleId}/lessons`)
+      .send({ title: { uz: 'Yopiq dars' }, contentType: 'TEXT', content: { uz: 'Yopiq matn' }, isFreePreview: false })
+      .expect(201);
+
+    const detail = await request(app).get('/api/courses/test-kursi').expect(200);
+    const lessons = detail.body.data.modules.flatMap(
+      (m: { lessons: unknown[] }) => m.lessons
+    ) as { id: string; title: string; content: string | null }[];
+
+    // Matn endi darslar bilan birga emas, alohida tor so'rov bilan olinadi.
+    // Ochiq darsda u JOYIDA qolishi, yopiq darsda esa sirtga CHIQMASLIGI shart —
+    // ikkinchisi pullik kontentning oshkor bo'lishi demak bo'lardi.
+    expect(lessons.find((l) => l.id === open.body.data.id)?.content).toBe('Ochiq matn');
+    expect(lessons.find((l) => l.id === locked.body.data.id)?.content).toBeNull();
+    // Ro'yxat uchun kerakli maydonlar ikkala darsda ham qoladi
+    expect(lessons.find((l) => l.id === locked.body.data.id)?.title).toBe('Yopiq dars');
+  });
+
   it('student modul yarata olmaydi (403)', async () => {
     await student.post('/api/modules').send({ courseId, title: { uz: 'Ruxsatsiz modul' } }).expect(403);
   });

@@ -317,6 +317,11 @@ model Module {
   description Json?
   order       Int
   lessons     Lesson[]
+
+  // Dastur HAR DOIM kurs bo'yicha va tartibda o'qiladi (kurs sahifasi, learn,
+  // curriculum editor). PostgreSQL tashqi kalitni o'zi indekslamaydi —
+  // indekssiz bu so'rovlar butun jadvalni skanerlardi.
+  @@index([courseId, order])
 }
 
 model Lesson {
@@ -333,6 +338,8 @@ model Lesson {
   isFreePreview   Boolean     @default(false)
   progress        LessonProgress[]
   questions       LessonQuestion[]
+
+  @@index([moduleId, order])
 }
 
 // O'quvchi ↔ mentor muloqoti: dars ostidagi savol-javob
@@ -590,6 +597,9 @@ model LessonProgress {
   completedAt DateTime @default(now())
 
   @@unique([userId, lessonId])
+  // Kompozit unikal indeks userId'dan boshlanadi, shuning uchun FAQAT lessonId
+  // bo'yicha qidiruvga (dars o'chirilganda cascade) yaramaydi
+  @@index([lessonId])
 }
 
 // Bosh sahifadagi "DATA LIFE'da bir kun" galereyasi — ofisdagi e'tiborli
@@ -726,6 +736,11 @@ model Enrollment {
   transactions    PaymentTransaction[]
 
   @@unique([userId, courseId])
+  // Band joylarni hisoblash (getSeatsForCourses) HAR kurslar ro'yxatida
+  // `courseId IN (...) AND status IN (...)` bo'yicha guruhlaydi. Yuqoridagi
+  // unikal indeks userId'dan boshlangani uchun bunga yaramaydi — indekssiz
+  // sahifaning har ochilishi butun Enrollment jadvalini o'qirdi.
+  @@index([courseId, status])
 }
 
 enum PaymentProvider {

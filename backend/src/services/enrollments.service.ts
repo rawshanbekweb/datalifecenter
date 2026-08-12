@@ -83,15 +83,41 @@ export async function getMyEnrollments(userId: string, locale: SupportedLocale) 
     include: { course: true },
   });
 
-  const result = await Promise.all(
-    enrollments.map(async (enrollment) => {
-      const [totalLessons, completedLessons] = await Promise.all([
-        prisma.lesson.count({ where: { module: { courseId: enrollment.courseId } } }),
-        prisma.lessonProgress.count({ where: { userId, lesson: { module: { courseId: enrollment.courseId } } } }),
-      ]);
-      return { ...hideReceiptUrl(enrollment), progress: { totalLessons, completedLessons } };
-    })
-  );
+  if (!enrollments.length) return resolveLocaleDeep([], locale);
+
+  // Ilgari har bir yozilish uchun ALOHIDA ikkita COUNT yuborilardi: 6 kursli
+  // talabaning kabineti 12 ta qo'shimcha so'rov qilardi. Endi qancha kurs
+  // bo'lmasin — ikkita paketli so'rov (mentors.service.ts dagi usul bilan bir xil).
+  const courseIds = [...new Set(enrollments.map((e) => e.courseId))];
+
+  const [modules, progressRows] = await Promise.all([
+    prisma.module.findMany({
+      where: { courseId: { in: courseIds } },
+      select: { courseId: true, _count: { select: { lessons: true } } },
+    }),
+    prisma.lessonProgress.findMany({
+      where: { userId, lesson: { module: { courseId: { in: courseIds } } } },
+      select: { lesson: { select: { module: { select: { courseId: true } } } } },
+    }),
+  ]);
+
+  const totalByCourse = new Map<string, number>();
+  for (const m of modules) {
+    totalByCourse.set(m.courseId, (totalByCourse.get(m.courseId) ?? 0) + m._count.lessons);
+  }
+  const completedByCourse = new Map<string, number>();
+  for (const p of progressRows) {
+    const key = p.lesson.module.courseId;
+    completedByCourse.set(key, (completedByCourse.get(key) ?? 0) + 1);
+  }
+
+  const result = enrollments.map((enrollment) => ({
+    ...hideReceiptUrl(enrollment),
+    progress: {
+      totalLessons: totalByCourse.get(enrollment.courseId) ?? 0,
+      completedLessons: completedByCourse.get(enrollment.courseId) ?? 0,
+    },
+  }));
   return resolveLocaleDeep(result, locale);
 }
 
