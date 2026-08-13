@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 import {
   getConversationHandler,
   listContactsHandler,
@@ -32,7 +33,7 @@ const messageLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: { success: false, error: { message: "Juda ko'p xabar yuborildi. Birozdan keyin urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  handler: tooManyRequestsHandler("Juda ko'p xabar yuborildi. Birozdan keyin urinib ko'ring."),
 });
 
 router.get('/unread-count', unreadCountHandler);

@@ -24,13 +24,11 @@ import {
 } from '../validators/auth.validator';
 import { authenticate } from '../middleware/authenticate';
 import { env } from '../config/env';
+import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 
 const router = Router();
 
-const tooManyAttempts = {
-  success: false,
-  error: { message: "Juda ko'p urinish. 15 daqiqadan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' },
-};
+const tooManyAttempts = tooManyRequestsHandler("Juda ko'p urinish. 15 daqiqadan keyin qayta urinib ko'ring.");
 
 /**
  * Brute-force himoyasi — FAQAT muvaffaqiyatsiz urinishlar sanaladi.
@@ -48,7 +46,7 @@ const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: tooManyAttempts,
+  handler: tooManyAttempts,
 });
 
 /**
@@ -68,7 +66,7 @@ const registerLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: tooManyAttempts,
+  handler: tooManyAttempts,
 });
 
 // Parol tiklash uchun qattiqroq limit — email-bombing'ning oldini oladi
@@ -78,7 +76,7 @@ const forgotLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: { success: false, error: { message: "Juda ko'p urinish. 15 daqiqadan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  handler: tooManyAttempts,
 });
 
 router.post('/register', registerLimiter, validateBody(registerSchema), registerHandler);
