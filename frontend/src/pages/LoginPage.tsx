@@ -72,7 +72,7 @@ export default function LoginPage(): React.ReactElement {
             </div>
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, marginTop: 6 }}>
-              {status === 'loading' ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.login.loading')}</> : t('nav.login')}
+              {status === 'loading' ? <><Loader size={15} className="dl-spin" /> {t('auth.login.loading')}</> : t('nav.login')}
             </button>
           </form>
 
@@ -81,7 +81,6 @@ export default function LoginPage(): React.ReactElement {
           </p>
         </div>
       </m.div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );
 }

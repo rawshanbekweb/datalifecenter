@@ -166,7 +166,7 @@ export default function ProfilePage(): React.ReactElement {
             <input className="inp" type="password" value={currentPassword}
               onChange={(e) => { setCurrentPassword(e.target.value); setPassStatus('idle'); }} required />
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="form-row">
             <div>
               <label style={labelStyle}>{t('auth.reset.newPassword')} *</label>
               <input className="inp" type="password" value={newPassword}

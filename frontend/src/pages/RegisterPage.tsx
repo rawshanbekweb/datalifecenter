@@ -79,7 +79,7 @@ export default function RegisterPage(): React.ReactElement {
             </div>
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, marginTop: 6 }}>
-              {status === 'loading' ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.register.loading')}</> : t('auth.register.title')}
+              {status === 'loading' ? <><Loader size={15} className="dl-spin" /> {t('auth.register.loading')}</> : t('auth.register.title')}
             </button>
           </form>
 
@@ -88,7 +88,6 @@ export default function RegisterPage(): React.ReactElement {
           </p>
         </div>
       </m.div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );
 }

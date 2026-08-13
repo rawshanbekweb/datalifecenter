@@ -363,6 +363,43 @@ select.inp option[value=""] { color: #94a3b8; }
   .dl-load__spin { animation: none; }
 }
 
+/* ── Tugma ichidagi aylanuvchi ikonka ──
+   Ilgari 8 ta fayl (kirish, ro'yxatdan o'tish, parol tiklash, email
+   tasdiqlash, sertifikat tekshirish, kontakt formasi, server uyg'otish
+   banneri) HAR BIRI o'zining `<style>` blogida bir xil 360° keyframe'ini
+   chiqarardi. Ular yuqoridagi `dl-load-spin` bilan aynan bir xil edi —
+   shuning uchun yangi keyframe yaratilmaydi, o'shanisi qayta ishlatiladi.
+
+   Yon foyda: `prefers-reduced-motion` endi bu ikonkalarga ham tegadi
+   (inline `style` bilan buni umuman qilib bo'lmasdi). */
+.dl-spin { animation: dl-load-spin 1s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .dl-spin { animation: none; }
+}
+
+/* ── Forma qatorlari ──
+   Admin va kabinet formalarida maydonlar yonma-yon `1fr 1fr` / `1fr 1fr 1fr`
+   bilan joylashtirilgan, lekin BIRORTASIDA media so'rov yo'q edi (jamoa
+   sahifalaridan tashqari). Natijada 360px kenglikdagi telefonda uch ustunli
+   qator har bir maydonni ~100px ga siqib qo'yardi — sana, narx va tanlov
+   maydonlari o'qib bo'lmas holga kelardi.
+
+   Endi bitta global qoida: tor ekranda hamma forma qatori bitta ustunga
+   tushadi. Chegara 760px — jamoa sahifalari allaqachon shu qiymatni
+   ishlatgani uchun (endi ular ham shu yerdan oladi). */
+.form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.form-row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+/* Birinchi maydon kengroq bo'lgan qator (dars qo'shish: sarlavha + tur +
+   davomiylik) — sarlavhaga matn sig'ishi kerak, qolgan ikkisi tor */
+.form-row-wide { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; align-items: flex-end; }
+@media (max-width: 760px) {
+  .form-row, .form-row-3, .form-row-wide { grid-template-columns: 1fr; }
+  /* To'rt ustunli qator (ijtimoiy tarmoq havolalari kabi qisqa maydonlar)
+     bitta ustunga tushsa forma cho'zilib ketardi — ikkitada qoladi */
+  .form-row-4 { grid-template-columns: 1fr 1fr; }
+}
+
 @media (max-width: 768px) {
   .h-section { font-size: 28px; }
 }

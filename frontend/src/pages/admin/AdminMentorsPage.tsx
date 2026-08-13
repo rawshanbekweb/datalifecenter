@@ -96,7 +96,7 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.mentors.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -108,7 +108,7 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
         onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
       <ImageFocusPicker url={form.photoUrl} focusX={form.focusX} focusY={form.focusY}
         onChange={(focusX, focusY) => setForm((f: MentorFormState) => ({ ...f, focusX, focusY }))} />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>LinkedIn</label>
           <input className="inp" value={form.linkedinUrl} onChange={change('linkedinUrl')} />

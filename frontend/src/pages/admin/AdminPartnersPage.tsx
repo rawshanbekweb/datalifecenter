@@ -71,7 +71,7 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.partners.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -81,7 +81,7 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
           <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.partners.categoryPlaceholder')} />
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <FileUpload kind="image" label={t('admin.partners.fLogo')} required value={form.logoUrl}
           onChange={(url) => setForm((f: PartnerFormState) => ({ ...f, logoUrl: url }))} />
         <div>

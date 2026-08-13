@@ -102,7 +102,7 @@ function LessonForm({ initial, moduleId, onCancel, onSaved }: LessonFormProps): 
   return (
     <form onSubmit={submit} style={{ padding:14, borderRadius:12, background:'#f8fafc', border:'1px dashed #cbd5e1', display:'flex', flexDirection:'column', gap:10, marginTop:8 }}>
       {error && <p style={{ fontSize:12.5, color:'#dc2626' }}>{error}</p>}
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:10, alignItems: 'flex-end' }}>
+      <div className="form-row-wide">
         <LocalizedField label="" placeholder={t('admin.curriculum.lessonTitlePlaceholder')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <select className="inp" value={form.contentType} style={{ fontSize:13 }}
           onChange={(e) => setForm((f) => ({ ...f, contentType: e.target.value as LessonItem['contentType'] }))}>

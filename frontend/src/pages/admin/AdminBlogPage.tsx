@@ -113,7 +113,7 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
       <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
       <LocalizedField label={t('admin.blog.fExcerpt')} required multiline rows={2} value={form.excerpt} onChange={(next) => setForm((f) => ({ ...f, excerpt: next }))} />
       <LocalizedField label={t('admin.blog.fContent')} required multiline rows={6} value={form.content} onChange={(next) => setForm((f) => ({ ...f, content: next }))} />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.categoryReq')}</label>
           <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.blog.categoryPlaceholder')} />
@@ -131,7 +131,7 @@ function BlogForm({ initial, onCancel, onSaved }: BlogFormProps): React.ReactEle
           </select>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.blog.fReadTime')}</label>
           <input className="inp" type="number" min="1" value={form.readMinutes} onChange={change('readMinutes')} />

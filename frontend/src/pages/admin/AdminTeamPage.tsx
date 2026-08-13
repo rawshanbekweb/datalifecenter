@@ -105,7 +105,7 @@ function TeamForm({ initial, users, mentors, projects, onCancel, onSaved }: Team
 
       <TeamProfileFields form={form} setForm={setForm} />
 
-      <div className="team-admin-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>
             {t('team.form.department')} *
@@ -131,7 +131,7 @@ function TeamForm({ initial, users, mentors, projects, onCancel, onSaved }: Team
         </div>
       </div>
 
-      <div className="team-admin-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>
             {t('team.form.account')}
@@ -199,7 +199,6 @@ function TeamForm({ initial, users, mentors, projects, onCancel, onSaved }: Team
         <button type="button" onClick={onCancel} className="btn-outline">{t('common.cancel')}</button>
       </div>
 
-      <style>{`@media(max-width:760px){.team-admin-row{grid-template-columns:1fr!important}}`}</style>
     </form>
   );
 }

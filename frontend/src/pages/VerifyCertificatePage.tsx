@@ -60,7 +60,7 @@ export default function VerifyCertificatePage(): React.ReactElement {
               placeholder="DL-XXXXXXXX" required style={{ flex: 1, fontFamily:'var(--font-mono)', textTransform: 'uppercase' }} />
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, flexShrink: 0 }}>
-              {status === 'loading' ? <Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> : t('pages.certificate.check')}
+              {status === 'loading' ? <Loader size={15} className="dl-spin" /> : t('pages.certificate.check')}
             </button>
           </form>
 
@@ -87,7 +87,6 @@ export default function VerifyCertificatePage(): React.ReactElement {
           )}
         </div>
       </m.div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );
 }

@@ -98,7 +98,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
           <p style={{ fontSize: 13, color: '#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.form.categoryReq')}</label>
@@ -112,7 +112,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
       </div>
       <FileUpload kind="image" label={t('admin.projects.fScreenshot')} required value={form.screenshotUrl}
         onChange={(url) => setForm((f: ProjectFormState) => ({ ...f, screenshotUrl: url }))} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.projects.fLiveUrl')}</label>
           <input className="inp" value={form.liveUrl} onChange={change('liveUrl')} placeholder="https://..." />

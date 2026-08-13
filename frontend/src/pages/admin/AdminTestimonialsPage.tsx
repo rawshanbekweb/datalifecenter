@@ -85,7 +85,7 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.testimonials.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -105,7 +105,7 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
         value={form.text}
         onChange={(next) => setForm((f) => ({ ...f, text: next }))}
       />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <FileUpload kind="image" label={t('admin.testimonials.fPhoto')} value={form.avatarUrl}
           onChange={(url) => setForm((f: TestimonialFormState) => ({ ...f, avatarUrl: url }))} />
         <div>

@@ -136,7 +136,7 @@
       "cookie": "Cookie"
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Barlıq huqıqlar qorǵalǵan.",
-    "systemsOperational": "All systems operational"
+    "systemsOperational": "Barlıq sistemalar islep atır"
   },
   "home": {
     "hero": {
@@ -226,7 +226,11 @@
       "telegramSub": "Tez juwap",
       "emailSub": "24 saat ishinde juwap",
       "addressLabel": "Mánzil",
-      "hoursTitle": "Jumıs waqıtları"
+      "hoursTitle": "Jumıs waqıtları",
+      "hoursWeekdays": "Dúyshembi — Juma",
+      "hoursSaturday": "Shembi",
+      "hoursSunday": "Ekshembi",
+      "hoursClosed": "Jabıq"
     },
     "testimonials": {
       "pill": "Pikirler",

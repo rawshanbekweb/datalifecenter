@@ -226,7 +226,11 @@
       "telegramSub": "Fast reply",
       "emailSub": "Reply within 24 hours",
       "addressLabel": "Address",
-      "hoursTitle": "Working Hours"
+      "hoursTitle": "Working Hours",
+      "hoursWeekdays": "Monday — Friday",
+      "hoursSaturday": "Saturday",
+      "hoursSunday": "Sunday",
+      "hoursClosed": "Closed"
     },
     "testimonials": {
       "pill": "Reviews",

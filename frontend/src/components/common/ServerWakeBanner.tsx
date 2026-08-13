@@ -30,9 +30,8 @@ export default function ServerWakeBanner(): React.ReactElement | null {
         fontSize: 13, fontWeight: 600, boxShadow: '0 8px 30px rgba(15,23,42,0.25)',
       }}
     >
-      <Loader2 size={15} style={{ flexShrink: 0, animation: 'dl-spin 1s linear infinite' }} />
+      <Loader2 size={15} className="dl-spin" style={{ flexShrink: 0 }} />
       <span>{t('common.serverWaking')}</span>
-      <style>{'@keyframes dl-spin{to{transform:rotate(360deg)}}'}</style>
     </div>
   );
 }

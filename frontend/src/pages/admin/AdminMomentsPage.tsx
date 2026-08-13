@@ -108,7 +108,7 @@ function MomentForm({ initial, onCancel, onSaved }: MomentFormProps): React.Reac
       <LocalizedField label={t('admin.moments.fCaption')} multiline value={form.caption}
         onChange={(next) => setForm((f) => ({ ...f, caption: next }))} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.moments.fDate')}</label>
           <input className="inp" type="date" value={form.happenedAt}

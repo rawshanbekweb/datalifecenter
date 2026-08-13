@@ -237,12 +237,12 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <LocalizedField label={t('admin.courses.fSubtitle')} value={form.subtitle} onChange={(next) => setForm((f) => ({ ...f, subtitle: next }))} />
       </div>
       <LocalizedField label={t('admin.form.descField')} required multiline value={form.description} onChange={(next) => setForm((f) => ({ ...f, description: next }))} />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.form.iconLabel')}</label>
           <select className="inp" value={form.iconKey} onChange={change('iconKey')}>
@@ -262,7 +262,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
           </select>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fPrice')}</label>
           <input className="inp" type="number" min="0" value={form.price} onChange={change('price')} />
@@ -285,7 +285,7 @@ function CourseForm({ initial, mentors, onCancel, onSaved }: CourseFormProps): R
       {/* GURUH SIG'IMI — bir vaqtda nechta o'quvchi o'qiydi. Bo'sh = cheklov yo'q.
           Joy tugaganda saytda "Joylar tugadi" chiqadi va yozilish to'xtaydi,
           lekin so'rov (navbat) qabul qilinaveradi. */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         {(form.format === 'ONLINE' || form.format === 'HYBRID') && (
           <div>
             <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.courses.fOnlineSeats')}</label>

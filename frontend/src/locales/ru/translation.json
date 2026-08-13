@@ -136,7 +136,7 @@
       "cookie": "Cookie"
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Все права защищены.",
-    "systemsOperational": "All systems operational"
+    "systemsOperational": "Все системы работают"
   },
   "home": {
     "hero": {
@@ -226,7 +226,11 @@
       "telegramSub": "Быстрый ответ",
       "emailSub": "Ответ в течение 24 часов",
       "addressLabel": "Адрес",
-      "hoursTitle": "Часы работы"
+      "hoursTitle": "Часы работы",
+      "hoursWeekdays": "Понедельник — Пятница",
+      "hoursSaturday": "Суббота",
+      "hoursSunday": "Воскресенье",
+      "hoursClosed": "Закрыто"
     },
     "testimonials": {
       "pill": "Отзывы",

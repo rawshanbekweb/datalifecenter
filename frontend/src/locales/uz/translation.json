@@ -136,7 +136,7 @@
       "cookie": "Cookie"
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Barcha huquqlar himoyalangan.",
-    "systemsOperational": "All systems operational"
+    "systemsOperational": "Barcha tizimlar ishlamoqda"
   },
   "home": {
     "hero": {
@@ -226,7 +226,11 @@
       "telegramSub": "Tezkor javob",
       "emailSub": "24 soat ichida javob",
       "addressLabel": "Manzil",
-      "hoursTitle": "Ish Vaqtlari"
+      "hoursTitle": "Ish Vaqtlari",
+      "hoursWeekdays": "Dushanba — Juma",
+      "hoursSaturday": "Shanba",
+      "hoursSunday": "Yakshanba",
+      "hoursClosed": "Yopiq"
     },
     "testimonials": {
       "pill": "Sharhlar",

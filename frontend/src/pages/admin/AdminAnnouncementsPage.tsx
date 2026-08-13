@@ -94,7 +94,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
         )}
         <LocalizedField label={t('admin.announcements.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <LocalizedField label={t('admin.announcements.bodyField')} required multiline value={form.body} onChange={(next) => setForm((f) => ({ ...f, body: next }))} />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+        <div className="form-row">
           <div>
             <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.announcements.audience')}</label>
             <select className="inp" value={form.audience} disabled={!!form.courseId}

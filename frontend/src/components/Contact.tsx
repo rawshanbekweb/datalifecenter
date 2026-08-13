@@ -42,18 +42,28 @@ interface FormState {
 
 type ContactStatus = 'idle' | 'loading' | 'success' | 'error';
 
-const DEFAULT_CONTACT: Required<ContactSettings> = {
+type Translate = (key: string) => string;
+
+const DEFAULT_CONTACT: Omit<Required<ContactSettings>, 'hours'> = {
   phone: '+998 91 383 68 08',
   telegram: '@datalifecentre',
   email: 'info@datalife.uz',
   address: "Ayimxan Shamuratova ko'chasi, Nukus",
   addressSub: 'IT Park, 11-qavat',
-  hours: [
-    { day: 'Dushanba — Juma', time: '09:00 — 18:00', closed: false },
-    { day: 'Shanba', time: '09:00 — 18:00', closed: false },
-    { day: 'Yakshanba', time: 'Yopiq', closed: true },
-  ],
 };
+
+/**
+ * Admin sayt sozlamalarida ish vaqtini kiritmagan bo'lsa ko'rsatiladigan
+ * zaxira jadval. Kun nomlari ATAYIN tarjimadan olinadi: ilgari ular
+ * o'zbekcha qatorlar edi ("Dushanba — Juma", "Yopiq") va saytning asosiy
+ * tili qoraqalpoqcha bo'lgani uchun mehmonlarning ko'pchiligi aynan shu
+ * o'zbekcha variantni ko'rardi.
+ */
+const defaultHours = (t: Translate): HoursItem[] => [
+  { day: t('home.contact.hoursWeekdays'), time: '09:00 — 18:00', closed: false },
+  { day: t('home.contact.hoursSaturday'), time: '09:00 — 18:00', closed: false },
+  { day: t('home.contact.hoursSunday'), time: t('home.contact.hoursClosed'), closed: true },
+];
 
 // Ikonka/rang doim bir xil qoladi — faqat qiymat (telefon raqami, email va h.k.) admin orqali o'zgaradi
 const INFO_META: StaticInfoItem[] = [
@@ -76,7 +86,7 @@ function MapBox({ query }: { query: string }): React.ReactElement {
 export default function Contact({ settings }: ContactProps = {}): React.ReactElement {
   const { t } = useTranslation();
   const info = { ...DEFAULT_CONTACT, ...settings };
-  const hours = settings?.hours?.length ? settings.hours : DEFAULT_CONTACT.hours;
+  const hours = settings?.hours?.length ? settings.hours : defaultHours(t);
   const mapQuery = [info.address, info.addressSub].filter(Boolean).join(', ');
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
   const [form, setForm]         = useState<FormState>({ name:'', email:'', phone:'', subject:'', message:'' });
@@ -139,7 +149,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
                       <p style={{ fontSize:13, color:'#dc2626' }}>{errorMsg}</p>
                     </m.div>
                   )}
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                  <div className="form-row">
                     <div>
                       <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('home.contact.nameLabel')} *</label>
                       <input className="inp" name="name" value={form.name} onChange={change} required placeholder={t('home.contact.namePlaceholder')}/>
@@ -169,7 +179,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
                   </div>
                   <button type="submit" disabled={status==='loading'} className="btn-primary"
                     style={{ justifyContent:'center', opacity:status==='loading'?0.7:1 }}>
-                    {status==='loading' ? <><Loader size={15} style={{ animation:'spin 1s linear infinite' }}/> {t('common.sending')}</> : <><Send size={14}/> {t('home.contact.sendButton')}</>}
+                    {status==='loading' ? <><Loader size={15} className="dl-spin"/> {t('common.sending')}</> : <><Send size={14}/> {t('home.contact.sendButton')}</>}
                   </button>
                 </form>
               )}
@@ -214,7 +224,7 @@ export default function Contact({ settings }: ContactProps = {}): React.ReactEle
           </m.div>
         </div>
       </div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @media(max-width:860px){.contact-grid{grid-template-columns:1fr!important}}`}</style>
+      <style>{`@media(max-width:860px){.contact-grid{grid-template-columns:1fr!important}}`}</style>
     </section>
   );
 }
