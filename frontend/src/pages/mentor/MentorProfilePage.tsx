@@ -3,6 +3,7 @@ import { CheckCircle, AlertCircle, UserRound, Link2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getMentorMe, updateMentorMe } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import ActiveSessions from '../../components/common/ActiveSessions';
 import FileUpload from '../../components/common/FileUpload';
 import LocalizedField from '../../components/admin/LocalizedField';
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
@@ -146,6 +147,10 @@ export default function MentorProfilePage(): React.ReactElement {
           </button>
         </form>
       )}
+
+      {/* Kirilgan qurilmalar — mentor profili mentor jadvaliga tegishli
+          bo'lsa ham, seanslar hisobga tegishli va hammaga kerak */}
+      <ActiveSessions />
     </div>
   );
 }

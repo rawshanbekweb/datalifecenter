@@ -2,6 +2,7 @@ import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
   Newspaper, Handshake, Mail, Inbox, Settings, Star, MessageSquare, LayoutGrid,
   Megaphone, Wallet, MessagesSquare, ClipboardList, Camera, LineChart, Images,
+  UserCog,
 } from 'lucide-react';
 
 /**
@@ -85,6 +86,7 @@ export const NAV_GROUPS: NavGroup[] = [
 ];
 
 export const BOTTOM_ITEMS: NavItem[] = [
+  { labelKey: 'admin.nav.profile',      to: '/admin/profile',       icon: UserCog },
   { labelKey: 'admin.nav.siteSettings', to: '/admin/site-settings', icon: Settings },
 ];
 

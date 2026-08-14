@@ -823,7 +823,8 @@
       "courseReviews": "Отзывы о курсах",
       "chat": "Переписка",
       "courseRequests": "Заявки на курсы",
-      "team": "Команда"
+      "team": "Команда",
+      "profile": "Профиль"
     },
     "navGroups": {
       "learning": "Обучение",

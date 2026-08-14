@@ -823,7 +823,8 @@
       "courseReviews": "Course reviews",
       "chat": "Chat",
       "courseRequests": "Course requests",
-      "team": "Team"
+      "team": "Team",
+      "profile": "Profile"
     },
     "navGroups": {
       "learning": "Learning",

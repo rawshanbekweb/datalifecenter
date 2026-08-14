@@ -199,6 +199,10 @@ export function createAppRouter(basename: string) {
       { path: 'course-reviews', element: s(<AdminCourseReviewsPage />) },
       { path: 'projects', element: s(<AdminProjectsPage />) },
       { path: 'moments', element: s(<AdminMomentsPage />) },
+      // Admin ham o'z profilini boshqarishi kerak (ism, avatar, parol va
+      // kirilgan qurilmalar). Talaba kabineti bilan BIR XIL sahifa —
+      // mazmuni rolga bog'liq emas, faqat admin qobig'i ichida ochiladi.
+      { path: 'profile', element: s(<ProfilePage />) },
     ],
   },
   ], { basename })

@@ -4,6 +4,7 @@ import { CheckCircle, AlertCircle, UserRound, ExternalLink, EyeOff } from 'lucid
 import { useTranslation } from 'react-i18next';
 import { getTeamMemberMe, updateTeamMemberMe } from '../../api/team';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import ActiveSessions from '../../components/common/ActiveSessions';
 import TeamProfileFields from '../../components/team/TeamProfileFields';
 import { departmentMeta } from '../../components/team/departments';
 import { TeamMemberAdmin, TeamProfileFormState, emptyTeamProfileForm } from '../../types/team';
@@ -135,6 +136,9 @@ export default function TeamProfilePage(): React.ReactElement {
           </button>
         </form>
       )}
+
+      {/* Kirilgan qurilmalar — hisobga tegishli, jamoa profiliga emas */}
+      <ActiveSessions />
     </div>
   );
 }
