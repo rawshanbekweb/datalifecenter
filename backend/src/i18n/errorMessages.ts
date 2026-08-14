@@ -66,6 +66,11 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Uzaq waqıt háreket bolmaǵanı ushın sistemadan shıǵarıldıńız',
     en: 'You were signed out due to a long period of inactivity',
   },
+  "So'rov yuborish uchun avval emailingizni tasdiqlang": {
+    ru: 'Чтобы отправить заявку, сначала подтвердите email',
+    kaa: "Soraw jiberiw ushın aldın emailińizdi tastıyıqlań",
+    en: 'Please verify your email before sending a request',
+  },
   'Seans topilmadi': {
     ru: 'Сессия не найдена',
     kaa: 'Seans tabılmadı',

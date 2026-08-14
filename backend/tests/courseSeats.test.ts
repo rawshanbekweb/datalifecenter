@@ -18,7 +18,8 @@ async function createCourse(fields: Record<string, unknown>): Promise<{ id: stri
 }
 
 async function newStudent(): Promise<Awaited<ReturnType<typeof loginAgent>>> {
-  const user = await createUser(`seat-${Date.now()}-${Math.random()}@test.uz`, 'STUDENT');
+  // emaili tasdiqlangan: kurs so'rovi faqat tasdiqlangan hisobdan qabul qilinadi
+  const user = await createUser(`seat-${Date.now()}-${Math.random()}@test.uz`, 'STUDENT', 'Test User', true);
   return loginAgent(user.email);
 }
 

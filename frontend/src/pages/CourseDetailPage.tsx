@@ -366,9 +366,10 @@ export default function CourseDetailPage(): React.ReactElement {
                       : selfEnrollAllowed ? t('pages.courseDetail.loginPrompt') : t('pages.courseDetail.requestPrompt')}
                   </p>
                   {seatsNotice}
-                  {/* Offline kursda ham, pullik kursda ham yozilish admin orqali —
-                      so'rov formasi login talab qilmaydi, shuning uchun mehmonni
-                      faqat bepul kursda login sahifasiga yuboramiz */}
+                  {/* Bepul onlayn kursga mehmon o'zi yozila oladi — uni to'g'ridan-to'g'ri
+                      login sahifasiga yuboramiz. Offline va pullik kursda esa yozilish
+                      admin orqali, shuning uchun so'rov tugmasi qoladi: login endi u yerda
+                      ham shart, lekin buni modalning o'zi kurs kontekstida tushuntiradi */}
                   {!isOfflineOnly && selfEnrollAllowed && (
                     <Link to="/login" state={{ from: `/courses/${slug}` }}>
                       <button className="btn-primary" style={{ width:'100%', justifyContent:'center', marginBottom:10 }}>

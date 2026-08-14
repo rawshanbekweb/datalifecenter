@@ -21,9 +21,11 @@ async function createCourse(title: string, format: 'ONLINE' | 'OFFLINE' | 'HYBRI
 
 beforeAll(async () => {
   await resetDb();
-  await createUser('admin@req.uz', 'ADMIN');
-  const student = await createUser('student@req.uz', 'STUDENT', 'Talaba Talabov');
+  await createUser('admin@req.uz', 'ADMIN', 'Test User', true);
+  // So'rov yuborish uchun email tasdiqlangan bo'lishi shart
+  const student = await createUser('student@req.uz', 'STUDENT', 'Talaba Talabov', true);
   studentId = student.id;
+  await createUser('tasdiqlanmagan@req.uz', 'STUDENT', 'Tasdiqlanmagan');
 
   adminAgent = await loginAgent('admin@req.uz');
   studentAgent = await loginAgent('student@req.uz');
@@ -57,32 +59,43 @@ describe('Kurs formati', () => {
 });
 
 describe("Kurs so'rovi", () => {
-  it('mehmon (login qilmagan) so‘rov yubora oladi', async () => {
-    const res = await request(app)
+  it('mehmon (login qilmagan) so‘rov yubora OLMAYDI', async () => {
+    await request(app)
       .post('/api/course-requests')
       .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Mehmon', phone: '+998901234567' })
-      .expect(201);
+      .expect(401);
+  });
 
-    expect(res.body.data.status).toBe('NEW');
-    expect(res.body.data.userId).toBeNull();
+  it('emaili tasdiqlanmagan foydalanuvchi so‘rov yubora olmaydi', async () => {
+    const agent = await loginAgent('tasdiqlanmagan@req.uz');
+    const res = await agent
+      .post('/api/course-requests')
+      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Tasdiqlanmagan', phone: '+998901234567' })
+      .expect(403);
+    expect(res.body.error.code).toBe('EMAIL_NOT_VERIFIED');
   });
 
   it("kurs formatiga mos kelmaydigan so'rov rad etiladi", async () => {
-    const res = await request(app)
+    const res = await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: offlineCourseId, format: 'ONLINE', name: 'Mehmon', phone: '+998901234567' })
+      .send({ courseId: offlineCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567' })
       .expect(400);
     expect(res.body.error.code).toBe('FORMAT_NOT_AVAILABLE');
   });
 
   it('gibrid kursda ikkala format ham qabul qilinadi', async () => {
-    await request(app)
+    await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: hybridCourseId, format: 'ONLINE', name: 'Mehmon', phone: '+998901234567' })
+      .send({ courseId: hybridCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567' })
       .expect(201);
-    await request(app)
+
+    // Ikkinchi format BOSHQA foydalanuvchidan: bitta odamning bitta kursga
+    // ochiq turgan ikkinchi so'rovi ataylab to'xtatiladi (REQUEST_PENDING)
+    await createUser('ikkinchi@req.uz', 'STUDENT', 'Ikkinchi Talaba', true);
+    const other = await loginAgent('ikkinchi@req.uz');
+    await other
       .post('/api/course-requests')
-      .send({ courseId: hybridCourseId, format: 'OFFLINE', name: 'Mehmon', phone: '+998901234567' })
+      .send({ courseId: hybridCourseId, format: 'OFFLINE', name: 'Ikkinchi Talaba', phone: '+998901234568' })
       .expect(201);
   });
 
@@ -94,8 +107,12 @@ describe("Kurs so'rovi", () => {
 
     expect(res.body.data.userId).toBe(studentId);
 
+    // /mine faqat shu hisobning so'rovlarini qaytaradi: yangi so'rov ro'yxatda
+    // bo'ladi, boshqa talabaning gibrid kursga so'rovi esa bu yerga tushmaydi
     const mine = await studentAgent.get('/api/course-requests/mine').expect(200);
-    expect(mine.body.data).toHaveLength(1);
+    const ids = mine.body.data.map((r: { id: string }) => r.id);
+    expect(ids).toContain(res.body.data.id);
+    expect(mine.body.data.every((r: { userId: string }) => r.userId === studentId)).toBe(true);
   });
 
   it("ko'rib chiqilmagan so'rov turganda takroriy so'rov yaratilmaydi", async () => {

@@ -21,7 +21,8 @@ let closedSlug: string;
 beforeAll(async () => {
   await resetDb();
   await createUser('admin@eo.uz', 'ADMIN');
-  await createUser('student@eo.uz', 'STUDENT');
+  // emaili tasdiqlangan: kurs so'rovi faqat tasdiqlangan hisobdan qabul qilinadi
+  await createUser('student@eo.uz', 'STUDENT', 'Test User', true);
   admin = await loginAgent('admin@eo.uz');
   student = await loginAgent('student@eo.uz');
 

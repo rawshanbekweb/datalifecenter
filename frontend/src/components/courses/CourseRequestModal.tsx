@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle, X, AlertCircle, Monitor, MapPin } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { CheckCircle, X, AlertCircle, Monitor, MapPin, LogIn, MailWarning } from 'lucide-react';
 import { createCourseRequest, type CourseRequestFormat } from '../../api/courseRequests';
 import { useAuth } from '../../hooks/useAuth';
 import { Z } from '../../utils/zLayers';
@@ -8,10 +9,14 @@ import { Z } from '../../utils/zLayers';
 /**
  * "Ma'lumot olish / bog'lanish" formasi.
  *
- * Login TALAB QILINMAYDI: kursga qiziqqan odam ko'pincha hali ro'yxatdan
- * o'tmagan bo'ladi — aynan shu odamni yo'qotmaslik uchun forma ochiq.
- * Saytga kirgan bo'lsa ism/email oldindan to'ldiriladi va adminning javobi
- * uning yozishmasiga tushadi.
+ * Login TALAB QILINADI va email tasdiqlangan bo'lishi kerak (2026-08-14) —
+ * server ham shuni tekshiradi. So'rov o'quvchi hisobiga bog'lanadi: guruh,
+ * to'lov va kurs boshlanishi haqidagi xabarlar o'sha hisobga (va uning
+ * pochtasiga) boradi, adminning javobi esa yozishmasiga tushadi.
+ *
+ * Shuning uchun modal formani ko'rsatishdan oldin ikkita to'siqni tekshiradi
+ * va serverdan 401/403 kutib o'tirmaydi: mehmon kirish sahifasiga, emaili
+ * tasdiqlanmagan odam esa profilidagi "qayta yuborish" tugmasiga yo'naltiriladi.
  */
 
 interface Props {
@@ -33,6 +38,10 @@ export default function CourseRequestModal({
 }: Props): React.ReactElement {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const location = useLocation();
+
+  // Maydon eski javobda bo'lmasa to'sib qo'ymaymiz — server baribir tekshiradi
+  const emailVerified = user?.emailVerified !== false;
 
   const [format, setFormat] = useState<CourseRequestFormat>(
     initialFormat ?? (courseFormat === 'OFFLINE' ? 'OFFLINE' : 'ONLINE'),
@@ -87,13 +96,39 @@ export default function CourseRequestModal({
           </button>
         </div>
 
-        {status === 'done' ? (
+        {!user ? (
+          <div style={{ textAlign:'center', padding:'12px 0 4px' }}>
+            <LogIn size={34} style={{ color:'#0ea5e9', marginBottom:12 }} />
+            <p style={{ fontSize:14.5, fontWeight:700, color:'#0f172a', marginBottom:6 }}>{t('courseRequest.authTitle')}</p>
+            <p style={{ fontSize:13, color:'#64748b', lineHeight:1.7 }}>{t('courseRequest.authSub')}</p>
+            <div style={{ display:'flex', gap:8, marginTop:16 }}>
+              <Link to="/login" state={{ from: location.pathname }} style={{ flex:1, textDecoration:'none' }}>
+                <button className="btn-primary" style={{ width:'100%', justifyContent:'center' }}>{t('nav.login')}</button>
+              </Link>
+              {/* Ro'yxatdan o'tish sahifasi `from` ni o'qimaydi: yangi hisob
+                  baribir avval emailni tasdiqlashi kerak */}
+              <Link to="/register" style={{ flex:1, textDecoration:'none' }}>
+                <button className="btn-outline" style={{ width:'100%', justifyContent:'center' }}>{t('auth.login.registerLink')}</button>
+              </Link>
+            </div>
+          </div>
+        ) : !emailVerified ? (
+          <div style={{ textAlign:'center', padding:'12px 0 4px' }}>
+            <MailWarning size={34} style={{ color:'#d97706', marginBottom:12 }} />
+            <p style={{ fontSize:14.5, fontWeight:700, color:'#0f172a', marginBottom:6 }}>{t('courseRequest.verifyTitle')}</p>
+            <p style={{ fontSize:13, color:'#64748b', lineHeight:1.7 }}>{t('courseRequest.verifySub')}</p>
+            {/* Profilda tasdiqlash xatini qayta yuborish tugmasi turadi */}
+            <Link to="/profile" style={{ textDecoration:'none' }}>
+              <button className="btn-primary" style={{ marginTop:16, width:'100%', justifyContent:'center' }}>
+                {t('courseRequest.verifyAction')}
+              </button>
+            </Link>
+          </div>
+        ) : status === 'done' ? (
           <div style={{ textAlign:'center', padding:'12px 0 4px' }}>
             <CheckCircle size={34} style={{ color:'#16a34a', marginBottom:12 }} />
             <p style={{ fontSize:14.5, fontWeight:700, color:'#0f172a', marginBottom:6 }}>{t('courseRequest.doneTitle')}</p>
-            <p style={{ fontSize:13, color:'#64748b', lineHeight:1.7 }}>
-              {user ? t('courseRequest.doneSubUser') : t('courseRequest.doneSubGuest')}
-            </p>
+            <p style={{ fontSize:13, color:'#64748b', lineHeight:1.7 }}>{t('courseRequest.doneSubUser')}</p>
             <button onClick={onClose} className="btn-primary" style={{ marginTop:16, width:'100%', justifyContent:'center' }}>
               {t('common.close')}
             </button>

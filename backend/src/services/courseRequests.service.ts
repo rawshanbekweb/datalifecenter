@@ -16,9 +16,12 @@ import { assertSeatAvailable, seatFormatFor } from './courseSeats.service';
  * qilinsa, to'lanmagan, hatto hali gaplashilmagan yozilishlar kurs
  * statistikasi, progress va sertifikat tizimiga aralashib ketardi.
  *
- * Mehmon ham (login qilmasdan) so'rov yubora oladi: aynan shu odamlar
- * keyinchalik ro'yxatdan o'tadi. Login qilgan bo'lsa — so'rov hisobiga
- * bog'lanadi va adminning javobi uning yozishmasiga tushadi.
+ * KIM YUBORA OLADI (2026-08-14 dan): faqat ro'yxatdan o'tgan va emaili
+ * TASDIQLANGAN foydalanuvchi. Avval mehmon ham yubora olardi, lekin
+ * o'quvchini guruhga rasman yozish uchun hisob kerak — status, guruh va
+ * yozishma o'sha hisobga bog'lanadi. Tasdiqlanmagan email esa amalda
+ * aloqa kanali emas: kurs boshlanishi va to'lov haqidagi xabarlar
+ * hech qayerga bormaydi.
  */
 
 const requestInclude = {
@@ -50,9 +53,25 @@ function assertFormatAllowed(courseFormat: CourseFormat, requested: CourseFormat
 
 export async function createCourseRequest(
   input: CreateCourseRequestInput,
-  userId: string | undefined,
+  userId: string,
   locale: SupportedLocale,
 ) {
+  // Email tasdiqlanmagan bo'lsa so'rov qabul qilinmaydi — aks holda o'quvchi
+  // ro'yxatga tushadi, lekin unga birorta ham xabar yetib bormaydi
+  const account = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { emailVerifiedAt: true },
+  });
+  if (!account) {
+    throw ApiError.notFound('Foydalanuvchi topilmadi');
+  }
+  if (!account.emailVerifiedAt) {
+    throw ApiError.forbidden(
+      "So'rov yuborish uchun avval emailingizni tasdiqlang",
+      'EMAIL_NOT_VERIFIED'
+    );
+  }
+
   const course = await prisma.course.findFirst({
     where: { id: input.courseId, published: true },
     select: { id: true, title: true, format: true },
@@ -70,18 +89,16 @@ export async function createCourseRequest(
   // Bir odam bir kursga qayta-qayta so'rov yubormasin: hali ko'rib
   // chiqilmagan so'rovi bo'lsa yangisi yaratilmaydi (admin ro'yxati
   // bir xil murojaat nusxalari bilan to'lib ketmasligi uchun)
-  if (userId) {
-    const pending = await prisma.courseRequest.findFirst({
-      where: { courseId: course.id, userId, status: { in: ['NEW', 'CONTACTED'] } },
-      select: { id: true },
-    });
-    if (pending) {
-      throw ApiError.conflict('Bu kurs bo‘yicha so‘rovingiz allaqachon ko‘rib chiqilmoqda', 'REQUEST_PENDING');
-    }
+  const pending = await prisma.courseRequest.findFirst({
+    where: { courseId: course.id, userId, status: { in: ['NEW', 'CONTACTED'] } },
+    select: { id: true },
+  });
+  if (pending) {
+    throw ApiError.conflict('Bu kurs bo‘yicha so‘rovingiz allaqachon ko‘rib chiqilmoqda', 'REQUEST_PENDING');
   }
 
   const request = await prisma.courseRequest.create({
-    data: { ...input, userId: userId ?? null },
+    data: { ...input, userId },
     include: requestInclude,
   });
 

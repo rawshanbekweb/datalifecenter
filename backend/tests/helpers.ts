@@ -50,9 +50,17 @@ export async function resetDb(): Promise<void> {
 
 export const TEST_PASSWORD = 'Passw0rd!';
 
-export async function createUser(email: string, role: Role = 'STUDENT', name = 'Test User') {
+/**
+ * `verified` ATAYIN sukut bo'yicha false: haqiqiy ro'yxatdan o'tish ham
+ * shunday boshlanadi va `users.test.ts` aynan tasdiqlanmagan hisoblar
+ * ro'yxatini tekshiradi. Emaili tasdiqlangan hisob kerak bo'lsa (masalan
+ * kurs so'rovi yuborish uchun) ochiq-oydin `true` beriladi.
+ */
+export async function createUser(email: string, role: Role = 'STUDENT', name = 'Test User', verified = false) {
   const passwordHash = await hashPassword(TEST_PASSWORD);
-  return prisma.user.create({ data: { email, name, passwordHash, role } });
+  return prisma.user.create({
+    data: { email, name, passwordHash, role, emailVerifiedAt: verified ? new Date() : null },
+  });
 }
 
 // Cookie'larni saqlaydigan supertest agenti bilan login qiladi

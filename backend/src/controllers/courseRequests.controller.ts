@@ -23,8 +23,9 @@ export const createCourseRequestHandler = asyncHandler(async (req: Request, res:
       email: orNull(req.body.email),
       note: orNull(req.body.note),
     },
-    // optionalAuth: saytga kirgan bo'lsa so'rov hisobiga bog'lanadi
-    req.user?.userId,
+    // Marshrutda `authenticate` turadi — bu yerga faqat kirgan foydalanuvchi
+    // yetib keladi, shuning uchun userId har doim bor
+    req.user!.userId,
     req.locale,
   );
   sendSuccess(res, request, 201);

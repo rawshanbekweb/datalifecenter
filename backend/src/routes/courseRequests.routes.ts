@@ -14,7 +14,6 @@ import { bulkDeleteSchema } from '../validators/shared/bulkDelete.validator';
 import { env } from '../config/env';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
-import { optionalAuth } from '../middleware/optionalAuth';
 import { validateBody, validateQuery } from '../middleware/validateRequest';
 import {
   createCourseRequestSchema,
@@ -25,10 +24,16 @@ import {
 const router = Router();
 
 /**
- * So'rov formasi ochiq (login talab qilmaydi) — kontakt formasi bilan bir xil
- * xavf: limitsiz qoldirilsa admin ro'yxatini spam bilan to'ldirish mumkin.
- * Soatiga 10 ta: bir odam bir necha kursga qiziqishi normal, avtomatik
- * to'ldirish uchun esa tor.
+ * So'rov endi FAQAT ro'yxatdan o'tgan va emaili tasdiqlangan foydalanuvchidan
+ * qabul qilinadi (2026-08-14). Avval mehmon ham yubora olardi.
+ *
+ * NEGA O'ZGARDI: o'quvchini kursga rasman yozish uchun uning hisobi kerak —
+ * guruh, statusi va yozishmasi shu hisobga bog'lanadi. Emailsiz esa unga
+ * hech qanday xabar bormaydi: kurs boshlanishi, guruh va to'lov haqidagi
+ * bildirishnomalar aynan shu manzilga ketadi.
+ *
+ * Limit saqlanib qoldi: hisobi bor odam ham ro'yxatni bir necha kursga
+ * takroriy so'rov bilan to'ldirib yuborishi mumkin.
  */
 const requestLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -39,7 +44,7 @@ const requestLimiter = rateLimit({
   handler: tooManyRequestsHandler("Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring."),
 });
 
-router.post('/', requestLimiter, optionalAuth, validateBody(createCourseRequestSchema), createCourseRequestHandler);
+router.post('/', requestLimiter, authenticate, validateBody(createCourseRequestSchema), createCourseRequestHandler);
 router.get('/mine', authenticate, listMyCourseRequestsHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listCourseRequestsQuerySchema), listCourseRequestsAdminHandler);
 router.patch('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseRequestSchema), updateCourseRequestHandler);
