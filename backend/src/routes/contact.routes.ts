@@ -9,6 +9,7 @@ import {
 } from '../controllers/contact.controller';
 import { bulkDeleteSchema } from '../validators/shared/bulkDelete.validator';
 import { env } from '../config/env';
+import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
 import { validateBody, validateQuery } from '../middleware/validateRequest';
@@ -34,7 +35,7 @@ const contactLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: { success: false, error: { message: "Juda ko'p xabar yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  handler: tooManyRequestsHandler("Juda ko'p xabar yuborildi. Birozdan keyin qayta urinib ko'ring."),
 });
 
 router.post('/', contactLimiter, validateBody(contactMessageSchema), createContactMessageHandler);

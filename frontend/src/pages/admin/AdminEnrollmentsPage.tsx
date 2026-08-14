@@ -5,6 +5,7 @@ import { listEnrollmentsAdmin, updateEnrollmentAdmin } from '../../api/enrollmen
 import { formatDate, formatNumber } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import Pagination from '../../components/admin/Pagination';
+import { useDebounced } from '../../hooks/useDebounced';
 import { useToast, usePrompt } from '../../components/common/Feedback';
 import ReceiptViewerModal from '../../components/admin/ReceiptViewerModal';
 import Loading from '../../components/common/Loading';
@@ -53,7 +54,8 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
   const [status, setStatus]         = useState<'loading' | 'ready' | 'error'>('loading');
   const [filter, setFilter]         = useState<string>('');
   const [search, setSearch]         = useState<string>('');
-  const [query, setQuery]           = useState<string>('');
+  // Qidiruv jonli: "Qidirish" tugmasini bosish shart emas
+  const query                       = useDebounced(search);
   const [busyId, setBusyId]         = useState<string>('');
   const [viewingReceiptId, setViewingReceiptId] = useState<string>('');
   const [page, setPage]             = useState<number>(1);
@@ -111,14 +113,14 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
             </button>
           ))}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); applyFilter(() => setQuery(search)); }}
+        {/* Enter bosilsa sahifa qayta yuklanmasin — qidiruv o'zi jonli ishlaydi */}
+        <form onSubmit={(e) => e.preventDefault()}
           style={{ display:'flex', gap:8, marginLeft:'auto' }}>
           <div style={{ position:'relative' }}>
             <Search size={14} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }} />
-            <input className="inp" value={search} onChange={(e) => setSearch(e.target.value)}
+            <input className="inp" value={search} onChange={(e) => applyFilter(() => setSearch(e.target.value))}
               placeholder={t('admin.enrollments.searchPlaceholder')} style={{ paddingLeft:34, width:220 }} />
           </div>
-          <button type="submit" className="btn-outline" style={{ fontSize:13 }}>{t('admin.common.search')}</button>
         </form>
       </div>
 
@@ -140,7 +142,7 @@ export default function AdminEnrollmentsPage(): React.ReactElement {
             const needsApproval = e.status === 'PENDING' && (e.paymentStatus === 'UNPAID' || e.paymentStatus === 'PENDING');
             const canReject = e.paymentStatus === 'PENDING';
             return (
-              <div key={e.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
+              <div key={e.id} className="card admin-row">
                 <div style={{ flex:'1 1 200px', minWidth:0 }}>
                   <p style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{e.user.name}</p>
                   <p style={{ fontSize:12, color:'#94a3b8' }}>{e.user.email}</p>

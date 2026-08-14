@@ -122,41 +122,10 @@ function AboutPreview({ data, locale, empty }: { data: AboutData; locale: Locale
         </ul>
       )}
 
-      {data.skills.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-          {data.skills.map((s, i) => (
-            <div key={i}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, marginBottom: 4 }}>
-                <span style={{ color: '#334155', fontWeight: 600 }}>
-                  <Text value={s.label} locale={locale} fallback={empty} />
-                </span>
-                <span style={{ color: '#0ea5e9', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{s.pct}%</span>
-              </div>
-              <div style={{ height: 5, borderRadius: 5, background: '#f1f5f9', overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', borderRadius: 5, width: `${Math.min(100, Math.max(0, s.pct))}%`,
-                  background: 'linear-gradient(90deg,#0ea5e9,#6366f1)',
-                }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {data.satisfaction.length > 0 && (
-        <div style={{ display: 'flex', gap: 10 }}>
-          {data.satisfaction.map((s, i) => (
-            <div key={i} style={{ ...CARD, flex: 1, padding: 12, textAlign: 'center', background: '#f8fafc' }}>
-              <div style={{ fontSize: 18, fontWeight: 900, color: '#6366f1', lineHeight: 1.1 }}>
-                {s.value || <Placeholder label="0" />}
-              </div>
-              <div style={{ fontSize: 10.5, color: '#64748b', marginTop: 3 }}>
-                <Text value={s.label} locale={locale} fallback={empty} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Ko'nikma chiziqlari va "mamnunlik" raqamlari bu yerdan ham olib
+          tashlandi: ko'rinish SAYTDA nima chiqishini ko'rsatishi kerak, o'sha
+          bloklar esa endi chiqmaydi (o'rnida jamoaning yuzlari). Preview
+          saytdan farq qilsa, u yo'l ko'rsatish o'rniga chalg'itadi. */}
     </div>
   );
 }

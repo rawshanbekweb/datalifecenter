@@ -1,54 +1,34 @@
-import { useState } from 'react';
-import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
-  Newspaper, Handshake, Mail, Inbox, LogOut, Globe, Menu, X, Settings, Star, MessageSquare, LayoutGrid, Megaphone, Wallet, MessagesSquare, ClipboardList, Camera, LineChart,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { LogOut, Globe, Menu, X, ChevronDown, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useUnreadMessages } from '../hooks/useUnreadMessages';
 import NotificationBell from '../components/common/NotificationBell';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
+import QuickJump, { QUICK_JUMP_EVENT } from '../components/admin/QuickJump';
+import {
+  BOTTOM_ITEMS, NAV_GROUPS, NavItem, TOP_ITEMS, groupOfPath,
+} from '../components/admin/adminNav';
 import { Z } from '../utils/zLayers';
-
-interface NavItem {
-  labelKey: string;
-  to: string;
-  icon: React.ComponentType<{ size?: number | string }>;
-  end?: boolean;
-  /** O'qilmagan xabarlar soni shu bo'limda ko'rsatiladi */
-  badge?: boolean;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { labelKey: 'admin.nav.dashboard',      to: '/admin',             icon: LayoutDashboard, end: true },
-  { labelKey: 'admin.nav.analytics',      to: '/admin/analytics',   icon: LineChart },
-  { labelKey: 'admin.nav.enrollments',    to: '/admin/enrollments', icon: GraduationCap },
-  { labelKey: 'admin.nav.subscriptions',  to: '/admin/subscriptions', icon: Wallet },
-  { labelKey: 'admin.nav.courses',        to: '/admin/courses',     icon: BookOpen },
-  { labelKey: 'admin.nav.users',          to: '/admin/users',       icon: Users },
-  { labelKey: 'admin.nav.mentors',        to: '/admin/mentors',     icon: UserSquare2 },
-  { labelKey: 'admin.nav.team',           to: '/admin/team',        icon: UsersRound },
-  { labelKey: 'admin.nav.mentorRequests', to: '/admin/mentor-requests', icon: Inbox },
-  { labelKey: 'admin.nav.blog',           to: '/admin/blog',        icon: Newspaper },
-  { labelKey: 'admin.nav.partners',       to: '/admin/partners',    icon: Handshake },
-  { labelKey: 'admin.nav.projects',       to: '/admin/projects',    icon: LayoutGrid },
-  { labelKey: 'admin.nav.moments',        to: '/admin/moments',     icon: Camera },
-  { labelKey: 'admin.nav.chat',           to: '/admin/chat',        icon: MessagesSquare, badge: true },
-  { labelKey: 'admin.nav.courseRequests', to: '/admin/course-requests', icon: ClipboardList },
-  { labelKey: 'admin.nav.messages',       to: '/admin/messages',    icon: Mail },
-  { labelKey: 'admin.nav.announcements',  to: '/admin/announcements', icon: Megaphone },
-  { labelKey: 'admin.nav.siteSettings',   to: '/admin/site-settings', icon: Settings },
-  { labelKey: 'admin.nav.testimonials',   to: '/admin/testimonials', icon: Star },
-  { labelKey: 'admin.nav.courseReviews',  to: '/admin/course-reviews', icon: MessageSquare },
-];
 
 export default function AdminLayout(): React.ReactElement {
   const { t } = useTranslation();
   const unreadMessages = useUnreadMessages();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+
+  // Turgan sahifangiz qaysi guruhda bo'lsa, o'sha guruh ochiq bo'ladi
+  const activeGroup = groupOfPath(location.pathname);
+  const [openGroup, setOpenGroup] = useState<string | null>(activeGroup);
+
+  // Boshqa bo'limga o'tilganda guruh o'zi almashadi — aks holda foydalanuvchi
+  // qaysi guruhda ekanini ko'rmay qolardi
+  useEffect(() => {
+    if (activeGroup) setOpenGroup(activeGroup);
+  }, [activeGroup]);
 
   const handleLogout = async (): Promise<void> => {
     // Avval sahifadan chiqamiz, keyin foydalanuvchini tozalaymiz — aks holda
@@ -59,48 +39,88 @@ export default function AdminLayout(): React.ReactElement {
     await logout();
   };
 
+  const renderItem = (item: NavItem): React.ReactElement => {
+    const Icon = item.icon;
+    return (
+      <NavLink key={item.to} to={item.to} end={item.end} onClick={() => setMenuOpen(false)}
+        style={({ isActive }) => ({
+          display:'flex', alignItems:'center', gap:10, padding:'8px 12px', borderRadius:9,
+          fontSize:13, fontWeight:600, textDecoration:'none', transition:'background 0.15s, color 0.15s',
+          color: isActive ? '#f8fafc' : '#94a3b8',
+          background: isActive ? 'rgba(14,165,233,0.18)' : 'transparent',
+          borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
+        })}>
+        <Icon size={15} /> {t(item.labelKey)}
+        {/* O'qilmagan xabarlar — kabinetning qaysi bo'limida ekaningizdan qat'i nazar ko'rinadi */}
+        {item.badge && unreadMessages > 0 && (
+          <span style={{ marginLeft:'auto', fontSize:10.5, fontWeight:800, color:'#fff', background:'#f43f5e', borderRadius:20, padding:'1px 7px' }}>
+            {unreadMessages}
+          </span>
+        )}
+      </NavLink>
+    );
+  };
+
   const sidebarContent = (
     <>
       <Link to="/admin" onClick={() => setMenuOpen(false)}
-        style={{ display:'flex', alignItems:'center', gap:10, padding:'22px 20px 18px', textDecoration:'none', borderBottom:'1px solid #1e293b' }}>
-        <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:34, height:34, borderRadius:10, objectFit:'cover', flexShrink:0 }} />
+        style={{ display:'flex', alignItems:'center', gap:10, padding:'16px 18px 14px', textDecoration:'none', borderBottom:'1px solid #1e293b' }}>
+        <img src="/assets/favicon.jpg" alt="DATA LIFE" style={{ width:30, height:30, borderRadius:9, objectFit:'cover', flexShrink:0 }} />
         <div>
           <p style={{ fontFamily:'var(--font-sans)', fontSize:15, fontWeight:800, color:'#f8fafc', lineHeight:1.1 }}>DATA LIFE</p>
           <p style={{ fontSize:10, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.08em' }}>{t('admin.panel')}</p>
         </div>
       </Link>
 
-      <nav style={{ padding:'14px 12px', display:'flex', flexDirection:'column', gap:2, flex:1, overflowY:'auto' }}>
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
+      <nav style={{ padding:'10px 10px', display:'flex', flexDirection:'column', gap:1, flex:1, overflowY:'auto' }}>
+        {TOP_ITEMS.map(renderItem)}
+
+        {NAV_GROUPS.map((group) => {
+          const GroupIcon = group.icon;
+          const open = openGroup === group.labelKey;
+          // Guruh yopiq bo'lsa ichidagi o'qilmagan xabar belgisi sarlavhaga
+          // ko'chadi — aks holda yangi xabar butunlay ko'rinmay qolardi
+          const hiddenBadge = !open && group.items.some((i) => i.badge) && unreadMessages > 0;
           return (
-            <NavLink key={item.to} to={item.to} end={item.end} onClick={() => setMenuOpen(false)}
-              style={({ isActive }) => ({
-                display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10,
-                fontSize:13.5, fontWeight:600, textDecoration:'none', transition:'background 0.15s, color 0.15s',
-                color: isActive ? '#f8fafc' : '#94a3b8',
-                background: isActive ? 'rgba(14,165,233,0.18)' : 'transparent',
-                borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
-              })}>
-              <Icon size={16} /> {t(item.labelKey)}
-              {/* O'qilmagan xabarlar — kabinetning qaysi bo'limida ekaningizdan qat'i nazar ko'rinadi */}
-              {item.badge && unreadMessages > 0 && (
-                <span style={{ marginLeft:'auto', fontSize:10.5, fontWeight:800, color:'#fff', background:'#f43f5e', borderRadius:20, padding:'1px 7px' }}>
-                  {unreadMessages}
-                </span>
+            <div key={group.labelKey} style={{ marginTop:6 }}>
+              <button type="button" onClick={() => setOpenGroup(open ? null : group.labelKey)}
+                aria-expanded={open}
+                style={{
+                  display:'flex', alignItems:'center', gap:9, width:'100%', padding:'7px 12px',
+                  borderRadius:9, border:'none', background:'transparent', cursor:'pointer', textAlign:'left',
+                  fontSize:10.5, fontWeight:800, letterSpacing:'0.07em', textTransform:'uppercase',
+                  color: open ? '#cbd5e1' : '#64748b',
+                }}>
+                <GroupIcon size={13} />
+                <span style={{ flex:1 }}>{t(group.labelKey)}</span>
+                {hiddenBadge && (
+                  <span style={{ fontSize:10, fontWeight:800, color:'#fff', background:'#f43f5e', borderRadius:20, padding:'1px 6px' }}>
+                    {unreadMessages}
+                  </span>
+                )}
+                {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+              </button>
+              {open && (
+                <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
+                  {group.items.map(renderItem)}
+                </div>
               )}
-            </NavLink>
+            </div>
           );
         })}
+
+        <div style={{ marginTop:6 }}>{BOTTOM_ITEMS.map(renderItem)}</div>
       </nav>
 
-      <div style={{ padding:'14px 12px', borderTop:'1px solid #1e293b', display:'flex', flexDirection:'column', gap:2 }}>
-        <Link to="/" style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#94a3b8', textDecoration:'none' }}>
-          <Globe size={16} /> {t('admin.backToSite')}
+      {/* O'lchamlar menyu punktlari bilan bir xil (8px/13px/15px) — aks holda
+          pastki ikki havola ularga nisbatan yirikroq ko'rinib qolardi */}
+      <div style={{ padding:'10px 10px', borderTop:'1px solid #1e293b', display:'flex', flexDirection:'column', gap:1 }}>
+        <Link to="/" style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 12px', borderRadius:9, fontSize:13, fontWeight:600, color:'#94a3b8', textDecoration:'none' }}>
+          <Globe size={15} /> {t('admin.backToSite')}
         </Link>
         <button onClick={handleLogout}
-          style={{ display:'flex', alignItems:'center', gap:11, padding:'10px 12px', borderRadius:10, fontSize:13.5, fontWeight:600, color:'#f87171', background:'transparent', border:'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
-          <LogOut size={16} /> {t('nav.logout')}
+          style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 12px', borderRadius:9, fontSize:13, fontWeight:600, color:'#f87171', background:'transparent', border:'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
+          <LogOut size={15} /> {t('nav.logout')}
         </button>
       </div>
     </>
@@ -131,7 +151,16 @@ export default function AdminLayout(): React.ReactElement {
             style={{ display:'none', width:36, height:36, borderRadius:9, border:'1px solid #e2e8f0', background:'#fff', cursor:'pointer', alignItems:'center', justifyContent:'center', color:'#475569' }}>
             {menuOpen ? <X size={17}/> : <Menu size={17}/>}
           </button>
-          <p style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>{t('admin.platformMgmt')}</p>
+          <p className="admin-hide-sm" style={{ fontSize:13, color:'#94a3b8', fontWeight:600 }}>{t('admin.platformMgmt')}</p>
+          {/* Tez o'tish tugmasi — klaviatura qisqartmasi o'z-o'zidan bilinmaydi,
+              shuning uchun u ko'rinib turadi va bosib ham ochiladi */}
+          <button type="button" onClick={() => window.dispatchEvent(new Event(QUICK_JUMP_EVENT))}
+            title={t('admin.quickJump.title')}
+            style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', borderRadius:9, border:'1px solid #e2e8f0', background:'#f8fafc', cursor:'pointer', color:'#94a3b8', fontSize:12.5, fontWeight:600 }}>
+            <Search size={14} />
+            <span className="admin-hide-sm">{t('admin.quickJump.button')}</span>
+            <kbd className="admin-hide-sm" style={{ fontSize:10, fontWeight:700, border:'1px solid #e2e8f0', borderRadius:5, padding:'1px 5px', background:'#fff', fontFamily:'var(--font-mono)' }}>Ctrl K</kbd>
+          </button>
           <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
             <LanguageSwitcher />
             <NotificationBell />
@@ -150,11 +179,18 @@ export default function AdminLayout(): React.ReactElement {
         </main>
       </div>
 
+      <QuickJump />
+
       <style>{`
         @media (max-width: 960px) {
           .admin-sidebar { display: none !important; }
           .admin-main { margin-left: 0 !important; }
           .admin-menu-btn { display: flex !important; }
+        }
+        /* Tor ekranda header'da faqat ikonkalar qoladi — matn va qisqartma
+           sig'may, tugmalarni bir-biriga siqib qo'yardi */
+        @media (max-width: 720px) {
+          .admin-hide-sm { display: none !important; }
         }
       `}</style>
     </div>

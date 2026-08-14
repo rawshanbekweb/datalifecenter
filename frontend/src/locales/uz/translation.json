@@ -79,6 +79,10 @@
       "done": "Emailingiz tasdiqlandi! Endi platformadan to'liq foydalanishingiz mumkin.",
       "errorHint": "Profil sahifasidan tasdiqlash havolasini qayta yuborishingiz mumkin.",
       "toProfile": "Profilga o'tish"
+    },
+    "sessionEnded": {
+      "idle": "Uzoq vaqt harakat bo'lmagani uchun tizimdan chiqarildingiz. Iltimos, qaytadan kiring.",
+      "revoked": "Seansingiz yopilgan. Iltimos, qaytadan kiring."
     }
   },
   "nav": {
@@ -136,7 +140,7 @@
       "cookie": "Cookie"
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Barcha huquqlar himoyalangan.",
-    "systemsOperational": "All systems operational"
+    "systemsOperational": "Barcha tizimlar ishlamoqda"
   },
   "home": {
     "hero": {
@@ -170,6 +174,10 @@
       "headingAccent": "IT ta'lim",
       "para1": "— 2019-yilda tashkil etilgan IT kompaniya. Buyurtmachilar uchun sayt, dasturiy ta'minot va startap yechimlarini ishlab chiqamiz.",
       "para2": "Shu bilan birga 7 ta yo'nalish bo'yicha o'qitamiz — ishlab chiqarishdagi tajribamiz to'g'ridan-to'g'ri darslarga o'tadi.",
+      "team": {
+        "title": "Bizning jamoa",
+        "all": "Jamoa bilan tanishing"
+      },
       "fallback": {
         "graduates": "Bitiruvchilar",
         "directions": "Yo'nalishlar",
@@ -222,7 +230,11 @@
       "telegramSub": "Tezkor javob",
       "emailSub": "24 soat ichida javob",
       "addressLabel": "Manzil",
-      "hoursTitle": "Ish Vaqtlari"
+      "hoursTitle": "Ish Vaqtlari",
+      "hoursWeekdays": "Dushanba — Juma",
+      "hoursSaturday": "Shanba",
+      "hoursSunday": "Yakshanba",
+      "hoursClosed": "Yopiq"
     },
     "testimonials": {
       "pill": "Sharhlar",
@@ -533,7 +545,21 @@
       "passChanged": "Parol muvaffaqiyatli o'zgartirildi",
       "currentPassword": "Joriy parol",
       "confirmNewPassword": "Yangi parol (takror)",
-      "mismatch": "Yangi parol takrori mos kelmadi"
+      "mismatch": "Yangi parol takrori mos kelmadi",
+      "devices": {
+        "title": "Kirilgan qurilmalar",
+        "subtitle": "Hisobingizga qaysi qurilmalardan kirilgani. Notanish qurilmani chiqarib yuboring.",
+        "current": "Shu qurilma",
+        "unknown": "Noma'lum qurilma",
+        "since": "kirilgan {{date}}",
+        "revoke": "Chiqarish",
+        "revokeOthers": "Boshqa qurilmalardan chiqish",
+        "loadError": "Qurilmalar ro'yxatini yuklab bo'lmadi",
+        "justNow": "hozir faol",
+        "minutesAgo": "{{count}} daqiqa oldin",
+        "hoursAgo": "{{count}} soat oldin",
+        "daysAgo": "{{count}} kun oldin"
+      }
     },
     "subscription": {
       "title": "Obuna",
@@ -798,6 +824,18 @@
       "chat": "Yozishmalar",
       "courseRequests": "Kurs so'rovlari",
       "team": "Jamoa"
+    },
+    "navGroups": {
+      "learning": "Taʼlim",
+      "people": "Odamlar",
+      "content": "Kontent",
+      "communication": "Muloqot"
+    },
+    "quickJump": {
+      "title": "Boʻlimga tez oʻtish",
+      "button": "Qidirish",
+      "placeholder": "Boʻlim nomini yozing...",
+      "empty": "Hech narsa topilmadi"
     },
     "common": {
       "all": "Barchasi",

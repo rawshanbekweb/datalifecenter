@@ -29,7 +29,7 @@ export default function TeamProfileFields<T extends TeamProfileFormState>({
 
   return (
     <>
-      <div className="team-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>
             {t('team.form.name')} *
@@ -53,7 +53,7 @@ export default function TeamProfileFields<T extends TeamProfileFormState>({
       <SkillsInput label={t('team.form.skills')} value={form.skills}
         onChange={(next) => setForm((f) => ({ ...f, skills: next }))} />
 
-      <div className="team-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>
             {t('team.form.email')}
@@ -68,7 +68,7 @@ export default function TeamProfileFields<T extends TeamProfileFormState>({
         </div>
       </div>
 
-      <div className="team-form-row4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+      <div className="form-row-4">
         {(['linkedinUrl', 'githubUrl', 'telegramUrl', 'websiteUrl'] as const).map((key) => (
           <div key={key}>
             <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>
@@ -79,12 +79,6 @@ export default function TeamProfileFields<T extends TeamProfileFormState>({
         ))}
       </div>
 
-      <style>{`
-        @media(max-width:760px){
-          .team-form-row{grid-template-columns:1fr!important}
-          .team-form-row4{grid-template-columns:1fr 1fr!important}
-        }
-      `}</style>
     </>
   );
 }

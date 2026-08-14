@@ -19,13 +19,28 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
 
   try {
     const payload = verifyToken(token);
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { isBlocked: true, role: true, tokenVersion: true },
+    // `sid` siz token — seans boshqaruvidan oldingi eski token; mehmon.
+    if (!payload.sid) return next();
+
+    const session = await prisma.session.findUnique({
+      where: { id: payload.sid },
+      select: {
+        userId: true,
+        revokedAt: true,
+        user: { select: { isBlocked: true, role: true, tokenVersion: true } },
+      },
     });
-    // Bloklangan yoki sessiyasi bekor qilingan hisob — mehmon sifatida davom etadi
-    if (user && !user.isBlocked && (payload.tv ?? 0) === user.tokenVersion) {
-      req.user = { ...payload, role: user.role };
+    // Yopilgan seans, bloklangan yoki paroli o'zgargan hisob — mehmon sifatida
+    // davom etadi. `lastSeenAt` bu yerda ATAYIN yangilanmaydi: mehmonlar uchun
+    // ochiq sahifada yozuv qilish seansni "tirik" ushlab turardi.
+    if (
+      session &&
+      !session.revokedAt &&
+      session.userId === payload.userId &&
+      !session.user.isBlocked &&
+      (payload.tv ?? 0) === session.user.tokenVersion
+    ) {
+      req.user = { ...payload, role: session.user.role };
     }
   } catch {
     // Yaroqsiz token — mehmon

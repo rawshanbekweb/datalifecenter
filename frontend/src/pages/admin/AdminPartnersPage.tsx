@@ -71,7 +71,7 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.partners.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -81,7 +81,7 @@ function PartnerForm({ initial, onCancel, onSaved }: PartnerFormProps): React.Re
           <input className="inp" value={form.category} onChange={change('category')} required placeholder={t('admin.partners.categoryPlaceholder')} />
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <FileUpload kind="image" label={t('admin.partners.fLogo')} required value={form.logoUrl}
           onChange={(url) => setForm((f: PartnerFormState) => ({ ...f, logoUrl: url }))} />
         <div>
@@ -150,8 +150,8 @@ export default function AdminPartnersPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {partners.map((p) => (
-            <div key={p.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0 }}>
+            <div key={p.id} className="card admin-row">
+              <div style={{ width:34, height:34, borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0 }}>
                 <Building2 size={18} style={{ color:'#0ea5e9' }} />
               </div>
               <div style={{ flex:1, minWidth:0 }}>

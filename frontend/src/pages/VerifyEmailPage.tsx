@@ -47,7 +47,7 @@ export default function VerifyEmailPage(): React.ReactElement {
 
           {status === 'loading' && (
             <p style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#64748b' }}>
-              <Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.verifyEmail.verifying')}
+              <Loader size={15} className="dl-spin" /> {t('auth.verifyEmail.verifying')}
             </p>
           )}
 
@@ -77,7 +77,6 @@ export default function VerifyEmailPage(): React.ReactElement {
           </p>
         </div>
       </m.div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );
 }

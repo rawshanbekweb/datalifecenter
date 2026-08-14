@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 import {
   getStatsHandler,
   registerViewHandler,
@@ -28,7 +29,7 @@ const engagementLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: { success: false, error: { message: "Juda ko'p so'rov. Birozdan keyin urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  handler: tooManyRequestsHandler("Juda ko'p so'rov. Birozdan keyin urinib ko'ring."),
 });
 
 // Statistika o'qish — deviceId ixtiyoriy (bo'lmasa hech narsa "yoqtirilgan" emas)

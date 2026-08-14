@@ -79,6 +79,10 @@
       "done": "Emailıńız tastıyıqlandı! Endi platformadan tolıq paydalanıwıńız múmkin.",
       "errorHint": "Profil betinen tastıyıqlaw siltemesin qayta jiberiwińiz múmkin.",
       "toProfile": "Profilge ótiw"
+    },
+    "sessionEnded": {
+      "idle": "Uzaq waqıt háreket bolmaǵanı ushın sistemadan shıǵarıldıńız. Qaytadan kiriń.",
+      "revoked": "Seansıńız jabıldı. Qaytadan kiriń."
     }
   },
   "nav": {
@@ -136,7 +140,7 @@
       "cookie": "Cookie"
     },
     "copyright": "© {{year}} DATA LIFE IT Center. Barlıq huqıqlar qorǵalǵan.",
-    "systemsOperational": "All systems operational"
+    "systemsOperational": "Barlıq sistemalar islep atır"
   },
   "home": {
     "hero": {
@@ -170,6 +174,10 @@
       "headingAccent": "IT bilimlendiriw",
       "para1": "— 2019-jılı shólkemlestirilgen IT kompaniya. Buyırtpashılar ushın sayt, baǵdarlamalıq támiynat hám startap sheshimlerin islep shıǵamız.",
       "para2": "Sonıń menen birge 7 baǵdar boyınsha oqıtamız — islep shıǵarıwdaǵı tájiriybemiz tuwrıdan-tuwrı sabaqlarǵa ótedi.",
+      "team": {
+        "title": "Bizdiń jámáát",
+        "all": "Jámáát penen tanısıń"
+      },
       "fallback": {
         "graduates": "Pitkeriwshiler",
         "directions": "Baǵdarlar",
@@ -222,7 +230,11 @@
       "telegramSub": "Tez juwap",
       "emailSub": "24 saat ishinde juwap",
       "addressLabel": "Mánzil",
-      "hoursTitle": "Jumıs waqıtları"
+      "hoursTitle": "Jumıs waqıtları",
+      "hoursWeekdays": "Dúyshembi — Juma",
+      "hoursSaturday": "Shembi",
+      "hoursSunday": "Ekshembi",
+      "hoursClosed": "Jabıq"
     },
     "testimonials": {
       "pill": "Pikirler",
@@ -533,7 +545,21 @@
       "passChanged": "Parol tabıslı ózgertildi",
       "currentPassword": "Házirgi parol",
       "confirmNewPassword": "Jańa parol (qayta)",
-      "mismatch": "Jańa parol qaytalawı sáykes kelmedi"
+      "mismatch": "Jańa parol qaytalawı sáykes kelmedi",
+      "devices": {
+        "title": "Kirilgen qurılmalar",
+        "subtitle": "Esabıńızǵa qaysı qurılmalardan kirilgeni. Tanıs emes qurılmanı shıǵarıp taslań.",
+        "current": "Usı qurılma",
+        "unknown": "Belgisiz qurılma",
+        "since": "kirilgen {{date}}",
+        "revoke": "Shıǵarıw",
+        "revokeOthers": "Basqa qurılmalardan shıǵıw",
+        "loadError": "Qurılmalar dizimin júklep bolmadı",
+        "justNow": "házir aktiv",
+        "minutesAgo": "{{count}} minut aldın",
+        "hoursAgo": "{{count}} saat aldın",
+        "daysAgo": "{{count}} kún aldın"
+      }
     },
     "subscription": {
       "title": "Jazılım",
@@ -798,6 +824,18 @@
       "chat": "Jazısıwlar",
       "courseRequests": "Kurs sorawları",
       "team": "Komanda"
+    },
+    "navGroups": {
+      "learning": "Oqıtıw",
+      "people": "Adamlar",
+      "content": "Kontent",
+      "communication": "Baylanıs"
+    },
+    "quickJump": {
+      "title": "Bólimge tez ótiw",
+      "button": "Izlew",
+      "placeholder": "Bólim atın jazıń...",
+      "empty": "Hesh nárse tabılmadı"
     },
     "common": {
       "all": "Barlıǵı",

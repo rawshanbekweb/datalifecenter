@@ -98,7 +98,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
           <p style={{ fontSize: 13, color: '#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <LocalizedField label={t('admin.form.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.form.categoryReq')}</label>
@@ -112,7 +112,7 @@ function ProjectForm({ initial, onCancel, onSaved }: ProjectFormProps): React.Re
       </div>
       <FileUpload kind="image" label={t('admin.projects.fScreenshot')} required value={form.screenshotUrl}
         onChange={(url) => setForm((f: ProjectFormState) => ({ ...f, screenshotUrl: url }))} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize: 12, color: '#475569', fontWeight: 600, display: 'block', marginBottom: 5 }}>{t('admin.projects.fLiveUrl')}</label>
           <input className="inp" value={form.liveUrl} onChange={change('liveUrl')} placeholder="https://..." />
@@ -199,7 +199,7 @@ export default function AdminProjectsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {projects.map((p) => (
-            <div key={p.id} className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div key={p.id} className="card admin-row">
               <img src={p.screenshotUrl} alt={p.title.uz} style={{ width: 64, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{p.title.uz}</p>

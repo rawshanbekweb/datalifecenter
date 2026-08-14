@@ -107,6 +107,7 @@ model User {
   teamProfile  TeamMember?
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  sessions     Session[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -134,6 +135,36 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+/**
+ * Kirilgan seans — bitta qurilmadagi bitta login.
+ *
+ * NEGA KERAK: JWT stateless bo'lgani uchun server qaysi qurilmalarda ochiq
+ * seans borligini bilmasdi va "Chiqish" tugmasi tokenni bekor qilolmasdi —
+ * u yana 7 kun (JWT_EXPIRES_IN) amal qilaverardi. Endi tokenda seans id'si
+ * (`sid`) yuriydi va `authenticate` har so'rovda shu yozuvni tekshiradi:
+ * bekor qilingan yoki uzoq harakatsiz qolgan seans darhol 401 oladi.
+ *
+ * DIQQAT: `LiveSession` (mentorning jonli darsi) butunlay boshqa narsa.
+ */
+model Session {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  // Ro'yxatda "Chrome, Windows" ko'rinishida ko'rsatish uchun
+  userAgent  String?
+  ip         String?
+  // Brauzerdagi anonim qurilma id (X-Device-Id) — "shu qurilma"ni ishonchli
+  // belgilash uchun: userAgent bir nechta qurilmada bir xil bo'lishi mumkin
+  deviceId   String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  revokedAt  DateTime?
+
+  @@index([userId])
+  // Eski yozuvlarni tozalash (clean:sessions) uchun
+  @@index([lastSeenAt])
 }
 
 model Mentor {

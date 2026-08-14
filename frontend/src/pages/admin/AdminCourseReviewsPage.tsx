@@ -70,7 +70,7 @@ export default function AdminCourseReviewsPage(): React.ReactElement {
       {status === 'ready' && items.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map((r) => (
-            <div key={r.id} className="card" style={{ padding: 16 }}>
+            <div key={r.id} className="card admin-card">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10, flexWrap: 'wrap' }}>
                 <div style={{ flex: '1 1 180px', minWidth: 0 }}>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{r.user.name}</p>

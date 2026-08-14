@@ -15,6 +15,8 @@ import { resolveLocale } from './middleware/locale';
 import { clearPublicCache } from './middleware/publicCache';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import { tooManyRequestsHandler } from './utils/rateLimitResponse';
+import { translateErrorMessage } from './i18n/translateError';
 import { verifyLocalVideoToken } from './utils/videoAccess';
 
 const app = express();
@@ -39,6 +41,11 @@ app.use(express.json({ limit: '100kb' }));
 // Click webhook'lari application/x-www-form-urlencoded yuboradi (Payme JSON ishlatadi, express.json() yetarli)
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
+// Til BUTUN ilova bo'ylab va eng boshida aniqlanadi. Ilgari u faqat `/api`
+// zanjirining o'rtasida turardi, ya'ni undan oldingi middleware'lar
+// (chastota chegarasi, CSRF) hamda /uploads yo'llari `req.locale` ni ko'rmay,
+// xatolarni doim o'zbekcha qaytarardi.
+app.use(resolveLocale);
 
 // Yuklangan rasmlar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz, ochiq qoladi
 app.use('/uploads/images', express.static(IMAGES_DIR, { maxAge: '30d', immutable: true, index: false, dotfiles: 'deny' }));
@@ -49,20 +56,17 @@ app.use('/uploads/images', express.static(IMAGES_DIR, { maxAge: '30d', immutable
 app.get('/uploads/videos/:filename', (req, res) => {
   const filename = path.basename(req.params.filename);
   if (!verifyLocalVideoToken(filename, req.query.exp, req.query.sig)) {
-    res.status(403).json({ success: false, error: { message: 'Havola yaroqsiz yoki muddati tugagan', code: 'VIDEO_TOKEN_INVALID' } });
+    res.status(403).json({ success: false, error: { message: translateErrorMessage('Havola yaroqsiz yoki muddati tugagan', req.locale), code: 'VIDEO_TOKEN_INVALID' } });
     return;
   }
   res.sendFile(filename, { root: VIDEOS_DIR, maxAge: '6h', dotfiles: 'deny' }, (err) => {
     if (err && !res.headersSent) {
-      res.status(404).json({ success: false, error: { message: 'Fayl topilmadi', code: 'NOT_FOUND' } });
+      res.status(404).json({ success: false, error: { message: translateErrorMessage('Fayl topilmadi', req.locale), code: 'NOT_FOUND' } });
     }
   });
 });
 
-const tooManyRequests = {
-  success: false,
-  error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' },
-};
+const tooManyRequests = tooManyRequestsHandler("Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.");
 
 const isRead = (req: express.Request): boolean => req.method === 'GET' || req.method === 'HEAD';
 
@@ -95,7 +99,7 @@ const readLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => alwaysSkip(req) || !isRead(req),
-  message: tooManyRequests,
+  handler: tooManyRequests,
 });
 
 /**
@@ -110,7 +114,7 @@ const writeLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => alwaysSkip(req) || isRead(req),
-  message: tooManyRequests,
+  handler: tooManyRequests,
 });
 
 /**
@@ -138,7 +142,7 @@ const invalidateCacheOnWrite: express.RequestHandler = (req, res, next) => {
   next();
 };
 
-app.use('/api', readLimiter, writeLimiter, csrfProtect, resolveLocale, invalidateCacheOnWrite, routes);
+app.use('/api', readLimiter, writeLimiter, csrfProtect, invalidateCacheOnWrite, routes);
 
 app.use(notFoundHandler);
 // Sentry'ga xatolar bizning errorHandler'dan OLDIN yoziladi (DSN sozlangan bo'lsa)

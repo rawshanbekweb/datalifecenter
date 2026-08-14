@@ -96,7 +96,7 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.mentors.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -108,7 +108,7 @@ function MentorForm({ initial, users, onCancel, onSaved }: MentorFormProps): Rea
         onChange={(url) => setForm((f: MentorFormState) => ({ ...f, photoUrl: url }))} />
       <ImageFocusPicker url={form.photoUrl} focusX={form.focusX} focusY={form.focusY}
         onChange={(focusX, focusY) => setForm((f: MentorFormState) => ({ ...f, focusX, focusY }))} />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+      <div className="form-row-3">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>LinkedIn</label>
           <input className="inp" value={form.linkedinUrl} onChange={change('linkedinUrl')} />
@@ -201,8 +201,8 @@ export default function AdminMentorsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {mentors.map((m) => (
-            <div key={m.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontSize:13, fontWeight:800, color:'#0ea5e9' }}>
+            <div key={m.id} className="card admin-row">
+              <div style={{ width:34, height:34, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontSize:13, fontWeight:800, color:'#0ea5e9' }}>
                 {initials(m.name)}
               </div>
               <div style={{ flex:1, minWidth:0 }}>

@@ -94,7 +94,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
         )}
         <LocalizedField label={t('admin.announcements.titleField')} required value={form.title} onChange={(next) => setForm((f) => ({ ...f, title: next }))} />
         <LocalizedField label={t('admin.announcements.bodyField')} required multiline value={form.body} onChange={(next) => setForm((f) => ({ ...f, body: next }))} />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+        <div className="form-row">
           <div>
             <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.announcements.audience')}</label>
             <select className="inp" value={form.audience} disabled={!!form.courseId}
@@ -124,7 +124,7 @@ export default function AdminAnnouncementsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {items.map((a) => (
-            <div key={a.id} className="card" style={{ padding:16, display:'flex', alignItems:'flex-start', gap:14 }}>
+            <div key={a.id} className="card admin-row" style={{ alignItems:'flex-start' }}>
               <div className="icon-box" style={{ flexShrink:0 }}><Megaphone size={16} style={{ color:'#0ea5e9' }} /></div>
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ fontSize:14, fontWeight:700, color:'#0f172a', marginBottom:2 }}>{a.title}</p>

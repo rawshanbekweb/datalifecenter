@@ -17,8 +17,8 @@ import { DEFAULT_LOCALE, ENABLED_LOCALES, LOCALE_LABELS, Locale, SUPPORTED_LOCAL
 import { LocalizedString, emptyLocalizedString } from '../../types/locale';
 import Loading from '../../components/common/Loading';
 import {
-  AboutData, AboutStatItem, ContactData, HeroData, HoursItem, SatisfactionItem, SectionKey,
-  SECTION_KEYS, Sections, ServiceItem, ServicesData, SkillItem, StatItem, WhyUsData, WhyUsItem,
+  AboutData, AboutStatItem, ContactData, HeroData, HoursItem, SectionKey,
+  SECTION_KEYS, Sections, ServiceItem, ServicesData, StatItem, WhyUsData, WhyUsItem,
 } from '../../types/siteSettings';
 
 // Har bo'lim bosh sahifadagi qaysi blokka mos kelishini ko'rsatish uchun —
@@ -273,10 +273,6 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
   const { t } = useTranslation();
   const updateStat = (i: number, patch: Partial<AboutStatItem>): void =>
     onChange({ ...data, stats: data.stats.map((s, idx) => (idx === i ? { ...s, ...patch } : s)) });
-  const updateSkill = (i: number, patch: Partial<SkillItem>): void =>
-    onChange({ ...data, skills: data.skills.map((s, idx) => (idx === i ? { ...s, ...patch } : s)) });
-  const updateSat = (i: number, patch: Partial<SatisfactionItem>): void =>
-    onChange({ ...data, satisfaction: data.satisfaction.map((s, idx) => (idx === i ? { ...s, ...patch } : s)) });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
@@ -318,49 +314,11 @@ function AboutForm({ data, onChange }: { data: AboutData; onChange: (d: AboutDat
           onClick={() => onChange({ ...data, features: [...data.features, emptyLocalizedString()] })} />
       </div>
 
-      <div>
-        <GroupTitle title={t('admin.siteSettings.aboutSkills')} count={data.skills.length} />
-        {data.skills.length === 0 && <EmptyState text={t('admin.siteSettings.emptyList')} />}
-        {data.skills.map((s, i) => (
-          <RowCard key={i} index={i} total={data.skills.length}
-            onMove={(to) => onChange({ ...data, skills: move(data.skills, i, to) })}
-            onRemove={() => onChange({ ...data, skills: data.skills.filter((_, idx) => idx !== i) })}>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <LocalizedField label={t('admin.siteSettings.f.name')} value={s.label} onChange={(next) => updateSkill(i, { label: next })} />
-            </div>
-            <Field label={t('admin.siteSettings.f.pct')} minWidth={90}>
-              <input className="inp" type="number" min={0} max={100} value={s.pct}
-                // Progress bar 0–100 oralig'ida chiziladi — chegaradan tashqari
-                // qiymat saytda buzuq ko'rinadi, shuning uchun shu yerda qisiladi.
-                onChange={(e) => updateSkill(i, { pct: Math.min(100, Math.max(0, Number(e.target.value) || 0)) })} />
-            </Field>
-            <div style={{ flex: 1, minWidth: 120, paddingBottom: 10 }}>
-              <div className="progress-track"><div className="progress-fill" style={{ width: `${Math.min(100, Math.max(0, s.pct))}%` }} /></div>
-            </div>
-          </RowCard>
-        ))}
-        <AddButton label={t('admin.siteSettings.addSkill')}
-          onClick={() => onChange({ ...data, skills: [...data.skills, { label: emptyLocalizedString(), pct: 50 }] })} />
-      </div>
-
-      <div>
-        <GroupTitle title={t('admin.siteSettings.aboutSatisfaction')} count={data.satisfaction.length} />
-        {data.satisfaction.length === 0 && <EmptyState text={t('admin.siteSettings.emptyList')} />}
-        {data.satisfaction.map((s, i) => (
-          <RowCard key={i} index={i} total={data.satisfaction.length}
-            onMove={(to) => onChange({ ...data, satisfaction: move(data.satisfaction, i, to) })}
-            onRemove={() => onChange({ ...data, satisfaction: data.satisfaction.filter((_, idx) => idx !== i) })}>
-            <Field label={t('admin.siteSettings.f.value')}>
-              <input className="inp" value={s.value} onChange={(e) => updateSat(i, { value: e.target.value })} />
-            </Field>
-            <div style={{ flex: 2, minWidth: 200 }}>
-              <LocalizedField label={t('admin.siteSettings.f.name')} value={s.label} onChange={(next) => updateSat(i, { label: next })} />
-            </div>
-          </RowCard>
-        ))}
-        <AddButton label={t('admin.siteSettings.addIndicator')}
-          onClick={() => onChange({ ...data, satisfaction: [...data.satisfaction, { value: '', label: emptyLocalizedString() }] })} />
-      </div>
+      {/* "Ko'nikmalar" (foizli chiziqlar) va "Mamnunlik" tahrirlagichlari OLIB
+          TASHLANDI: ular boshqargan blok saytdan chiqarildi (o'rniga jamoaning
+          yuzlari — AboutTeamCard). Ko'rinmaydigan maydonni panelda qoldirish
+          tuzoq bo'lardi: admin to'ldiradi, saqlaydi va saytda hech narsa
+          o'zgarmaydi. Bazadagi eski qiymatlar tegilmagan. */}
     </div>
   );
 }
@@ -542,11 +500,12 @@ function sectionMissing(key: SectionKey, s: Sections): number {
 function collectLocalized(key: SectionKey, s: Sections): (LocalizedString | undefined)[] {
   switch (key) {
     case 'hero': return s.hero.stats.map((x) => x.label);
+    // skills/satisfaction ATAYIN sanalmaydi: ular endi tahrirlanmaydi, ya'ni
+    // bazada eski bo'sh yozuv qolgan bo'lsa "tarjima yetishmayapti" hisobiga
+    // tushib, admin uni TUZATA OLMAY saqlashdan bloklanib qolardi
     case 'about': return [
       ...s.about.stats.map((x) => x.label),
       ...s.about.features,
-      ...s.about.skills.map((x) => x.label),
-      ...s.about.satisfaction.map((x) => x.label),
     ];
     case 'services': return s.services.items.flatMap((x) => [x.title, x.desc, ...x.feats]);
     case 'why_us': return s.why_us.items.flatMap((x) => [x.title, x.desc]);

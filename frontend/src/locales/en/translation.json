@@ -79,6 +79,10 @@
       "done": "Your email has been verified! You now have full access to the platform.",
       "errorHint": "You can resend the verification link from your profile page.",
       "toProfile": "Go to profile"
+    },
+    "sessionEnded": {
+      "idle": "You were signed out due to a long period of inactivity. Please sign in again.",
+      "revoked": "Your session was closed. Please sign in again."
     }
   },
   "nav": {
@@ -170,6 +174,10 @@
       "headingAccent": "IT education",
       "para1": "— an IT company founded in 2019. We build websites, software and startup solutions for our clients.",
       "para2": "Alongside that we teach seven tracks — our production experience feeds straight into the classroom.",
+      "team": {
+        "title": "Our team",
+        "all": "Meet the team"
+      },
       "fallback": {
         "graduates": "Graduates",
         "directions": "Tracks",
@@ -222,7 +230,11 @@
       "telegramSub": "Fast reply",
       "emailSub": "Reply within 24 hours",
       "addressLabel": "Address",
-      "hoursTitle": "Working Hours"
+      "hoursTitle": "Working Hours",
+      "hoursWeekdays": "Monday — Friday",
+      "hoursSaturday": "Saturday",
+      "hoursSunday": "Sunday",
+      "hoursClosed": "Closed"
     },
     "testimonials": {
       "pill": "Reviews",
@@ -533,7 +545,21 @@
       "passChanged": "Password changed successfully",
       "currentPassword": "Current password",
       "confirmNewPassword": "New password (repeat)",
-      "mismatch": "New passwords do not match"
+      "mismatch": "New passwords do not match",
+      "devices": {
+        "title": "Signed-in devices",
+        "subtitle": "Where your account is currently signed in. Sign out any device you do not recognise.",
+        "current": "This device",
+        "unknown": "Unknown device",
+        "since": "signed in {{date}}",
+        "revoke": "Sign out",
+        "revokeOthers": "Sign out other devices",
+        "loadError": "Could not load the device list",
+        "justNow": "active now",
+        "minutesAgo": "{{count}} min ago",
+        "hoursAgo": "{{count}} h ago",
+        "daysAgo": "{{count}} d ago"
+      }
     },
     "subscription": {
       "title": "Subscription",
@@ -798,6 +824,18 @@
       "chat": "Chat",
       "courseRequests": "Course requests",
       "team": "Team"
+    },
+    "navGroups": {
+      "learning": "Learning",
+      "people": "People",
+      "content": "Content",
+      "communication": "Communication"
+    },
+    "quickJump": {
+      "title": "Jump to section",
+      "button": "Search",
+      "placeholder": "Type a section name...",
+      "empty": "Nothing found"
     },
     "common": {
       "all": "All",

@@ -109,7 +109,7 @@ export default function MentorProfilePage(): React.ReactElement {
             </div>
           )}
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="form-row">
             <div>
               <label style={labelStyle}>{t('mentor.profile.name')}</label>
               <input className="inp" value={form.name} onChange={(e) => set('name')(e.target.value)} required minLength={2} />
@@ -125,7 +125,7 @@ export default function MentorProfilePage(): React.ReactElement {
           <p style={{ display:'flex', alignItems:'center', gap:8, fontSize:13.5, fontWeight:800, color:'#0f172a', marginTop:6 }}>
             <Link2 size={15} style={{ color:'#0ea5e9' }}/> {t('mentor.profile.socialLinks')}
           </p>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+          <div className="form-row">
             <div>
               <label style={labelStyle}>LinkedIn</label>
               <input className="inp" value={form.linkedinUrl} onChange={(e) => set('linkedinUrl')(e.target.value)} placeholder="https://linkedin.com/in/..." />

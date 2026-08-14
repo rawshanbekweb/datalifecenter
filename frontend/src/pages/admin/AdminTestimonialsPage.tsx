@@ -85,7 +85,7 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
           <p style={{ fontSize:13, color:'#dc2626' }}>{error}</p>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <div>
           <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('admin.testimonials.fName')}</label>
           <input className="inp" value={form.name} onChange={change('name')} required />
@@ -105,7 +105,7 @@ function TestimonialForm({ initial, onCancel, onSaved }: TestimonialFormProps): 
         value={form.text}
         onChange={(next) => setForm((f) => ({ ...f, text: next }))}
       />
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+      <div className="form-row">
         <FileUpload kind="image" label={t('admin.testimonials.fPhoto')} value={form.avatarUrl}
           onChange={(url) => setForm((f: TestimonialFormState) => ({ ...f, avatarUrl: url }))} />
         <div>
@@ -185,8 +185,8 @@ export default function AdminTestimonialsPage(): React.ReactElement {
       {status === 'ready' && (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {items.map((item) => (
-            <div key={item.id} className="card" style={{ padding:16, display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontWeight:800, color:'#0ea5e9' }}>
+            <div key={item.id} className="card admin-row">
+              <div style={{ width:34, height:34, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'#f0f9ff', border:'1.5px solid #bae6fd', flexShrink:0, fontWeight:800, color:'#0ea5e9' }}>
                 {item.name.charAt(0).toUpperCase()}
               </div>
               <div style={{ flex:1, minWidth:0 }}>

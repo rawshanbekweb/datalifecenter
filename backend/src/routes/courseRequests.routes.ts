@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 import {
   createCourseRequestHandler,
   deleteCourseRequestHandler,
@@ -35,7 +36,7 @@ const requestLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: () => env.NODE_ENV === 'test',
-  message: { success: false, error: { message: "Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring.", code: 'TOO_MANY_REQUESTS' } },
+  handler: tooManyRequestsHandler("Juda ko'p so'rov yuborildi. Birozdan keyin qayta urinib ko'ring."),
 });
 
 router.post('/', requestLimiter, optionalAuth, validateBody(createCourseRequestSchema), createCourseRequestHandler);

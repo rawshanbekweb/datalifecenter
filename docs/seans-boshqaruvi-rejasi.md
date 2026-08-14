@@ -1,7 +1,19 @@
 # Seans (session) boshqaruvi — amalga oshirish rejasi
 
-> Holat: **REJA, kod yozilmagan.** 2026-08-05 da kelishilgan.
-> Qarorlar: idle chegarasi rolga qarab, deploy tadbirdan keyin.
+> Holat: **KOD YOZILDI (2026-08-14).** Reja 2026-08-05 da kelishilgan va
+> 1–9 qadamlari bajarilgan; qolgani — 10-qadam, ya'ni tinch vaqtda deploy
+> qilib admin hisobida qo'lda tekshirish.
+>
+> Rejadan farqlar:
+> - Parol o'zgarganda seanslar yopilib, joriy qurilmaga yangisi ochiladi
+>   (ro'yxatda o'lik yozuvlar qolmasligi uchun).
+> - `optionalAuth` ham seansni tekshiradi, lekin `lastSeenAt` ni ATAYIN
+>   yangilamaydi — ochiq sahifadagi mehmon so'rovi seansni tirik ushlab
+>   turmasligi kerak.
+> - Heartbeat butun ilova uchun bitta joyda: router'dan tashqaridagi
+>   `SessionKeepAlive` komponenti (har layoutga alohida ulanmagan).
+> - Tozalash: `npm run clean:sessions` (quruq ishga tushirish standart,
+>   o'chirish uchun `-- --apply`).
 
 ## 1. Nima uchun kerak — hozirgi holatdagi kamchilik
 

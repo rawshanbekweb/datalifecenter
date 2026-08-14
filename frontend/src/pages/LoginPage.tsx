@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { LogIn, AlertCircle, Loader } from 'lucide-react';
+import { LogIn, AlertCircle, Clock, Loader } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { roleHome, isRouteAllowedForRole } from '../utils/roleHome';
+import { clearSessionEndReason, readSessionEndReason, SessionEndReason } from '../api/sessionEnd';
 import Seo from '../components/common/Seo';
 
 interface LoginForm {
@@ -20,6 +21,13 @@ export default function LoginPage(): React.ReactElement {
   const [form, setForm]     = useState<LoginForm>({ email: '', password: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  // Server seansni yopgan bo'lsa sababi ko'rsatiladi — sababsiz login sahifasi
+  // foydalanuvchiga nosozlikdek ko'rinadi.
+  const [endedReason] = useState<SessionEndReason | null>(readSessionEndReason);
+
+  // Sabab ekranga chiqdi — endi o'chiriladi, aks holda keyingi safar
+  // login sahifasi ochilganda eski xabar yana ko'rinardi
+  useEffect(clearSessionEndReason, []);
 
   const change = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -51,6 +59,13 @@ export default function LoginPage(): React.ReactElement {
             </div>
           </div>
 
+          {endedReason && status !== 'error' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 12, background: '#fffbeb', border: '1.5px solid #fde68a', marginBottom: 16 }}>
+              <Clock size={16} style={{ color: '#b45309', flexShrink: 0 }} />
+              <p style={{ fontSize: 13, color: '#b45309' }}>{t(`auth.sessionEnded.${endedReason}`)}</p>
+            </div>
+          )}
+
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {status === 'error' && (
               <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
@@ -72,7 +87,7 @@ export default function LoginPage(): React.ReactElement {
             </div>
             <button type="submit" disabled={status === 'loading'} className="btn-primary"
               style={{ justifyContent: 'center', opacity: status === 'loading' ? 0.7 : 1, marginTop: 6 }}>
-              {status === 'loading' ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> {t('auth.login.loading')}</> : t('nav.login')}
+              {status === 'loading' ? <><Loader size={15} className="dl-spin" /> {t('auth.login.loading')}</> : t('nav.login')}
             </button>
           </form>
 
@@ -81,7 +96,6 @@ export default function LoginPage(): React.ReactElement {
           </p>
         </div>
       </m.div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </section>
   );
 }

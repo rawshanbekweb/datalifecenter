@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { fetchMe, loginUser, logoutUser, registerUser } from '../api/auth';
 import { clearToken, getToken } from '../api/token';
+import { SESSION_END_EVENT } from '../api/sessionEnd';
 import { AuthContext, AuthUser } from './auth-context';
 
 type User = AuthUser;
@@ -33,6 +34,15 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         if (status === 401 || status === 403) clearToken();
       })
       .finally(() => setLoading(false));
+  }, []);
+
+  // Server seansni yopganda (boshqa qurilmadan chiqarish yoki harakatsizlik)
+  // `apiFetch` tokenni tozalab shu hodisani otadi. Foydalanuvchini bu yerda
+  // nolga tushirsak, ProtectedRoute o'zi login sahifasiga yo'naltiradi.
+  useEffect(() => {
+    const onSessionEnded = (): void => setUser(null);
+    window.addEventListener(SESSION_END_EVENT, onSessionEnded);
+    return () => window.removeEventListener(SESSION_END_EVENT, onSessionEnded);
   }, []);
 
   const login = useCallback(async (form: LoginForm): Promise<User> => {
