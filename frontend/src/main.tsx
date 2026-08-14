@@ -6,6 +6,7 @@ import { LazyMotion } from 'framer-motion'
 import { createAppRouter } from './router'
 import { FeedbackProvider } from './components/common/Feedback'
 import ServerWakeBanner from './components/common/ServerWakeBanner'
+import SessionKeepAlive from './components/common/SessionKeepAlive'
 import { AuthProvider } from './context/AuthContext'
 import EngagementProvider from './context/EngagementProvider'
 import { LocaleProvider } from './context/LocaleContext'
@@ -51,6 +52,8 @@ function mount(): void {
                 <RouterProvider router={router} />
               </EngagementProvider>
               <ServerWakeBanner />
+              {/* Seansni tirik ushlab turadi (ko'rinmas) */}
+              <SessionKeepAlive />
             </FeedbackProvider>
           </AuthProvider>
         </LocaleProvider>

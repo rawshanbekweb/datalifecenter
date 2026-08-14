@@ -79,6 +79,10 @@
       "done": "Emailıńız tastıyıqlandı! Endi platformadan tolıq paydalanıwıńız múmkin.",
       "errorHint": "Profil betinen tastıyıqlaw siltemesin qayta jiberiwińiz múmkin.",
       "toProfile": "Profilge ótiw"
+    },
+    "sessionEnded": {
+      "idle": "Uzaq waqıt háreket bolmaǵanı ushın sistemadan shıǵarıldıńız. Qaytadan kiriń.",
+      "revoked": "Seansıńız jabıldı. Qaytadan kiriń."
     }
   },
   "nav": {
@@ -541,7 +545,21 @@
       "passChanged": "Parol tabıslı ózgertildi",
       "currentPassword": "Házirgi parol",
       "confirmNewPassword": "Jańa parol (qayta)",
-      "mismatch": "Jańa parol qaytalawı sáykes kelmedi"
+      "mismatch": "Jańa parol qaytalawı sáykes kelmedi",
+      "devices": {
+        "title": "Kirilgen qurılmalar",
+        "subtitle": "Esabıńızǵa qaysı qurılmalardan kirilgeni. Tanıs emes qurılmanı shıǵarıp taslań.",
+        "current": "Usı qurılma",
+        "unknown": "Belgisiz qurılma",
+        "since": "kirilgen {{date}}",
+        "revoke": "Shıǵarıw",
+        "revokeOthers": "Basqa qurılmalardan shıǵıw",
+        "loadError": "Qurılmalar dizimin júklep bolmadı",
+        "justNow": "házir aktiv",
+        "minutesAgo": "{{count}} minut aldın",
+        "hoursAgo": "{{count}} saat aldın",
+        "daysAgo": "{{count}} kún aldın"
+      }
     },
     "subscription": {
       "title": "Jazılım",

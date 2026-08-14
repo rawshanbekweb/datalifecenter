@@ -79,6 +79,10 @@
       "done": "Emailingiz tasdiqlandi! Endi platformadan to'liq foydalanishingiz mumkin.",
       "errorHint": "Profil sahifasidan tasdiqlash havolasini qayta yuborishingiz mumkin.",
       "toProfile": "Profilga o'tish"
+    },
+    "sessionEnded": {
+      "idle": "Uzoq vaqt harakat bo'lmagani uchun tizimdan chiqarildingiz. Iltimos, qaytadan kiring.",
+      "revoked": "Seansingiz yopilgan. Iltimos, qaytadan kiring."
     }
   },
   "nav": {
@@ -541,7 +545,21 @@
       "passChanged": "Parol muvaffaqiyatli o'zgartirildi",
       "currentPassword": "Joriy parol",
       "confirmNewPassword": "Yangi parol (takror)",
-      "mismatch": "Yangi parol takrori mos kelmadi"
+      "mismatch": "Yangi parol takrori mos kelmadi",
+      "devices": {
+        "title": "Kirilgan qurilmalar",
+        "subtitle": "Hisobingizga qaysi qurilmalardan kirilgani. Notanish qurilmani chiqarib yuboring.",
+        "current": "Shu qurilma",
+        "unknown": "Noma'lum qurilma",
+        "since": "kirilgan {{date}}",
+        "revoke": "Chiqarish",
+        "revokeOthers": "Boshqa qurilmalardan chiqish",
+        "loadError": "Qurilmalar ro'yxatini yuklab bo'lmadi",
+        "justNow": "hozir faol",
+        "minutesAgo": "{{count}} daqiqa oldin",
+        "hoursAgo": "{{count}} soat oldin",
+        "daysAgo": "{{count}} kun oldin"
+      }
     },
     "subscription": {
       "title": "Obuna",

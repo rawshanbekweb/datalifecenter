@@ -3,12 +3,16 @@ import rateLimit from 'express-rate-limit';
 import {
   changePasswordHandler,
   forgotPasswordHandler,
+  heartbeatHandler,
+  listSessionsHandler,
   loginHandler,
   logoutHandler,
   meHandler,
   registerHandler,
   resendVerificationHandler,
   resetPasswordHandler,
+  revokeOtherSessionsHandler,
+  revokeSessionHandler,
   updateProfileHandler,
   verifyEmailHandler,
 } from '../controllers/auth.controller';
@@ -23,6 +27,7 @@ import {
   verifyEmailSchema,
 } from '../validators/auth.validator';
 import { authenticate } from '../middleware/authenticate';
+import { optionalDeviceId } from '../middleware/deviceId';
 import { env } from '../config/env';
 import { tooManyRequestsHandler } from '../utils/rateLimitResponse';
 
@@ -79,8 +84,11 @@ const forgotLimiter = rateLimit({
   handler: tooManyAttempts,
 });
 
-router.post('/register', registerLimiter, validateBody(registerSchema), registerHandler);
-router.post('/login', authLimiter, validateBody(loginSchema), loginHandler);
+// `optionalDeviceId` — seans yozuviga brauzerning anonim qurilma id'sini
+// biriktirish uchun: User-Agent bir nechta qurilmada bir xil bo'lishi mumkin,
+// bu id esa "shu qurilma"ni aniq ajratadi.
+router.post('/register', registerLimiter, optionalDeviceId, validateBody(registerSchema), registerHandler);
+router.post('/login', authLimiter, optionalDeviceId, validateBody(loginSchema), loginHandler);
 router.post('/forgot-password', forgotLimiter, validateBody(forgotPasswordSchema), forgotPasswordHandler);
 router.post('/reset-password', authLimiter, validateBody(resetPasswordSchema), resetPasswordHandler);
 router.post('/verify-email', authLimiter, validateBody(verifyEmailSchema), verifyEmailHandler);
@@ -89,5 +97,20 @@ router.post('/logout', logoutHandler);
 router.get('/me', authenticate, meHandler);
 router.patch('/me', authenticate, validateBody(updateProfileSchema), updateProfileHandler);
 router.patch('/me/password', authenticate, validateBody(changePasswordSchema), changePasswordHandler);
+
+/**
+ * Seans boshqaruvi.
+ *
+ * `/heartbeat` ATAYIN GET: POST bo'lsa u yozuv limitiga (writeLimiter) tushardi
+ * va bitta Wi-Fi ortidagi o'nlab foydalanuvchi limitni birgalikda yeb qo'yardi.
+ * Yozuv baribir bo'ladi — `authenticate` ichida, daqiqasiga bir marta.
+ *
+ * `/sessions/others` `/sessions/:id` dan OLDIN turishi shart, aks holda
+ * "others" so'zi `:id` sifatida o'qilardi.
+ */
+router.get('/heartbeat', authenticate, heartbeatHandler);
+router.get('/sessions', authenticate, listSessionsHandler);
+router.delete('/sessions/others', authenticate, revokeOtherSessionsHandler);
+router.delete('/sessions/:id', authenticate, revokeSessionHandler);
 
 export default router;

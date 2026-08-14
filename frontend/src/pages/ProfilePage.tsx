@@ -4,6 +4,7 @@ import { CheckCircle, AlertCircle, User, KeyRound, MailWarning } from 'lucide-re
 import { useTranslation } from 'react-i18next';
 import { updateProfile, changePassword, resendVerification } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
+import ActiveSessions from '../components/common/ActiveSessions';
 import FileUpload from '../components/common/FileUpload';
 import ImageFocusPicker from '../components/common/ImageFocusPicker';
 import { DEFAULT_FOCUS } from '../utils/imageFocus';
@@ -183,6 +184,8 @@ export default function ProfilePage(): React.ReactElement {
             {passStatus === 'loading' ? t('common.saving') : t('student.profile.changePassword')}
           </button>
         </form>
+
+        <ActiveSessions />
       </div>
     </div>
   );

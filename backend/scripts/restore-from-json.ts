@@ -77,6 +77,7 @@ const ORDER = [
   'PaymentTransaction',
   'EmailVerificationToken',
   'PasswordResetToken',
+  'Session',
   'ContentLike',
   'ContentView',
   'EngagementDaily',

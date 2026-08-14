@@ -6,6 +6,7 @@ import { ApiError } from '../utils/ApiError';
 import { comparePassword, hashPassword } from '../utils/password';
 import { signToken } from '../utils/jwt';
 import { sendPasswordResetEmail, sendVerificationEmail } from './email.service';
+import { createSession, revokeAllSessions, SessionContext } from './session.service';
 
 interface RegisterInput {
   name: string;
@@ -75,7 +76,7 @@ async function issueVerificationEmail(userId: string, email: string, name: strin
  */
 const MAX_ACCOUNTS_PER_PHONE = 3;
 
-export async function register(input: RegisterInput) {
+export async function register(input: RegisterInput, ctx: SessionContext = {}) {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
   if (existing) {
     throw ApiError.conflict('Bu email allaqachon ro\'yxatdan o\'tgan', 'EMAIL_TAKEN');
@@ -110,7 +111,8 @@ export async function register(input: RegisterInput) {
 
   await issueVerificationEmail(user.id, user.email, user.name);
 
-  const token = signToken({ userId: user.id, role: user.role, tv: user.tokenVersion });
+  const sid = await createSession(user.id, ctx);
+  const token = signToken({ userId: user.id, role: user.role, tv: user.tokenVersion, sid });
   return { user: toPublicUser(user), token };
 }
 
@@ -118,7 +120,7 @@ export async function register(input: RegisterInput) {
 // aks holda javob vaqti farqidan email ro'yxatda bor-yo'qligini bilib olish mumkin
 const DUMMY_HASH_PROMISE = hashPassword(crypto.randomBytes(16).toString('hex'));
 
-export async function login(input: LoginInput) {
+export async function login(input: LoginInput, ctx: SessionContext = {}) {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
     include: { teamProfile: { select: { id: true } } },
@@ -137,7 +139,8 @@ export async function login(input: LoginInput) {
     throw ApiError.forbidden('Hisobingiz bloklangan. Administratorga murojaat qiling.', 'USER_BLOCKED');
   }
 
-  const token = signToken({ userId: user.id, role: user.role, tv: user.tokenVersion });
+  const sid = await createSession(user.id, ctx);
+  const token = signToken({ userId: user.id, role: user.role, tv: user.tokenVersion, sid });
   return { user: toPublicUser(user), token };
 }
 
@@ -208,7 +211,12 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   return toPublicUser(updated);
 }
 
-export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+  ctx: SessionContext = {}
+) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     throw ApiError.notFound('Foydalanuvchi topilmadi');
@@ -226,7 +234,14 @@ export async function changePassword(userId: string, currentPassword: string, ne
     where: { id: userId },
     data: { passwordHash, tokenVersion: { increment: 1 } },
   });
-  return signToken({ userId: updated.id, role: updated.role, tv: updated.tokenVersion });
+
+  // Eski seans yozuvlari ham yopiladi: `tokenVersion` allaqachon ularni
+  // ishlamas qilgan, lekin yopilmasa seanslar ro'yxatida "ochiq" bo'lib
+  // ko'rinib turardi. Joriy qurilma uchun darhol yangi seans ochiladi.
+  await revokeAllSessions(userId);
+  const sid = await createSession(updated.id, ctx);
+
+  return signToken({ userId: updated.id, role: updated.role, tv: updated.tokenVersion, sid });
 }
 
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000; // 30 daqiqa
@@ -277,4 +292,8 @@ export async function resetPassword(token: string, newPassword: string) {
     }),
     prisma.passwordResetToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
   ]);
+
+  // Parolni tiklash — ko'pincha "hisobim o'g'irlangan" holati. Barcha qurilmalar
+  // chiqariladi; foydalanuvchi yangi parol bilan qaytadan kiradi.
+  await revokeAllSessions(record.userId);
 }

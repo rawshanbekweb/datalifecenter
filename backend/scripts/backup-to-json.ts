@@ -39,7 +39,7 @@ const ORDER = [
   'AssignmentSubmission', 'LessonQuestion', 'Conversation',
   'ConversationParticipant', 'Message', 'Notification', 'ContactMessage',
   'Subscription', 'PaymentTransaction', 'EmailVerificationToken',
-  'PasswordResetToken', 'ContentLike', 'ContentView', 'EngagementDaily',
+  'PasswordResetToken', 'Session', 'ContentLike', 'ContentView', 'EngagementDaily',
 ];
 
 /** Prisma o'zining migratsiya jurnalini o'zi boshqaradi — nusxaga kerak emas */

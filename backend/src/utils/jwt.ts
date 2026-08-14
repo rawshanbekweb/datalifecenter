@@ -7,6 +7,10 @@ export interface JwtPayload {
   // tokenVersion: parol o'zgarganda bazadagi qiymat oshadi va eski tokenlar
   // bekor bo'ladi. Eski (tv'siz) tokenlar 0 deb qabul qilinadi.
   tv?: number;
+  // Session yozuvining id'si. Shu tufayli bitta qurilmani tanlab chiqarish
+  // mumkin bo'ladi. Ixtiyoriy deb belgilangan, chunki tur jihatidan eski
+  // tokenlarda yo'q — LEKIN `authenticate` ularni rad etadi (SESSION_REVOKED).
+  sid?: string;
 }
 
 export function signToken(payload: JwtPayload): string {

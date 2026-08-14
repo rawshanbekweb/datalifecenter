@@ -61,6 +61,16 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Sessiya eskirgen. Qaytadan kiriń.',
     en: 'Your session has expired. Please sign in again.',
   },
+  "Uzoq vaqt harakat bo'lmagani uchun tizimdan chiqarildingiz": {
+    ru: 'Вы вышли из системы из-за длительного бездействия',
+    kaa: 'Uzaq waqıt háreket bolmaǵanı ushın sistemadan shıǵarıldıńız',
+    en: 'You were signed out due to a long period of inactivity',
+  },
+  'Seans topilmadi': {
+    ru: 'Сессия не найдена',
+    kaa: 'Seans tabılmadı',
+    en: 'Session not found',
+  },
   "Token yaroqsiz yoki muddati o'tgan": {
     ru: 'Токен недействителен или истёк',
     kaa: 'Token jaramsız yaki múddeti ótken',

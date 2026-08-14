@@ -1,5 +1,6 @@
 import { API_URL } from './config';
-import { getToken } from './token';
+import { clearToken, getToken } from './token';
+import { markSessionEnded } from './sessionEnd';
 import { getDeviceId } from './device';
 import { trackRequest } from './serverStatus';
 import { detectLocale } from '../i18n/locale';
@@ -114,11 +115,25 @@ export async function apiFetch<T = unknown>(
         continue;
       }
 
+      // 204 — tanasiz javob (heartbeat). `res.json()` bunda xato beradi,
+      // shuning uchun uni umuman o'qimaymiz.
+      if (res.status === 204) {
+        return undefined as T;
+      }
+
       const body: ApiResponse<T> | null = await res.json().catch(() => null);
 
       if (!res.ok || !body?.success) {
+        const code = body?.error?.code;
+        // Server seansni yopgan bo'lsa tokenni saqlab turishning ma'nosi yo'q:
+        // har sahifada muvaffaqiyatsiz so'rov takrorlanaverardi. Sabab esa
+        // login sahifasida xabar bo'lib chiqadi.
+        if (res.status === 401 && (code === 'SESSION_IDLE' || code === 'SESSION_REVOKED')) {
+          clearToken();
+          markSessionEnded(code);
+        }
         const message: string = body?.error?.message || i18n.t('errors.generic');
-        throw new ApiClientError(message, res.status, body?.error?.code);
+        throw new ApiClientError(message, res.status, code);
       }
 
       return body.data;
