@@ -10,6 +10,7 @@ import {
   listCourseRequestsAdmin,
   updateCourseRequest,
 } from '../../api/courseRequests';
+import { CourseGroup, listCourseGroups } from '../../api/courseGroups';
 import { formatDate } from '../../utils/format';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import CourseFormatBadge from '../../components/courses/CourseFormatBadge';
@@ -42,6 +43,12 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   const [drafts, setDrafts]     = useState<Record<string, string>>({});
   const [busyId, setBusyId]     = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState<boolean>(false);
+  // Barcha guruhlar bir marta olinadi va har so'rov uchun kursi/formati
+  // bo'yicha filtrlanadi — so'rov boshiga alohida so'rov yubormaslik uchun
+  const [groups, setGroups]     = useState<CourseGroup[]>([]);
+  const [groupChoice, setGroupChoice] = useState<Record<string, string>>({});
+  // Oldindan to'lov: bo'sh = to'liq to'landi, 0 = hozircha to'lanmadi
+  const [paidChoice, setPaidChoice] = useState<Record<string, string>>({});
 
   const confirm = useConfirm();
   const selection = useBulkSelection(requests.map((r) => r.id));
@@ -54,6 +61,12 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   }, [filter]);
 
   useEffect(load, [load]);
+
+  useEffect(() => {
+    listCourseGroups()
+      .then((rows) => setGroups(rows.filter((g) => g.status !== 'FINISHED')))
+      .catch(() => {});
+  }, []);
 
   const removeOne = async (id: string): Promise<void> => {
     const ok = await confirm(t('admin.bulk.confirmDeleteOne'), { confirmLabel: t('admin.bulk.deleteOne'), danger: true });
@@ -107,7 +120,14 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   const enroll = async (id: string): Promise<void> => {
     setBusyId(id);
     try {
-      const updated = await enrollFromRequest(id);
+      // Guruh tanlanmagan bo'lsa o'quvchi guruhsiz qabul qilinadi —
+      // admin uni keyin /admin/course-groups da taqsimlaydi.
+      // Oldindan to'lov bo'sh bo'lsa summa to'liq to'langan deb yoziladi.
+      const upfront = (paidChoice[id] ?? '').trim();
+      const updated = await enrollFromRequest(id, {
+        groupId: groupChoice[id] || null,
+        paidAmount: upfront === '' ? null : Number(upfront),
+      });
       setRequests((prev) => prev.map((r) => (r.id === id ? updated : r)));
       toast.success(t('admin.courseRequests.enrolled'));
     } catch (err: unknown) {
@@ -233,14 +253,37 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
                       u joyni tekshiradi va onlayn kursda Enrollment ochadi.
                       Qo'lda status qo'yish bunday qilmasdi, shuning uchun ENROLLED
                       quyidagi oddiy status tugmalari ro'yxatidan olib tashlangan. */}
-                  {r.status !== 'ENROLLED' && (
-                    <button onClick={() => void enroll(r.id)} disabled={busyId === r.id || !r.userId}
-                      title={r.userId ? undefined : t('admin.courseRequests.enrollNeedsAccount')}
-                      className="btn-primary"
-                      style={{ fontSize:11.5, padding:'6px 13px', opacity: busyId === r.id || !r.userId ? 0.55 : 1 }}>
-                      <UserPlus size={13}/> {t('admin.courseRequests.enroll')}
-                    </button>
-                  )}
+                  {r.status !== 'ENROLLED' && (() => {
+                    // Faqat shu kursning va shu formatdagi guruhlari
+                    const options = groups.filter((g) => g.courseId === r.courseId && g.format === r.format);
+                    return (
+                      <>
+                        {options.length > 0 && (
+                          <select className="inp" value={groupChoice[r.id] || ''}
+                            onChange={(e) => setGroupChoice((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                            style={{ cursor:'pointer', fontSize:11.5, padding:'5px 10px', width:'auto', maxWidth:230 }}>
+                            <option value="">{t('admin.courseRequests.noGroup')}</option>
+                            {options.map((g) => (
+                              <option key={g.id} value={g.id}>
+                                {g.name}{g.capacity !== null ? ` (${g._count.enrollments}/${g.capacity})` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        <input className="inp" type="number" min={0} value={paidChoice[r.id] ?? ''}
+                          onChange={(e) => setPaidChoice((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                          placeholder={t('admin.courseRequests.upfront')}
+                          title={t('admin.courseRequests.upfrontHint')}
+                          style={{ fontSize:11.5, padding:'5px 10px', width:150 }} />
+                        <button onClick={() => void enroll(r.id)} disabled={busyId === r.id || !r.userId}
+                          title={r.userId ? undefined : t('admin.courseRequests.enrollNeedsAccount')}
+                          className="btn-primary"
+                          style={{ fontSize:11.5, padding:'6px 13px', opacity: busyId === r.id || !r.userId ? 0.55 : 1 }}>
+                          <UserPlus size={13}/> {t('admin.courseRequests.enroll')}
+                        </button>
+                      </>
+                    );
+                  })()}
                   {(['CONTACTED', 'REJECTED'] as CourseRequestStatus[])
                     .filter((next) => next !== r.status)
                     .map((next) => (

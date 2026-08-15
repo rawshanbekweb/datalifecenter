@@ -46,8 +46,11 @@ export default function CourseRequestModal({
   const [format, setFormat] = useState<CourseRequestFormat>(
     initialFormat ?? (courseFormat === 'OFFLINE' ? 'OFFLINE' : 'ONLINE'),
   );
+  // Hisobdagi ma'lumot oldindan to'ldiriladi — ro'yxatdan o'tishda bir marta
+  // yozilgan narsani qayta yozdirmaymiz. Tahrirlash ochiq: odam boshqa raqamda
+  // yoki boshqa ism bilan bog'lanishni so'rashi mumkin.
   const [name, setName]   = useState<string>(user?.name ?? '');
-  const [phone, setPhone] = useState<string>('');
+  const [phone, setPhone] = useState<string>((user?.phone as string | null) ?? '');
   const [email, setEmail] = useState<string>(user?.email ?? '');
   const [note, setNote]   = useState<string>('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');

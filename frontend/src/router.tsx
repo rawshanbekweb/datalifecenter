@@ -78,6 +78,8 @@ const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProject
 const AdminMomentsPage = lazyWithRetry(() => import('./pages/admin/AdminMomentsPage'))
 const AdminChatPage = lazyWithRetry(() => import('./pages/admin/AdminChatPage'))
 const AdminCourseRequestsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseRequestsPage'))
+const AdminCourseGroupsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseGroupsPage'))
+const AdminDebtorsPage = lazyWithRetry(() => import('./pages/admin/AdminDebtorsPage'))
 
 // Sahifadan sahifaga o'tishda eng ko'p ko'rinadigan holat — kirish splash'i
 // faqat bir marta chiqadi, foydalanuvchi esa kunning qolgan qismida aynan
@@ -186,6 +188,8 @@ export function createAppRouter(basename: string) {
       { path: 'messages', element: s(<AdminMessagesPage />) },
       { path: 'chat', element: s(<AdminChatPage />) },
       { path: 'course-requests', element: s(<AdminCourseRequestsPage />) },
+      { path: 'course-groups', element: s(<AdminCourseGroupsPage />) },
+      { path: 'debtors', element: s(<AdminDebtorsPage />) },
       { path: 'announcements', element: s(<AdminAnnouncementsPage />) },
       { path: 'courses', element: s(<AdminCoursesPage />) },
       { path: 'courses/:id/curriculum', element: s(<AdminCurriculumPage />) },

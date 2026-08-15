@@ -15,6 +15,17 @@ export function formatNumber(value: number): string {
   return value.toLocaleString(bcp47());
 }
 
+/**
+ * Pul summasi. Backend Decimal'ni SATR sifatida qaytaradi ("900000.0000...")
+ * — aniqlik yo'qolmasligi uchun. Ko'rsatishda kasr qismi keraksiz: narxlar
+ * so'mda butun bo'ladi.
+ */
+export function formatMoney(value: string | number | null | undefined, currency?: string): string {
+  const amount = Number(value ?? 0);
+  const text = formatNumber(Number.isFinite(amount) ? Math.round(amount) : 0);
+  return currency ? `${text} ${currency}` : text;
+}
+
 export function formatTime(value: string | Date, options?: Intl.DateTimeFormatOptions): string {
   return new Date(value).toLocaleTimeString(bcp47(), options ?? { hour: '2-digit', minute: '2-digit' });
 }

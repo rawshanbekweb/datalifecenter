@@ -140,6 +140,51 @@ export async function sendPaymentConfirmedEmail(
   });
 }
 
+/**
+ * Admin kurs so'rovini tasdiqlab, o'quvchini guruhga qo'shganda.
+ *
+ * NEGA ALOHIDA XAT: bu odam saytda o'tirmagan bo'lishi mumkin — u forma
+ * to'ldirib, javob kutayotgan edi. Ichki bildirishnoma unga yetib bormaydi.
+ * Offline uchun matn boshqacha: darslar markazda o'tadi, shuning uchun
+ * manzil va "administrator jadval bo'yicha bog'lanadi" degani muhimroq.
+ */
+export interface CourseEnrolledEmailInput {
+  to: string;
+  name: string;
+  courseTitle: string;
+  format: 'ONLINE' | 'OFFLINE';
+  courseUrl: string;
+  location?: string | null;
+  /** Guruh jadvali bir qatorda (courseGroups.service.ts: groupScheduleText) */
+  schedule?: string | null;
+}
+
+export async function sendCourseEnrolledEmail(input: CourseEnrolledEmailInput): Promise<void> {
+  const { to, name, courseTitle, courseUrl, location, schedule } = input;
+  const offline = input.format === 'OFFLINE';
+  // Guruh tanlangan bo'lsa aynan u eng muhim ma'lumot: qachon va qayerda
+  // kelish kerakligini o'quvchi shu qatordan biladi
+  const contact = schedule
+    ? `Guruhingiz: <b>${schedule}</b>.`
+    : "Jadval bo'yicha administrator siz bilan bog'lanadi.";
+  const intro = offline
+    ? `<b>"${courseTitle}"</b> kursining <b>offline guruhiga</b> qabul qilindingiz. ${contact}${location ? ` Mashg'ulotlar manzili: <b>${location}</b>.` : ''}`
+    : `<b>"${courseTitle}"</b> kursiga qabul qilindingiz — darslar kabinetingizda ochildi.${schedule ? ` Guruhingiz: <b>${schedule}</b>.` : ''}`;
+
+  await sendMail({
+    to,
+    subject: `DATA LIFE — kursga qabul qilindingiz: ${courseTitle}`,
+    text: offline
+      ? `Salom, ${name}!\n\n"${courseTitle}" kursining offline guruhiga qabul qilindingiz.\n${schedule ? `Guruhingiz: ${schedule}` : "Jadval bo'yicha administrator siz bilan bog'lanadi."}${location ? `\nManzil: ${location}` : ''}\n\nKurs materiallari kabinetingizda ham ochiq:\n${courseUrl}`
+      : `Salom, ${name}!\n\n"${courseTitle}" kursiga qabul qilindingiz.${schedule ? `\nGuruhingiz: ${schedule}` : ''}\n\nDarslarni boshlashingiz mumkin:\n${courseUrl}`,
+    html: layout(
+      'Kursga qabul qilindingiz 🎉',
+      `<p style="font-size:14px;color:#475569">Salom, <b>${name}</b>! ${intro}</p>
+       <p style="margin:20px 0"><a href="${courseUrl}" style="background:#0ea5e9;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:bold;display:inline-block">${offline ? 'Kurs materiallari' : 'Darslarni boshlash'}</a></p>`
+    ),
+  });
+}
+
 export async function sendPaymentRejectedEmail(
   to: string,
   name: string,

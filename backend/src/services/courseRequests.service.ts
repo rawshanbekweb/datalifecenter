@@ -1,11 +1,15 @@
 import { CourseFormat, CourseRequestStatus, Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
+import { env } from '../config/env';
 import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { Actor } from '../utils/mentorAccess';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { excerpt, notify, notifyAdmins } from './notifications.service';
 import { sendAdminMessageTo } from './messages.service';
+import { sendCourseEnrolledEmail } from './email.service';
+import { assertGroupFits, groupScheduleText } from './courseGroups.service';
+import { addEnrollmentPayment, enrollmentDebt, recalcEnrollmentPayment } from './enrollmentPayments.service';
 import { assertSeatAvailable, seatFormatFor } from './courseSeats.service';
 
 /**
@@ -214,23 +218,45 @@ export async function updateCourseRequestAdmin(
  * Admin so'rovni tasdiqlab, o'quvchini kursga QO'SHADI — "yozilish admin
  * orqali" oqimining oxirgi bo'g'ini.
  *
- * ONLAYN: Enrollment yaratiladi (ACTIVE) — o'quvchi darhol darslarni ko'radi.
- * To'lov markazda qabul qilingani uchun paymentStatus darrov PAID (bepul kursda
- * FREE): saytda hech kim pul o'tkazmaydi, admin tugmani bosgani = to'lov bo'lgani.
+ * IKKALA FORMATDA HAM Enrollment yaratiladi (ACTIVE). Ilgari offline
+ * tasdiqlash faqat so'rov holatini o'zgartirardi va o'quvchi shu yerda
+ * "yo'qolib" qolardi — sabablari schema.prisma dagi Enrollment izohida.
+ * Farq endi bitta ustunda: `format`.
  *
- * OFFLINE: Enrollment yaratilmaydi (darslar markazda o'tadi) — so'rovning
- * ENROLLED holati o'zi offline guruhdagi band joyni bildiradi.
+ * TO'LOV: yozilishga KELISHILGAN summa (`priceAgreed`) yoziladi — offline
+ * uchun Course.offlinePrice'dan, markazda o'qish qimmatroq. Pulning o'zi
+ * to'lov daftariga tushadi (enrollmentPayments.service.ts):
+ *   - `paidAmount` berilmasa — kelishilgan summa to'liq to'langan deb
+ *     yoziladi (markazda odatda shunday va bu eski xatti-harakat);
+ *   - `paidAmount` berilsa — o'sha summa oldindan to'lov bo'lib tushadi va
+ *     yozilish PARTIAL holatida qoladi, qarzi qarzdorlar ro'yxatida ko'rinadi.
+ * Bepul kursda pul yozilmaydi (FREE).
  *
- * Idempotent: allaqachon ENROLLED so'rov qayta ishlanmaydi, aks holda offline
+ * Idempotent: allaqachon ENROLLED so'rov qayta ishlanmaydi, aks holda
  * joylar har bosishda qaytadan sanalardi.
  */
-export async function enrollFromRequest(id: string, locale: SupportedLocale) {
+export interface EnrollFromRequestOptions {
+  groupId?: string | null;
+  /** Oldindan to'lov; berilmasa kelishilgan summa to'liq to'langan deb hisoblanadi */
+  paidAmount?: number | string | null;
+}
+
+export async function enrollFromRequest(
+  id: string,
+  options: EnrollFromRequestOptions,
+  locale: SupportedLocale,
+) {
+  const groupId = options.groupId ?? null;
   const request = await prisma.courseRequest.findUnique({
     where: { id },
     include: {
       course: {
-        select: { id: true, title: true, slug: true, format: true, isFree: true, price: true, onlineSeats: true, offlineSeats: true },
+        select: {
+          id: true, title: true, slug: true, format: true, location: true, currency: true,
+          isFree: true, price: true, offlinePrice: true, onlineSeats: true, offlineSeats: true,
+        },
       },
+      user: { select: { name: true, email: true } },
     },
   });
   if (!request) {
@@ -242,56 +268,147 @@ export async function enrollFromRequest(id: string, locale: SupportedLocale) {
   }
   // Mehmon so'rovida biriktiriladigan hisob yo'q — admin avval o'quvchini
   // ro'yxatdan o'tkazishi kerak (telefon orqali bog'lanib).
-  if (!request.userId) {
+  if (!request.userId || !request.user) {
     throw ApiError.badRequest(
       'Bu so‘rov hisobsiz yuborilgan — avval o‘quvchi ro‘yxatdan o‘tishi kerak',
       'REQUEST_HAS_NO_ACCOUNT'
     );
   }
 
-  const seatFormat = seatFormatFor(request.course.format, request.format);
-
-  if (seatFormat === 'ONLINE') {
-    const existing = await prisma.enrollment.findUnique({
-      where: { userId_courseId: { userId: request.userId, courseId: request.courseId } },
-    });
-    if (!existing) {
-      await assertSeatAvailable(request.course, 'ONLINE');
-      await prisma.$transaction([
-        prisma.enrollment.create({
-          data: {
-            userId: request.userId,
-            courseId: request.courseId,
-            status: 'ACTIVE',
-            paymentStatus: request.course.isFree ? 'FREE' : 'PAID',
-            provider: 'admin',
-            providerRef: `request_${request.id}`,
-            amountPaid: request.course.isFree ? null : request.course.price,
-          },
-        }),
-        prisma.course.update({ where: { id: request.courseId }, data: { studentsCount: { increment: 1 } } }),
-      ]);
-    } else if (existing.status !== 'ACTIVE' && existing.status !== 'COMPLETED') {
-      await prisma.enrollment.update({ where: { id: existing.id }, data: { status: 'ACTIVE' } });
-    }
-  } else {
-    await assertSeatAvailable(request.course, 'OFFLINE');
-  }
-
-  const updated = await prisma.courseRequest.update({
-    where: { id },
-    data: { status: 'ENROLLED' },
-    include: requestInclude,
+  const format = seatFormatFor(request.course.format, request.format);
+  const existing = await prisma.enrollment.findUnique({
+    where: { userId_courseId: { userId: request.userId, courseId: request.courseId } },
+    select: { id: true, status: true, format: true, paymentStatus: true, groupId: true },
   });
 
+  // Mavjud yozilish AYNI SHU formatda joyni allaqachon band qilgan bo'lsa
+  // qayta tekshirilmaydi. Qolgan hamma holatda (yangi yozilish, bekor
+  // qilinganini tiklash, onlayndan offline guruhga o'tish) joy kerak.
+  const holdsSeat = existing !== null
+    && existing.format === format
+    && (existing.status === 'PENDING' || existing.status === 'ACTIVE');
+  if (!holdsSeat) {
+    await assertSeatAvailable(request.course, format);
+  }
+
+  // Guruh tanlangan bo'lsa u kursga, formatga va sig'imga mos kelishi kerak.
+  // Tanlanmasa o'quvchi guruhsiz qabul qilinadi — admin keyin guruhga
+  // taqsimlaydi (onlayn o'quvchi ko'pincha guruhsiz qolaveradi).
+  if (groupId) {
+    await assertGroupFits(groupId, {
+      id: existing?.id ?? '',
+      courseId: request.courseId,
+      format,
+      groupId: existing?.groupId ?? null,
+    });
+  }
+
+  // Kelishilgan summa — offline uchun markazdagi narx (odatda qimmatroq).
+  // Allaqachon to'liq to'lagan yozilishning kelishuviga tegilmaydi.
+  const agreed = request.course.isFree
+    ? null
+    : (format === 'OFFLINE' ? request.course.offlinePrice ?? request.course.price : request.course.price);
+  const terms = {
+    provider: 'admin',
+    providerRef: `request_${request.id}`,
+    ...(existing?.paymentStatus === 'PAID' ? {} : { priceAgreed: agreed }),
+  };
+
+  // Yozilish va so'rov holati BITTA tranzaksiyada: orada uzilish bo'lsa
+  // o'quvchi kursga qo'shilib, so'rov esa "yangi" bo'lib qolib ketardi.
+  const writes: Prisma.PrismaPromise<unknown>[] = [];
+  if (!existing) {
+    writes.push(
+      prisma.enrollment.create({
+        data: { userId: request.userId, courseId: request.courseId, format, groupId, status: 'ACTIVE', ...terms },
+      }),
+      prisma.course.update({ where: { id: request.courseId }, data: { studentsCount: { increment: 1 } } }),
+    );
+  } else if (existing.status !== 'COMPLETED') {
+    // Kursni tamomlaganga tegilmaydi — ACTIVE'ga qaytarish sertifikatni
+    // olib qo'yardi. Boshqa holatlarda yozilish faollashtiriladi va format
+    // yangilanadi (o'quvchi boshqa guruhga o'tgan bo'lishi mumkin).
+    writes.push(
+      prisma.enrollment.update({
+        where: { id: existing.id },
+        data: {
+          status: 'ACTIVE',
+          format,
+          // Guruh faqat yangisi tanlanganda almashadi — bo'sh yuborilsa
+          // o'quvchi hozirgi guruhida qoladi
+          ...(groupId ? { groupId } : {}),
+          ...terms,
+        },
+      }),
+    );
+  }
+  writes.push(prisma.courseRequest.update({ where: { id }, data: { status: 'ENROLLED' } }));
+  await prisma.$transaction(writes);
+
+  // Pul daftarga alohida tushadi. Yoziladigan summa QARZdan oshmaydi:
+  // shu tufayli allaqachon to'lagan o'quvchiga (ikkinchi so'rov tasdiqlansa)
+  // pul ikkinchi marta qo'shilmaydi.
+  const enrollment = await prisma.enrollment.findUniqueOrThrow({
+    where: { userId_courseId: { userId: request.userId, courseId: request.courseId } },
+    select: { id: true },
+  });
+  const debt = await enrollmentDebt(enrollment.id);
+  const requested = options.paidAmount === undefined || options.paidAmount === null
+    ? debt
+    : new Prisma.Decimal(options.paidAmount);
+  const toRecord = Prisma.Decimal.min(requested, debt);
+  if (toRecord.greaterThan(0)) {
+    await addEnrollmentPayment(
+      enrollment.id,
+      { amount: toRecord.toString(), method: 'CASH', note: `request_${request.id}` },
+      null,
+      locale,
+      // Quyida qabul haqidagi to'liq xabar va email yuboriladi
+      { notifyStudent: false },
+    );
+  } else {
+    await recalcEnrollmentPayment(enrollment.id);
+  }
+
+  const updated = await prisma.courseRequest.findUniqueOrThrow({ where: { id }, include: requestInclude });
+
+  // Guruh tanlangan bo'lsa jadval xabarning eng qimmatli qismi bo'ladi:
+  // "qachon va qayerda kelaman" degan savolga javob shu qatorda
+  const group = groupId
+    ? await prisma.courseGroup.findUnique({
+      where: { id: groupId },
+      select: { name: true, startsAt: true, weekdays: true, startTime: true, room: true },
+    })
+    : null;
+  const schedule = group ? groupScheduleText(group) : null;
+
+  // Qarz qolgan bo'lsa o'quvchi buni birinchi kundan bilib tursin —
+  // keyin "menga aytilmagan edi" degan gap chiqmasin
+  const remaining = await enrollmentDebt(enrollment.id);
+  const debtLine = remaining.greaterThan(0)
+    ? `\nQolgan to'lov: ${remaining.toString()} ${request.course.currency}`
+    : '';
+
+  const baseBody = format === 'ONLINE'
+    ? 'Kurs kabinetingizda ochildi — darslarni boshlashingiz mumkin.'
+    : 'Offline guruhga yozildingiz. Kurs materiallari kabinetingizda ochiq.';
   await notify(request.userId, {
     type: 'ENROLLMENT_ACTIVATED',
     title: `Kursga qabul qilindingiz: ${toUzText(request.course.title)}`,
-    body:
-      seatFormat === 'ONLINE'
-        ? 'Kurs kabinetingizda ochildi — darslarni boshlashingiz mumkin.'
-        : 'Offline guruhga yozildingiz — jadval bo‘yicha administrator bog‘lanadi.',
-    link: seatFormat === 'ONLINE' ? `/learn/${request.course.slug}` : '/student',
+    body: `${baseBody}${schedule ? `\nGuruhingiz: ${schedule}` : ''}${debtLine}`,
+    link: `/learn/${request.course.slug}`,
+  });
+
+  // Bildirishnoma faqat saytga kirgan odamga ko'rinadi — so'rov yuborib
+  // javob kutayotgan o'quvchi esa aynan saytdan tashqarida bo'ladi.
+  await sendCourseEnrolledEmail({
+    to: request.user.email,
+    name: request.user.name,
+    courseTitle: toUzText(request.course.title),
+    format,
+    courseUrl: `${env.FRONTEND_URL.replace(/\/+$/, '')}/learn/${request.course.slug}`,
+    location: format === 'OFFLINE' ? toUzText(request.course.location) || null : null,
+    schedule,
   });
 
   return resolveLocaleDeep(updated, locale);

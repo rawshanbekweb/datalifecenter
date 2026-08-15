@@ -24,6 +24,8 @@ export const listEnrollmentsAdminHandler = asyncHandler(async (req: Request, res
   const filters = req.validatedQuery as {
     status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
     paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REFUNDED';
+    format?: 'ONLINE' | 'OFFLINE';
+    courseId?: string;
     search?: string;
     page: number;
     limit: number;

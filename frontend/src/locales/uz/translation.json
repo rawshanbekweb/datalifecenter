@@ -491,7 +491,25 @@
     "payPayme": "Payme orqali to'lash",
     "adminOnlyTitle": "To'lov administrator orqali rasmiylashtiriladi",
     "adminOnlyText": "To'lovni o'quv markazida amalga oshirasiz. Administrator to'lovni tasdiqlagach, kurs kabinetingizda avtomatik ochiladi — saytda pul o'tkazish shart emas.",
-    "contactAdmin": "Adminga yozish"
+    "contactAdmin": "Adminga yozish",
+    "ledger": {
+      "agreed": "Kelishilgan",
+      "paid": "To'langan",
+      "debt": "Qarz",
+      "empty": "Hozircha to'lov yozilmagan.",
+      "amount": "Summa",
+      "note": "Izoh (ixtiyoriy)",
+      "add": "Qo'shish",
+      "confirmDelete": "Bu to'lov yozuvini o'chirasizmi? Qarz qayta hisoblanadi.",
+      "myPayments": "To'lovlarim",
+      "method": {
+        "CASH": "Naqd",
+        "CARD": "Karta",
+        "TRANSFER": "O'tkazma",
+        "ONLINE": "Onlayn",
+        "OTHER": "Boshqa"
+      }
+    }
   },
   "student": {
     "dashboard": {
@@ -512,6 +530,8 @@
         "CANCELLED": "Bekor qilingan"
       },
       "enrolledAt": "Yozilgan sana:",
+      "offlineNote": "Bu kurs markazda o'tiladi — jadval bo'yicha administrator siz bilan bog'lanadi.",
+      "offlineLocation": "Manzil",
       "lessonsCount": "{{done}}/{{total}} dars",
       "continue": "Davom etish",
       "certificate": "Sertifikat",
@@ -642,6 +662,11 @@
       "ended": "Bu jonli dars yakunlangan.",
       "cancelled": "Bu jonli dars bekor qilingan.",
       "mentorTip": "Ekraningizni ulashish uchun pastdagi Jitsi panelidan ekran belgisini bosing."
+    },
+    "groups": {
+      "title": "Guruhingiz va jadval",
+      "nextLesson": "Keyingi dars",
+      "startsAt": "Boshlanadi"
     }
   },
   "mentor": {
@@ -824,7 +849,9 @@
       "chat": "Yozishmalar",
       "courseRequests": "Kurs so'rovlari",
       "team": "Jamoa",
-      "profile": "Profil"
+      "profile": "Profil",
+      "courseGroups": "O'quv guruhlari",
+      "debtors": "Qarzdorlar"
     },
     "navGroups": {
       "learning": "Taʼlim",
@@ -968,13 +995,15 @@
       "title": "Yozilishlar",
       "sub": "Kursga yozilishlar va to'lovlarni boshqarish",
       "searchPlaceholder": "Talaba yoki kurs...",
+      "formatAll": "Barcha formatlar",
       "empty": "Yozilishlar topilmadi.",
       "viewReceipt": "Chekni ko'rish",
       "approvePayment": "To'lovni tasdiqlash",
       "reject": "Rad etish",
       "complete": "Yakunlash",
       "cancel": "Bekor qilish",
-      "restore": "Tiklash"
+      "restore": "Tiklash",
+      "payments": "To'lovlar"
     },
     "subscriptions": {
       "title": "Obunalar",
@@ -1274,7 +1303,8 @@
         "CONTACTED": "Bog'lanildi",
         "ENROLLED": "Yozildi",
         "REJECTED": "Rad etildi"
-      }
+      },
+      "noGroup": "Guruhsiz"
     },
     "team": {
       "title": "Jamoa",
@@ -1316,6 +1346,49 @@
       "confirmDeleteOne": "Bu yozuv butunlay o'chiriladi. Buni qaytarib bo'lmaydi.",
       "deletedOne": "Yozuv o'chirildi",
       "deleteFailed": "O'chirib bo'lmadi"
+    },
+    "courseGroups": {
+      "title": "O'quv guruhlari",
+      "sub": "Guruhlar, jadval va a'zolar",
+      "create": "Yangi guruh",
+      "createTitle": "Yangi guruh ochish",
+      "editTitle": "Guruhni tahrirlash",
+      "allCourses": "Barcha kurslar",
+      "course": "Kurs",
+      "name": "Guruh nomi",
+      "namePlaceholder": "Masalan: Python-3 kechki",
+      "format": "Format",
+      "mentor": "Mentor",
+      "mentorNone": "Tayinlanmagan",
+      "statusField": "Holat",
+      "startsAt": "Boshlanish sanasi",
+      "endsAt": "Tugash sanasi",
+      "weekdays": "Dars kunlari",
+      "startTime": "Dars vaqti",
+      "durationMin": "Davomiyligi (daq.)",
+      "room": "Xona",
+      "roomPlaceholder": "Masalan: 2-xona",
+      "capacity": "Sig'imi",
+      "empty": "Hozircha guruh ochilmagan.",
+      "members": "A'zolar",
+      "hideMembers": "Yopish",
+      "noMembers": "Bu guruhda hali o'quvchi yo'q.",
+      "addMember": "O'quvchi qo'shish...",
+      "removeMember": "Guruhdan chiqarish",
+      "confirmDelete": "\"{{name}}\" guruhini o'chirasizmi? A'zolarning yozilishi saqlanadi.",
+      "nextLesson": "Keyingi dars",
+      "status": {
+        "PLANNED": "Rejalashtirilgan",
+        "ACTIVE": "Faol",
+        "FINISHED": "Tugagan"
+      }
+    },
+    "debtors": {
+      "title": "Qarzdorlar",
+      "sub": "To'lovi tugallanmagan faol o'quvchilar",
+      "totalDebt": "Jami qarz",
+      "count": "{{n}} ta o'quvchi",
+      "empty": "Qarzdor yo'q — barcha to'lovlar yopilgan."
     }
   },
   "engagement": {
@@ -1505,5 +1578,14 @@
       "title": "Jamoa profili bog'lanmagan",
       "message": "Sizning hisobingizga jamoa profili bog'lanmagan. Administratorga murojaat qiling."
     }
+  },
+  "weekdayShort": {
+    "0": "Yak",
+    "1": "Du",
+    "2": "Se",
+    "3": "Cho",
+    "4": "Pay",
+    "5": "Ju",
+    "6": "Sha"
   }
 }

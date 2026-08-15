@@ -30,6 +30,9 @@ export async function resetDb(): Promise<void> {
     // Kurs ↔ mentor bog'lanishi cascade bilan o'chadi, lekin mentor
     // qatorlari kursdan KEYIN o'chirilgani uchun tartib ochiq yozildi
     prisma.courseMentor.deleteMany(),
+    // Guruhlar kurs bilan cascade o'chadi, lekin tartib ochiq yozilgani
+    // ma'qul: yozilishlar allaqachon yuqorida o'chirilgan
+    prisma.courseGroup.deleteMany(),
     prisma.course.deleteMany(),
     prisma.blogPost.deleteMany(),
     // TeamMemberProject onDelete: Cascade — lekin Project qatorlari testlarda

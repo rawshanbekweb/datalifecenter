@@ -66,11 +66,21 @@ export function updateCourseRequest(
 
 /**
  * So'rovni tasdiqlab, o'quvchini kursga qo'shadi (joy tekshiruvi bilan).
- * Onlayn kursda darhol Enrollment ochiladi; offline'da so'rov ENROLLED
- * bo'ladi va shu offline guruhdagi band joyni bildiradi.
+ * Ikkala formatda ham Enrollment ochiladi; `groupId` berilsa o'quvchi
+ * darrov jadvali bor guruhga tushadi va qabul xatida shu jadval ketadi.
  */
-export function enrollFromRequest(id: string): Promise<CourseRequest> {
-  return apiFetch(`/course-requests/${id}/enroll`, { method: 'POST' });
+export function enrollFromRequest(
+  id: string,
+  options: { groupId?: string | null; paidAmount?: number | null } = {},
+): Promise<CourseRequest> {
+  return apiFetch(`/course-requests/${id}/enroll`, {
+    method: 'POST',
+    body: JSON.stringify({
+      groupId: options.groupId || null,
+      // undefined = "to'liq to'landi" (sukut), 0 = hozircha to'lanmadi
+      paidAmount: options.paidAmount ?? null,
+    }),
+  });
 }
 
 export function deleteCourseRequest(id: string): Promise<{ deleted: boolean }> {

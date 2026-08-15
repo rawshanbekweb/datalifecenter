@@ -251,6 +251,26 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Jazılıw tabılmadı',
     en: 'Enrollment not found',
   },
+  "To'lov yozuvi topilmadi": {
+    ru: 'Запись о платеже не найдена',
+    kaa: 'Tólem jazıwı tabılmadı',
+    en: 'Payment record not found',
+  },
+  "To'lov summasi noldan katta bo'lishi kerak": {
+    ru: 'Сумма платежа должна быть больше нуля',
+    kaa: 'Tólem summası noldan úlken bolıwı kerek',
+    en: 'The payment amount must be greater than zero',
+  },
+  "To'lov summasi manfiy bo'lmasligi kerak": {
+    ru: 'Сумма платежа не может быть отрицательной',
+    kaa: 'Tólem summası teris bolmawı kerek',
+    en: 'The payment amount cannot be negative',
+  },
+  "To'lov sanasi noto'g'ri": {
+    ru: 'Неверная дата платежа',
+    kaa: 'Tólem sánesi qáte',
+    en: 'Invalid payment date',
+  },
   'Siz bu kursga yozilmagansiz': {
     ru: 'Вы не записаны на этот курс',
     kaa: 'Siz bul kursqa jazılmaǵansız',
@@ -305,6 +325,83 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     ru: 'В этой группе мест не осталось — дождитесь следующей группы или оставьте заявку',
     kaa: 'Bul toparda orınlar tamamlandı — keyingi topar ashılıwın kútiń yamasa soraw qaldırıń',
     en: 'This group is full — wait for the next group or leave a request',
+  },
+
+  // ── O'quv guruhlari ───────────────────────────────────────────────────────
+  'Guruh topilmadi': {
+    ru: 'Группа не найдена',
+    kaa: 'Topar tabılmadı',
+    en: 'Group not found',
+  },
+  'Guruh formati kurs formatiga mos emas': {
+    ru: 'Формат группы не соответствует формату курса',
+    kaa: 'Topar formatı kurs formatına sáykes emes',
+    en: 'The group format does not match the course format',
+  },
+  "Guruh formati o'quvchining yozilish formatiga mos emas": {
+    ru: 'Формат группы не совпадает с форматом записи студента',
+    kaa: "Topar formatı studenttiń jazılıw formatına sáykes emes",
+    en: "The group format does not match the student's enrollment format",
+  },
+  'Guruh boshqa kursga tegishli': {
+    ru: 'Группа относится к другому курсу',
+    kaa: 'Topar basqa kursqa tiyisli',
+    en: 'The group belongs to a different course',
+  },
+  'Bu mentor kursga biriktirilmagan': {
+    ru: 'Этот ментор не закреплён за курсом',
+    kaa: 'Bul mentor kursqa bekitilmegen',
+    en: 'This mentor is not assigned to the course',
+  },
+  "Tugagan guruhga o'quvchi qo'shilmaydi": {
+    ru: 'В завершённую группу нельзя добавить студента',
+    kaa: "Juwmaqlanǵan toparǵa student qosılmaydı",
+    en: 'Students cannot be added to a finished group',
+  },
+  'Bu guruhda joylar tugagan': {
+    ru: 'В этой группе нет свободных мест',
+    kaa: 'Bul toparda orınlar tawsıldı',
+    en: 'This group is full',
+  },
+  "Guruh nomi kamida 2 ta belgidan iborat bo'lishi kerak": {
+    ru: 'Название группы должно содержать минимум 2 символа',
+    kaa: "Topar atı keminde 2 belgiden ibarat bolıwı kerek",
+    en: 'The group name must be at least 2 characters',
+  },
+  'Hafta kuni 0 dan 6 gacha': {
+    ru: 'День недели — от 0 до 6',
+    kaa: "Hápte kúni 0 den 6 ǵa shekem",
+    en: 'Weekday must be between 0 and 6',
+  },
+  "Format noto'g'ri": {
+    ru: 'Неверный формат',
+    kaa: 'Format qáte',
+    en: 'Invalid format',
+  },
+  "Boshlanish sanasi noto'g'ri": {
+    ru: 'Неверная дата начала',
+    kaa: 'Baslanıw sánesi qáte',
+    en: 'Invalid start date',
+  },
+  "Tugash sanasi noto'g'ri": {
+    ru: 'Неверная дата окончания',
+    kaa: 'Juwmaqlanıw sánesi qáte',
+    en: 'Invalid end date',
+  },
+  'Kamida 1 joy': {
+    ru: 'Минимум 1 место',
+    kaa: 'Keminde 1 orın',
+    en: 'At least 1 seat',
+  },
+  "Hech bo'lmasa bitta maydon yuborilishi kerak": {
+    ru: 'Нужно отправить хотя бы одно поле',
+    kaa: 'Keminde bir maydan jiberiliwi kerek',
+    en: 'At least one field must be provided',
+  },
+  'Yozilish tanlanishi kerak': {
+    ru: 'Нужно выбрать запись',
+    kaa: 'Jazılıw saylanıwı kerek',
+    en: 'An enrollment must be selected',
   },
 
   // ── Kurs so'rovlari ───────────────────────────────────────────────────────

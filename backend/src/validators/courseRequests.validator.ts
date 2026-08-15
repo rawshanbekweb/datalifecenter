@@ -18,6 +18,18 @@ export const createCourseRequestSchema = z.object({
   note: z.string().trim().max(2000, 'Izoh juda uzun').optional().or(z.literal('')),
 });
 
+// So'rovni tasdiqlash: guruh tanlash ixtiyoriy. `.default({})` shart —
+// tugma tanasiz ham bosiladi va o'shanda req.body butunlay `undefined`
+// bo'ladi (JSON tanasi yo'q so'rovda express uni to'ldirmaydi).
+export const enrollFromRequestSchema = z
+  .object({
+    groupId: z.string().min(1).nullish(),
+    // Oldindan to'lov. Berilmasa kelishilgan summa to'liq to'langan deb
+    // yoziladi; 0 esa "hozircha to'lanmadi" degani (qarzdorlarga tushadi).
+    paidAmount: z.coerce.number().min(0, "To'lov summasi manfiy bo'lmasligi kerak").nullish(),
+  })
+  .default({});
+
 export const listCourseRequestsQuerySchema = z.object({
   status: z.enum(['NEW', 'CONTACTED', 'ENROLLED', 'REJECTED']).optional(),
   format: z.enum(['ONLINE', 'OFFLINE']).optional(),

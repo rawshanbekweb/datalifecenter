@@ -491,7 +491,25 @@
     "payPayme": "Pay with Payme",
     "adminOnlyTitle": "Payment is handled by an administrator",
     "adminOnlyText": "You pay at the training centre. Once an administrator confirms the payment, the course opens in your dashboard automatically — no online transfer needed.",
-    "contactAdmin": "Message the administrator"
+    "contactAdmin": "Message the administrator",
+    "ledger": {
+      "agreed": "Agreed",
+      "paid": "Paid",
+      "debt": "Debt",
+      "empty": "No payments recorded yet.",
+      "amount": "Amount",
+      "note": "Note (optional)",
+      "add": "Add",
+      "confirmDelete": "Delete this payment record? The debt will be recalculated.",
+      "myPayments": "My payments",
+      "method": {
+        "CASH": "Cash",
+        "CARD": "Card",
+        "TRANSFER": "Transfer",
+        "ONLINE": "Online",
+        "OTHER": "Other"
+      }
+    }
   },
   "student": {
     "dashboard": {
@@ -512,6 +530,8 @@
         "CANCELLED": "Cancelled"
       },
       "enrolledAt": "Enrolled on:",
+      "offlineNote": "This course is held at the center — an administrator will contact you about the schedule.",
+      "offlineLocation": "Address",
       "lessonsCount": "{{done}}/{{total}} lessons",
       "continue": "Continue",
       "certificate": "Certificate",
@@ -642,6 +662,11 @@
       "ended": "This live lesson has ended.",
       "cancelled": "This live lesson was cancelled.",
       "mentorTip": "To share your screen, click the screen-share icon in the Jitsi toolbar below."
+    },
+    "groups": {
+      "title": "Your group and schedule",
+      "nextLesson": "Next lesson",
+      "startsAt": "Starts"
     }
   },
   "mentor": {
@@ -824,7 +849,9 @@
       "chat": "Chat",
       "courseRequests": "Course requests",
       "team": "Team",
-      "profile": "Profile"
+      "profile": "Profile",
+      "courseGroups": "Study groups",
+      "debtors": "Debtors"
     },
     "navGroups": {
       "learning": "Learning",
@@ -968,13 +995,15 @@
       "title": "Enrollments",
       "sub": "Manage course enrollments and payments",
       "searchPlaceholder": "Student or course...",
+      "formatAll": "All formats",
       "empty": "No enrollments found.",
       "viewReceipt": "View receipt",
       "approvePayment": "Approve payment",
       "reject": "Reject",
       "complete": "Complete",
       "cancel": "Cancel",
-      "restore": "Restore"
+      "restore": "Restore",
+      "payments": "Payments"
     },
     "subscriptions": {
       "title": "Subscriptions",
@@ -1274,7 +1303,8 @@
         "CONTACTED": "Contacted",
         "ENROLLED": "Enrolled",
         "REJECTED": "Rejected"
-      }
+      },
+      "noGroup": "No group"
     },
     "team": {
       "title": "Team",
@@ -1316,6 +1346,49 @@
       "confirmDeleteOne": "This record will be permanently deleted. This cannot be undone.",
       "deletedOne": "Record deleted",
       "deleteFailed": "Could not delete"
+    },
+    "courseGroups": {
+      "title": "Study groups",
+      "sub": "Groups, schedule and members",
+      "create": "New group",
+      "createTitle": "Create a group",
+      "editTitle": "Edit group",
+      "allCourses": "All courses",
+      "course": "Course",
+      "name": "Group name",
+      "namePlaceholder": "e.g. Python-3 evening",
+      "format": "Format",
+      "mentor": "Mentor",
+      "mentorNone": "Not assigned",
+      "statusField": "Status",
+      "startsAt": "Start date",
+      "endsAt": "End date",
+      "weekdays": "Class days",
+      "startTime": "Class time",
+      "durationMin": "Duration (min)",
+      "room": "Room",
+      "roomPlaceholder": "e.g. Room 2",
+      "capacity": "Capacity",
+      "empty": "No groups yet.",
+      "members": "Members",
+      "hideMembers": "Hide",
+      "noMembers": "No students in this group yet.",
+      "addMember": "Add a student...",
+      "removeMember": "Remove from group",
+      "confirmDelete": "Delete the group \"{{name}}\"? Student enrollments will be kept.",
+      "nextLesson": "Next lesson",
+      "status": {
+        "PLANNED": "Planned",
+        "ACTIVE": "Active",
+        "FINISHED": "Finished"
+      }
+    },
+    "debtors": {
+      "title": "Debtors",
+      "sub": "Active students with outstanding payments",
+      "totalDebt": "Total debt",
+      "count": "{{n}} students",
+      "empty": "No debtors — all payments are settled."
     }
   },
   "engagement": {
@@ -1505,5 +1578,14 @@
       "title": "Team profile not linked",
       "message": "Your account is not linked to a team profile. Please contact an administrator."
     }
+  },
+  "weekdayShort": {
+    "0": "Sun",
+    "1": "Mon",
+    "2": "Tue",
+    "3": "Wed",
+    "4": "Thu",
+    "5": "Fri",
+    "6": "Sat"
   }
 }

@@ -17,6 +17,7 @@ import { authorize } from '../middleware/authorize';
 import { validateBody, validateQuery } from '../middleware/validateRequest';
 import {
   createCourseRequestSchema,
+  enrollFromRequestSchema,
   listCourseRequestsQuerySchema,
   updateCourseRequestSchema,
 } from '../validators/courseRequests.validator';
@@ -48,8 +49,9 @@ router.post('/', requestLimiter, authenticate, validateBody(createCourseRequestS
 router.get('/mine', authenticate, listMyCourseRequestsHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listCourseRequestsQuerySchema), listCourseRequestsAdminHandler);
 router.patch('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseRequestSchema), updateCourseRequestHandler);
-// So'rovni tasdiqlab o'quvchini kursga qo'shish (joy tekshiruvi bilan)
-router.post('/:id/enroll', authenticate, authorize('ADMIN'), enrollFromRequestHandler);
+// So'rovni tasdiqlab o'quvchini kursga qo'shish (joy tekshiruvi bilan).
+// Tanada guruh berilishi mumkin — o'shanda o'quvchi darrov jadvalga tushadi.
+router.post('/:id/enroll', authenticate, authorize('ADMIN'), validateBody(enrollFromRequestSchema), enrollFromRequestHandler);
 // POST bilan: DELETE tanasi (body) hamma proxy va mijozda ishonchli o'tmaydi
 router.post('/bulk-delete', authenticate, authorize('ADMIN'), validateBody(bulkDeleteSchema), deleteCourseRequestsHandler);
 router.delete('/:id', authenticate, authorize('ADMIN'), deleteCourseRequestHandler);

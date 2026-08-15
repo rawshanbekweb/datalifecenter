@@ -98,6 +98,51 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
     expect(learn.body.data.enrollment.paymentStatus).toBe('PAID');
   });
 
+  it("offline so'rov tasdiqlansa markazdagi o'quvchi ham Enrollment oladi", async () => {
+    const course = await createCourse({ price: 500000, offlinePrice: 900000, format: 'OFFLINE', offlineSeats: 3 });
+    const student = await newStudent();
+
+    const created = await student
+      .post('/api/course-requests')
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Markaz talabasi', phone: '+998901112266' })
+      .expect(201);
+    await admin.post(`/api/course-requests/${created.body.data.id}/enroll`).expect(200);
+
+    const mine = await student.get('/api/enrollments/me').expect(200);
+    const row = mine.body.data.find((e: { course: { slug: string } }) => e.course.slug === course.slug);
+    expect(row).toBeDefined();
+    expect(row.format).toBe('OFFLINE');
+    expect(row.status).toBe('ACTIVE');
+    expect(row.paymentStatus).toBe('PAID');
+    // Markazda o'qish narxi alohida — onlayn narx yozilmasligi kerak
+    expect(Number(row.amountPaid)).toBe(900000);
+  });
+
+  it("offline yozilish bekor qilinsa joy bo'shaydi", async () => {
+    const course = await createCourse({ price: 500000, offlineSeats: 1, format: 'OFFLINE' });
+    const first = await newStudent();
+    const second = await newStudent();
+
+    const firstReq = await first
+      .post('/api/course-requests')
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Ketuvchi', phone: '+998901112277' })
+      .expect(201);
+    await admin.post(`/api/course-requests/${firstReq.body.data.id}/enroll`).expect(200);
+
+    const secondReq = await second
+      .post('/api/course-requests')
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Navbatdagi', phone: '+998901112288' })
+      .expect(201);
+    await admin.post(`/api/course-requests/${secondReq.body.data.id}/enroll`).expect(409);
+
+    // Guruhni tark etgan o'quvchi: yozilish bekor qilinadi va joy darhol
+    // bo'shaydi (ilgari so'rov ENROLLED bo'lib qolib, joy band turaverardi)
+    const enrollment = await prisma.enrollment.findFirstOrThrow({ where: { courseId: course.id } });
+    await admin.patch(`/api/enrollments/${enrollment.id}`).send({ status: 'CANCELLED' }).expect(200);
+
+    await admin.post(`/api/course-requests/${secondReq.body.data.id}/enroll`).expect(200);
+  });
+
   it('qayta tasdiqlash joyni ikkinchi marta band qilmaydi (idempotent)', async () => {
     const course = await createCourse({ price: 500000, offlineSeats: 1, format: 'OFFLINE' });
     const student = await newStudent();

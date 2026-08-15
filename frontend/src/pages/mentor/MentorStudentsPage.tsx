@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMentorStudents } from '../../api/mentors';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import CourseFormatBadge from '../../components/courses/CourseFormatBadge';
 import MentorNotLinked from './MentorNotLinked';
 import Loading from '../../components/common/Loading';
 
 interface StudentProgressRow {
   id: string;
   status: string;
+  /** Markazda o'qiydimi yoki onlaynmi — offline o'quvchi bilan ish uslubi boshqacha */
+  format?: 'ONLINE' | 'OFFLINE';
+  group?: { id: string; name: string } | null;
   enrolledAt: string;
   user: { id: string; name: string; email: string };
   course: { id: string; title: string; slug: string };
@@ -59,7 +63,11 @@ export default function MentorStudentsPage(): React.ReactElement {
                   <p style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{row.user.name}</p>
                   <p style={{ fontSize:11.5, color:'#94a3b8' }}>{row.user.email}</p>
                 </div>
-                <p style={{ flex:'1 1 150px', fontSize:12.5, fontWeight:600, color:'#475569', minWidth:0 }}>{row.course.title}</p>
+                <div style={{ flex:'1 1 150px', minWidth:0, display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+                  <p style={{ fontSize:12.5, fontWeight:600, color:'#475569' }}>{row.course.title}</p>
+                  {row.group && <span className="tag" style={{ fontWeight:700 }}>{row.group.name}</span>}
+                  {row.format === 'OFFLINE' && <CourseFormatBadge format="OFFLINE" />}
+                </div>
                 <div style={{ flex:'2 1 220px', display:'flex', alignItems:'center', gap:10, minWidth:0 }}>
                   <div style={{ flex:1, height:7, borderRadius:99, background:'#f1f5f9', border:'1px solid #e2e8f0', overflow:'hidden' }}>
                     <div style={{ width:`${pct}%`, height:'100%', borderRadius:99, background: done ? '#16a34a' : '#9333ea' }} />

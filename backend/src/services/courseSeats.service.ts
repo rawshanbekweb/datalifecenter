@@ -8,11 +8,16 @@ import { ApiError } from '../utils/ApiError';
  * Chegara onlayn va offline uchun alohida (Course.onlineSeats / offlineSeats),
  * chunki HYBRID kursda ikki guruh mustaqil to'ladi. null = cheklov yo'q.
  *
- * BAND JOY:
- *   onlayn  — PENDING yoki ACTIVE Enrollment (PENDING ham joyni band qiladi:
- *             admin to'lovni tasdiqlagunicha o'rin boshqasiga berilmasin)
- *   offline — ENROLLED holatidagi CourseRequest (offline yozilishda Enrollment
- *             yaratilmaydi — courseRequests.service.ts izohiga qarang)
+ * BAND JOY — ikkala tomonda ham bir xil: PENDING yoki ACTIVE Enrollment,
+ * `format` bo'yicha ajratilgan. PENDING ham joyni band qiladi: admin
+ * to'lovni tasdiqlagunicha o'rin boshqasiga berilmasin.
+ *
+ * ILGARI offline joylar ENROLLED holatidagi CourseRequest'dan sanalardi —
+ * offline yozilish Enrollment yaratmasdi. Endi yaratadi (schema.prisma dagi
+ * Enrollment izohi), shuning uchun hisob bitta manbadan yuritiladi. Buning
+ * amaliy foydasi: guruhni tark etgan o'quvchining yozilishi CANCELLED
+ * qilinsa joy DARHOL bo'shaydi — avval so'rov ENROLLED bo'lib qolaverar
+ * va joy abadiy band turardi.
  *
  * COMPLETED/CANCELLED joyni bo'shatadi: chegara ayni paytda o'qiyotganlar
  * uchun, kursni tamomlaganlar keyingi guruhning o'rnini egallamaydi.
@@ -28,13 +33,8 @@ export interface SeatInfo {
 }
 
 export async function countTakenSeats(courseId: string, format: 'ONLINE' | 'OFFLINE'): Promise<number> {
-  if (format === 'ONLINE') {
-    return prisma.enrollment.count({
-      where: { courseId, status: { in: ['PENDING', 'ACTIVE'] } },
-    });
-  }
-  return prisma.courseRequest.count({
-    where: { courseId, format: 'OFFLINE', status: 'ENROLLED' },
+  return prisma.enrollment.count({
+    where: { courseId, format, status: { in: ['PENDING', 'ACTIVE'] } },
   });
 }
 
@@ -76,21 +76,16 @@ export async function getSeatsForCourses<T extends SeatCourse>(
   const result = new Map<string, { online: SeatInfo; offline: SeatInfo }>();
   if (ids.length === 0) return result;
 
-  const [onlineRows, offlineRows] = await Promise.all([
-    prisma.enrollment.groupBy({
-      by: ['courseId'],
-      where: { courseId: { in: ids }, status: { in: ['PENDING', 'ACTIVE'] } },
-      _count: { _all: true },
-    }),
-    prisma.courseRequest.groupBy({
-      by: ['courseId'],
-      where: { courseId: { in: ids }, format: 'OFFLINE', status: 'ENROLLED' },
-      _count: { _all: true },
-    }),
-  ]);
+  // Ikkala format bitta guruhlashda: `by` ga format qo'shilgani uchun
+  // natija kurs boshiga ko'pi bilan ikki qator qaytaradi.
+  const rows = await prisma.enrollment.groupBy({
+    by: ['courseId', 'format'],
+    where: { courseId: { in: ids }, status: { in: ['PENDING', 'ACTIVE'] } },
+    _count: { _all: true },
+  });
 
-  const onlineTaken = new Map(onlineRows.map((r) => [r.courseId, r._count._all]));
-  const offlineTaken = new Map(offlineRows.map((r) => [r.courseId, r._count._all]));
+  const onlineTaken = new Map(rows.filter((r) => r.format === 'ONLINE').map((r) => [r.courseId, r._count._all]));
+  const offlineTaken = new Map(rows.filter((r) => r.format === 'OFFLINE').map((r) => [r.courseId, r._count._all]));
 
   for (const course of courses) {
     result.set(course.id, {

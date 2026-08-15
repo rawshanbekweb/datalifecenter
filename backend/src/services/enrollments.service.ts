@@ -5,6 +5,7 @@ import { SupportedLocale } from '../config/locale';
 import { ApiError } from '../utils/ApiError';
 import { resolveLocaleDeep, toUzText } from '../utils/localizedField';
 import { assertSeatAvailable } from './courseSeats.service';
+import { addEnrollmentPayment, enrollmentDebt, recalcEnrollmentPayment } from './enrollmentPayments.service';
 import { notify, notifyAdmins } from './notifications.service';
 import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail } from './email.service';
 import { deleteUploadByUrl } from './storage.service';
@@ -58,6 +59,9 @@ export async function createEnrollment(userId: string, courseId: string, locale:
       data: {
         userId,
         courseId,
+        // Bu yo'l bilan faqat onlayn yoziladi (offline yuqorida to'xtatilgan) —
+        // offline yozilish enrollFromRequest orqali keladi
+        format: 'ONLINE',
         status: course.isFree ? 'ACTIVE' : 'PENDING',
         paymentStatus: course.isFree ? 'FREE' : 'UNPAID',
       },
@@ -123,7 +127,9 @@ export async function getMyEnrollments(userId: string, locale: SupportedLocale) 
 
 interface ListEnrollmentsAdminFilters {
   status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REFUNDED';
+  paymentStatus?: 'FREE' | 'UNPAID' | 'PARTIAL' | 'PENDING' | 'PAID' | 'REFUNDED';
+  format?: 'ONLINE' | 'OFFLINE';
+  courseId?: string;
   search?: string;
   page: number;
   limit: number;
@@ -133,6 +139,8 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters,
   const where: Prisma.EnrollmentWhereInput = {
     ...(filters.status ? { status: filters.status } : {}),
     ...(filters.paymentStatus ? { paymentStatus: filters.paymentStatus } : {}),
+    ...(filters.format ? { format: filters.format } : {}),
+    ...(filters.courseId ? { courseId: filters.courseId } : {}),
     ...(filters.search
       ? {
           OR: [
@@ -153,6 +161,7 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters,
       include: {
         user: { select: { id: true, name: true, email: true } },
         course: { select: { id: true, title: true, slug: true, isFree: true, price: true, currency: true } },
+        group: { select: { id: true, name: true } },
       },
     }),
     prisma.enrollment.count({ where }),
@@ -166,7 +175,8 @@ export async function listEnrollmentsAdmin(filters: ListEnrollmentsAdminFilters,
 
 interface UpdateEnrollmentAdminInput {
   status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  paymentStatus?: 'FREE' | 'UNPAID' | 'PENDING' | 'PAID' | 'REJECTED' | 'REFUNDED';
+  // Daftardan hosil bo'ladigan holatlar bu yerda yo'q — validator izohiga qarang
+  paymentStatus?: 'PENDING' | 'PAID' | 'REJECTED' | 'REFUNDED';
   rejectionReason?: string;
 }
 
@@ -183,10 +193,13 @@ export async function updateEnrollmentAdmin(enrollmentId: string, input: UpdateE
   // bir xil yadrodan (confirmEnrollmentPayment) o'tadi — ikkalasida ham bir xil
   // status/bildirishnoma/email natijasi bo'lishi uchun.
   if (input.paymentStatus === 'PAID' && enrollment.paymentStatus !== 'PAID') {
+    // "To'liq to'landi" = QOLGAN qarzni yopish. Ilgari bu yerda `amountPaid`
+    // uzatilardi — daftar joriy etilgach u qisman to'lagan o'quvchining
+    // to'lagan summasini ikkinchi marta qo'shib yuborardi.
     return confirmEnrollmentPayment(enrollmentId, {
       provider: enrollment.provider ?? 'manual',
       providerRef: enrollment.providerRef ?? `manual_${Date.now()}`,
-      amount: enrollment.amountPaid ?? enrollment.course.price ?? 0,
+      amount: await enrollmentDebt(enrollmentId),
     }, locale);
   }
 
@@ -260,14 +273,35 @@ export async function confirmEnrollmentPayment(enrollmentId: string, input: Conf
   }
 
   const wasActive = enrollment.status === 'ACTIVE' || enrollment.status === 'COMPLETED';
+  // To'lov daftarga yoziladi va holat o'shandan hosil bo'ladi
+  // (enrollmentPayments.service.ts) — `paymentStatus`/`amountPaid` bu yerda
+  // qo'lda yozilmaydi, aks holda daftar bilan yig'indi ajralib ketardi.
+  // Summa 0 bo'lishi mumkin (qarzi yo'q yozilishni "to'landi" deb belgilash) —
+  // o'shanda daftarga bo'sh yozuv qo'shilmaydi, faqat holat qayta sanaladi.
+  const amount = new Prisma.Decimal(input.amount);
+  if (amount.greaterThan(0)) {
+    await addEnrollmentPayment(
+      enrollmentId,
+      {
+        amount: amount.toString(),
+        method: input.provider === 'click' || input.provider === 'payme' ? 'ONLINE' : 'TRANSFER',
+        note: input.providerRef,
+      },
+      null,
+      locale,
+      // Quyida to'liqroq "kurs ochildi" xabari va email yuboriladi
+      { notifyStudent: false },
+    );
+  } else {
+    await recalcEnrollmentPayment(enrollmentId);
+  }
+
   const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
     data: {
-      paymentStatus: 'PAID',
       status: wasActive ? undefined : 'ACTIVE',
       provider: input.provider,
       providerRef: input.providerRef,
-      amountPaid: input.amount,
       rejectionReason: null,
     },
     include: {
@@ -447,15 +481,22 @@ export async function mockPayEnrollment(userId: string, enrollmentId: string, lo
     throw ApiError.conflict("Bu yozilish uchun to'lov allaqachon amalga oshirilgan", 'ALREADY_PAID');
   }
 
+  // DEV tugmasi ham daftar orqali o'tadi — aks holda test/dev muhitida
+  // yig'indi bilan daftar bir-biriga to'g'ri kelmasdi
+  const debt = await enrollmentDebt(enrollmentId);
+  if (debt.greaterThan(0)) {
+    await addEnrollmentPayment(
+      enrollmentId,
+      { amount: debt.toString(), method: 'OTHER', note: `mock_${Date.now()}` },
+      null,
+      locale,
+      { notifyStudent: false },
+    );
+  }
+
   const updated = await prisma.enrollment.update({
     where: { id: enrollmentId },
-    data: {
-      status: 'ACTIVE',
-      paymentStatus: 'PAID',
-      provider: 'mock',
-      providerRef: `mock_${Date.now()}`,
-      amountPaid: enrollment.course.price,
-    },
+    data: { status: 'ACTIVE', provider: 'mock', providerRef: `mock_${Date.now()}` },
     include: { course: true },
   });
   return resolveLocaleDeep(updated, locale);

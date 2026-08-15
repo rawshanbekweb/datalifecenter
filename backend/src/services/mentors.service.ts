@@ -275,6 +275,7 @@ export async function getMentorStudents(userId: string, locale: SupportedLocale)
     include: {
       user: { select: { id: true, name: true, email: true } },
       course: { select: { id: true, title: true, slug: true } },
+      group: { select: { id: true, name: true } },
     },
   });
   if (!enrollments.length) return [];
@@ -305,6 +306,12 @@ export async function getMentorStudents(userId: string, locale: SupportedLocale)
     enrollments.map((e) => ({
       id: e.id,
       status: e.status,
+      // Mentor uchun muhim farq: bu o'quvchi markazda o'qiydimi yoki
+      // onlaynmi — savol/topshiriq bilan ishlash uslubi shunga bog'liq
+      format: e.format,
+      // Qaysi guruhda o'qiydi — mentor jadval bo'yicha kim bilan
+      // ishlashini shu yerdan ko'radi
+      group: e.group,
       enrolledAt: e.enrolledAt,
       user: e.user,
       course: e.course,

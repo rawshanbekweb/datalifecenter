@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, CheckCircle2, Clock, CreditCard, Hourglass, MapPin, PlayCircle, Settings, TrendingUp, AlertTriangle, Star, MessageSquare, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { downloadCertificate, getMyEnrollments, mockPayEnrollment } from '../api/enrollments';
 import { getMyCourseReview, submitCourseReview } from '../api/reviews';
@@ -9,7 +9,10 @@ import { resolveIcon } from '../utils/iconMap';
 import { formatDate, formatNumber } from '../utils/format';
 import { useAuth } from '../hooks/useAuth';
 import UpcomingSessionsPanel from '../components/sessions/UpcomingSessionsPanel';
+import CourseFormatBadge from '../components/courses/CourseFormatBadge';
 import MyCourseRequestsPanel from '../components/courses/MyCourseRequestsPanel';
+import MyGroupsPanel from '../components/courses/MyGroupsPanel';
+import EnrollmentPaymentsPanel from '../components/payments/EnrollmentPaymentsPanel';
 import Loading from '../components/common/Loading';
 
 interface CourseInfo {
@@ -22,11 +25,14 @@ interface CourseInfo {
   isFree?: boolean;
   price?: string | number | null;
   currency?: string;
+  location?: string | null;
 }
 
 interface Enrollment {
   id: string;
   course: CourseInfo;
+  /** Qaysi guruhda o'qiyapti — offline o'quvchi darslarga markazga keladi */
+  format?: 'ONLINE' | 'OFFLINE';
   status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
   paymentStatus: string;
   rejectionReason?: string | null;
@@ -59,6 +65,7 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
   const { t } = useTranslation();
   const [payStatus, setPayStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [payOpen, setPayOpen]     = useState<boolean>(false);
+  const [ledgerOpen, setLedgerOpen] = useState<boolean>(false);
   const [certState, setCertState] = useState<'idle' | 'loading' | 'error'>('idle');
   const Icon = resolveIcon(enrollment.course.iconKey);
   const s = STATUS_LABELS[enrollment.status];
@@ -66,6 +73,10 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
   const paymentRejected = enrollment.paymentStatus === 'REJECTED';
   const awaitingPayment = enrollment.status === 'PENDING' && (enrollment.paymentStatus === 'UNPAID' || paymentRejected);
   const receiptSent     = enrollment.paymentStatus === 'PENDING';
+  // Daftar faqat pul harakati bo'lgan yozilishda ochiladi: to'lanmagan
+  // yozilishda bo'sh jadval "sizda qarz yo'q" degandek ko'rinardi
+  const hasLedger = !enrollment.course.isFree
+    && (enrollment.paymentStatus === 'PARTIAL' || enrollment.paymentStatus === 'PAID');
 
   const simulatePayment = async () => {
     setPayStatus('loading');
@@ -172,14 +183,33 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
           <CreditCard size={13} /> {t('student.dashboard.paymentInfo')}
         </button>
       )}
+      {hasLedger && (
+        <button onClick={() => setLedgerOpen((v) => !v)} className="btn-outline"
+          style={{ fontSize: 12, padding: '8px 14px', flexShrink: 0 }}>
+          <Wallet size={13} /> {t('payment.ledger.myPayments')}
+        </button>
+      )}
       {import.meta.env.DEV && enrollment.paymentStatus === 'UNPAID' && (
         <button onClick={simulatePayment} disabled={payStatus === 'loading'} className="btn-outline"
           style={{ fontSize: 12, padding: '8px 14px', opacity: payStatus === 'loading' ? 0.7 : 1 }}>
           <CreditCard size={13} /> {payStatus === 'loading' ? '...' : "[DEV] To'lash"}
         </button>
       )}
+      {/* Offline guruh alohida belgilanadi: bu yozilish "kabinetda o'qish"
+          emas, markazdagi jadval bo'yicha mashg'ulot degani */}
+      {enrollment.format === 'OFFLINE' && <CourseFormatBadge format="OFFLINE" />}
       <span className="tag" style={{ background: s.bg, borderColor: s.border, color: s.color, fontWeight: 700, flexShrink: 0 }}>{t(s.labelKey)}</span>
     </div>
+
+    {enrollment.format === 'OFFLINE' && enrollment.status === 'ACTIVE' && (
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 14px', borderRadius: 10, background: '#fff7ed', border: '1px solid #fed7aa' }}>
+        <MapPin size={14} style={{ color: '#c2410c', flexShrink: 0, marginTop: 2 }} />
+        <p style={{ fontSize: 12.5, color: '#7c2d12', lineHeight: 1.6 }}>
+          {t('student.dashboard.offlineNote')}
+          {enrollment.course.location ? ` ${t('student.dashboard.offlineLocation')}: ${enrollment.course.location}` : ''}
+        </p>
+      </div>
+    )}
 
     {certState === 'error' && (
       <p style={{ fontSize: 12, color: '#dc2626' }}>{t('student.certificates.downloadError')}</p>
@@ -227,6 +257,12 @@ function EnrollmentRow({ enrollment, onPaid }: EnrollmentRowProps): React.ReactE
             <MessageSquare size={14} /> {t('payment.contactAdmin')}
           </button>
         </Link>
+      </div>
+    )}
+
+    {hasLedger && ledgerOpen && (
+      <div style={{ padding: 16, borderRadius: 12, background: '#fff', border: `1px solid ${enrollment.course.border}` }}>
+        <EnrollmentPaymentsPanel enrollmentId={enrollment.id} />
       </div>
     )}
 
@@ -304,6 +340,10 @@ export default function DashboardPage(): React.ReactElement {
         </m.div>
 
         <UpcomingSessionsPanel />
+
+        {/* Guruh jadvali sessiyalardan keyin, so'rovlardan oldin: qabul
+            qilingan o'quvchi uchun eng dolzarb ma'lumot shu */}
+        <MyGroupsPanel />
 
         <MyCourseRequestsPanel />
 

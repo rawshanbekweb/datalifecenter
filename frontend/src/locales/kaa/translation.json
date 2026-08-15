@@ -491,7 +491,25 @@
     "payPayme": "Payme arqalı tólew",
     "adminOnlyTitle": "Tólem administrator arqalı rásmiylestiriledi",
     "adminOnlyText": "Tólemdi oqıw orayında ámelge asırasız. Administrator tólemdi tastıyıqlaǵannan keyin kurs kabinetińizde avtomat ashıladı — saytta pul ótkeriw shárt emes.",
-    "contactAdmin": "Adminge jazıw"
+    "contactAdmin": "Adminge jazıw",
+    "ledger": {
+      "agreed": "Kelisilgen",
+      "paid": "Tólengen",
+      "debt": "Qarız",
+      "empty": "Házirshe tólem jazılmaǵan.",
+      "amount": "Summa",
+      "note": "Eskertpe (májbúriy emes)",
+      "add": "Qosıw",
+      "confirmDelete": "Bul tólem jazıwın óshiresiz be? Qarız qayta esaplanadı.",
+      "myPayments": "Tólemlerim",
+      "method": {
+        "CASH": "Naqt",
+        "CARD": "Karta",
+        "TRANSFER": "Awdarma",
+        "ONLINE": "Onlayn",
+        "OTHER": "Basqa"
+      }
+    }
   },
   "student": {
     "dashboard": {
@@ -512,6 +530,8 @@
         "CANCELLED": "Biykar etilgen"
       },
       "enrolledAt": "Jazılǵan sáne:",
+      "offlineNote": "Bul kurs orayda ótkeriledi — keste boyınsha administrator siz benen baylanısadı.",
+      "offlineLocation": "Mánzil",
       "lessonsCount": "{{done}}/{{total}} sabaq",
       "continue": "Dawam etiw",
       "certificate": "Sertifikat",
@@ -642,6 +662,11 @@
       "ended": "Bul janlı sabaq tamamlanǵan.",
       "cancelled": "Bul janlı sabaq biykar etilgen.",
       "mentorTip": "Ekranıńızdı bólisiw ushın tómendegi Jitsi panelinen ekran belgisin basıń."
+    },
+    "groups": {
+      "title": "Toparıńız hám keste",
+      "nextLesson": "Keyingi sabaq",
+      "startsAt": "Baslanadı"
     }
   },
   "mentor": {
@@ -824,7 +849,9 @@
       "chat": "Jazısıwlar",
       "courseRequests": "Kurs sorawları",
       "team": "Komanda",
-      "profile": "Profil"
+      "profile": "Profil",
+      "courseGroups": "Oqıw toparları",
+      "debtors": "Qarızdarlar"
     },
     "navGroups": {
       "learning": "Oqıtıw",
@@ -968,13 +995,15 @@
       "title": "Jazılıwlar",
       "sub": "Kursqa jazılıwlar hám tólemlerdi basqarıw",
       "searchPlaceholder": "Student yamasa kurs...",
+      "formatAll": "Barlıq formatlar",
       "empty": "Jazılıwlar tabılmadı.",
       "viewReceipt": "Chekti kóriw",
       "approvePayment": "Tólemdi tastıyıqlaw",
       "reject": "Biykar etiw",
       "complete": "Juwmaqlaw",
       "cancel": "Biykar etiw",
-      "restore": "Tiklew"
+      "restore": "Tiklew",
+      "payments": "Tólemler"
     },
     "subscriptions": {
       "title": "Jazılıwlar (obuna)",
@@ -1274,7 +1303,8 @@
         "CONTACTED": "Baylanısıldı",
         "ENROLLED": "Jazıldı",
         "REJECTED": "Biykarlandı"
-      }
+      },
+      "noGroup": "Toparsız"
     },
     "team": {
       "title": "Komanda",
@@ -1316,6 +1346,49 @@
       "confirmDeleteOne": "Bul jazıw pútkilley óshiriledi. Bunı qaytarıp bolmaydı.",
       "deletedOne": "Jazıw óshirildi",
       "deleteFailed": "Óshirip bolmadı"
+    },
+    "courseGroups": {
+      "title": "Oqıw toparları",
+      "sub": "Toparlar, keste hám aǵzalar",
+      "create": "Jaña topar",
+      "createTitle": "Jaña topar ashıw",
+      "editTitle": "Toparnı redaktorlaw",
+      "allCourses": "Barlıq kurslar",
+      "course": "Kurs",
+      "name": "Topar atı",
+      "namePlaceholder": "Mısalı: Python-3 keshki",
+      "format": "Format",
+      "mentor": "Mentor",
+      "mentorNone": "Tayınlanbaǵan",
+      "statusField": "Jaǵday",
+      "startsAt": "Baslanıw sánesi",
+      "endsAt": "Juwmaqlanıw sánesi",
+      "weekdays": "Sabaq kúnleri",
+      "startTime": "Sabaq waqtı",
+      "durationMin": "Dawamlılıǵı (min.)",
+      "room": "Bólme",
+      "roomPlaceholder": "Mısalı: 2-bólme",
+      "capacity": "Sıyımlılıǵı",
+      "empty": "Házirshe topar ashılmaǵan.",
+      "members": "Aǵzalar",
+      "hideMembers": "Jabıw",
+      "noMembers": "Bul toparda hálishe student joq.",
+      "addMember": "Student qosıw...",
+      "removeMember": "Topardan shıǵarıw",
+      "confirmDelete": "«{{name}}» toparın óshiresiz be? Studentlerdiń jazılıwı saqlanadı.",
+      "nextLesson": "Keyingi sabaq",
+      "status": {
+        "PLANNED": "Rejelestirilgen",
+        "ACTIVE": "Aktiv",
+        "FINISHED": "Juwmaqlanǵan"
+      }
+    },
+    "debtors": {
+      "title": "Qarızdarlar",
+      "sub": "Tólemi juwmaqlanbaǵan aktiv oqıwshılar",
+      "totalDebt": "Ulıwma qarız",
+      "count": "{{n}} oqıwshı",
+      "empty": "Qarızdar joq — barlıq tólemler jabıldı."
     }
   },
   "engagement": {
@@ -1505,5 +1578,14 @@
       "title": "Komanda profili baylanıspaǵan",
       "message": "Sizin akkauntıńızǵa komanda profili baylanıspaǵan. Administratorǵa múrájat etiń."
     }
+  },
+  "weekdayShort": {
+    "0": "Ye",
+    "1": "Dú",
+    "2": "Si",
+    "3": "Sá",
+    "4": "Pi",
+    "5": "Ju",
+    "6": "Sh"
   }
 }

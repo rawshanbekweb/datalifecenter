@@ -46,13 +46,33 @@ enum EnrollmentStatus {
   CANCELLED
 }
 
+/**
+ * Yozilishning pul holati. FREE/PAID/PARTIAL/UNPAID qiymatlari to'lov
+ * daftaridan (EnrollmentPayment) HOSIL QILINADI — ularni qo'lda yozmang,
+ * enrollmentPayments.service.ts dagi recalcEnrollmentPayment ishlatiladi.
+ *
+ * PENDING va REJECTED daftardan tashqarida: bular chek yuklab, admin
+ * tasdiqini kutish oqimi (submitReceipt) — hali pul kelmagan holat.
+ */
 enum PaymentStatus {
   FREE
   UNPAID
+  // Qisman to'langan — qarzi bor, lekin o'qishdan to'xtatilmaydi
+  PARTIAL
   PENDING
   PAID
   REJECTED
   REFUNDED
+}
+
+// To'lov qanday qabul qilingani. ONLINE — Click/Payme (PaymentTransaction
+// bilan keladi), qolganlari markazda qo'lda qayd etiladi.
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+  ONLINE
+  OTHER
 }
 
 enum MessageStatus {
@@ -74,6 +94,14 @@ enum CourseFormat {
   ONLINE
   OFFLINE
   HYBRID
+}
+
+// Aynan bitta yozilish qaysi guruhda — CourseFormat'dan farqli, bu yerda
+// HYBRID yo'q: kurs ikki shaklda o'tilishi mumkin, lekin bitta o'quvchi
+// baribir bitta guruhda o'qiydi.
+enum EnrollmentFormat {
+  ONLINE
+  OFFLINE
 }
 
 model User {
@@ -108,6 +136,8 @@ model User {
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   sessions     Session[]
+  // Bu admin qabul qilgan to'lovlar (kassa yozuvlari)
+  recordedPayments EnrollmentPayment[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -193,6 +223,7 @@ model Mentor {
   requests      MentorRequest[]
   // Mentor ayni paytda jamoa a'zosi ham bo'lishi mumkin (majburiy emas)
   teamProfile   TeamMember?
+  groups        CourseGroup[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -270,6 +301,7 @@ model Course {
   announcements  Announcement[]
   reviews        CourseReview[]
   requests       CourseRequest[]
+  groups         CourseGroup[]
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 }
@@ -749,17 +781,113 @@ model TeamMemberProject {
   @@index([projectId])
 }
 
+enum CourseGroupStatus {
+  // E'lon qilingan, hali boshlanmagan — o'quvchilar shu guruhga to'planadi
+  PLANNED
+  // Hozir o'qiyapti
+  ACTIVE
+  // Tugagan; a'zolari tarixda qoladi
+  FINISHED
+}
+
+/**
+ * Aniq guruh — "Python-3 kechki", 15-sentabrda boshlanadi, dush/chor/juma 18:00.
+ *
+ * NEGA KERAK: kursga qabul qilingan o'quvchi shu paytgacha "kursdagi
+ * o'quvchi" edi, xolos — qachon, qayerda va kim bilan boshlashini tizim
+ * bilmasdi. Bu ma'lumot faqat administratorning telefon qo'ng'irog'ida
+ * yashardi. Guruh uni saqlaydigan joy: o'quvchi kabinetida jadvalini va
+ * keyingi darsini ko'radi, admin esa kimni qaysi guruhga qo'yganini.
+ *
+ * JADVAL HAFTALIK, TAQVIM EMAS: `weekdays` + `startTime` takrorlanuvchi
+ * qoidani beradi (LiveSession esa bitta aniq voqea). Ikkalasi bir-birini
+ * almashtirmaydi — offline guruhning haftalik jadvali bor, onlayn jonli
+ * dars esa sana-vaqtga bog'langan alohida hodisa.
+ *
+ * SIG'IM: `capacity` — SHU guruhdagi joy. Course.onlineSeats/offlineSeats
+ * esa kursda ayni paytda o'qiy oladigan umumiy son (courseSeats.service.ts).
+ * Ikkalasi bir-biriga xalaqit bermaydi: kursda joy bo'lib, tanlangan guruh
+ * to'lgan bo'lishi mumkin — o'shanda o'quvchi boshqa guruhga qo'yiladi.
+ */
+model CourseGroup {
+  id          String            @id @default(cuid())
+  course      Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    String
+  // Ichki nom, tarjima qilinmaydi: "Python-3 kechki", "Frontend ertalabki"
+  name        String
+  format      EnrollmentFormat  @default(OFFLINE)
+  // Guruhni olib boradigan mentor. Kursning mentorlaridan biri bo'ladi,
+  // lekin majburiy emas — guruh mentor tayinlanmasdan oldin ham ochiladi
+  mentor      Mentor?           @relation(fields: [mentorId], references: [id], onDelete: SetNull)
+  mentorId    String?
+  status      CourseGroupStatus @default(PLANNED)
+  startsAt    DateTime
+  endsAt      DateTime?
+  // Hafta kunlari: 0 = yakshanba ... 6 = shanba (JS Date.getDay bilan bir xil,
+  // shuning uchun frontend keyingi darsni qo'shimcha moslashtirishsiz hisoblaydi)
+  weekdays    Int[]             @default([])
+  // "18:00" — mahalliy vaqt, sana emas. DateTime emasligi ataylab: haftalik
+  // takrorlanadigan vaqtning sanasi yo'q, UTC'ga o'tkazish esa uni buzardi
+  startTime   String?
+  durationMin Int               @default(90)
+  // Xona yoki manzil — kursning umumiy manzilidan farq qilishi mumkin
+  room        String?
+  capacity    Int?
+  enrollments Enrollment[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([courseId, status])
+  @@index([mentorId])
+}
+
+/**
+ * O'quvchining kursdagi o'rni — ONLAYN va OFFLINE guruh uchun BIR XIL yozuv.
+ *
+ * NEGA OFFLINE'DA HAM: ilgari offline yozilish faqat CourseRequest.ENROLLED
+ * bo'lib qolardi, Enrollment yaratilmasdi. Natijada markazda o'qiyotgan
+ * o'quvchi tizim uchun mavjud emas edi: mentorning o'quvchilar ro'yxatiga
+ * tushmasdi (mentors.service.ts Enrollment'dan quriladi), jonli seansga
+ * kira olmasdi, topshiriq ololmasdi, progress va sertifikat ham yo'q edi.
+ * Har bir yangi imkoniyat ikki marta — Enrollment uchun va CourseRequest
+ * uchun alohida — yozilishi kerak bo'lardi.
+ *
+ * Endi tasdiqlash ikkala formatda ham shu yozuvni yaratadi, `format` esa
+ * farqni saqlaydi: darslar qayerda o'tishi, qaysi narx olingani va guruh
+ * sig'imi qaysi tomondan sanalishi.
+ *
+ * Offline o'quvchi ham kurs materiallarini ko'radi: u markazda o'qigani
+ * uchun ko'proq to'laydi (Course.offlinePrice), materialdan mahrum qilish
+ * uchun sabab yo'q — kirish nazorati ikkala formatda bir xil.
+ */
 model Enrollment {
   id              String               @id @default(cuid())
   user            User                 @relation(fields: [userId], references: [id])
   userId          String
   course          Course               @relation(fields: [courseId], references: [id])
   courseId        String
+  // Qaysi guruhda o'qiydi. Kurs HYBRID bo'lsa o'quvchi tanlagan tomon,
+  // aks holda kursning o'z formati (courseSeats.service.ts: seatFormatFor).
+  format          EnrollmentFormat     @default(ONLINE)
+  // Aniq guruh (jadval, mentor, xona). Ixtiyoriy: onlayn o'quvchi ko'pincha
+  // guruhsiz — o'z sur'atida o'qiydi. Guruh o'chirilsa yozilish saqlanadi
+  // (SetNull), chunki o'quvchi kursda qolaveradi.
+  group           CourseGroup?         @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId         String?
   status          EnrollmentStatus     @default(PENDING)
   paymentStatus   PaymentStatus        @default(UNPAID)
   provider        String?
   providerRef     String?
+  // KELISHILGAN SUMMA — kurs narxidan farq qilishi mumkin (chegirma, grant,
+  // aka-uka uchun yon berish). Qarz aynan shundan hisoblanadi, kurs narxidan
+  // emas: kurs narxi keyin ko'tarilsa allaqachon kelishilgan o'quvchining
+  // qarzi o'sib ketmasligi kerak. null = eski yozuv yoki bepul kurs.
+  priceAgreed     Decimal?
+  // To'langan JAMI — to'lov daftarining keshlangan yig'indisi. Yagona manba
+  // `payments`, bu ustun esa har ro'yxatda SUM qilmaslik uchun saqlanadi
+  // (recalcEnrollmentPayment ikkalasini birga yangilaydi).
   amountPaid      Decimal?
+  payments        EnrollmentPayment[]
   receiptUrl      String?
   rejectionReason String?
   enrolledAt      DateTime             @default(now())
@@ -771,7 +899,45 @@ model Enrollment {
   // `courseId IN (...) AND status IN (...)` bo'yicha guruhlaydi. Yuqoridagi
   // unikal indeks userId'dan boshlangani uchun bunga yaramaydi — indekssiz
   // sahifaning har ochilishi butun Enrollment jadvalini o'qirdi.
-  @@index([courseId, status])
+  //
+  // `format` oxirida turadi: [courseId, status] prefiksi eski so'rovlarga
+  // avvalgidek xizmat qiladi, joy sanashda esa format ham shu indeksdan
+  // filtrlanadi — ikkinchi indeks kerak emas.
+  @@index([courseId, status, format])
+  // Guruh a'zolarini sanash va ro'yxatlash uchun
+  @@index([groupId])
+}
+
+/**
+ * To'lov daftari — "kim, qachon, qancha to'ladi" ning yagona yozuvi.
+ *
+ * NEGA KERAK: ilgari yozilishda faqat `amountPaid` bitta son bo'lib turardi
+ * va u "to'liq to'landi" degan taxminga tayanardi. Amalda markazda pul
+ * BO'LIB to'lanadi: birinchi oyda oldindan, keyin qolganiga qarab. Bitta son
+ * bunda nima to'langanini ham, qachon to'langanini ham ko'rsata olmasdi —
+ * qarzdorlar ro'yxati esa umuman chiqmasdi.
+ *
+ * PaymentTransaction BILAN CHALKASHTIRMANG: u to'lov shlyuzining (Click/Payme)
+ * protokol yozuvi — holat mashinasi, qaytarишlar, imzolar. Bu esa buxgalteriya
+ * daftari: naqd pul ham, shlyuz to'lovi ham (confirmEnrollmentPayment orqali)
+ * bir xil ko'rinishda shu yerga tushadi.
+ */
+model EnrollmentPayment {
+  id           String        @id @default(cuid())
+  enrollment   Enrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  enrollmentId String
+  amount       Decimal
+  method       PaymentMethod @default(CASH)
+  // Kassada kim turgani — admin hisobi. Hisob o'chirilsa yozuv qoladi
+  recordedBy   User?         @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+  recordedById String?
+  note         String?
+  // Pul HAQIQATDA kelgan sana — yozuv keyinroq kiritilishi mumkin
+  paidAt       DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+
+  @@index([enrollmentId, paidAt])
+  @@index([recordedById])
 }
 
 enum PaymentProvider {

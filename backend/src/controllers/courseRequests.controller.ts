@@ -59,7 +59,13 @@ export const updateCourseRequestHandler = asyncHandler(async (req: Request, res:
 });
 
 export const enrollFromRequestHandler = asyncHandler(async (req: Request, res: Response) => {
-  const request = await courseRequestsService.enrollFromRequest(req.params.id as string, req.locale);
+  // Guruh ham, oldindan to'lov ham ixtiyoriy: admin ikkalasini keyinroq
+  // ham qo'shishi mumkin (guruhga taqsimlash, kassaga to'lov yozish)
+  const request = await courseRequestsService.enrollFromRequest(
+    req.params.id as string,
+    { groupId: req.body?.groupId ?? null, paidAmount: req.body?.paidAmount ?? null },
+    req.locale
+  );
   sendSuccess(res, request);
 });
 

@@ -19,6 +19,7 @@ import { announcementsRouter, notificationsRouter } from './notifications.routes
 import engagementRoutes from './engagement.routes';
 import messagesRoutes from './messages.routes';
 import courseRequestsRoutes from './courseRequests.routes';
+import courseGroupsRoutes from './courseGroups.routes';
 import siteSettingsRoutes from './siteSettings.routes';
 import testimonialsRoutes from './testimonials.routes';
 import courseReviewsRoutes from './courseReviews.routes';
@@ -57,6 +58,7 @@ router.use('/announcements', announcementsRouter);
 router.use('/engagement', engagementRoutes);
 router.use('/messages', messagesRoutes);
 router.use('/course-requests', courseRequestsRoutes);
+router.use('/course-groups', courseGroupsRoutes);
 router.use('/site-settings', siteSettingsRoutes);
 router.use('/testimonials', testimonialsRoutes);
 router.use('/reviews', courseReviewsRoutes);
