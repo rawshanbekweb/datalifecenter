@@ -104,8 +104,7 @@
     "mentorCabinetFull": "Mentor kabineti",
     "team": "Komanda",
     "teamCabinet": "Komanda",
-    "teamCabinetFull": "Komanda kabineti",
-    "games": "Oyınlar"
+    "teamCabinetFull": "Komanda kabineti"
   },
   "footer": {
     "description": "DATA LIFE IT Center — 2019-jıldan berli baǵdarlamalıq támiynat islep shıǵamız hám IT baǵdarları boyınsha oqıtamız.",
@@ -408,7 +407,9 @@
       "downloadBtn": "Júklep alıw",
       "version": "Versiya",
       "featuredTag": "Usınıs etilgen",
-      "downloads": "{{n}} márte júklep alındı"
+      "downloads": "{{n}} márte júklep alındı",
+      "readMore": "Tolıq oqıw",
+      "showLess": "Qısqartıw"
     }
   },
   "comingSoon": {

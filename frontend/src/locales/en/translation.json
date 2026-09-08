@@ -104,8 +104,7 @@
     "mentorCabinetFull": "Mentor dashboard",
     "team": "Team",
     "teamCabinet": "Team",
-    "teamCabinetFull": "Team cabinet",
-    "games": "Games"
+    "teamCabinetFull": "Team cabinet"
   },
   "footer": {
     "description": "DATA LIFE IT Center — building software and teaching IT since 2019.",
@@ -408,7 +407,9 @@
       "downloadBtn": "Download",
       "version": "Version",
       "featuredTag": "Featured",
-      "downloads": "Downloaded {{n}} times"
+      "downloads": "Downloaded {{n}} times",
+      "readMore": "Read more",
+      "showLess": "Show less"
     }
   },
   "comingSoon": {

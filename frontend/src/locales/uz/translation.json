@@ -104,8 +104,7 @@
     "mentorCabinetFull": "Mentor kabineti",
     "team": "Jamoa",
     "teamCabinet": "Jamoa",
-    "teamCabinetFull": "Jamoa kabineti",
-    "games": "O'yinlar"
+    "teamCabinetFull": "Jamoa kabineti"
   },
   "footer": {
     "description": "DATA LIFE IT Center — 2019-yildan beri dasturiy ta'minot ishlab chiqamiz va IT yo'nalishlari bo'yicha o'qitamiz.",
@@ -408,7 +407,9 @@
       "downloadBtn": "Yuklab olish",
       "version": "Versiya",
       "featuredTag": "Tavsiya etilgan",
-      "downloads": "{{n}} marta yuklab olindi"
+      "downloads": "{{n}} marta yuklab olindi",
+      "readMore": "Batafsil",
+      "showLess": "Qisqartirish"
     }
   },
   "comingSoon": {

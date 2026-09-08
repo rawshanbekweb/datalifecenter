@@ -32,13 +32,21 @@ interface GameCardProps {
   index?: number;
 }
 
+// Shu uzunlikdan qisqa tavsif 4 qatorga baribir sig'adi — "Batafsil" tugmasi
+// keraksiz joyda chiqmasin (masalan bo'sh joy qoldirib "..." ko'rsatilmasin)
+const READ_MORE_THRESHOLD = 220;
+
 export default function GameCard({ game, index = 0 }: GameCardProps): React.ReactElement {
   const { t } = useTranslation();
   // Logotip yuklanmasa zaxira ikonka ko'rsatiladi (PartnerCard'dagi bilan bir xil qoida)
   const [logoFailed, setLogoFailed] = useState(false);
+  // Tavsif uzun bo'lsa (o'yin qoidalari kabi) qisqartirilgan holda boshlanadi —
+  // qirqib tashlangandek emas, "Batafsil" bilan ochiladigan holda ko'rsatiladi
+  const [expanded, setExpanded] = useState(false);
   const showLogo = Boolean(game.logoUrl) && !logoFailed;
   const sizeMb = game.apkSizeBytes ? Math.round((game.apkSizeBytes / (1024 * 1024)) * 10) / 10 : null;
   const downloads = game.downloadsCount ?? 0;
+  const isLong = game.description.length > READ_MORE_THRESHOLD;
 
   return (
     <m.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-30px' }}
@@ -79,10 +87,20 @@ export default function GameCard({ game, index = 0 }: GameCardProps): React.Reac
         </div>
       </div>
 
-      <p style={{
-        fontSize: 13.5, color: '#64748b', lineHeight: 1.75, whiteSpace: 'pre-line',
-        display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-      }}>{game.description}</p>
+      <div>
+        <p style={{
+          fontSize: 13.5, color: '#64748b', lineHeight: 1.75, whiteSpace: 'pre-line',
+          ...(isLong && !expanded
+            ? { display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+            : {}),
+        }}>{game.description}</p>
+        {isLong && (
+          <button type="button" onClick={() => setExpanded((v) => !v)}
+            style={{ background: 'none', border: 'none', padding: 0, marginTop: 6, color: '#0ea5e9', fontWeight: 700, fontSize: 12.5, cursor: 'pointer' }}>
+            {expanded ? t('pages.games.showLess') : t('pages.games.readMore')}
+          </button>
+        )}
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 'auto', paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
         {downloads > 0 && (

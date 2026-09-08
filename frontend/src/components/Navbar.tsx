@@ -7,7 +7,6 @@ import { useAuth } from '../hooks/useAuth';
 import { roleHome } from '../utils/roleHome';
 import { useHasTeam } from '../hooks/useHasTeam';
 import { useHasPartners } from '../hooks/useHasPartners';
-import { useHasGames } from '../hooks/useHasGames';
 import NotificationBell from './common/NotificationBell';
 import LanguageSwitcher from './common/LanguageSwitcher';
 import { Z } from '../utils/zLayers';
@@ -21,9 +20,11 @@ interface NavItem {
   // bo'sh sahifaga tushmasin (`useHasTeam`, `useHasPartners`)
   requiresTeam?: boolean;
   requiresPartners?: boolean;
-  requiresGames?: boolean;
 }
 
+// "O'yinlar" ATAYIN shu ro'yxatda yo'q — Game Dev bo'limi bosh sahifadagi
+// suzuvchi tugma (GameFloatingBadge) orqali topiladi, header'da alohida
+// band sifatida emas (dizayn qarori).
 const NAV: NavItem[] = [
   { labelKey: 'nav.home', to: '/', end: true },
   { labelKey: 'nav.about', to: '/about' },
@@ -31,7 +32,6 @@ const NAV: NavItem[] = [
   { labelKey: 'nav.mentors', to: '/mentors' },
   { labelKey: 'nav.team', to: '/team', requiresTeam: true },
   { labelKey: 'nav.partners', to: '/partners', requiresPartners: true },
-  { labelKey: 'nav.games', to: '/games', requiresGames: true },
   { labelKey: 'nav.blog', to: '/blog' },
   { labelKey: 'nav.contact', to: '/contact' },
 ];
@@ -47,10 +47,9 @@ export default function Navbar(): React.ReactElement {
   const navigate = useNavigate();
   const hasTeam = useHasTeam();
   const hasPartners = useHasPartners();
-  const hasGames = useHasGames();
   const navItems = useMemo(
-    () => NAV.filter((n) => (!n.requiresTeam || hasTeam) && (!n.requiresPartners || hasPartners) && (!n.requiresGames || hasGames)),
-    [hasTeam, hasPartners, hasGames]
+    () => NAV.filter((n) => (!n.requiresTeam || hasTeam) && (!n.requiresPartners || hasPartners)),
+    [hasTeam, hasPartners]
   );
 
   const handleLogout = async (): Promise<void> => {

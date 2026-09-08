@@ -6,6 +6,7 @@ import { lazyWithRetry } from '../utils/lazyWithRetry';
 import LazySection from '../components/common/LazySection';
 import Seo from '../components/common/Seo';
 import JsonLd from '../components/common/JsonLd';
+import GameFloatingBadge from '../components/games/GameFloatingBadge';
 import { SITE_URL } from '../api/config';
 
 // Hero'dan pastdagi seksiyalar alohida chunk'larda — kirish bundle'i faqat
@@ -40,6 +41,7 @@ export default function HomePage(): React.ReactElement {
         }}
       />
       <Hero settings={settings.hero} />
+      <GameFloatingBadge />
       <LazySection anchorId="about"><About settings={settings.about} /></LazySection>
       <LazySection anchorId="courses"><Courses /></LazySection>
       {/* Kurslardan keyin: tashrifchi avval nimani o'rganishini, so'ng kim

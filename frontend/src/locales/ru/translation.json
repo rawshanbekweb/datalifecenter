@@ -104,8 +104,7 @@
     "mentorCabinetFull": "Кабинет ментора",
     "team": "Команда",
     "teamCabinet": "Команда",
-    "teamCabinetFull": "Кабинет команды",
-    "games": "Игры"
+    "teamCabinetFull": "Кабинет команды"
   },
   "footer": {
     "description": "DATA LIFE IT Center — с 2019 года разрабатываем программное обеспечение и обучаем IT-направлениям.",
@@ -408,7 +407,9 @@
       "downloadBtn": "Скачать",
       "version": "Версия",
       "featuredTag": "Рекомендуем",
-      "downloads": "Скачано {{n}} раз"
+      "downloads": "Скачано {{n}} раз",
+      "readMore": "Подробнее",
+      "showLess": "Свернуть"
     }
   },
   "comingSoon": {
