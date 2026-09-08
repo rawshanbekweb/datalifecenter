@@ -7,6 +7,7 @@ import { comparePassword, hashPassword } from '../utils/password';
 import { signToken } from '../utils/jwt';
 import { sendPasswordResetEmail, sendVerificationEmail } from './email.service';
 import { createSession, revokeAllSessions, SessionContext } from './session.service';
+import { assertNotLocked, clearFailures, recordFailure } from './loginThrottle';
 
 interface RegisterInput {
   name: string;
@@ -121,23 +122,36 @@ export async function register(input: RegisterInput, ctx: SessionContext = {}) {
 const DUMMY_HASH_PROMISE = hashPassword(crypto.randomBytes(16).toString('hex'));
 
 export async function login(input: LoginInput, ctx: SessionContext = {}) {
+  // IP bo'yicha chegara botnetda ishlamaydi — hisob bo'yicha chegara shu yerda
+  // (loginThrottle.ts). Tekshiruv bazaga murojaatdan OLDIN: qulflangan hisobga
+  // kelgan urinish so'rov bo'yicha bironta ham DB/bcrypt ishini talab qilmaydi.
+  assertNotLocked(input.email);
+
   const user = await prisma.user.findUnique({
     where: { email: input.email },
     include: { teamProfile: { select: { id: true } } },
   });
   if (!user) {
     await comparePassword(input.password, await DUMMY_HASH_PROMISE);
+    // Mavjud bo'lmagan email ham sanaladi — aks holda javob vaqti yoki qulf
+    // holati orqali "bu email ro'yxatdan o'tganmi" degan savolga javob topilardi
+    recordFailure(input.email);
     throw ApiError.unauthorized('Email yoki parol noto\'g\'ri', 'INVALID_CREDENTIALS');
   }
 
   const valid = await comparePassword(input.password, user.passwordHash);
   if (!valid) {
+    recordFailure(input.email);
     throw ApiError.unauthorized('Email yoki parol noto\'g\'ri', 'INVALID_CREDENTIALS');
   }
 
   if (user.isBlocked) {
     throw ApiError.forbidden('Hisobingiz bloklangan. Administratorga murojaat qiling.', 'USER_BLOCKED');
   }
+
+  // Parol to'g'ri chiqdi — hisoblagich tozalanadi, aks holda kunda bir necha bor
+  // kiradigan foydalanuvchi vaqt o'tib chegaraga yetib qolardi
+  clearFailures(input.email);
 
   const sid = await createSession(user.id, ctx);
   const token = signToken({ userId: user.id, role: user.role, tv: user.tokenVersion, sid });

@@ -3,10 +3,17 @@ import { imageFocusFields } from './shared/imageFocus.validator';
 import { personName } from './shared/personName.validator';
 import { optionalPhone } from './shared/phone.validator';
 
+// Parolning eng kam uzunligi. 6 ta belgi bcrypt bilan ham zamonaviy
+// parol-lug'at hujumiga bardosh bermaydi — YANGI parollar uchun 8 ta.
+// DIQQAT: `loginSchema` bunga bog'lanmaydi (u faqat `min(1)` tekshiradi),
+// aks holda eski, 6 belgili parolli foydalanuvchilar tizimga kira olmay
+// qolardi — ular parolni almashtirganda avtomatik yangi qoidaga o'tadi.
+const password = z.string().min(8, "Parol kamida 8 ta belgidan iborat bo'lishi kerak");
+
 export const registerSchema = z.object({
   name: personName,
   email: z.email('Email noto\'g\'ri'),
-  password: z.string().min(6, 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak'),
+  password,
   phone: optionalPhone,
 });
 
@@ -26,7 +33,7 @@ export const updateProfileSchema = z
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Joriy parol kerak'),
-  newPassword: z.string().min(6, "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak"),
+  newPassword: password,
 });
 
 export const forgotPasswordSchema = z.object({
@@ -35,7 +42,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, 'Token kerak'),
-  newPassword: z.string().min(6, "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak"),
+  newPassword: password,
 });
 
 export const verifyEmailSchema = z.object({
