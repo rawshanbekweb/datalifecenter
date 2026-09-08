@@ -54,7 +54,7 @@ function readStringLiteral(source: string, start: number): string | null {
  */
 function collectMessages(): Map<string, string[]> {
   const found = new Map<string, string[]>();
-  const call = /ApiError\.(?:badRequest|unauthorized|forbidden|notFound|conflict)\(\s*|new ApiError\(\s*\d+\s*,\s*|tooManyRequestsHandler\(\s*/g;
+  const call = /ApiError\.(?:badRequest|unauthorized|forbidden|notFound|conflict|tooManyRequests)\(\s*|new ApiError\(\s*\d+\s*,\s*|tooManyRequestsHandler\(\s*/g;
 
   for (const file of sourceFiles(SRC)) {
     // Lug'atning o'zi va uni o'qiydigan modul hisobga olinmaydi

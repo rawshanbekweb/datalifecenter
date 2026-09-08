@@ -19,6 +19,7 @@ const MentorsPage = lazyWithRetry(() => import('./pages/MentorsPage'))
 const TeamPage = lazyWithRetry(() => import('./pages/TeamPage'))
 const TeamMemberPage = lazyWithRetry(() => import('./pages/TeamMemberPage'))
 const PartnersPage = lazyWithRetry(() => import('./pages/PartnersPage'))
+const GamesPage = lazyWithRetry(() => import('./pages/GamesPage'))
 const BlogPage = lazyWithRetry(() => import('./pages/BlogPage'))
 const BlogDetailPage = lazyWithRetry(() => import('./pages/BlogDetailPage'))
 const ContactPage = lazyWithRetry(() => import('./pages/ContactPage'))
@@ -75,6 +76,7 @@ const AdminSiteSettingsPage = lazyWithRetry(() => import('./pages/admin/AdminSit
 const AdminTestimonialsPage = lazyWithRetry(() => import('./pages/admin/AdminTestimonialsPage'))
 const AdminCourseReviewsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseReviewsPage'))
 const AdminProjectsPage = lazyWithRetry(() => import('./pages/admin/AdminProjectsPage'))
+const AdminGamesPage = lazyWithRetry(() => import('./pages/admin/AdminGamesPage'))
 const AdminMomentsPage = lazyWithRetry(() => import('./pages/admin/AdminMomentsPage'))
 const AdminChatPage = lazyWithRetry(() => import('./pages/admin/AdminChatPage'))
 const AdminCourseRequestsPage = lazyWithRetry(() => import('./pages/admin/AdminCourseRequestsPage'))
@@ -116,6 +118,7 @@ export function createAppRouter(basename: string) {
       // ustun qo'yadi; backend ham o'sha so'zlarni slug sifatida bermaydi.
       { path: 'team/:slug', element: s(<TeamMemberPage />) },
       { path: 'partners', element: s(<PartnersPage />) },
+      { path: 'games', element: s(<GamesPage />) },
       { path: 'blog', element: s(<BlogPage />) },
       { path: 'blog/:slug', element: s(<BlogDetailPage />) },
       { path: 'contact', element: s(<ContactPage />) },
@@ -202,6 +205,7 @@ export function createAppRouter(basename: string) {
       { path: 'testimonials', element: s(<AdminTestimonialsPage />) },
       { path: 'course-reviews', element: s(<AdminCourseReviewsPage />) },
       { path: 'projects', element: s(<AdminProjectsPage />) },
+      { path: 'games', element: s(<AdminGamesPage />) },
       { path: 'moments', element: s(<AdminMomentsPage />) },
       // Admin ham o'z profilini boshqarishi kerak (ism, avatar, parol va
       // kirilgan qurilmalar). Talaba kabineti bilan BIR XIL sahifa —

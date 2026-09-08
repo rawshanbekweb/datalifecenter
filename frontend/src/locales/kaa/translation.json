@@ -104,7 +104,8 @@
     "mentorCabinetFull": "Mentor kabineti",
     "team": "Komanda",
     "teamCabinet": "Komanda",
-    "teamCabinetFull": "Komanda kabineti"
+    "teamCabinetFull": "Komanda kabineti",
+    "games": "Oyınlar"
   },
   "footer": {
     "description": "DATA LIFE IT Center — 2019-jıldan berli baǵdarlamalıq támiynat islep shıǵamız hám IT baǵdarları boyınsha oqıtamız.",
@@ -396,6 +397,18 @@
       "notFound": "Xızmetker tabılmadı",
       "notFoundSub": "Bul mánzilde komanda aǵzası joq — profil óshirilgen yamasa ele járiyalanbaǵan bolıwı múmkin.",
       "loadError": "Maǵlıwmatlardı júklew múmkin bolmadı"
+    },
+    "games": {
+      "pill": "Game Dev",
+      "title": "Bizdiń",
+      "accent": "oyınlarımız",
+      "sub": "DATA LIFE islep shıǵarǵan oyınlardı tegin júklep alıń",
+      "empty": "Házirshe oyınlar qosılmaǵan.",
+      "loadError": "Oyınlardı júklep bolmadı. Backend iske túsirilgenin tekseriń.",
+      "downloadBtn": "Júklep alıw",
+      "version": "Versiya",
+      "featuredTag": "Usınıs etilgen",
+      "downloads": "{{n}} márte júklep alındı"
     }
   },
   "comingSoon": {
@@ -453,7 +466,8 @@
     "timeout": "Júklew waqtı tamamlandı. Qayta urınıp kóriń.",
     "serverWaking": "Server oyanıp atır, qayta urınılmaqta...",
     "tooLarge": "Fayl kólemi {{max}} MB tan aspawı kerek",
-    "ephemeralWarning": "Bult saqlaw sazlanbaǵan: júklengen fayl waqtınsha diskte qaladı hám keyingi deployda joǵaladı. Administrator SUPABASE_* (yamasa CLOUDINARY_*) sazlawların kiritiwi kerek."
+    "ephemeralWarning": "Bult saqlaw sazlanbaǵan: júklengen fayl waqtınsha diskte qaladı hám keyingi deployda joǵaladı. Administrator SUPABASE_* (yamasa CLOUDINARY_*) sazlawların kiritiwi kerek.",
+    "apkPlaceholder": "https://... yamasa APK fayl júkleń"
   },
   "imageFocus": {
     "title": "Súwret fokusı",
@@ -851,7 +865,8 @@
       "team": "Komanda",
       "profile": "Profil",
       "courseGroups": "Oqıw toparları",
-      "debtors": "Qarızdarlar"
+      "debtors": "Qarızdarlar",
+      "games": "Oyınlar"
     },
     "navGroups": {
       "learning": "Oqıtıw",
@@ -1389,6 +1404,18 @@
       "totalDebt": "Ulıwma qarız",
       "count": "{{n}} oqıwshı",
       "empty": "Qarızdar joq — barlıq tólemler jabıldı."
+    },
+    "games": {
+      "title": "Oyınlar",
+      "sub": "Saytttan júklep alınatuǵın oyınlardı basqarıw",
+      "newBtn": "Jańa oyın",
+      "fVersion": "Versiya *",
+      "fLogo": "Logotip *",
+      "fApk": "APK fayl *",
+      "featuredCheck": "Usınıs etilgen",
+      "publishedCheck": "Saytta kórsetilsin",
+      "empty": "Oyınlar tabılmadı.",
+      "confirmDelete": "Oyındı óshiriwdi tastıyıqlaysızba?"
     }
   },
   "engagement": {
@@ -1497,6 +1524,10 @@
     "team": {
       "title": "Komanda",
       "description": "DATA LIFE komandası — programmistler, dizaynerler, maǵlıwmat injenerleri hám mentorlar."
+    },
+    "games": {
+      "title": "Oyınlar",
+      "description": "DATA LIFE oyınları hám olardı júklep alıw."
     }
   },
   "team": {

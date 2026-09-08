@@ -17,6 +17,7 @@ export interface UploadConfig {
   /** Serverdagi limitlar — mijoz shu bo'yicha oldindan tekshiradi */
   imageMaxBytes?: number;
   videoMaxBytes?: number;
+  apkMaxBytes?: number;
 }
 
 /**
@@ -47,9 +48,10 @@ export function getUploadConfig(): Promise<UploadConfig> {
  * hech qachon chaqirilmasdi va nosoz tarmoqda progress hech tugamaydigan
  * holatda qotib qolardi. Video kattaroq bo'lgani uchun unga uzunroq muddat.
  */
-const TIMEOUT_MS: Record<'image' | 'video', number> = {
+const TIMEOUT_MS: Record<'image' | 'video' | 'apk', number> = {
   image: 120_000,
   video: 900_000,
+  apk: 300_000,
 };
 
 /**
@@ -76,7 +78,7 @@ class UploadError extends Error {
 
 function once(
   file: File,
-  kind: 'image' | 'video',
+  kind: 'image' | 'video' | 'apk',
   onProgress?: (percent: number) => void
 ): Promise<UploadResult> {
   return new Promise((resolve, reject) => {
@@ -135,11 +137,11 @@ function once(
  * Sozlamani olib bo'lmasa tekshiruv o'tkazib yuboriladi — yuklashning o'zi
  * ishlashi kerak, oxirgi so'z baribir serverda.
  */
-async function assertSizeAllowed(file: File, kind: 'image' | 'video'): Promise<void> {
+async function assertSizeAllowed(file: File, kind: 'image' | 'video' | 'apk'): Promise<void> {
   let max: number | undefined;
   try {
     const cfg = await getUploadConfig();
-    max = kind === 'image' ? cfg.imageMaxBytes : cfg.videoMaxBytes;
+    max = kind === 'image' ? cfg.imageMaxBytes : kind === 'video' ? cfg.videoMaxBytes : cfg.apkMaxBytes;
   } catch {
     return;
   }
@@ -151,12 +153,12 @@ async function assertSizeAllowed(file: File, kind: 'image' | 'video'): Promise<v
 // fetch o'rniga XHR — yuklash jarayonini (progress) ko'rsatish uchun
 export async function uploadFile(
   file: File,
-  kind: 'image' | 'video',
+  kind: 'image' | 'video' | 'apk',
   onProgress?: (percent: number) => void
 ): Promise<UploadResult> {
   // Rasm avval kichraytiriladi, tekshiruv esa HAQIQATAN yuborilayotgan
   // baytlarga qo'llanadi — telefon surati kichraytirilgach limitga sig'sa,
-  // foydalanuvchini bekorga rad etmaymiz. Video o'z holicha ketadi.
+  // foydalanuvchini bekorga rad etmaymiz. Video va APK o'z holicha ketadi.
   const payload = kind === 'image' ? await downscaleImage(file) : file;
   await assertSizeAllowed(payload, kind);
 

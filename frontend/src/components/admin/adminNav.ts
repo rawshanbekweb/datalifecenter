@@ -2,7 +2,7 @@ import {
   LayoutDashboard, GraduationCap, BookOpen, Users, UserSquare2, UsersRound,
   Newspaper, Handshake, Mail, Inbox, Settings, Star, MessageSquare, LayoutGrid,
   Megaphone, Wallet, MessagesSquare, ClipboardList, Camera, LineChart, Images,
-  UserCog, CalendarDays, HandCoins,
+  UserCog, CalendarDays, HandCoins, Gamepad2,
 } from 'lucide-react';
 
 /**
@@ -71,6 +71,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { labelKey: 'admin.nav.blog',          to: '/admin/blog',           icon: Newspaper },
       { labelKey: 'admin.nav.projects',      to: '/admin/projects',       icon: LayoutGrid },
+      { labelKey: 'admin.nav.games',         to: '/admin/games',          icon: Gamepad2 },
       { labelKey: 'admin.nav.moments',       to: '/admin/moments',        icon: Camera },
       { labelKey: 'admin.nav.partners',      to: '/admin/partners',       icon: Handshake },
       { labelKey: 'admin.nav.testimonials',  to: '/admin/testimonials',   icon: Star },

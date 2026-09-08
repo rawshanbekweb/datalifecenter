@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { uploadConfigHandler, uploadImageHandler, uploadVideoHandler } from '../controllers/uploads.controller';
+import { uploadApkHandler, uploadConfigHandler, uploadImageHandler, uploadVideoHandler } from '../controllers/uploads.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
-import { uploadImage, uploadVideo } from '../middleware/upload';
+import { uploadApk, uploadImage, uploadVideo } from '../middleware/upload';
 
 const router = Router();
 
@@ -13,5 +13,7 @@ router.get('/config', uploadConfigHandler);
 router.post('/image', uploadImage, uploadImageHandler);
 // Video — faqat mentor va admin (dars materiallari)
 router.post('/video', authorize('MENTOR', 'ADMIN'), uploadVideo, uploadVideoHandler);
+// APK — faqat admin (o'yin fayli)
+router.post('/apk', authorize('ADMIN'), uploadApk, uploadApkHandler);
 
 export default router;

@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { corsOptions } from './config/cors';
 import { env } from './config/env';
 import { Sentry, sentryEnabled } from './config/sentry';
-import { IMAGES_DIR, VIDEOS_DIR } from './config/uploads';
+import { APKS_DIR, IMAGES_DIR, VIDEOS_DIR } from './config/uploads';
 import routes from './routes';
 import { csrfProtect } from './middleware/csrfProtect';
 import { resolveLocale } from './middleware/locale';
@@ -49,6 +49,9 @@ app.use(resolveLocale);
 
 // Yuklangan rasmlar — nomlari tasodifiy bo'lgani uchun uzoq keshlash xavfsiz, ochiq qoladi
 app.use('/uploads/images', express.static(IMAGES_DIR, { maxAge: '30d', immutable: true, index: false, dotfiles: 'deny' }));
+
+// O'yin APK fayllari — rasm kabi ochiq (tekshiruv shart emas, erkin yuklab olinadi)
+app.use('/uploads/apks', express.static(APKS_DIR, { maxAge: '30d', immutable: true, index: false, dotfiles: 'deny' }));
 
 // Video darslar (lokal disk rejimi) — enrollment tekshiruvidan o'tgan foydalanuvchiga
 // courses.service.ts orqali beriladigan vaqtinchalik ?exp&sig tokensiz ochilmaydi

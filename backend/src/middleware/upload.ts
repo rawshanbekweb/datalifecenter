@@ -3,6 +3,9 @@ import { RequestHandler } from 'express';
 import multer from 'multer';
 import { ApiError } from '../utils/ApiError';
 import {
+  APKS_DIR,
+  APK_MAX_BYTES,
+  APK_MIME_TYPES,
   IMAGES_DIR,
   IMAGE_MAX_BYTES,
   IMAGE_MIME_EXT,
@@ -22,9 +25,29 @@ function makeStorage(dir: string, mimeExt: Record<string, string>) {
   });
 }
 
+// APK uchun kengaytma har doim qattiq — mimetype ishonchsiz (Windows'da
+// ko'pincha aniqlanmaydi), shuning uchun mime->kengaytma xaritasi shart emas.
+function makeFixedExtStorage(dir: string, ext: string) {
+  return multer.diskStorage({
+    destination: dir,
+    filename: (_req, _file, cb) => {
+      cb(null, `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${ext}`);
+    },
+  });
+}
+
 function makeFilter(mimeExt: Record<string, string>, errorMessage: string): multer.Options['fileFilter'] {
   return (_req, file, cb) => {
     if (!mimeExt[file.mimetype]) {
+      return cb(ApiError.badRequest(errorMessage, 'INVALID_FILE_TYPE'));
+    }
+    cb(null, true);
+  };
+}
+
+function makeListFilter(mimeTypes: string[], errorMessage: string): multer.Options['fileFilter'] {
+  return (_req, file, cb) => {
+    if (!mimeTypes.includes(file.mimetype)) {
       return cb(ApiError.badRequest(errorMessage, 'INVALID_FILE_TYPE'));
     }
     cb(null, true);
@@ -41,6 +64,12 @@ const videoMulter = multer({
   storage: makeStorage(VIDEOS_DIR, VIDEO_MIME_EXT),
   limits: { fileSize: VIDEO_MAX_BYTES, files: 1 },
   fileFilter: makeFilter(VIDEO_MIME_EXT, 'Faqat MP4 yoki WEBM video yuklash mumkin'),
+});
+
+const apkMulter = multer({
+  storage: makeFixedExtStorage(APKS_DIR, '.apk'),
+  limits: { fileSize: APK_MAX_BYTES, files: 1 },
+  fileFilter: makeListFilter(APK_MIME_TYPES, 'Faqat APK fayl yuklash mumkin'),
 });
 
 // Multer xatolarini API formatiga o'girib beradi
@@ -64,4 +93,8 @@ export const uploadImage = wrapMulter(
 export const uploadVideo = wrapMulter(
   videoMulter.single('file'),
   `Video hajmi ${toMb(VIDEO_MAX_BYTES)} MB dan oshmasligi kerak`
+);
+export const uploadApk = wrapMulter(
+  apkMulter.single('file'),
+  `APK hajmi ${toMb(APK_MAX_BYTES)} MB dan oshmasligi kerak`
 );

@@ -11,6 +11,18 @@ const SIGNATURE_CHECKS: Record<string, (buf: Buffer) => boolean> = {
   'video/webm': (b) => b.length >= 4 && b[0] === 0x1a && b[1] === 0x45 && b[2] === 0xdf && b[3] === 0xa3,
 };
 
+// APK aslida ZIP arxiv — brauzer/OS mimetype'ni ishonchli bermaydi (ayniqsa
+// Windows'da .apk kengaytmasi ro'yxatdan o'tmagan bo'lishi mumkin), shuning
+// uchun bir nechta mumkin bo'lgan mimetype bitta ZIP-imzo tekshiruviga
+// yo'naltiriladi. Xavfsiz: har route o'z multer-filter'i orqali oldindan
+// cheklaydi, shuning uchun bu yozuvlar faqat APK yuklash yo'lida ishlaydi.
+const ZIP_SIGNATURE = (b: Buffer): boolean =>
+  b.length >= 4 && b[0] === 0x50 && b[1] === 0x4b && [0x03, 0x05, 0x07].includes(b[2]);
+
+for (const mime of ['application/vnd.android.package-archive', 'application/octet-stream', 'application/zip', 'application/x-zip-compressed']) {
+  SIGNATURE_CHECKS[mime] = ZIP_SIGNATURE;
+}
+
 export async function verifyFileSignature(filePath: string, mimeType: string): Promise<boolean> {
   const check = SIGNATURE_CHECKS[mimeType];
   if (!check) return false;

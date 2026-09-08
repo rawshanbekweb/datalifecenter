@@ -104,7 +104,8 @@
     "mentorCabinetFull": "Mentor kabineti",
     "team": "Jamoa",
     "teamCabinet": "Jamoa",
-    "teamCabinetFull": "Jamoa kabineti"
+    "teamCabinetFull": "Jamoa kabineti",
+    "games": "O'yinlar"
   },
   "footer": {
     "description": "DATA LIFE IT Center — 2019-yildan beri dasturiy ta'minot ishlab chiqamiz va IT yo'nalishlari bo'yicha o'qitamiz.",
@@ -396,6 +397,18 @@
       "notFound": "Xodim topilmadi",
       "notFoundSub": "Bu manzilda jamoa a'zosi yo'q — profil o'chirilgan yoki hali nashr qilinmagan bo'lishi mumkin.",
       "loadError": "Ma'lumotni yuklab bo'lmadi"
+    },
+    "games": {
+      "pill": "Game Dev",
+      "title": "Bizning",
+      "accent": "o'yinlarimiz",
+      "sub": "DATA LIFE ishlab chiqargan o'yinlarni bepul yuklab oling",
+      "empty": "Hozircha o'yinlar qo'shilmagan.",
+      "loadError": "O'yinlarni yuklab bo'lmadi. Backend ishga tushirilganini tekshiring.",
+      "downloadBtn": "Yuklab olish",
+      "version": "Versiya",
+      "featuredTag": "Tavsiya etilgan",
+      "downloads": "{{n}} marta yuklab olindi"
     }
   },
   "comingSoon": {
@@ -453,7 +466,8 @@
     "timeout": "Yuklash vaqti tugadi. Qayta urinib ko’ring.",
     "serverWaking": "Server uyg'onmoqda, qayta urinilmoqda...",
     "tooLarge": "Fayl hajmi {{max}} MB dan oshmasligi kerak",
-    "ephemeralWarning": "Bulut xotira sozlanmagan: yuklangan fayl vaqtinchalik diskda qoladi va keyingi deployda yo'qoladi. Administrator SUPABASE_* (yoki CLOUDINARY_*) sozlamalarini kiritishi kerak."
+    "ephemeralWarning": "Bulut xotira sozlanmagan: yuklangan fayl vaqtinchalik diskda qoladi va keyingi deployda yo'qoladi. Administrator SUPABASE_* (yoki CLOUDINARY_*) sozlamalarini kiritishi kerak.",
+    "apkPlaceholder": "https://... yoki APK fayl yuklang"
   },
   "imageFocus": {
     "title": "Rasm fokusi",
@@ -851,7 +865,8 @@
       "team": "Jamoa",
       "profile": "Profil",
       "courseGroups": "O'quv guruhlari",
-      "debtors": "Qarzdorlar"
+      "debtors": "Qarzdorlar",
+      "games": "O'yinlar"
     },
     "navGroups": {
       "learning": "Taʼlim",
@@ -1389,6 +1404,18 @@
       "totalDebt": "Jami qarz",
       "count": "{{n}} ta o'quvchi",
       "empty": "Qarzdor yo'q — barcha to'lovlar yopilgan."
+    },
+    "games": {
+      "title": "O'yinlar",
+      "sub": "Saytdan yuklab olinadigan o'yinlarni boshqarish",
+      "newBtn": "Yangi o'yin",
+      "fVersion": "Versiya *",
+      "fLogo": "Logotip *",
+      "fApk": "APK fayl *",
+      "featuredCheck": "Tavsiya etilgan",
+      "publishedCheck": "Saytda ko'rsatilsin",
+      "empty": "O'yinlar topilmadi.",
+      "confirmDelete": "O'yinni o'chirishni tasdiqlaysizmi?"
     }
   },
   "engagement": {
@@ -1497,6 +1524,10 @@
     "team": {
       "title": "Jamoa",
       "description": "DATA LIFE jamoasi — dasturchilar, dizaynerlar, ma'lumot muhandislari va mentorlar bilan tanishing."
+    },
+    "games": {
+      "title": "O'yinlar",
+      "description": "DATA LIFE ishlab chiqargan o'yinlar va ularni yuklab olish."
     }
   },
   "team": {

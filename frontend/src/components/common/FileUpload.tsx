@@ -16,7 +16,7 @@ function checkCloudStorage(): Promise<boolean> {
 interface FileUploadProps {
   value: string;
   onChange: (url: string) => void;
-  kind: 'image' | 'video';
+  kind: 'image' | 'video' | 'apk';
   label?: string;
   required?: boolean;
   placeholder?: string;
@@ -25,6 +25,9 @@ interface FileUploadProps {
 const ACCEPT: Record<FileUploadProps['kind'], string> = {
   image: 'image/jpeg,image/png,image/webp,image/gif',
   video: 'video/mp4,video/webm',
+  // Kengaytma + mimetype birga: Windows kabi OS'larda .apk ko'pincha mime
+  // ro'yxatidan o'tmagan, faqat kengaytma bo'yicha filtrlash ishonchli qoladi
+  apk: '.apk,application/vnd.android.package-archive',
 };
 
 // URL kiritish + kompyuterdan yuklash birlashtirilgan maydon.
@@ -75,7 +78,7 @@ export default function FileUpload({ value, onChange, kind, label, required, pla
         )}
         <input className="inp" value={value} required={required} disabled={uploading}
           onChange={(e) => { onChange(e.target.value); setDone(false); }}
-          placeholder={placeholder || (kind === 'image' ? t('upload.imagePlaceholder') : t('upload.videoPlaceholder'))}
+          placeholder={placeholder || (kind === 'image' ? t('upload.imagePlaceholder') : kind === 'video' ? t('upload.videoPlaceholder') : t('upload.apkPlaceholder'))}
           style={{ flex:1, minWidth:0 }} />
         <button type="button" className="btn-outline" disabled={uploading}
           onClick={() => inputRef.current?.click()}

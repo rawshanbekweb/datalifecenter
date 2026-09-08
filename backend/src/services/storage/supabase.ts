@@ -6,10 +6,12 @@ import { env } from '../../config/env';
 // bizga uchta amal kerak (yuklash, imzolash, o'chirish) va ular oddiy REST
 // so'rovlari — qo'shimcha bog'liqlik olib kelishga arzimaydi.
 //
-// Ikki bucket ishlatiladi:
+// Uchta bucket ishlatiladi:
 //   images — OCHIQ (public). Sayt rasmlari to'g'ridan-to'g'ri shu URL'dan yuklanadi.
 //   videos — YOPIQ (private). Xom URL ishlamaydi, faqat vaqtinchalik imzoli havola
 //            ochadi — bu Cloudinary'dagi `type: authenticated` bilan bir xil model.
+//   apks   — OCHIQ (public), xuddi images kabi. O'yin fayli erkin yuklab olinadi,
+//            enrollment kabi tekshiruv shart emas.
 //
 // ESLATMA: to'lov cheklari ham `images` bucketiga tushadi, ya'ni URL'ni bilgan
 // odam ochib ko'ra oladi. Bu Cloudinary'dagi hozirgi xatti-harakat bilan AYNAN
@@ -25,6 +27,7 @@ export const supabaseEnabled = Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_
 export const BUCKETS = {
   images: env.SUPABASE_BUCKET_IMAGES,
   videos: env.SUPABASE_BUCKET_VIDEOS,
+  apks: env.SUPABASE_BUCKET_APKS,
 } as const;
 
 type Kind = keyof typeof BUCKETS;
@@ -47,7 +50,7 @@ async function ensureBucket(kind: Kind): Promise<void> {
     body: JSON.stringify({
       id: BUCKETS[kind],
       name: BUCKETS[kind],
-      public: kind === 'images',
+      public: kind === 'images' || kind === 'apks',
     }),
   });
   // 409 = allaqachon mavjud (poygada boshqa so'rov yaratib ulgurgan) — bu xato emas
@@ -127,7 +130,7 @@ export async function upload(
 
   // Ochiq bucket — doimiy public URL; yopiq bucket — imzosiz kanonik URL
   // (u holicha ochilmaydi, signUrls() orqali vaqtinchalik havolaga aylanadi).
-  return kind === 'images'
+  return kind === 'images' || kind === 'apks'
     ? `${API}/object/public/${BUCKETS[kind]}/${encodePath(path)}`
     : `${API}/object/${BUCKETS[kind]}/${encodePath(path)}`;
 }

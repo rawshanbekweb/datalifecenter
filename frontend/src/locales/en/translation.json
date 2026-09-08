@@ -104,7 +104,8 @@
     "mentorCabinetFull": "Mentor dashboard",
     "team": "Team",
     "teamCabinet": "Team",
-    "teamCabinetFull": "Team cabinet"
+    "teamCabinetFull": "Team cabinet",
+    "games": "Games"
   },
   "footer": {
     "description": "DATA LIFE IT Center — building software and teaching IT since 2019.",
@@ -396,6 +397,18 @@
       "notFound": "Team member not found",
       "notFoundSub": "There is no team member at this address — the profile may have been removed or is not published yet.",
       "loadError": "Could not load the profile"
+    },
+    "games": {
+      "pill": "Game Dev",
+      "title": "Our",
+      "accent": "Games",
+      "sub": "Download games built by DATA LIFE, free",
+      "empty": "No games added yet.",
+      "loadError": "Failed to load games. Check that the backend is running.",
+      "downloadBtn": "Download",
+      "version": "Version",
+      "featuredTag": "Featured",
+      "downloads": "Downloaded {{n}} times"
     }
   },
   "comingSoon": {
@@ -453,7 +466,8 @@
     "timeout": "The upload timed out. Please try again.",
     "serverWaking": "The server is waking up, retrying...",
     "tooLarge": "The file must not exceed {{max}} MB",
-    "ephemeralWarning": "Cloud storage is not configured: the file stays on a temporary disk and will be lost on the next deploy. An administrator needs to set the SUPABASE_* (or CLOUDINARY_*) variables."
+    "ephemeralWarning": "Cloud storage is not configured: the file stays on a temporary disk and will be lost on the next deploy. An administrator needs to set the SUPABASE_* (or CLOUDINARY_*) variables.",
+    "apkPlaceholder": "https://... or upload an APK file"
   },
   "imageFocus": {
     "title": "Image focus",
@@ -851,7 +865,8 @@
       "team": "Team",
       "profile": "Profile",
       "courseGroups": "Study groups",
-      "debtors": "Debtors"
+      "debtors": "Debtors",
+      "games": "Games"
     },
     "navGroups": {
       "learning": "Learning",
@@ -1389,6 +1404,18 @@
       "totalDebt": "Total debt",
       "count": "{{n}} students",
       "empty": "No debtors — all payments are settled."
+    },
+    "games": {
+      "title": "Games",
+      "sub": "Manage downloadable games shown on the site",
+      "newBtn": "New game",
+      "fVersion": "Version *",
+      "fLogo": "Logo *",
+      "fApk": "APK file *",
+      "featuredCheck": "Featured",
+      "publishedCheck": "Show on site",
+      "empty": "No games found.",
+      "confirmDelete": "Delete this game?"
     }
   },
   "engagement": {
@@ -1497,6 +1524,10 @@
     "team": {
       "title": "Team",
       "description": "The DATA LIFE team — engineers, designers, data specialists and mentors."
+    },
+    "games": {
+      "title": "Games",
+      "description": "Games built by DATA LIFE, free to download."
     }
   },
   "team": {

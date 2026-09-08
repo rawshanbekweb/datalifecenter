@@ -113,6 +113,11 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Júdá kóp urınıw. 15 minuttan keyin qayta urınıp kóriń.',
     en: 'Too many attempts. Please try again in 15 minutes.',
   },
+  "Juda ko'p muvaffaqiyatsiz urinish. 15 daqiqadan keyin qayta urinib ko'ring.": {
+    ru: 'Слишком много неудачных попыток. Повторите через 15 минут.',
+    kaa: 'Júdá kóp sátsiz urınıw. 15 minuttan keyin qayta urınıp kóriń.',
+    en: 'Too many failed attempts. Please try again in 15 minutes.',
+  },
   "Juda ko'p xabar yuborildi. Birozdan keyin qayta urinib ko'ring.": {
     ru: 'Отправлено слишком много сообщений. Повторите попытку чуть позже.',
     kaa: 'Júdá kóp xabar jiberildi. Azǵana waqıttan keyin qayta urınıp kóriń.',
@@ -686,6 +691,11 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Joybar tabılmadı',
     en: 'Project not found',
   },
+  "O'yin topilmadi": {
+    ru: 'Игра не найдена',
+    kaa: 'Oyın tabılmadı',
+    en: 'Game not found',
+  },
   'Tanlangan loyihalardan biri topilmadi': {
     ru: 'Один из выбранных проектов не найден',
     kaa: 'Saylanǵan joybarlardıń biri tabılmadı',
@@ -769,10 +779,10 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Telefon nomeri nadurıs',
     en: 'Invalid phone number',
   },
-  "Parol kamida 6 ta belgidan iborat bo'lishi kerak": {
-    ru: 'Пароль должен содержать не менее 6 символов',
-    kaa: 'Parol keminde 6 belgiden ibarat bolıwı kerek',
-    en: 'The password must be at least 6 characters long',
+  "Parol kamida 8 ta belgidan iborat bo'lishi kerak": {
+    ru: 'Пароль должен содержать не менее 8 символов',
+    kaa: 'Parol keminde 8 belgiden ibarat bolıwı kerek',
+    en: 'The password must be at least 8 characters long',
   },
   'Parol kerak': {
     ru: 'Введите пароль',
@@ -940,11 +950,6 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     ru: 'Текст заявки должен содержать не менее 5 символов',
     kaa: 'Soraw teksti keminde 5 belgiden ibarat bolıwı kerek',
     en: 'The request text must be at least 5 characters long',
-  },
-  "Yangi parol kamida 6 ta belgidan iborat bo'lishi kerak": {
-    ru: 'Новый пароль должен содержать не менее 6 символов',
-    kaa: 'Jańa parol keminde 6 belgiden ibarat bolıwı kerek',
-    en: 'The new password must be at least 6 characters long',
   },
   "Javob bo'sh bo'lishi mumkin emas": {
     ru: 'Ответ не может быть пустым',
@@ -1119,6 +1124,16 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     ru: 'Укажите адрес скриншота',
     kaa: 'Skrinshot mánzili kerek',
     en: 'A screenshot URL is required',
+  },
+  'APK fayl manzili kerak': {
+    ru: 'Укажите адрес APK-файла',
+    kaa: 'APK fayl mánzili kerek',
+    en: 'An APK file URL is required',
+  },
+  'Versiya kerak': {
+    ru: 'Укажите версию',
+    kaa: 'Versiya kerek',
+    en: 'A version is required',
   },
   'Kamida bitta texnologiya kerak': {
     ru: 'Нужна хотя бы одна технология',

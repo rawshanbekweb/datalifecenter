@@ -4,15 +4,15 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 import { verifyFileSignature } from '../utils/fileSignature';
-import { IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '../config/uploads';
+import { APK_MAX_BYTES, IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '../config/uploads';
 import { cloudStorageEnabled, storageProvider, uploadToCloud } from '../services/storage.service';
 import { StorageLimitError } from '../services/storage/supabase';
 
-function publicUrl(req: Request, folder: 'images' | 'videos', filename: string): string {
+function publicUrl(req: Request, folder: 'images' | 'videos' | 'apks', filename: string): string {
   return `${req.protocol}://${req.get('host')}/uploads/${folder}/${filename}`;
 }
 
-function makeUploadHandler(folder: 'images' | 'videos') {
+function makeUploadHandler(folder: 'images' | 'videos' | 'apks') {
   return asyncHandler(async (req: Request, res: Response) => {
     const file = req.file;
     if (!file) {
@@ -60,6 +60,7 @@ function makeUploadHandler(folder: 'images' | 'videos') {
 
 export const uploadImageHandler = makeUploadHandler('images');
 export const uploadVideoHandler = makeUploadHandler('videos');
+export const uploadApkHandler = makeUploadHandler('apks');
 
 /**
  * Yuklash sozlamalari holati.
@@ -79,5 +80,6 @@ export const uploadConfigHandler = asyncHandler(async (_req: Request, res: Respo
     provider: storageProvider,
     imageMaxBytes: IMAGE_MAX_BYTES,
     videoMaxBytes: VIDEO_MAX_BYTES,
+    apkMaxBytes: APK_MAX_BYTES,
   });
 });

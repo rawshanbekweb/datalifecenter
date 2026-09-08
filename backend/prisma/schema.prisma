@@ -724,6 +724,30 @@ model Project {
   createdAt     DateTime @default(now())
 }
 
+// "Game Dev" bo'limi — kompaniya ishlab chiqargan, saytdan bevosita yuklab
+// olinadigan o'yinlar katalogi (birinchi yozuv: Dots & Boxes APK).
+//
+// `downloadsCount` — Project'dagi `views`/`likesCount` kabi oddiy denormallashgan
+// hisoblagich. Polimorf ContentLike/ContentView/EngagementTarget tizimiga ATAYIN
+// QO'SHILMAGAN: u yerga yangi tur qo'shish har funksiyada `switch` o'zgartirishni
+// talab qiladi — sof yuklab olish soni uchun bu ortiqcha murakkablik.
+model Game {
+  id             String   @id @default(cuid())
+  // Ko'p tilli matn: {uz: string, ru?: string, kaa?: string, en?: string}
+  title          Json
+  description    Json
+  logoUrl        String
+  apkUrl         String
+  version        String
+  apkSizeBytes   Int?
+  order          Int      @default(0)
+  featured       Boolean  @default(false)
+  published      Boolean  @default(true)
+  downloadsCount Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 // Kompaniya jamoasi — mentor bo'lmagan xodimlar (dasturchi, dizayner, PM, HR...) ham
 // shu yerda. Mentor modeli ataylab tegilmaydi: u faqat o'quv tomonini bildiradi,
 // jamoa a'zosi ixtiyoriy ravishda mentorProfile'ga bog'lanadi (mentorId).

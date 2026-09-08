@@ -3,7 +3,7 @@ import { createReadStream } from 'fs';
 import path from 'path';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { env } from '../config/env';
-import { IMAGES_DIR, VIDEOS_DIR } from '../config/uploads';
+import { APKS_DIR, IMAGES_DIR, VIDEOS_DIR } from '../config/uploads';
 import { signLocalVideoUrl } from '../utils/videoAccess';
 import * as supabase from './storage/supabase';
 
@@ -46,7 +46,7 @@ if (cloudinaryEnabled) {
 // (Render 512 MB) OOM bilan o'lardi.
 export async function uploadToCloud(
   filePath: string,
-  kind: 'images' | 'videos',
+  kind: 'images' | 'videos' | 'apks',
   contentType = 'application/octet-stream'
 ): Promise<{ url: string }> {
   if (storageProvider === 'supabase') {
@@ -62,15 +62,16 @@ export async function uploadToCloud(
 
   const options = {
     folder: `datalife/${kind}`,
-    resource_type: (kind === 'videos' ? 'video' : 'image') as 'video' | 'image',
+    // APK — Cloudinary'da rasm/video emas, xom fayl ("raw") sifatida saqlanadi.
+    resource_type: (kind === 'videos' ? 'video' : kind === 'apks' ? 'raw' : 'image') as 'video' | 'image' | 'raw',
     // Video "authenticated" turida yuklanadi — xom secure_url imzosiz ishlamaydi,
     // faqat signVideoUrl() bilan generatsiya qilingan vaqtinchalik havola ochadi.
-    // Rasm oldingidek public (type: 'upload') qoladi.
+    // Rasm va APK oldingidek public (type: 'upload') qoladi.
     ...(kind === 'videos' ? { type: 'authenticated' as const } : {}),
   };
 
   const result: UploadApiResponse =
-    kind === 'videos'
+    kind === 'videos' || kind === 'apks'
       ? await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_large(filePath, { ...options, chunk_size: 20 * 1024 * 1024 }, (err, res) =>
             err || !res ? reject(err ?? new Error('Cloudinary javob qaytarmadi')) : resolve(res)
@@ -87,14 +88,14 @@ export async function uploadToCloud(
 // "authenticated" turidagi video URL'lar /video/authenticated/... ko'rinishida keladi.
 function parseCloudinaryUrl(
   url: string
-): { publicId: string; resourceType: 'image' | 'video'; deliveryType: 'upload' | 'authenticated' } | null {
-  const match = /res\.cloudinary\.com\/[^/]+\/(image|video)\/(upload|authenticated)\/(?:s--[\w-]+--\/)?(?:v\d+\/)?(.+?)(?:\.\w+)?$/.exec(
+): { publicId: string; resourceType: 'image' | 'video' | 'raw'; deliveryType: 'upload' | 'authenticated' } | null {
+  const match = /res\.cloudinary\.com\/[^/]+\/(image|video|raw)\/(upload|authenticated)\/(?:s--[\w-]+--\/)?(?:v\d+\/)?(.+?)(?:\.\w+)?$/.exec(
     url
   );
   if (!match) return null;
   return {
     publicId: match[3],
-    resourceType: match[1] as 'image' | 'video',
+    resourceType: match[1] as 'image' | 'video' | 'raw',
     deliveryType: match[2] as 'upload' | 'authenticated',
   };
 }
@@ -198,9 +199,9 @@ export async function deleteUploadByUrl(url: string | null | undefined): Promise
     }
 
     // Lokal /uploads fayli — faqat basename ishlatiladi (path traversal'ga qarshi)
-    const local = /\/uploads\/(images|videos)\/([^/?#]+)/.exec(url);
+    const local = /\/uploads\/(images|videos|apks)\/([^/?#]+)/.exec(url);
     if (local) {
-      const dir = local[1] === 'images' ? IMAGES_DIR : VIDEOS_DIR;
+      const dir = local[1] === 'images' ? IMAGES_DIR : local[1] === 'videos' ? VIDEOS_DIR : APKS_DIR;
       await fs.unlink(path.join(dir, path.basename(local[2])));
     }
   } catch (err) {

@@ -31,12 +31,15 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   SUPABASE_BUCKET_IMAGES: z.string().default('datalife-images'),
   SUPABASE_BUCKET_VIDEOS: z.string().default('datalife-videos'),
+  SUPABASE_BUCKET_APKS: z.string().default('datalife-apks'),
 
   // Yuklash hajmi chegaralari (MB). DIQQAT: bulut xotirada O'ZINING chegarasi bor
   // va u ustun turadi — Supabase Free rejasida loyiha bo'yicha 50 MB. Undan
   // katta qilib qo'ysangiz fayl serverdan o'tadi-yu, Supabase rad etadi.
   IMAGE_MAX_MB: z.coerce.number().int().positive().default(15),
   VIDEO_MAX_MB: z.coerce.number().int().positive().default(500),
+  // O'yin APK fayllari (Game.apkUrl) uchun — rasm/video'dan mustaqil chegara
+  APK_MAX_MB: z.coerce.number().int().positive().default(200),
 
   // Sentry (ixtiyoriy) — production'da xatolarni kuzatish
   SENTRY_DSN: z.string().optional(),
