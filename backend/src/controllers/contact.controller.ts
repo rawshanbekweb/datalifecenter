@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as contactService from '../services/contact.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/ApiResponse';
+import { ApiError } from '../utils/ApiError';
 
 export const createContactMessageHandler = asyncHandler(async (req: Request, res: Response) => {
   const message = await contactService.createContactMessage(req.body);
@@ -20,6 +21,16 @@ export const listContactMessagesHandler = asyncHandler(async (req: Request, res:
 
 export const updateContactMessageStatusHandler = asyncHandler(async (req: Request, res: Response) => {
   const message = await contactService.updateContactMessageStatus(req.params.id as string, req.body.status);
+  sendSuccess(res, message);
+});
+
+export const replyToContactMessageHandler = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const message = await contactService.replyToContactMessage(
+    req.params.id as string,
+    req.body.reply,
+    req.user.userId,
+  );
   sendSuccess(res, message);
 });
 

@@ -56,6 +56,16 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Serverde qátelik júz berdi',
     en: 'A server error occurred',
   },
+  "Email yuborish sozlanmagan. BREVO_API_KEY ni serverga qo'shing": {
+    ru: 'Отправка email не настроена. Добавьте BREVO_API_KEY на сервере',
+    kaa: 'Email jiberiw sazlanbaǵan. Serverge BREVO_API_KEY qosıń',
+    en: 'Email delivery is not configured. Add BREVO_API_KEY to the server',
+  },
+  "Email yuborilmadi. Email xizmati sozlamalarini tekshirib, qayta urinib ko'ring": {
+    ru: 'Не удалось отправить email. Проверьте настройки почтового сервиса и повторите попытку',
+    kaa: 'Email jiberilmedi. Email xızmeti sazlawların tekserip, qayta urınıp kóriń',
+    en: 'The email could not be sent. Check the email service settings and try again',
+  },
   "Sessiya eskirgan. Qaytadan kiring.": {
     ru: 'Сессия устарела. Войдите заново.',
     kaa: 'Sessiya eskirgen. Qaytadan kiriń.',

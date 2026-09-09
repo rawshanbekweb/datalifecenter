@@ -935,7 +935,13 @@
       "allStatuses": "Все статусы",
       "emptyFiltered": "В этом статусе сообщений нет.",
       "empty": "Пока сообщений нет.",
-      "subjectLabel": "Тема: {{subject}}"
+      "subjectLabel": "Тема: {{subject}}",
+      "replyPlaceholder": "Напишите ответ для отправки по email...",
+      "sendReply": "Отправить ответ",
+      "sending": "Отправляется...",
+      "replySent": "Ответ успешно принят службой отправки email.",
+      "replyFailed": "Не удалось отправить ответ.",
+      "lastReply": "Последний ответ по email"
     },
     "reviews": {
       "title": "Отзывы о курсах",

@@ -935,7 +935,13 @@
       "allStatuses": "Barcha holatlar",
       "emptyFiltered": "Bu holatda xabarlar yo'q.",
       "empty": "Hozircha xabarlar yo'q.",
-      "subjectLabel": "Mavzu: {{subject}}"
+      "subjectLabel": "Mavzu: {{subject}}",
+      "replyPlaceholder": "Email orqali yuboriladigan javobni yozing...",
+      "sendReply": "Javob yuborish",
+      "sending": "Yuborilmoqda...",
+      "replySent": "Javob email xizmatiga muvaffaqiyatli topshirildi.",
+      "replyFailed": "Javobni yuborib bo‘lmadi.",
+      "lastReply": "Oxirgi email javobi"
     },
     "reviews": {
       "title": "Kurs sharhlari",

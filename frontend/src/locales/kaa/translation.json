@@ -935,7 +935,13 @@
       "allStatuses": "Barlıq jaǵdaylar",
       "emptyFiltered": "Bul jaǵdayda xabarlar joq.",
       "empty": "Házirshe xabarlar joq.",
-      "subjectLabel": "Tema: {{subject}}"
+      "subjectLabel": "Tema: {{subject}}",
+      "replyPlaceholder": "Email arqalı jiberiletuǵın juwaptı jazıń...",
+      "sendReply": "Juwap jiberiw",
+      "sending": "Jiberilmekte...",
+      "replySent": "Juwap email xızmetine tabıslı jiberildi.",
+      "replyFailed": "Juwaptı jiberip bolmadı.",
+      "lastReply": "Sońǵı email juwabı"
     },
     "reviews": {
       "title": "Kurs pikirleri",

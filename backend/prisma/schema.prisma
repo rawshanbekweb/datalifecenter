@@ -1142,6 +1142,10 @@ model ContactMessage {
   phone     String?
   subject   String?
   message   String
+  // Admin yuborgan oxirgi email javobi. Murojaat oddiy kontakt formasidan
+  // kelgani uchun foydalanuvchining ichki chat hisobi bo'lishi shart emas.
+  reply     String?
+  repliedAt DateTime?
   status    MessageStatus @default(NEW)
   createdAt DateTime      @default(now())
 }

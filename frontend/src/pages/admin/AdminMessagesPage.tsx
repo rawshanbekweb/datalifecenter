@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Mail, Phone, Trash2 } from 'lucide-react';
+import { CornerDownRight, Mail, Phone, Send, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   deleteContactMessage,
   deleteContactMessages,
   listContactMessages,
+  replyToContactMessage,
   updateContactMessageStatus,
 } from '../../api/contact';
 import { formatDateTime } from '../../utils/format';
@@ -24,6 +25,8 @@ interface ContactMessage {
   phone?: string;
   subject?: string;
   message: string;
+  reply?: string | null;
+  repliedAt?: string | null;
   status: MessageStatus;
   createdAt: string;
 }
@@ -59,6 +62,8 @@ export default function AdminMessagesPage(): React.ReactElement {
   const [total, setTotal]       = useState<number>(0);
   const [filter, setFilter]     = useState<string>('');
   const [busy, setBusy]         = useState<boolean>(false);
+  const [replyingId, setReplyingId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const confirm = useConfirm();
   const toast = useToast();
@@ -129,6 +134,25 @@ export default function AdminMessagesPage(): React.ReactElement {
     }
   };
 
+  const sendReply = async (id: string): Promise<void> => {
+    const reply = (drafts[id] || '').trim();
+    if (!reply || replyingId) return;
+    setReplyingId(id);
+    try {
+      const updated = await replyToContactMessage(id, reply) as ContactMessage;
+      setMessages((current) => current.map((message) => message.id === id ? updated : message));
+      setDrafts((current) => ({ ...current, [id]: '' }));
+      toast.success(t('admin.messages.replySent'));
+      // NEW/READ filtri ochiq bo'lsa REPLIED bo'lgan yozuv ro'yxatdan chiqishi
+      // kerak; serverdan qayta olish pagination sonlarini ham to'g'rilaydi.
+      if (filter && filter !== 'REPLIED') await load();
+    } catch (err: unknown) {
+      toast.error((err as Error).message || t('admin.messages.replyFailed'));
+    } finally {
+      setReplyingId(null);
+    }
+  };
+
   const header = (
     <div>
       <AdminPageHeader title={t('admin.messages.title')} sub={total ? t('admin.messages.subCount', { n: total }) : t('admin.messages.sub')} />
@@ -179,8 +203,8 @@ export default function AdminMessagesPage(): React.ReactElement {
                 <div>
                   <p style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{m.name}</p>
                   <div style={{ display:'flex', gap:14, flexWrap:'wrap', marginTop:4 }}>
-                    <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Mail size={12}/>{m.email}</span>
-                    {m.phone && <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#64748b' }}><Phone size={12}/>{m.phone}</span>}
+                    <a href={`mailto:${m.email}`} style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#0284c7', textDecoration:'none' }}><Mail size={12}/>{m.email}</a>
+                    {m.phone && <a href={`tel:${m.phone}`} style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'#0284c7', textDecoration:'none' }}><Phone size={12}/>{m.phone}</a>}
                   </div>
                 </div>
               </div>
@@ -198,6 +222,28 @@ export default function AdminMessagesPage(): React.ReactElement {
             </div>
             {m.subject && <p style={{ fontSize:12, color:'#94a3b8', marginBottom:6 }}>{t('admin.messages.subjectLabel', { subject: m.subject })}</p>}
             <p style={{ fontSize:13, color:'#334155', lineHeight:1.7 }}>{m.message}</p>
+            {m.reply && (
+              <div style={{ display:'flex', gap:8, marginTop:12, padding:'10px 12px', borderRadius:10, background:'#f0fdf4', border:'1px solid #bbf7d0' }}>
+                <CornerDownRight size={14} style={{ color:'#16a34a', flexShrink:0, marginTop:2 }}/>
+                <div>
+                  <p style={{ fontSize:11.5, fontWeight:800, color:'#16a34a', marginBottom:3 }}>{t('admin.messages.lastReply')}</p>
+                  <p style={{ fontSize:13, color:'#334155', lineHeight:1.7, whiteSpace:'pre-wrap' }}>{m.reply}</p>
+                  {m.repliedAt && <p style={{ fontSize:11, color:'#94a3b8', marginTop:5 }}>{formatDateTime(m.repliedAt)}</p>}
+                </div>
+              </div>
+            )}
+            <div style={{ display:'flex', gap:8, marginTop:12, alignItems:'flex-end', flexWrap:'wrap' }}>
+              <textarea className="inp" rows={3} value={drafts[m.id] || ''}
+                placeholder={t('admin.messages.replyPlaceholder')}
+                onChange={(e) => setDrafts((current) => ({ ...current, [m.id]: e.target.value }))}
+                style={{ flex:'1 1 320px', minHeight:76, resize:'vertical', fontSize:13 }} />
+              <button className="btn-primary" onClick={() => void sendReply(m.id)}
+                disabled={!(drafts[m.id] || '').trim() || replyingId !== null}
+                style={{ fontSize:12.5, padding:'9px 16px', flexShrink:0,
+                  opacity: !(drafts[m.id] || '').trim() || replyingId !== null ? 0.6 : 1 }}>
+                <Send size={13}/> {replyingId === m.id ? t('admin.messages.sending') : t('admin.messages.sendReply')}
+              </button>
+            </div>
             <p style={{ fontSize:11, color:'#cbd5e1', marginTop:10 }}>{formatDateTime(m.createdAt)}</p>
           </div>
         );

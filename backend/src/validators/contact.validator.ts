@@ -15,6 +15,10 @@ export const updateContactMessageStatusSchema = z.object({
   status: z.enum(['NEW', 'READ', 'REPLIED', 'ARCHIVED']),
 });
 
+export const replyToContactMessageSchema = z.object({
+  reply: z.string().trim().min(1, 'Javob bo‘sh bo‘lmasligi kerak').max(4000, 'Javob juda uzun'),
+});
+
 export const listContactMessagesQuerySchema = z.object({
   status: z.enum(['NEW', 'READ', 'REPLIED', 'ARCHIVED']).optional(),
   page: z.coerce.number().int().min(1).default(1),

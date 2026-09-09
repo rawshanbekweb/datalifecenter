@@ -935,7 +935,13 @@
       "allStatuses": "All statuses",
       "emptyFiltered": "No messages in this status.",
       "empty": "No messages yet.",
-      "subjectLabel": "Subject: {{subject}}"
+      "subjectLabel": "Subject: {{subject}}",
+      "replyPlaceholder": "Write an email reply...",
+      "sendReply": "Send reply",
+      "sending": "Sending...",
+      "replySent": "Reply accepted for email delivery.",
+      "replyFailed": "The reply could not be sent.",
+      "lastReply": "Last email reply"
     },
     "reviews": {
       "title": "Course reviews",

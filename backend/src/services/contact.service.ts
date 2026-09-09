@@ -1,6 +1,7 @@
 import { MessageStatus } from '@prisma/client';
 import { prisma } from '../config/prisma';
 import { ApiError } from '../utils/ApiError';
+import { sendContactReplyEmail } from './email.service';
 
 interface ContactInput {
   name: string;
@@ -44,6 +45,42 @@ export async function updateContactMessageStatus(id: string, status: MessageStat
     throw ApiError.notFound('Xabar topilmadi');
   }
   return prisma.contactMessage.update({ where: { id }, data: { status } });
+}
+
+export async function replyToContactMessage(id: string, reply: string, adminUserId: string) {
+  // Qabul qiluvchi manzil faqat bazadagi murojaatdan olinadi. Endpointga
+  // ixtiyoriy email qabul qilinsa, admin sessiyasi ommaviy xat yuborish
+  // vositasiga aylanib qolardi.
+  const [message, admin] = await Promise.all([
+    prisma.contactMessage.findUnique({ where: { id } }),
+    prisma.user.findUnique({
+      where: { id: adminUserId },
+      select: { name: true, email: true },
+    }),
+  ]);
+  if (!message) {
+    throw ApiError.notFound('Xabar topilmadi');
+  }
+  if (!admin) {
+    throw ApiError.unauthorized();
+  }
+
+  const cleanReply = reply.trim();
+  await sendContactReplyEmail({
+    to: message.email,
+    recipientName: message.name,
+    originalSubject: message.subject,
+    reply: cleanReply,
+    // Mijoz emaildagi Reply tugmasini bossa, javobi aynan javob bergan
+    // administratorga boradi; FROM esa Brevo'da tasdiqlangan domen bo'lib qoladi.
+    replyTo: { email: admin.email, name: admin.name },
+  });
+
+  // Faqat Brevo xatni qabul qilgandan keyin "javob berilgan" deb belgilanadi.
+  return prisma.contactMessage.update({
+    where: { id },
+    data: { reply: cleanReply, repliedAt: new Date(), status: 'REPLIED' },
+  });
 }
 
 export async function deleteContactMessage(id: string): Promise<void> {

@@ -1,4 +1,5 @@
 import { env } from '../config/env';
+import { ApiError } from '../utils/ApiError';
 
 // Brevo API kaliti sozlanmagan bo'lsa email yuborilmaydi — asosiy oqimlar yiqilmasligi kerak.
 // Development'da xat mazmuni konsolga chiqariladi (masalan, parol tiklash havolasi).
@@ -35,34 +36,37 @@ interface MailInput {
   subject: string;
   text: string;
   html: string;
+  replyTo?: { email: string; name: string };
 }
 
 async function deliver(input: MailInput): Promise<void> {
-  try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'api-key': env.BREVO_API_KEY as string,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      // Brevo'ga ulanib bo'lmasa (tarmoq bloklangan/sekin) 8 soniyada uziladi —
-      // undici'ning 10s connect-timeout'ini kutmasdan aniq xato logi qoldiriladi
-      signal: AbortSignal.timeout(8000),
-      body: JSON.stringify({
-        sender: { name: FROM_NAME, email: FROM_EMAIL },
-        to: [{ email: input.to }],
-        subject: input.subject,
-        textContent: input.text,
-        htmlContent: input.html,
-      }),
-    });
-    if (!res.ok) {
-      console.error(`Email yuborilmadi (${input.to} — ${input.subject}):`, res.status, await res.text().catch(() => ''));
-    }
-  } catch (err) {
-    console.error(`Email yuborilmadi (${input.to} — ${input.subject}):`, err instanceof Error ? err.message : err);
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': env.BREVO_API_KEY as string,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    // Brevo'ga ulanib bo'lmasa (tarmoq bloklangan/sekin) 8 soniyada uziladi —
+    // undici'ning 10s connect-timeout'ini kutmasdan aniq xato logi qoldiriladi
+    signal: AbortSignal.timeout(8000),
+    body: JSON.stringify({
+      sender: { name: FROM_NAME, email: FROM_EMAIL },
+      to: [{ email: input.to }],
+      subject: input.subject,
+      textContent: input.text,
+      htmlContent: input.html,
+      ...(input.replyTo ? { replyTo: input.replyTo } : {}),
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Brevo ${res.status}${detail ? `: ${detail}` : ''}`);
   }
+}
+
+function logDeliveryFailure(input: MailInput, err: unknown): void {
+  console.error(`Email yuborilmadi (${input.to} — ${input.subject}):`, err instanceof Error ? err.message : err);
 }
 
 // Fire-and-forget: email yuborish HTTP so'rovni hech qachon bloklamaydi va
@@ -75,7 +79,7 @@ async function sendMail(input: MailInput): Promise<void> {
     }
     return;
   }
-  void deliver(input);
+  void deliver(input).catch((err: unknown) => logDeliveryFailure(input, err));
 }
 
 function layout(title: string, bodyHtml: string): string {
@@ -91,6 +95,70 @@ function layout(title: string, bodyHtml: string): string {
     </div>
   </div>
 </div>`;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+export interface ContactReplyEmailInput {
+  to: string;
+  recipientName: string;
+  originalSubject?: string | null;
+  reply: string;
+  replyTo: { email: string; name: string };
+}
+
+/**
+ * Kontakt formasiga admin javobi.
+ *
+ * Avtomatik xatlardan farqli ravishda bu funksiya Brevo javobini KUTADI:
+ * panelda "yuborildi" deyishdan oldin provayder xatni qabul qilgan bo'lishi
+ * kerak. Yetkazish xatosi bo'lsa murojaat REPLIED holatiga o'tkazilmaydi.
+ */
+export async function sendContactReplyEmail(input: ContactReplyEmailInput): Promise<void> {
+  if (!emailEnabled) {
+    throw new ApiError(
+      503,
+      "Email yuborish sozlanmagan. BREVO_API_KEY ni serverga qo'shing",
+      'EMAIL_NOT_CONFIGURED',
+    );
+  }
+
+  const cleanSubject = (input.originalSubject || 'DATA LIFE murojaati').replace(/[\r\n]+/g, ' ').trim();
+  const mail: MailInput = {
+    to: input.to,
+    subject: `Re: ${cleanSubject}`,
+    replyTo: input.replyTo,
+    text: `Salom, ${input.recipientName}!\n\n${input.reply}\n\nHurmat bilan, DATA LIFE jamoasi`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#0f172a">
+  <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
+    <div style="background:#0ea5e9;padding:16px 24px"><span style="color:#fff;font-size:18px;font-weight:bold">DATA LIFE</span></div>
+    <div style="padding:24px">
+      <p style="font-size:14px;color:#475569">Salom, <b>${escapeHtml(input.recipientName)}</b>!</p>
+      <p style="font-size:14px;color:#0f172a;line-height:1.7;white-space:pre-wrap">${escapeHtml(input.reply)}</p>
+      <p style="font-size:13px;color:#64748b;margin-top:24px">Hurmat bilan, DATA LIFE jamoasi</p>
+      <p style="font-size:12px;color:#94a3b8;margin-top:20px">Javob yozish uchun ushbu emailga to'g'ridan-to'g'ri javob qaytarishingiz mumkin.</p>
+    </div>
+  </div>
+</div>`,
+  };
+
+  try {
+    await deliver(mail);
+  } catch (err) {
+    logDeliveryFailure(mail, err);
+    throw new ApiError(
+      502,
+      "Email yuborilmadi. Email xizmati sozlamalarini tekshirib, qayta urinib ko'ring",
+      'EMAIL_DELIVERY_FAILED',
+    );
+  }
 }
 
 export async function sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<void> {

@@ -30,6 +30,13 @@ export function updateContactMessageStatus(id: string | number, status: string):
   });
 }
 
+export function replyToContactMessage(id: string, reply: string): Promise<any> {
+  return apiFetch(`/contact/${id}/reply`, {
+    method: 'POST',
+    body: JSON.stringify({ reply }),
+  });
+}
+
 export function deleteContactMessage(id: string): Promise<any> {
   return apiFetch(`/contact/${id}`, { method: 'DELETE' });
 }
