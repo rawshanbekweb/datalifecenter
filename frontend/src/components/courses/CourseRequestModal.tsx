@@ -72,7 +72,7 @@ export default function CourseRequestModal({
         format,
         name: name.trim(),
         phone: phone.trim(),
-        email: email.trim() || undefined,
+        email: email.trim(),
         note: note.trim() || undefined,
       });
       setStatus('done');
@@ -185,7 +185,7 @@ export default function CourseRequestModal({
 
             <div>
               <label style={{ fontSize:12, color:'#475569', fontWeight:600, display:'block', marginBottom:5 }}>{t('courseRequest.emailLabel')}</label>
-              <input className="inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} />
+              <input className="inp" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={200} />
             </div>
 
             <div>

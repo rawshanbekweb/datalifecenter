@@ -1326,7 +1326,8 @@
         "ENROLLED": "Yozildi",
         "REJECTED": "Rad etildi"
       },
-      "noGroup": "Guruhsiz"
+      "noGroup": "Guruhsiz",
+      "exportCsv": "Excelga yuklab olish"
     },
     "team": {
       "title": "Jamoa",
@@ -1473,7 +1474,7 @@
     "formatLabel": "Qaysi shaklda o'qimoqchisiz?",
     "nameLabel": "Ismingiz",
     "phoneLabel": "Telefon raqamingiz",
-    "emailLabel": "Email (ixtiyoriy)",
+    "emailLabel": "Email",
     "noteLabel": "Savol yoki izoh (ixtiyoriy)",
     "notePlaceholder": "Masalan: qulay vaqt, guruh jadvali yoki to'lov haqida savol",
     "submit": "So'rov yuborish",

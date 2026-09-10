@@ -784,6 +784,11 @@ export const ERROR_MESSAGES: Record<string, ErrorTranslation> = {
     kaa: 'Email nadurıs',
     en: 'Invalid email',
   },
+  'Email kiritilishi shart': {
+    ru: 'Email обязателен',
+    kaa: 'Email kirsetiliwi shárt',
+    en: 'Email is required',
+  },
   "Telefon raqami noto'g'ri": {
     ru: 'Неверный номер телефона',
     kaa: 'Telefon nomeri nadurıs',

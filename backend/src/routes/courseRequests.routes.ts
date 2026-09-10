@@ -6,6 +6,7 @@ import {
   deleteCourseRequestHandler,
   deleteCourseRequestsHandler,
   enrollFromRequestHandler,
+  exportCourseRequestsHandler,
   listCourseRequestsAdminHandler,
   listMyCourseRequestsHandler,
   updateCourseRequestHandler,
@@ -18,6 +19,7 @@ import { validateBody, validateQuery } from '../middleware/validateRequest';
 import {
   createCourseRequestSchema,
   enrollFromRequestSchema,
+  exportCourseRequestsQuerySchema,
   listCourseRequestsQuerySchema,
   updateCourseRequestSchema,
 } from '../validators/courseRequests.validator';
@@ -48,6 +50,7 @@ const requestLimiter = rateLimit({
 router.post('/', requestLimiter, authenticate, validateBody(createCourseRequestSchema), createCourseRequestHandler);
 router.get('/mine', authenticate, listMyCourseRequestsHandler);
 router.get('/', authenticate, authorize('ADMIN'), validateQuery(listCourseRequestsQuerySchema), listCourseRequestsAdminHandler);
+router.get('/export', authenticate, authorize('ADMIN'), validateQuery(exportCourseRequestsQuerySchema), exportCourseRequestsHandler);
 router.patch('/:id', authenticate, authorize('ADMIN'), validateBody(updateCourseRequestSchema), updateCourseRequestHandler);
 // So'rovni tasdiqlab o'quvchini kursga qo'shish (joy tekshiruvi bilan).
 // Tanada guruh berilishi mumkin — o'shanda o'quvchi darrov jadvalga tushadi.

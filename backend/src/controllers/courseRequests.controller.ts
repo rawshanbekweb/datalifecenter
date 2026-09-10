@@ -48,6 +48,19 @@ export const listCourseRequestsAdminHandler = asyncHandler(async (req: Request, 
   sendSuccess(res, result);
 });
 
+export const exportCourseRequestsHandler = asyncHandler(async (req: Request, res: Response) => {
+  const filters = req.validatedQuery as {
+    status?: 'NEW' | 'CONTACTED' | 'ENROLLED' | 'REJECTED';
+    format?: 'ONLINE' | 'OFFLINE';
+    search?: string;
+  };
+  const csv = await courseRequestsService.exportCourseRequestsCsv(filters);
+  const filename = `kurs-sorovlari-${new Date().toISOString().slice(0, 10)}.csv`;
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(csv);
+});
+
 export const updateCourseRequestHandler = asyncHandler(async (req: Request, res: Response) => {
   const request = await courseRequestsService.updateCourseRequestAdmin(
     req.params.id as string,

@@ -70,7 +70,7 @@ describe("Kurs so'rovi", () => {
     const agent = await loginAgent('tasdiqlanmagan@req.uz');
     const res = await agent
       .post('/api/course-requests')
-      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Tasdiqlanmagan', phone: '+998901234567' })
+      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Tasdiqlanmagan', phone: '+998901234567', email: 'tasdiqlanmagan@req.uz' })
       .expect(403);
     expect(res.body.error.code).toBe('EMAIL_NOT_VERIFIED');
   });
@@ -78,7 +78,7 @@ describe("Kurs so'rovi", () => {
   it("kurs formatiga mos kelmaydigan so'rov rad etiladi", async () => {
     const res = await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: offlineCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567' })
+      .send({ courseId: offlineCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567', email: 'student@req.uz' })
       .expect(400);
     expect(res.body.error.code).toBe('FORMAT_NOT_AVAILABLE');
   });
@@ -86,7 +86,7 @@ describe("Kurs so'rovi", () => {
   it('gibrid kursda ikkala format ham qabul qilinadi', async () => {
     await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: hybridCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567' })
+      .send({ courseId: hybridCourseId, format: 'ONLINE', name: 'Talaba', phone: '+998901234567', email: 'student@req.uz' })
       .expect(201);
 
     // Ikkinchi format BOSHQA foydalanuvchidan: bitta odamning bitta kursga
@@ -95,14 +95,14 @@ describe("Kurs so'rovi", () => {
     const other = await loginAgent('ikkinchi@req.uz');
     await other
       .post('/api/course-requests')
-      .send({ courseId: hybridCourseId, format: 'OFFLINE', name: 'Ikkinchi Talaba', phone: '+998901234568' })
+      .send({ courseId: hybridCourseId, format: 'OFFLINE', name: 'Ikkinchi Talaba', phone: '+998901234568', email: 'ikkinchi@req.uz' })
       .expect(201);
   });
 
   it("saytga kirgan foydalanuvchining so'rovi hisobiga bog'lanadi", async () => {
     const res = await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Talaba Talabov', phone: '+998901112233', note: 'Kechqurungi guruh bormi?' })
+      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Talaba Talabov', phone: '+998901112233', email: 'student@req.uz', note: 'Kechqurungi guruh bormi?' })
       .expect(201);
 
     expect(res.body.data.userId).toBe(studentId);
@@ -118,7 +118,7 @@ describe("Kurs so'rovi", () => {
   it("ko'rib chiqilmagan so'rov turganda takroriy so'rov yaratilmaydi", async () => {
     const res = await studentAgent
       .post('/api/course-requests')
-      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Talaba Talabov', phone: '+998901112233' })
+      .send({ courseId: offlineCourseId, format: 'OFFLINE', name: 'Talaba Talabov', phone: '+998901112233', email: 'student@req.uz' })
       .expect(409);
     expect(res.body.error.code).toBe('REQUEST_PENDING');
   });

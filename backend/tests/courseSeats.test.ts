@@ -87,7 +87,7 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
 
     const created = await student
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'ONLINE', name: 'Talaba', phone: '+998901112233' })
+      .send({ courseId: course.id, format: 'ONLINE', name: 'Talaba', phone: '+998901112233', email: 'talaba@test.uz' })
       .expect(201);
 
     const enrolled = await admin.post(`/api/course-requests/${created.body.data.id}/enroll`).expect(200);
@@ -104,7 +104,7 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
 
     const created = await student
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Markaz talabasi', phone: '+998901112266' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Markaz talabasi', phone: '+998901112266', email: 'markaz@test.uz' })
       .expect(201);
     await admin.post(`/api/course-requests/${created.body.data.id}/enroll`).expect(200);
 
@@ -125,13 +125,13 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
 
     const firstReq = await first
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Ketuvchi', phone: '+998901112277' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Ketuvchi', phone: '+998901112277', email: 'ketuvchi@test.uz' })
       .expect(201);
     await admin.post(`/api/course-requests/${firstReq.body.data.id}/enroll`).expect(200);
 
     const secondReq = await second
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Navbatdagi', phone: '+998901112288' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Navbatdagi', phone: '+998901112288', email: 'navbatdagi@test.uz' })
       .expect(201);
     await admin.post(`/api/course-requests/${secondReq.body.data.id}/enroll`).expect(409);
 
@@ -149,7 +149,7 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
 
     const created = await student
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Talaba', phone: '+998901112233' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Talaba', phone: '+998901112233', email: 'talaba2@test.uz' })
       .expect(201);
 
     await admin.post(`/api/course-requests/${created.body.data.id}/enroll`).expect(200);
@@ -166,13 +166,13 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
 
     const firstReq = await first
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Birinchi', phone: '+998901112233' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Birinchi', phone: '+998901112233', email: 'birinchi@test.uz' })
       .expect(201);
     await admin.post(`/api/course-requests/${firstReq.body.data.id}/enroll`).expect(200);
 
     const secondReq = await second
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'OFFLINE', name: 'Ikkinchi', phone: '+998901112244' })
+      .send({ courseId: course.id, format: 'OFFLINE', name: 'Ikkinchi', phone: '+998901112244', email: 'ikkinchi@test.uz' })
       .expect(201);
     const res = await admin.post(`/api/course-requests/${secondReq.body.data.id}/enroll`).expect(409);
     expect(res.body.error.code).toBe('COURSE_FULL');
@@ -186,7 +186,7 @@ describe("So'rovni admin tasdiqlab kursga qo'shishi", () => {
     const waiting = await newStudent();
     await waiting
       .post('/api/course-requests')
-      .send({ courseId: course.id, format: 'ONLINE', name: 'Navbatchi', phone: '+998901112255' })
+      .send({ courseId: course.id, format: 'ONLINE', name: 'Navbatchi', phone: '+998901112255', email: 'navbatchi@test.uz' })
       .expect(201);
   });
 

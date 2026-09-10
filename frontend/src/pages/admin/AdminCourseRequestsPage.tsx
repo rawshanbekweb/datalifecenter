@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Inbox, Send, CornerDownRight, Phone, Mail, Trash2, User as UserIcon, UserPlus } from 'lucide-react';
+import { Inbox, Send, CornerDownRight, Phone, Mail, Trash2, User as UserIcon, UserPlus, FileDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   CourseRequest,
@@ -7,6 +7,7 @@ import {
   deleteCourseRequest,
   deleteCourseRequests,
   enrollFromRequest,
+  exportCourseRequestsCsv,
   listCourseRequestsAdmin,
   updateCourseRequest,
 } from '../../api/courseRequests';
@@ -43,6 +44,7 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
   const [drafts, setDrafts]     = useState<Record<string, string>>({});
   const [busyId, setBusyId]     = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState<boolean>(false);
+  const [exporting, setExporting] = useState<boolean>(false);
   // Barcha guruhlar bir marta olinadi va har so'rov uchun kursi/formati
   // bo'yicha filtrlanadi — so'rov boshiga alohida so'rov yubormaslik uchun
   const [groups, setGroups]     = useState<CourseGroup[]>([]);
@@ -139,12 +141,24 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
 
   const newCount = requests.filter((r) => r.status === 'NEW').length;
 
+  const exportCsv = async (): Promise<void> => {
+    setExporting(true);
+    try {
+      await exportCourseRequestsCsv({ status: filter === 'ALL' ? undefined : filter });
+    } catch (err: unknown) {
+      toast.error((err as Error).message || t('common.error'));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div>
       <AdminPageHeader title={t('admin.courseRequests.title')}
         sub={newCount > 0 ? t('admin.courseRequests.subWaiting', { n: newCount }) : t('admin.courseRequests.sub')} />
 
-      <div style={{ display:'flex', gap:7, flexWrap:'wrap', marginBottom:16 }}>
+      <div style={{ display:'flex', gap:10, alignItems:'center', flexWrap:'wrap', marginBottom:16 }}>
+        <div style={{ display:'flex', gap:7, flexWrap:'wrap' }}>
         {FILTERS.map((value) => {
           const active = filter === value;
           return (
@@ -158,6 +172,11 @@ export default function AdminCourseRequestsPage(): React.ReactElement {
             </button>
           );
         })}
+        </div>
+        <button onClick={() => void exportCsv()} disabled={exporting || requests.length === 0}
+          className="btn-outline" style={{ fontSize:12, padding:'7px 14px', marginLeft:'auto', opacity: exporting || requests.length === 0 ? 0.6 : 1 }}>
+          <FileDown size={14}/> {exporting ? t('common.loading') : t('admin.courseRequests.exportCsv')}
+        </button>
       </div>
 
       {status === 'loading' && <Loading />}

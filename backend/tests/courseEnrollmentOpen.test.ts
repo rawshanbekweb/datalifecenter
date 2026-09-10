@@ -95,7 +95,7 @@ describe('Kursga qabul: onlayn va offline alohida', () => {
   it('gibrid kursda offline ochiq bo\'lsa so\'rov qabul qilinaveradi', async () => {
     await student
       .post('/api/course-requests')
-      .send({ courseId: hybridCourseId, name: 'Talaba', phone: '+998901234567', format: 'OFFLINE' })
+      .send({ courseId: hybridCourseId, name: 'Talaba', phone: '+998901234567', format: 'OFFLINE', email: 'talaba@test.uz' })
       .expect(201);
     expect(await prisma.courseRequest.count({ where: { courseId: hybridCourseId } })).toBe(1);
   });
@@ -111,7 +111,7 @@ describe('Kursga qabul: onlayn va offline alohida', () => {
   it('yopiq kursga ham SO\'ROV yuborish mumkin — bu navbat ro\'yxati', async () => {
     await student
       .post('/api/course-requests')
-      .send({ courseId: closedCourseId, name: 'Talaba', phone: '+998901234567', format: 'ONLINE' })
+      .send({ courseId: closedCourseId, name: 'Talaba', phone: '+998901234567', format: 'ONLINE', email: 'talaba@test.uz' })
       .expect(201);
     expect(await prisma.courseRequest.count({ where: { courseId: closedCourseId } })).toBe(1);
   });

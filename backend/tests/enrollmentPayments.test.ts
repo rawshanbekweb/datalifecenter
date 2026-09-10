@@ -45,7 +45,7 @@ async function enroll(
   const format = options.format ?? 'OFFLINE';
   const created = await student
     .post('/api/course-requests')
-    .send({ courseId, format, name: 'Talaba', phone: '+998901112233' })
+    .send({ courseId, format, name: 'Talaba', phone: '+998901112233', email: 'talaba@test.uz' })
     .expect(201);
   await admin
     .post(`/api/course-requests/${created.body.data.id}/enroll`)

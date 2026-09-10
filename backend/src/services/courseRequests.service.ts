@@ -168,6 +168,79 @@ export async function listCourseRequestsAdmin(filters: ListCourseRequestsFilters
   };
 }
 
+const STATUS_LABEL: Record<CourseRequestStatus, string> = {
+  NEW: 'Yangi',
+  CONTACTED: "Bog'lanildi",
+  ENROLLED: "Ro'yxatga olindi",
+  REJECTED: 'Rad etildi',
+};
+const FORMAT_LABEL: Record<CourseFormat, string> = {
+  ONLINE: 'Onlayn',
+  OFFLINE: 'Offline',
+  HYBRID: 'Gibrid',
+};
+
+// Excel/Google Sheets vergul, tirnoq yoki yangi qatorni ko'rsa maydonni
+// tirnoqqa oladi — aks holda ular ustunlarni siljitib yuboradi.
+function csvCell(value: string | null | undefined): string {
+  const text = (value ?? '').toString();
+  if (/[",\n\r]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+interface ExportCourseRequestsFilters {
+  status?: CourseRequestStatus;
+  format?: CourseFormat;
+  search?: string;
+}
+
+/**
+ * Kursga yozilish so'rovlarini CSV (Excel'da to'g'ridan-to'g'ri ochiladi)
+ * ko'rinishida qaytaradi. Sahifalash yo'q — joriy filtrga mos HAMMASI.
+ */
+export async function exportCourseRequestsCsv(filters: ExportCourseRequestsFilters): Promise<string> {
+  const where: Prisma.CourseRequestWhereInput = {
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.format ? { format: filters.format } : {}),
+    ...(filters.search
+      ? {
+        OR: [
+          { name: { contains: filters.search, mode: 'insensitive' } },
+          { phone: { contains: filters.search, mode: 'insensitive' } },
+          { email: { contains: filters.search, mode: 'insensitive' } },
+        ],
+      }
+      : {}),
+  };
+
+  const items = await prisma.courseRequest.findMany({
+    where,
+    orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
+    include: requestInclude,
+  });
+
+  const header = ['Sana', 'Ism', 'Telefon', 'Email', 'Kurs', 'Format', 'Holat', 'Izoh', 'Javob', 'Hisob'];
+  const rows = items.map((r) => [
+    r.createdAt.toISOString().slice(0, 16).replace('T', ' '),
+    r.name,
+    r.phone,
+    r.email ?? '',
+    toUzText(r.course.title),
+    FORMAT_LABEL[r.format],
+    STATUS_LABEL[r.status],
+    r.note ?? '',
+    r.reply ?? '',
+    r.userId ? 'Ro‘yxatdan o‘tgan' : 'Mehmon',
+  ]);
+
+  // BOM: Excel qatorni UTF-8 deb tanimasa, qoraqalpoqcha/o'zbekcha harflar
+  // buzilib ko'rinadi
+  const BOM = '﻿';
+  return BOM + [header, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
+}
+
 export interface UpdateCourseRequestInput {
   status?: CourseRequestStatus;
   reply?: string | null;

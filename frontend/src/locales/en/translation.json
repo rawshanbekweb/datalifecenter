@@ -1326,7 +1326,8 @@
         "ENROLLED": "Enrolled",
         "REJECTED": "Rejected"
       },
-      "noGroup": "No group"
+      "noGroup": "No group",
+      "exportCsv": "Download as Excel"
     },
     "team": {
       "title": "Team",
@@ -1473,7 +1474,7 @@
     "formatLabel": "Which format do you prefer?",
     "nameLabel": "Your name",
     "phoneLabel": "Phone number",
-    "emailLabel": "Email (optional)",
+    "emailLabel": "Email",
     "noteLabel": "Question or note (optional)",
     "notePlaceholder": "For example: preferred time, group schedule or a payment question",
     "submit": "Send request",

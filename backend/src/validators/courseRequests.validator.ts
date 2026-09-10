@@ -14,7 +14,9 @@ export const createCourseRequestSchema = z.object({
   format: z.enum(['ONLINE', 'OFFLINE'], { message: 'Format tanlanishi kerak' }),
   name: z.string().trim().min(2, 'Ism kamida 2 ta belgidan iborat bo‘lsin').max(120),
   phone,
-  email: z.string().trim().email('Email noto‘g‘ri').max(200).optional().or(z.literal('')),
+  // 2026-09-10: barcha maydonlar majburiy — email endi ixtiyoriy emas, chunki
+  // guruh/to'lov/qabul haqidagi xabarlar aynan shu manzilga yuboriladi.
+  email: z.string().trim().min(1, 'Email kiritilishi shart').email('Email noto‘g‘ri').max(200),
   note: z.string().trim().max(2000, 'Izoh juda uzun').optional().or(z.literal('')),
 });
 
@@ -36,6 +38,13 @@ export const listCourseRequestsQuerySchema = z.object({
   search: z.string().trim().max(120).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+// Excelga (CSV) yuklab olish — sahifalash yo'q, joriy filtrga mos hammasi
+export const exportCourseRequestsQuerySchema = z.object({
+  status: z.enum(['NEW', 'CONTACTED', 'ENROLLED', 'REJECTED']).optional(),
+  format: z.enum(['ONLINE', 'OFFLINE']).optional(),
+  search: z.string().trim().max(120).optional(),
 });
 
 export const updateCourseRequestSchema = z

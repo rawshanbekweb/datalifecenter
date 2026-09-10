@@ -1326,7 +1326,8 @@
         "ENROLLED": "Jazıldı",
         "REJECTED": "Biykarlandı"
       },
-      "noGroup": "Toparsız"
+      "noGroup": "Toparsız",
+      "exportCsv": "Excelge júklep alıw"
     },
     "team": {
       "title": "Komanda",
@@ -1473,7 +1474,7 @@
     "formatLabel": "Qaysı formatta oqımaqshısız?",
     "nameLabel": "Atıńız",
     "phoneLabel": "Telefon nomerińiz",
-    "emailLabel": "Email (qálewi boyınsha)",
+    "emailLabel": "Email",
     "noteLabel": "Soraw yamasa pikir (qálewi boyınsha)",
     "notePlaceholder": "Mısalı: qolaylı waqıt, gruppa kestesi yamasa tólem haqqındaǵı soraw",
     "submit": "Soraw jiberiw",
