@@ -1,246 +1,484 @@
-# DATA LIFE — IT ta'lim platformasi
+# DATA LIFE — IT Education Platform
 
-To'liq stack veb-platforma: kurslar, mentorlar, jonli sessiyalar, blog, savol-javob,
-bildirishnomalar, qo'lda to'lov tasdiqlash (chek yuklash) va PDF sertifikatlar bilan.
+A full-stack web platform for IT education, featuring courses, mentors, live sessions, a blog, Q&A, notifications, manual payment verification through receipt uploads, and PDF certificates.
 
-## Texnologiyalar
+## Technologies
 
-| Qatlam    | Stack                                                              |
-|-----------|--------------------------------------------------------------------|
-| Frontend  | React 19, TypeScript, Vite, Tailwind CSS 4, framer-motion          |
-| Backend   | Express 5, TypeScript, Prisma 7, PostgreSQL, Zod 4                 |
-| Auth      | JWT (httpOnly cookie), bcrypt, rolga asoslangan ruxsat (RBAC)      |
-| Fayllar   | Multer (lokal) yoki Cloudinary (production)                        |
-| Email     | Nodemailer (SMTP) — parol tiklash, to'lov tasdiqlash xatlari       |
-| Testlar   | Vitest + Supertest (integratsion)                                  |
-| CI        | GitHub Actions (build + lint + test)                               |
+| Layer          | Stack                                                              |
+| -------------- | ------------------------------------------------------------------ |
+| Frontend       | React 19, TypeScript, Vite, Tailwind CSS 4, framer-motion          |
+| Backend        | Express 5, TypeScript, Prisma 7, PostgreSQL, Zod 4                 |
+| Authentication | JWT (httpOnly cookie), bcrypt, role-based access control (RBAC)    |
+| File Storage   | Multer (local) or Cloudinary (production)                          |
+| Email          | Nodemailer (SMTP) — password reset and payment confirmation emails |
+| Testing        | Vitest + Supertest (integration testing)                           |
+| CI             | GitHub Actions (build + lint + test)                               |
 
-## Rollar va imkoniyatlar
+## Roles and Capabilities
 
-- **Talaba** — kursga yoziladi, chek yuklaydi, darslarni o'tadi, savol beradi,
-  jonli sessiyalarga qatnashadi, sertifikat oladi.
-- **Mentor** — o'z kurslari dasturini (modul/dars) boshqaradi, savollarga javob beradi,
-  sessiyalar o'tkazadi, talabalar progressini kuzatadi, adminga so'rov yuboradi.
-  Bitta kursni bir nechta mentor birga olib borishi mumkin: ular kursni TENG
-  boshqaradi (dastur, savol-javob, topshiriq, jonli dars), farqi faqat shunda —
-  ro'yxatdagi birinchisi "asosiy" mentor bo'lib, saytda birinchi ko'rinadi va
-  admin kurs nomidan sessiya/topshiriq yaratganda muallif sifatida tanlanadi.
-- **Admin** — hamma narsa: kurslar, foydalanuvchilar, to'lovlarni tasdiqlash,
-  mentorlar, blog, hamkorlar, e'lonlar, murojaatlar.
+* **Student** — enrolls in courses, uploads payment receipts, completes lessons, asks questions, attends live sessions, and receives certificates.
+* **Mentor** — manages the curriculum (modules/lessons) of their courses, answers questions, conducts live sessions, monitors student progress, and sends requests to administrators.
 
-## Lokal ishga tushirish
+  Multiple mentors can manage the same course together. They have **equal management permissions** over the course, including the curriculum, Q&A, assignments, and live lessons. The only difference is that the first mentor in the list is designated as the **primary mentor**. The primary mentor is displayed first on the website and is selected as the author when an administrator creates a session or assignment on behalf of the course.
+* **Admin** — has full management access to courses, users, payments, mentors, blog content, partners, announcements, and contact requests.
 
-Talablar: Node.js >= 20, PostgreSQL 14+ (yoki Docker).
+## Local Development
+
+### Requirements
+
+* Node.js >= 20
+* PostgreSQL 14+ or Docker
 
 ```bash
 # 1. Backend
 cd backend
-cp .env.example .env          # DATABASE_URL va JWT_SECRET'ni sozlang
+cp .env.example .env          # Configure DATABASE_URL and JWT_SECRET
 npm install
-npx prisma migrate dev        # bazani yaratadi
-npm run seed                  # demo ma'lumotlar (ixtiyoriy)
+npx prisma migrate dev        # Creates the database
+npm run seed                  # Demo data (optional)
 npm run dev                   # http://localhost:4000
 
-# 2. Frontend (yangi terminal)
+# 2. Frontend (new terminal)
 cd frontend
 cp .env.example .env          # VITE_API_URL=http://localhost:4000/api
 npm install
 npm run dev                   # http://localhost:5173
 ```
 
-Seed'dan keyingi demo hisoblar (faqat development):
+### Demo Accounts After Seeding
 
-> **DIQQAT:** bu parollar ochiq repoda turibdi. Jonli bazada ham xuddi shu
-> `admin@datalife.uz` hisobi mavjud — u YARATILGANDAN KEYIN DARHOL boshqa
-> parolga o'tkazilishi shart (kabinet → parolni o'zgartirish). Aks holda
-> administrator huquqi hamma uchun ochiq bo'ladi: bu yerda urinishlar
-> limiti yordam bermaydi, chunki hujumchi parolni topishi shart emas.
+The following accounts are intended for development only:
 
-| Rol     | Email                    | Parol       |
-|---------|--------------------------|-------------|
-| Admin   | admin@datalife.uz        | Admin123!   |
-| Mentor  | aziz-karimov@datalife.uz | Mentor123!  |
-| Talaba  | student@datalife.uz      | Student123! |
+> **WARNING:** These passwords are publicly visible in this repository. The `admin@datalife.uz` account also exists in the live database and **must be assigned a different password immediately after creation** through the account settings.
+>
+> Otherwise, administrator access may be exposed to anyone who knows the credentials. Login attempt limits do not mitigate this specific risk because an attacker does not need to discover the password through brute force.
 
-## Docker bilan (backend + Postgres)
+| Role    | Email                                                       | Password    |
+| ------- | ----------------------------------------------------------- | ----------- |
+| Admin   | [admin@datalife.uz](mailto:admin@datalife.uz)               | Admin123!   |
+| Mentor  | [aziz-karimov@datalife.uz](mailto:aziz-karimov@datalife.uz) | Mentor123!  |
+| Student | [student@datalife.uz](mailto:student@datalife.uz)           | Student123! |
+
+## Docker — Backend + PostgreSQL
 
 ```bash
 docker compose up -d --build
-# demo ma'lumotlar kerak bo'lsa (backend papkasidan, hostdan):
+
+# If demo data is required (from the backend directory, on the host):
 cd backend
 DATABASE_URL="postgresql://datalife:datalife_dev_password@localhost:5433/datalife?schema=public" npm run seed
 ```
 
-API `http://localhost:4000` da ko'tariladi (migratsiyalar avtomatik qo'llanadi);
-frontend odatdagidek `npm run dev` bilan. Postgres hostga `5433` portda ochilgan.
+The API runs on:
 
-## Muhit o'zgaruvchilari (backend)
+```text
+http://localhost:4000
+```
 
-| O'zgaruvchi             | Majburiy | Tavsif                                              |
-|-------------------------|----------|-----------------------------------------------------|
-| `DATABASE_URL`          | ha       | PostgreSQL ulanish satri                            |
-| `PORT`                  | yo'q     | API porti (default 4000)                            |
-| `NODE_ENV`              | ha       | `development` / `production` / `test`               |
-| `FRONTEND_URL`          | ha       | CORS va emaildagi havolalar uchun frontend manzili  |
-| `EXTRA_ALLOWED_ORIGINS` | yo'q     | CORS/CSRF uchun qo'shimcha origin'lar (vergul bilan) |
-| `JWT_SECRET`            | ha       | Production'da kamida 32 belgi (server tekshiradi)   |
-| `JWT_EXPIRES_IN`        | yo'q     | Token muddati (default `7d`)                        |
-| `BREVO_API_KEY`         | yo'q     | Email yuborish (Brevo HTTP API; sozlanmasa o'chiq)  |
-| `EMAIL_FROM`            | yo'q     | Yuboruvchi: `Nomi <email>` (Brevo'da tasdiqlangan)  |
-| `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | yo'q* | Fayl xotirasi (Supabase Storage). *Render/Railway'da shu yoki Cloudinary majburiy |
-| `SUPABASE_BUCKET_IMAGES/VIDEOS` | yo'q | Bucket nomlari (default `datalife-images`/`datalife-videos`) |
-| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET` | yo'q* | Muqobil fayl xotirasi. **Cloudinary O'zbekistondan bloklangan** |
-| `IMAGE_MAX_MB` / `VIDEO_MAX_MB` | yo'q | Yuklash chegaralari (default 15 / 500). Bulut xotiraning o'z chegarasidan oshirmang — Supabase Free rejasida loyiha bo'yicha 50 MB |
-| `SENTRY_DSN`            | yo'q     | Xatolarni Sentry'ga yuborish (sentry.io)            |
-| `CLICK_*` / `PAYME_*`   | yo'q     | To'lov shlyuzlari (sozlanmasa tugmalar ko'rinmaydi) |
+Database migrations are applied automatically.
 
-Frontend: `VITE_API_URL` (masalan `http://localhost:4000/api`), ixtiyoriy `VITE_SENTRY_DSN`.
+The frontend can be started normally with:
 
-## Fayl xotirasi
+```bash
+npm run dev
+```
 
-Render/Railway'ning diski **ephemeral**: har deploy'da va instans qayta
-ishga tushganda tozalanadi. Bulut xotira sozlanmagan bo'lsa yuklash
-"ishlaganday" ko'rinadi (rasm chiqadi, URL bazaga yoziladi), lekin keyingi
-deploy'dan so'ng o'sha URL 404 qaytaradi. Shuning uchun production'da bu
-sozlama **majburiy**.
+PostgreSQL is exposed on port `5433` on the host.
 
-Ikkita provayder qo'llab-quvvatlanadi — **Supabase Storage** (tavsiya etiladi)
-va **Cloudinary**. Ikkalasi sozlangan bo'lsa Cloudinary ustun turadi.
+## Environment Variables — Backend
 
-> **Cloudinary O'zbekistondan ishlamaydi**: ro'yxatdan o'tish sahifasi
-> "Unfortunately our services currently are not available in your country"
-> qaytaradi. Shu sabab asosiy yo'l — Supabase.
+| Variable                                     | Required | Description                                                                                |
+| -------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`                               | Yes      | PostgreSQL connection string                                                               |
+| `PORT`                                       | No       | API port (default: `4000`)                                                                 |
+| `NODE_ENV`                                   | Yes      | `development` / `production` / `test`                                                      |
+| `FRONTEND_URL`                               | Yes      | Frontend URL used for CORS and email links                                                 |
+| `EXTRA_ALLOWED_ORIGINS`                      | No       | Additional origins for CORS/CSRF, separated by commas                                      |
+| `JWT_SECRET`                                 | Yes      | At least 32 characters in production; validated by the server                              |
+| `JWT_EXPIRES_IN`                             | No       | Token lifetime (default: `7d`)                                                             |
+| `BREVO_API_KEY`                              | No       | Email delivery through the Brevo HTTP API; disabled if not configured                      |
+| `EMAIL_FROM`                                 | No       | Sender address: `Name <email>` (must be verified in Brevo)                                 |
+| `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | No*      | File storage using Supabase Storage. *Required on Render/Railway if Cloudinary is not used |
+| `SUPABASE_BUCKET_IMAGES/VIDEOS`              | No       | Bucket names (default: `datalife-images` / `datalife-videos`)                              |
+| `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET`   | No*      | Alternative file storage. **Cloudinary is unavailable from Uzbekistan**                    |
+| `IMAGE_MAX_MB` / `VIDEO_MAX_MB`              | No       | Upload limits (default: 15 / 500 MB). Do not exceed the storage provider's own limits      |
+| `SENTRY_DSN`                                 | No       | Send application errors to Sentry                                                          |
+| `CLICK_*` / `PAYME_*`                        | No       | Payment gateways; payment buttons remain hidden if not configured                          |
 
-### Supabase Storage (tavsiya)
+Frontend:
 
-1. [supabase.com](https://supabase.com) da bepul hisob va yangi **Project**
-   oching (eng yaqin region — `eu-central` / Frankfurt).
-2. Project Settings → **API** bo'limidan ikkita qiymatni oling:
-   - **Project URL** (`https://xxxx.supabase.co`) → `SUPABASE_URL`
-   - **service_role** kaliti → `SUPABASE_SERVICE_ROLE_KEY`
-3. Render → Web Service → **Environment** → shu ikkita o'zgaruvchini qo'shing
-   → **Save** (Render avtomatik qayta deploy qiladi).
-4. Bucketlarni qo'lda yaratish **shart emas** — birinchi yuklashda server
-   o'zi yaratadi: `datalife-images` (ochiq) va `datalife-videos` (yopiq).
+```text
+VITE_API_URL
+```
 
-> **Diqqat:** `service_role` kaliti loyihaning barcha ma'lumotlariga to'liq
-> huquq beradi. U faqat backend env'ida turishi kerak — frontendga,
-> `VITE_*` o'zgaruvchilarga yoki repozitoriyga hech qachon tushmasin.
+Example:
 
-Videolar yopiq bucketda saqlanadi: xom havola ochilmaydi, har so'rovda
-6 soatlik imzoli havola generatsiya qilinadi (Cloudinary'dagi `authenticated`
-bilan bir xil model). Rasmlar ochiq bucketda — ular saytda baribir ko'rinadi.
+```text
+VITE_API_URL=http://localhost:4000/api
+```
 
-### Cloudinary (muqobil)
+Optional:
 
-1. [cloudinary.com](https://cloudinary.com) da bepul hisob oching.
-2. Dashboard → **Product Environment Credentials**: `Cloud name`, `API Key`,
-   `API Secret`.
-3. Render'da `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
-   `CLOUDINARY_API_SECRET` o'zgaruvchilarini kiriting.
+```text
+VITE_SENTRY_DSN
+```
 
-### Tekshirish
+## File Storage
 
-Render **Logs**da `Fayl xotirasi: supabase` (yoki `cloudinary`) qatori
-ko'rinishi kerak; `[OGOHLANTIRISH] Bulut xotira sozlanmagan` esa chiqmasligi.
-Admin panelda rasm yuklash maydonidagi "fayl keyingi deployda yo'qoladi"
-ogohlantirishi ham yo'qoladi (holat `GET /api/uploads/config` dan keladi).
+Render/Railway disks are **ephemeral**. Files stored on the local filesystem may be removed when the service is redeployed or restarted.
 
-### Yo'qolgan fayllarni topish
+If cloud storage is not configured, uploads may appear to work initially — the image may be displayed and its URL may be stored in the database — but the file can return `404` after a deployment.
 
-Sozlashdan oldin yuklangan fayllar qaytmaydi —
-ularning bazadagi havolasi qoladi, fayli esa yo'q. Nimani qayta yuklash
-kerakligini shu audit ko'rsatadi (faqat o'qiydi, hech narsa o'zgartirmaydi):
+Therefore, cloud storage is **required in production**.
+
+The application supports two providers:
+
+* **Supabase Storage** — recommended
+* **Cloudinary** — alternative
+
+If both are configured, Cloudinary takes precedence.
+
+> **Cloudinary is unavailable from Uzbekistan:** the registration page currently returns "Unfortunately our services currently are not available in your country." Therefore, Supabase is the primary recommended option for this deployment environment.
+
+### Supabase Storage — Recommended
+
+1. Create a free account and a new **Project** at [supabase.com](https://supabase.com).
+2. Choose a nearby region, such as `eu-central` / Frankfurt.
+3. Go to **Project Settings → API** and obtain:
+
+   * **Project URL** (`https://xxxx.supabase.co`) → `SUPABASE_URL`
+   * **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
+4. In Render → Web Service → **Environment**, add these two variables.
+5. Save the configuration. Render will automatically redeploy the service.
+6. Buckets do not need to be created manually. The server creates them during the first upload:
+
+   * `datalife-images` — public
+   * `datalife-videos` — private
+
+> **Security warning:** The `service_role` key provides full access to the project's data. It must exist **only in the backend environment**. Never expose it through the frontend, `VITE_*` variables, or the repository.
+
+Videos are stored in a private bucket. Direct raw URLs are not exposed. A signed URL valid for 6 hours is generated for each request.
+
+Images are stored in a public bucket because they are intended to be publicly displayed on the website.
+
+### Cloudinary — Alternative
+
+1. Create an account at [cloudinary.com](https://cloudinary.com).
+2. Go to **Dashboard → Product Environment Credentials**.
+3. Obtain:
+
+   * `Cloud name`
+   * `API Key`
+   * `API Secret`
+4. Add the following environment variables to Render:
+
+```text
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+```
+
+### Verification
+
+In Render **Logs**, you should see:
+
+```text
+File storage: supabase
+```
+
+or:
+
+```text
+File storage: cloudinary
+```
+
+You should not see:
+
+```text
+[WARNING] Cloud storage is not configured
+```
+
+The admin panel's file upload interface should also stop displaying the warning that uploaded files will be lost after the next deployment. This status is obtained from:
+
+```text
+GET /api/uploads/config
+```
+
+### Finding Missing Files
+
+Files uploaded before cloud storage was configured cannot be recovered automatically.
+
+Their database URLs may still exist, but the actual files may have already been removed.
+
+The following audit command identifies broken file references. It is read-only and does not modify any data:
 
 ```bash
 cd backend
-DATABASE_URL="<prod url>" API_URL="https://<backend>" FRONTEND_URL="https://<sayt>" npm run check:uploads
+
+DATABASE_URL="<prod url>" \
+API_URL="https://<backend>" \
+FRONTEND_URL="https://<site>" \
+npm run check:uploads
 ```
 
-Natijada har bir buzuq havola **kim/qaysi bo'lim** ekani va **qayerdan
-tuzatilishi** (masalan `/admin/mentors`) bilan ro'yxatlanadi. `SKIP_HTTP=true`
-bilan tarmoqsiz, faqat tasnif ko'rsatiladi.
+The result lists each broken reference, including:
 
-> Bulut xotira yoqilgunga qadar yuklangan **videolar** ham lokal diskda — ular
-> qayta yuklanishi kerak, shundagina yopiq bucketga (yoki Cloudinary'da
-> `type: authenticated`) tushadi va imzoli havola ishlaydi.
+* who or which section owns it;
+* where it is used;
+* where it needs to be fixed, such as `/admin/mentors`.
 
-## Xavfsizlik xususiyatlari
+For a network-free classification check:
 
-- JWT httpOnly cookie **va** `Authorization: Bearer` header (Safari krossdomen
-  cookie'ni bloklaydi — token localStorage'dan header orqali ham yuboriladi)
-- Parol o'zgarganda barcha eski sessiyalar bekor bo'ladi (`tokenVersion`)
-- Email tasdiqlash (ro'yxatdan o'tganda havola yuboriladi, bloklamaydi)
-- CSRF himoyasi (Origin tekshiruvi), rate-limit (global + auth + parol tiklash)
-- Fayl yuklashda magic-bytes tekshiruvi, o'chirilgan kontent fayllari avtomatik tozalanadi
-- Sertifikatlar ochiq tekshiriladi: `/verify-certificate` sahifasi
-  (PDF pastida havola bor) yoki `GET /api/certificates/DL-XXXXXXXX/verify`
+```bash
+SKIP_HTTP=true
+```
 
-## Production deploy
+> Videos uploaded before cloud storage was enabled may still exist only on the local filesystem. They must be uploaded again so they are stored in the private bucket or, when using Cloudinary, with `type: authenticated`, allowing signed URLs to work correctly.
+
+## Security Features
+
+* JWT authentication using an `httpOnly` cookie and `Authorization: Bearer` header
+
+  * Safari may block cross-domain cookies, so the token can also be sent through the authorization header.
+* All previous sessions are invalidated after a password change using `tokenVersion`.
+* Email verification during registration.
+* CSRF protection through Origin validation.
+* Rate limiting:
+
+  * global rate limit;
+  * authentication rate limit;
+  * password-reset rate limit.
+* File uploads use magic-byte validation.
+* Deleted content files are automatically cleaned up.
+* Public certificate verification:
+
+  * `/verify-certificate`
+  * `GET /api/certificates/DL-XXXXXXXX/verify`
+
+The certificate PDF also contains a verification link.
+
+## Production Deployment
 
 ### Backend — Render
 
-1. Render'da **PostgreSQL** yarating, "Internal Database URL"ni nusxalang.
-2. **Web Service** yarating (root: `backend/`):
-   - Build Command: `npm install && npm run build && npx prisma migrate deploy`
-   - Start Command: `npm start`
-3. Environment o'zgaruvchilarini kiriting: `DATABASE_URL`, `NODE_ENV=production`,
-   `FRONTEND_URL`, `JWT_SECRET` (32+ belgi), `SUPABASE_URL`+`SUPABASE_SERVICE_ROLE_KEY`
-   (majburiy! — "Fayl xotirasi" bo'limiga qarang), `BREVO_API_KEY`+`EMAIL_FROM`
-   (email kerak bo'lsa).
-4. Birinchi deploy'dan keyin kontent kerak bo'lsa, Render Shell'da:
-   `SEED_FORCE=true ADMIN_PASSWORD=<kuchli parol> npm run seed`
+1. Create a **PostgreSQL** database in Render.
+2. Copy the **Internal Database URL**.
+3. Create a **Web Service** with the root directory:
 
-> **To'liq seed jonli bazada nimani buzadi:** hamkor logotiplarini
-> placeholder'ga qaytaradi, kurs narxlarini seed qiymatiga tushiradi va
-> `Team123!`/`Student123!` kabi ochiq ma'lum parolli demo akkauntlar ochadi.
-> Shuning uchun ishlab turgan saytda undan foydalanmang.
->
-> Faqat jamoa a'zolari kerak bo'lsa xavfsiz muqobil bor — boshqa hech qanday
-> jadvalga tegmaydi, akkaunt ochmaydi va takroran ishga tushirilsa dublikat
-> yaratmaydi:
->
-> ```bash
-> npm run seed:team                      # qo'shadi
-> npm run seed:team -- --dry-run         # faqat ko'rsatadi, yozmaydi
-> npm run seed:team -- --published=false # yopiq holda qo'shadi
-> ```
+```text
+backend/
+```
 
-> **Diqqat:** bulut xotira sozlanmasa, yuklangan rasm/videolar Render'ning
-> ephemeral diskida saqlanadi va **har deploy'da yo'qoladi**.
+4. Configure the build command:
+
+```bash
+npm install && npm run build && npx prisma migrate deploy
+```
+
+5. Configure the start command:
+
+```bash
+npm start
+```
+
+6. Add the required environment variables:
+
+```text
+DATABASE_URL
+NODE_ENV=production
+FRONTEND_URL
+JWT_SECRET
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+`JWT_SECRET` must contain at least 32 characters in production.
+
+If email functionality is required, also configure:
+
+```text
+BREVO_API_KEY
+EMAIL_FROM
+```
+
+After the first deployment, if initial content is required, run the seed command from the Render Shell:
+
+```bash
+SEED_FORCE=true ADMIN_PASSWORD=<strong-password> npm run seed
+```
+
+> **Important:** Running the full seed on a live database can modify existing data. It can:
+>
+> * reset partner logos to placeholders;
+> * reset course prices to seed values;
+> * create demo accounts with publicly known passwords such as `Team123!` and `Student123!`.
+>
+> Therefore, do **not** run the full seed on an active production database unless you understand and accept these changes.
+
+If only team members need to be created, use the safer alternative:
+
+```bash
+npm run seed:team
+```
+
+Dry run:
+
+```bash
+npm run seed:team -- --dry-run
+```
+
+Create unpublished accounts:
+
+```bash
+npm run seed:team -- --published=false
+```
+
+The team seed:
+
+* does not modify other tables;
+* does not create unrelated accounts;
+* does not create duplicates when executed multiple times.
+
+> **Important:** Without cloud storage, uploaded images and videos are stored on Render's ephemeral filesystem and may be lost after every deployment.
 
 ### Frontend — Vercel
 
-1. Loyihani import qiling (root: `frontend/`), framework: Vite.
-2. Environment: `VITE_API_URL=https://<backend-domeningiz>/api`.
-3. `vercel.json` allaqachon SPA rewrite bilan sozlangan.
-4. Agar domen o'zgarsa, backend'dagi `FRONTEND_URL`ni ham yangilang
-   (emaildagi havolalar uchun) va CORS ro'yxatiga qo'shing: yangi domenni
-   `backend/src/config/cors.ts`dagi `STATIC_ORIGINS`ga yoki Render'dagi
-   `EXTRA_ALLOWED_ORIGINS` env'iga kiriting.
+1. Import the project into Vercel.
+2. Set the root directory to:
 
-## Testlar
+```text
+frontend/
+```
+
+3. Select **Vite** as the framework.
+4. Configure:
+
+```text
+VITE_API_URL=https://<backend-domain>/api
+```
+
+5. The existing `vercel.json` already contains the SPA rewrite configuration.
+6. If the domain changes, update `FRONTEND_URL` in the backend as well.
+7. Add the new domain to the CORS configuration:
+
+```text
+backend/src/config/cors.ts
+```
+
+or configure:
+
+```text
+EXTRA_ALLOWED_ORIGINS
+```
+
+in the Render environment.
+
+## Tests
+
+Run the test suite from the backend directory:
 
 ```bash
 cd backend
-npm test          # DATABASE_URL'dagi bazadan foydalanadi — test bazasini ko'rsating!
+npm test
 ```
 
-Testlar auth (register/login/parol tiklash), kurs CRUD va enrollment
-(yozilish → chek → tasdiqlash → sertifikat) oqimlarini qamrab oladi.
+> **Important:** Tests use the database configured through `DATABASE_URL`. Make sure `DATABASE_URL` points to a dedicated test database.
 
-## API qisqacha
+The test suite covers:
 
-Hamma endpointlar `/api` ostida, javob formati:
-`{ "success": true, "data": ... }` yoki `{ "success": false, "error": { "message", "code" } }`.
+* authentication;
+* registration;
+* login;
+* password recovery;
+* course CRUD;
+* enrollment flow:
 
-Asosiy guruhlar: `/auth`, `/courses`, `/enrollments`, `/mentors`, `/sessions`,
-`/questions`, `/mentor-requests`, `/notifications`, `/announcements`, `/blog`,
-`/partners`, `/contact`, `/users` (admin), `/admin/stats`, `/admin/analytics`,
-`/engagement`, `/uploads`, `/progress`.
+  * enrollment;
+  * receipt upload;
+  * payment approval;
+  * certificate generation.
 
-`/admin/analytics?days=7|30|90` — vaqt bo'yicha monitoring: kunlik ko'rish,
-yoqtirish, yangi foydalanuvchi va yozilishlar, oldingi shuncha kunlik davr bilan
-solishtirilgan holda. Manbasi — `EngagementDaily` jadvali (kunlik yig'indi).
-Yangi bazada u bo'sh bo'ladi; demo raqamlar uchun `npm run seed:analytics`
-(tozalash: `npm run seed:analytics -- --clear`).
+## API Overview
+
+All endpoints are available under:
+
+```text
+/api
+```
+
+The standard response format is:
+
+```json
+{
+  "success": true,
+  "data": {}
+}
+```
+
+or:
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "...",
+    "code": "..."
+  }
+}
+```
+
+### Main API Groups
+
+```text
+/auth
+/courses
+/enrollments
+/mentors
+/sessions
+/questions
+/mentor-requests
+/notifications
+/announcements
+/blog
+/partners
+/contact
+/users
+/admin/stats
+/admin/analytics
+/engagement
+/uploads
+/progress
+```
+
+### Admin Analytics
+
+```text
+/admin/analytics?days=7
+/admin/analytics?days=30
+/admin/analytics?days=90
+```
+
+The endpoint provides time-based monitoring of:
+
+* daily views;
+* likes;
+* new users;
+* course enrollments.
+
+The selected period is compared with the previous period of the same length.
+
+The data source is the `EngagementDaily` table, which stores daily aggregated statistics.
+
+A new database will initially contain no analytics data.
+
+To generate demo analytics data:
+
+```bash
+npm run seed:analytics
+```
+
+To clear the generated analytics data:
+
+```bash
+npm run seed:analytics -- --clear
+```
