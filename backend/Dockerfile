@@ -22,6 +22,8 @@ COPY prisma.config.ts ./
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
+# `prisma generate` faqat build bosqichida ishlaydi — generatsiya qilingan klientni olib o'tamiz
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 4000
 
